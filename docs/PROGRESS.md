@@ -14,7 +14,7 @@ Last updated: 2026-07-30.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 22 tests pass, Ruff passes, strict MyPy passes, measured coverage is 81%.
+- Python: 23 tests pass, Ruff passes, strict MyPy passes, measured coverage is 81%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose

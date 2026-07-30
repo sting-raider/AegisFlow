@@ -57,6 +57,18 @@ def test_parent_rows_flush_before_foreign_key_dependants(bundle, tmp_path: Path)
     assert inserts.index("detection_results") < inserts.index("alerts")
 
 
+def test_record_model_refreshes_loaded_manifest(tmp_path: Path) -> None:
+    repository = Repository(f"sqlite:///{(tmp_path / 'models.db').as_posix()}")
+    repository.create_schema()
+    original = {"model_name": "smoke", "version": "1.0.0", "git_commit": "old"}
+    refreshed = {**original, "git_commit": "current"}
+    repository.record_model(original)
+    repository.record_model(refreshed)
+    models = repository.models()
+    assert len(models) == 1
+    assert models[0]["metadata"]["git_commit"] == "current"
+
+
 def test_synthetic_pcap_replay_is_deterministic(tmp_path: Path) -> None:
     path = tmp_path / "demo.pcap"
     generate(path)

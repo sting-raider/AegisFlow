@@ -489,6 +489,7 @@ class Repository:
     def record_model(self, manifest: dict[str, Any]) -> None:
         key = f"{manifest['model_name']}:{manifest['version']}"
         with self.session() as session:
+            loaded_at = datetime.now(UTC)
             row = session.get(ModelVersionRow, key)
             if row is None:
                 session.add(
@@ -497,10 +498,14 @@ class Repository:
                         model_name=str(manifest["model_name"]),
                         version=str(manifest["version"]),
                         production=True,
-                        loaded_at=datetime.now(UTC),
+                        loaded_at=loaded_at,
                         metadata_json=manifest,
                     )
                 )
+            else:
+                row.production = True
+                row.loaded_at = loaded_at
+                row.metadata_json = manifest
 
     def cleanup_before(self, cutoff: datetime) -> dict[str, int]:
         """Delete expired operational records in foreign-key-safe order."""
