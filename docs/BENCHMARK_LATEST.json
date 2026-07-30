@@ -1,0 +1,18 @@
+{
+  "scope": "single-process synthetic inference benchmark",
+  "flows": 2000,
+  "flows_per_second": 331.84374208236017,
+  "latency_ms": {
+    "p50": 2.8885499996249564,
+    "p95": 3.3903199997439515,
+    "p99": 3.915212994761532
+  },
+  "elapsed_seconds": 6.026933000001009,
+  "machine": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.9",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel"
+  },
+  "queue_growth": "not measured by single-process benchmark",
+  "dropped_events": 0
+}

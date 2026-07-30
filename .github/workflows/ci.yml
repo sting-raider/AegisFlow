@@ -1,0 +1,102 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.3"
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked --extra dev
+      - run: uv run ruff check .
+      - run: uv run mypy packages services apps/api training scripts
+      - run: uv run pytest --cov=packages --cov=services --cov=apps.api
+      - run: uv run python -m training.cli.train_smoke
+      - run: AEGISFLOW_DATABASE_URL=sqlite:///ci-migration.db uv run alembic upgrade head
+
+  dashboard:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: apps/dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/dashboard/package-lock.json
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+
+  compose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose -f compose.yml -f compose.demo.yml config --quiet
+      - run: docker compose -f compose.yml -f compose.demo.yml build
+
+  integration:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.3"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/dashboard/package-lock.json
+      - run: uv sync --locked --extra dev
+      - run: uv run python -m training.cli.train_smoke
+      - run: docker compose -f compose.yml -f compose.demo.yml up --build -d
+      - run: docker compose -f compose.yml -f compose.demo.yml run --rm sensor
+      - run: |
+          for attempt in {1..30}; do
+            curl --fail http://127.0.0.1:8000/health/ready && break
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:8000/api/v1/alerts
+      - run: npm ci
+        working-directory: apps/dashboard
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/dashboard
+      - run: npm run test:e2e
+        working-directory: apps/dashboard
+      - if: always()
+        run: docker compose -f compose.yml -f compose.demo.yml logs
+      - if: always()
+        run: docker compose -f compose.yml -f compose.demo.yml down -v
+
+  security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+      - uses: aquasecurity/trivy-action@0.32.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true

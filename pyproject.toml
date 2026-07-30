@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aegisflow"
+version = "0.1.0"
+description = "Adaptive hybrid real-time network intrusion detection"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = {file = "LICENSE"}
+dependencies = [
+  "alembic==1.16.4",
+  "fastapi==0.116.1",
+  "httpx==0.28.1",
+  "joblib==1.5.1",
+  "numpy==2.3.2",
+  "prometheus-client==0.22.1",
+  "psycopg[binary]==3.2.9",
+  "pydantic==2.11.7",
+  "redis==6.2.0",
+  "scapy==2.6.1",
+  "scikit-learn==1.7.1",
+  "sqlalchemy==2.0.41",
+  "structlog==25.4.0",
+  "uvicorn[standard]==0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy==1.17.0",
+  "pytest==8.4.1",
+  "pytest-cov==6.2.1",
+  "ruff==0.12.7",
+]
+
+[project.scripts]
+aegisflow-api = "apps.api.main:run"
+aegisflow-sensor = "services.sensor.main:run"
+aegisflow-detector = "services.detector.main:run"
+aegisflow-train-smoke = "training.cli.train_smoke:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["apps", "packages", "services", "training", "scripts"]
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+exclude = ["apps/dashboard"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["joblib", "sklearn", "sklearn.*", "scapy", "scapy.*"]
+ignore_missing_imports = true
+follow_imports = "skip"

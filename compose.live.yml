@@ -1,0 +1,7 @@
+services:
+  sensor:
+    command: ["python", "-m", "services.sensor.main", "--mode", "live", "--interface", "${INTERFACE:?set INTERFACE explicitly}"]
+    network_mode: host
+    cap_drop: ["ALL"]
+    cap_add: ["NET_RAW"]
+    profiles: ["live"]

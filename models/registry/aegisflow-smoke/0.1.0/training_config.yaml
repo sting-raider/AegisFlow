@@ -1,0 +1,4 @@
+seed: 431
+split: source_group
+model: logistic_regression
+anomaly: isolation_forest

@@ -1,0 +1,7 @@
+services:
+  api:
+    environment:
+      AEGISFLOW_DEMO: "1"
+      AEGISFLOW_DEMO_SEED: "0"
+  sensor:
+    profiles: []

@@ -1,0 +1,99 @@
+name: aegisflow
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: aegisflow
+      POSTGRES_USER: aegisflow
+      POSTGRES_PASSWORD: ${AEGISFLOW_DB_PASSWORD:-aegisflow-demo-only}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegisflow -d aegisflow"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    security_opt: ["no-new-privileges:true"]
+
+  redis:
+    image: redis:7.2.5-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    security_opt: ["no-new-privileges:true"]
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    command: ["sh", "-c", "alembic upgrade head && uvicorn apps.api.main:app --host 0.0.0.0 --port 8000"]
+    environment:
+      AEGISFLOW_DATABASE_URL: postgresql+psycopg://aegisflow:${AEGISFLOW_DB_PASSWORD:-aegisflow-demo-only}@postgres:5432/aegisflow
+      AEGISFLOW_REDIS_URL: redis://redis:6379/0
+      AEGISFLOW_CONSUME_REDIS: "1"
+      AEGISFLOW_DEMO: ${AEGISFLOW_DEMO:-1}
+      AEGISFLOW_DEMO_SEED: "0"
+      AEGISFLOW_MODEL_REGISTRY: /app/models/registry
+      AEGISFLOW_API_KEY: ${AEGISFLOW_API_KEY:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+
+  detector:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    command: ["python", "-m", "services.detector.main"]
+    environment:
+      AEGISFLOW_REDIS_URL: redis://redis:6379/0
+      AEGISFLOW_MODEL_REGISTRY: /app/models/registry
+    depends_on:
+      redis: { condition: service_healthy }
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+
+  sensor:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    command: ["python", "-m", "services.sensor.main", "--mode", "demo"]
+    environment:
+      AEGISFLOW_REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis: { condition: service_healthy }
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    profiles: ["demo"]
+
+  dashboard:
+    build:
+      context: ./apps/dashboard
+      dockerfile: ../../infra/docker/dashboard.Dockerfile
+    ports:
+      - "127.0.0.1:5173:8080"
+    depends_on:
+      api: { condition: service_started }
+    read_only: true
+    tmpfs: ["/tmp", "/var/cache/nginx", "/var/run"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+
+volumes:
+  postgres-data:
+  redis-data:

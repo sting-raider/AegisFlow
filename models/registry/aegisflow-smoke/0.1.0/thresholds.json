@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "known_threshold": 0.72,
+  "anomaly_threshold": 0.7,
+  "anomaly_decision_center": -3.778444571111983e-17,
+  "anomaly_decision_scale": 0.02250499841759187,
+  "selection_target": "smoke grouped-split macro F1; thresholds are demo baselines"
+}

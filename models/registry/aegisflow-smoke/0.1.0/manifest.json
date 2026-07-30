@@ -1,0 +1,36 @@
+{
+  "model_name": "aegisflow-smoke",
+  "version": "0.1.0",
+  "created_at": "2026-07-30T11:13:41.890953+00:00",
+  "git_commit": "uncommitted",
+  "python_version": "3.12.9",
+  "sklearn_version": "1.7.1",
+  "feature_schema_version": "1.0.0",
+  "dataset_fingerprints": [
+    "synthetic-seed-431-v1"
+  ],
+  "training_seed": 431,
+  "model_classes": [
+    "benign",
+    "brute_force",
+    "port_scan"
+  ],
+  "thresholds": {
+    "version": "1.0.0",
+    "known_threshold": 0.72,
+    "anomaly_threshold": 0.7,
+    "anomaly_decision_center": -3.778444571111983e-17,
+    "anomaly_decision_scale": 0.02250499841759187,
+    "selection_target": "smoke grouped-split macro F1; thresholds are demo baselines"
+  },
+  "calibration_method": "native probabilities; smoke only",
+  "validation_metrics": {
+    "macro_f1": 1.0
+  },
+  "known_limitations": [
+    "Synthetic smoke data is not evidence of production detection quality",
+    "No payload features",
+    "Isolation Forest is a baseline"
+  ],
+  "artifact_format": "joblib-local-trusted"
+}
