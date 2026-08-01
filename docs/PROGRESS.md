@@ -14,7 +14,7 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 53 tests pass, Ruff passes across the repository, and strict MyPy passes
+- Python: 63 tests pass, Ruff passes across the repository, and strict MyPy passes
   across 46 source files. The last full measured
   coverage baseline before bundle v2 was 82%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
@@ -62,6 +62,15 @@ Last updated: 2026-08-01.
   monitors. New crossings are persisted idempotently before Redis acknowledgement and
   exposed by API/dashboard plus Prometheus count/magnitude metrics. Stored events
   explicitly prohibit automatic action and retraining eligibility.
+- Incident explanations now run only on an analyst-requested API path. A recursive
+  allow-list builds endpoint-free aggregate evidence for deterministic, remote
+  OpenAI-compatible, or loopback-local rendering. Optional providers are disabled by
+  default and bounded by HTTPS/loopback URL validation, explicit model configuration,
+  timeout, retry cap, per-process rate limiting, response limits, and incident-version
+  LRU caching. Every provider/configuration/rate failure returns a visibly deterministic
+  fallback; dashboard text is labelled AI-generated or deterministic and cannot affect
+  detection or authorize action. Provider protocol, retry, rate, cache, failure,
+  privacy, API, repository, and UI behavior are covered in the green full suites.
 
 ## Hard blockers and fallbacks
 
@@ -70,6 +79,6 @@ Last updated: 2026-08-01.
 
 ## Highest-priority required backlog
 
-- Explanation providers, richer incidents/API/export/dashboard,
-  remaining structured observability and input/backpressure hardening tracked in
+- Richer incidents/API/export/dashboard, remaining structured observability and
+  input/backpressure hardening tracked in
   `docs/COMPLETION_AUDIT.md`.

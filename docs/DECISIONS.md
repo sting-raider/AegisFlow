@@ -114,3 +114,17 @@ deterministically identified crossings before acknowledging the detection stream
 Events are review recommendations with both automatic-action and retraining flags fixed
 false. Updating a learned benign baseline from observed traffic was rejected because it
 would allow suspicious traffic to poison the detector.
+
+## D-013 — On-demand, sanitized, fail-closed explanation providers
+
+Keep AI explanation generation outside ingestion and detection: an analyst-only incident
+endpoint builds a separate endpoint-free aggregate envelope and recursively allow-lists it
+before rendering. The default provider is the deterministic template. Optional remote
+OpenAI-compatible Chat Completions and loopback-local compatible providers require an
+explicit model and have bounded timeout, retries, rate, output, and incident-version LRU
+cache. Provider configuration or runtime failure falls back visibly to the template.
+
+Provider output remains labelled advisory text and has no route into detection, blocking,
+feedback eligibility, retraining, or promotion. Sending full alert/flow records, analyst
+comments, packet data, raw address history, or unencrypted/credential-bearing provider
+URLs was rejected.

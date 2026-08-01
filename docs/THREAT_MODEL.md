@@ -10,7 +10,7 @@
 | Model tampering | Required manifest, SHA-256, exact schema/order, immutable demo image/read-only production mount | Trusted registry or image compromise; joblib is executable |
 | Path traversal | Fixed registry layout, resolved PCAP path, extension/size checks | Host-side symlink policy |
 | Baseline poisoning | Suspicious data excluded; only analyst-approved benign candidates | Compromised analyst account |
-| Prompt injection | Allow-list structured fields; no payload/secrets; local fallback | Misleading signature names |
+| Prompt injection | Recursive field allow-list; endpoint-free aggregates; untrusted JSON boundary; embedded instructions ignored; bounded output; deterministic fallback; output cannot reach detection/action code | A provider can still produce misleading advisory prose, which is visibly labelled |
 | Credential leakage | Environment/mounted secrets, redacted structured logging | Misconfigured orchestration |
 | Excess retention | No payload, configurable cleanup, export anonymization policy | Operational endpoint metadata |
 | Container escape | Non-root, read-only, cap drop, no-new-privileges | Runtime/kernel vulnerability |

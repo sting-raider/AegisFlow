@@ -19,3 +19,10 @@ WebSockets:
 Clients reconnect with bounded delay. Safe CORS defaults allow only local dashboard
 origins. Production deployments must configure explicit origins and an API key or
 place the API behind organizational authentication.
+
+Incident explanations are fetched on demand from
+`GET /api/v1/incidents/{incident_id}/explanation`. The response identifies the requested
+and actual provider, whether text is AI-generated, deterministic fallback, or cached,
+the incident-version hash, generation time, and limitations. This endpoint uses only
+sanitized aggregate evidence and is not part of ingestion or detection. See
+[`AI_EXPLANATIONS.md`](AI_EXPLANATIONS.md).

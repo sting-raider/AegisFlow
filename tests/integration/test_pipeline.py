@@ -28,6 +28,14 @@ def test_demo_detection_persistence_and_idempotency(bundle, tmp_path: Path) -> N
         "benign",
         "suspicious_unknown",
     }
+    incident = repository.incidents()[0]
+    context = repository.incident_explanation_context(incident["id"])
+    assert context is not None
+    serialized = str(context["payload"])
+    assert incident["source_host"] not in serialized
+    assert "src_ip" not in serialized
+    assert "dst_ip" not in serialized
+    assert context["payload"]["aggregated_features"]["flow_count"] >= 1
 
 
 def test_parent_rows_flush_before_foreign_key_dependants(bundle, tmp_path: Path) -> None:

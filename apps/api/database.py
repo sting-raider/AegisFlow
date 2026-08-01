@@ -388,6 +388,114 @@ class Repository:
     def incident(self, incident_id: str) -> dict[str, Any] | None:
         return next((item for item in self.incidents() if item["id"] == incident_id), None)
 
+    def incident_explanation_context(self, incident_id: str) -> dict[str, Any] | None:
+        """Build an endpoint-free, allow-list-ready incident evidence envelope."""
+
+        with self.session() as session:
+            incident = session.get(IncidentRow, incident_id)
+            if incident is None:
+                return None
+            rows = session.execute(
+                select(AlertRow, DetectionRow, FlowRow)
+                .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
+                .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
+                .where(AlertRow.id.in_(incident.alert_ids))
+                .order_by(AlertRow.created_at.asc())
+            ).all()
+            detections = [detection.payload for _, detection, _ in rows]
+            flows = [flow.payload for _, _, flow in rows]
+            community_ids = {flow.community_flow_id for _, _, flow in rows}
+            signatures = (
+                session.scalars(
+                    select(SignatureRow).where(SignatureRow.community_flow_id.in_(community_ids))
+                ).all()
+                if community_ids
+                else []
+            )
+
+            highest = max(rows, key=lambda row: row[0].risk, default=None)
+            verdict = highest[0].verdict if highest is not None else "needs_review"
+            reason_codes = sorted(
+                {
+                    str(reason)
+                    for detection in detections
+                    for reason in detection.get("reason_codes", [])
+                    if isinstance(reason, str)
+                }
+            )
+            payload = {
+                "verdict": verdict,
+                "severity": incident.severity,
+                "reason_codes": reason_codes,
+                "aggregated_features": self._aggregate_explanation_features(flows),
+                "known_attack_probability": self._maximum(
+                    detections, "known_attack_probability"
+                ),
+                "anomaly_score": self._maximum(detections, "anomaly_score"),
+                "signature_score": self._maximum(detections, "signature_score"),
+                "contextual_score": self._maximum(detections, "contextual_score"),
+                "final_risk_score": max((alert.risk for alert, _, _ in rows), default=0.0),
+                "signature_names": sorted(
+                    {
+                        str(signature.payload["signature_name"])
+                        for signature in signatures
+                        if isinstance(signature.payload.get("signature_name"), str)
+                    }
+                ),
+                "timeline": [
+                    {
+                        "timestamp": alert.created_at.isoformat(),
+                        "verdict": alert.verdict,
+                        "severity": alert.severity,
+                        "risk": alert.risk,
+                    }
+                    for alert, _, _ in rows
+                ],
+            }
+            return {
+                "incident_id": incident.id,
+                "incident_version": incident.updated_at.isoformat(),
+                "payload": payload,
+            }
+
+    @staticmethod
+    def _maximum(items: list[dict[str, Any]], key: str) -> float:
+        values = [
+            float(item[key])
+            for item in items
+            if isinstance(item.get(key), int | float) and not isinstance(item.get(key), bool)
+        ]
+        return max(values, default=0.0)
+
+    @staticmethod
+    def _aggregate_explanation_features(flows: list[dict[str, Any]]) -> dict[str, float | int]:
+        def mean(key: str) -> float:
+            values = [
+                float(flow[key])
+                for flow in flows
+                if isinstance(flow.get(key), int | float) and not isinstance(flow.get(key), bool)
+            ]
+            return sum(values) / len(values) if values else 0.0
+
+        def total(*keys: str) -> int:
+            return sum(
+                int(flow.get(key, 0))
+                for flow in flows
+                for key in keys
+                if isinstance(flow.get(key, 0), int) and not isinstance(flow.get(key, 0), bool)
+            )
+
+        return {
+            "flow_count": len(flows),
+            "duration_ms_mean": mean("duration_ms"),
+            "packets_total": total("packets_forward", "packets_reverse"),
+            "bytes_total": total("bytes_forward", "bytes_reverse"),
+            "packet_rate_mean": mean("packet_rate"),
+            "byte_rate_mean": mean("byte_rate"),
+            "packet_length_mean": mean("packet_length_mean"),
+            "iat_mean": mean("iat_mean"),
+        }
+
     def set_incident_status(self, incident_id: str, status: str) -> bool:
         with self.session() as session:
             row = session.get(IncidentRow, incident_id)

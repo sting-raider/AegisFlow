@@ -108,7 +108,11 @@ quality. Public datasets are downloaded separately and never committed. See
 - Drift cannot retrain or promote a model.
 - Optional explanation providers receive only sanitized structured fields.
 
-Read the full [`threat model`](docs/THREAT_MODEL.md) before live deployment.
+Optional incident explanations are disabled by default and run only when requested from
+an incident. The deterministic explanation always remains available; configured remote
+or loopback-local providers have timeout, retry, rate, privacy, and cache bounds. See
+[`docs/AI_EXPLANATIONS.md`](docs/AI_EXPLANATIONS.md). Read the full
+[`threat model`](docs/THREAT_MODEL.md) before live deployment.
 
 ## Known limitations
 

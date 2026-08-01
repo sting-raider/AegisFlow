@@ -19,14 +19,14 @@ marked complete only when implementation and proportionate verification both exi
 | Drift | Bounded runtime monitoring of anomaly/confidence/flow-rate/three stable features/alert-rate; deterministic persisted events; API/dashboard; count/magnitude metrics; explicit no-action/no-retraining gates | Complete |
 | Analyst feedback | Immutable original result, eligibility gate, audit entry | Complete; retraining-candidate query/export remains |
 | Incidents | Deterministic source/time grouping | **Incomplete:** destination/signature/reason/stage/escalation grouping evidence and incident timeline/detail controls |
-| Explanation layer | Deterministic template and allow-list sanitizer | **Incomplete:** OpenAI-compatible/local providers, timeout/retry/rate limit/cache/fallback, API/UI and AI label |
+| Explanation layer | Deterministic template; recursive allow-list/address redaction; endpoint-free aggregate context; remote OpenAI-compatible and loopback-local providers; explicit model; HTTPS/loopback validation; timeout/retry/rate/output bounds; incident-version LRU; injection boundary; fallback; on-demand API/metrics/UI; AI/deterministic labels; focused provider/API/UI tests | Complete |
 | Database/retention | All minimum tables, indexes, UUID idempotency, cleanup and backup docs | **Incomplete:** scheduled cleanup command, sanitized/IP-anonymized export and health-event writes |
 | API | Required endpoint paths, auth, CORS, pagination bounds, REST/WebSocket tests | **Incomplete:** date/protocol/host flow filters, structured global errors, exports and richer incident/system responses |
 | Dashboard | Seven navigation views, live alerts, feedback, responsive states | **Incomplete:** all brief-listed overview analytics, alert pause/filters/ack, incident detail, exports, host/model/system depth |
 | Security | Threat model, bounded inputs, local ports, non-root/read-only containers, CI scans | **Incomplete:** HTTP/body/WebSocket limits, structured redacted logging and explicit queue backpressure counters |
 | Observability | Detection/alert/latency/WebSocket/database/model/queue metrics | **Incomplete:** remaining required sensor/signature/processing/drift counters and structured JSON service logs |
 | Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix, previous-valid model fallback | Complete |
-| Automated tests | 53 Python tests plus Vitest/Playwright, Redis/PostgreSQL recovery, migration, model-fallback and Compose fault injection | **Incomplete:** expanded property, UI and performance coverage remains |
+| Automated tests | 63 Python tests plus Vitest/Playwright, Redis/PostgreSQL recovery, migration, model-fallback and Compose fault injection | **Incomplete:** expanded property, UI and performance coverage remains |
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
 | CI/CD | Python/frontend/Compose/integration/migration/audit/Trivy/gitleaks jobs | Complete; final remote run must be verified after publication |
 | Documentation | Required topic files and screenshots exist | **Incomplete:** refresh after remaining implementation and remove outdated completion claims |

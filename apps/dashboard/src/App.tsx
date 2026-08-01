@@ -267,15 +267,45 @@ function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
 }
 
 function Incidents({ incidents }: { incidents: Incident[] }) {
-  return <div className="card-grid">{incidents.map((incident) => (
-    <article className="incident-card" key={incident.id}>
-      <div><Badge value={incident.severity} /><span className="incident-card__status">{incident.status}</span></div>
-      <h3>{incident.title}</h3>
-      <p>{incident.alert_ids.length} related alert{incident.alert_ids.length === 1 ? "" : "s"}</p>
-      <ul>{incident.grouping_reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
-      <small>Updated {new Date(incident.updated_at).toLocaleString()}</small>
-    </article>
-  ))}</div>;
+  const [selected, setSelected] = useState<Incident | null>(null);
+  const explanation = useQuery({
+    queryKey: ["incident-explanation", selected?.id],
+    queryFn: () => api.incidentExplanation(selected!.id),
+    enabled: selected !== null,
+    retry: false
+  });
+  return <>
+    <div className="card-grid">{incidents.map((incident) => (
+      <article className="incident-card" key={incident.id}>
+        <div><Badge value={incident.severity} /><span className="incident-card__status">{incident.status}</span></div>
+        <h3>{incident.title}</h3>
+        <p>{incident.alert_ids.length} related alert{incident.alert_ids.length === 1 ? "" : "s"}</p>
+        <ul>{incident.grouping_reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
+        <small>Updated {new Date(incident.updated_at).toLocaleString()}</small>
+        <button className="primary incident-card__explain" onClick={() => setSelected(incident)}>
+          Explain incident
+        </button>
+      </article>
+    ))}</div>
+    {selected && <aside className="drawer" aria-label="Incident explanation">
+      <button className="drawer__close" onClick={() => setSelected(null)} aria-label="Close incident explanation">×</button>
+      <p className="eyebrow">Sanitized incident evidence</p>
+      <h2>{selected.title}</h2>
+      {explanation.isLoading && <div className="state">Generating an advisory explanation…</div>}
+      {explanation.isError && <div className="state state--error">The optional provider is unavailable.</div>}
+      {explanation.data && <section className="explanation">
+        <div className="explanation__label">
+          <Badge value={explanation.data.ai_generated ? "ai_generated" : "deterministic"} />
+          <span>{explanation.data.provider}{explanation.data.cached ? " · cached" : ""}</span>
+        </div>
+        {explanation.data.fallback && <p className="limitation">Optional provider failed or was limited; deterministic fallback shown.</p>}
+        <p>{explanation.data.text}</p>
+        <h3>Limitations</h3>
+        <ul>{explanation.data.limitations.map((item) => <li key={item}>{item}</li>)}</ul>
+        <small>Generated {new Date(explanation.data.generated_at).toLocaleString()}</small>
+      </section>}
+    </aside>}
+  </>;
 }
 
 function Flows({ flows }: { flows: Flow[] }) {

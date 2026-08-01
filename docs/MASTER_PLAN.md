@@ -8,10 +8,11 @@
 | 3 | PCAP adapter, live guard, Suricata EVE parser/correlation | Complete |
 | 4 | Smoke training, train-only preprocessing, versioned bundle | Complete |
 | 5 | Open-set fusion, thresholds, benchmarks | Complete |
-| 6 | Incidents, feedback, WebSockets, dashboard pages | Complete |
+| 6 | Incidents, feedback, WebSockets, dashboard pages | Base complete; enrichment in progress |
 | 7 | Drift and safe optional explanations | Complete |
-| 8 | Malformed-input/recovery tests, threat model, CI scans | Complete |
-| 9 | Full validation and final measured status | Complete |
+| 8 | Malformed-input/recovery tests, threat model, CI scans | Base complete; hardening in progress |
+| 9 | Full validation and final measured status | In progress |
 
-Priority is a truthful working vertical slice. Optional work that remains is tracked
-in `docs/PROGRESS.md` with acceptance criteria.
+This phase table does not substitute for the authoritative requirement audit. Required
+remaining work is tracked in `docs/COMPLETION_AUDIT.md`; the project is not complete while
+that matrix contains an incomplete row.

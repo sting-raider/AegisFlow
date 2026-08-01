@@ -3,6 +3,7 @@ import type {
   Flow,
   Host,
   Incident,
+  IncidentExplanation,
   ModelVersion,
   Page,
   SystemStatus
@@ -20,6 +21,8 @@ export const api = {
   alerts: (query = "") => get<Page<Alert>>(`/api/v1/alerts${query}`),
   alert: (id: string) => get<Alert>(`/api/v1/alerts/${id}`),
   incidents: () => get<Page<Incident>>("/api/v1/incidents"),
+  incidentExplanation: (id: string) =>
+    get<IncidentExplanation>(`/api/v1/incidents/${id}/explanation`),
   flows: () => get<Page<Flow>>("/api/v1/flows"),
   hosts: () => get<Page<Host>>("/api/v1/hosts"),
   models: () => get<Page<ModelVersion>>("/api/v1/models"),

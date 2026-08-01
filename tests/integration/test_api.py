@@ -12,6 +12,7 @@ def test_api_vertical_slice(monkeypatch, registry: Path, tmp_path: Path) -> None
     monkeypatch.setenv("AEGISFLOW_MODEL_REGISTRY", str(registry))
     monkeypatch.setenv("AEGISFLOW_DEMO", "1")
     monkeypatch.setenv("AEGISFLOW_DEMO_SEED", "1")
+    monkeypatch.setenv("AEGISFLOW_EXPLANATION_PROVIDER", "disabled")
     monkeypatch.delenv("AEGISFLOW_API_KEY", raising=False)
     with TestClient(app) as client:
         assert client.get("/health/ready").json() == {"status": "ready"}
@@ -38,7 +39,19 @@ def test_api_vertical_slice(monkeypatch, registry: Path, tmp_path: Path) -> None
             },
         )
         assert feedback.status_code == 200
-        assert client.get("/api/v1/incidents").json()["count"] >= 1
+        incidents = client.get("/api/v1/incidents").json()["items"]
+        assert incidents
+        explanation = client.get(
+            f"/api/v1/incidents/{incidents[0]['id']}/explanation"
+        ).json()
+        assert explanation["provider"] == "template"
+        assert explanation["requested_provider"] == "disabled"
+        assert explanation["ai_generated"] is False
+        assert explanation["fallback"] is False
+        assert len(explanation["incident_version_hash"]) == 64
+        assert incidents[0]["source_host"] not in explanation["text"]
+        assert "cannot authorize" in explanation["text"]
+        assert "incident_explanations_total" in client.get("/metrics").text
         assert client.get("/api/v1/models/current").status_code == 200
         with client.websocket_connect("/api/v1/stream/alerts") as websocket:
             message = websocket.receive_json()

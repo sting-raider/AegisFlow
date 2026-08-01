@@ -35,7 +35,12 @@ from packages.contracts import (
     SignatureEvent,
 )
 from packages.detection import DetectionEngine
-from packages.incidents import DriftEvent, RuntimeDriftMonitor
+from packages.incidents import (
+    DriftEvent,
+    ExplanationService,
+    RuntimeDriftMonitor,
+    explanation_service_from_env,
+)
 from packages.model_bundle import BundleError, load_production_bundle
 from services.sensor import DemoAdapter
 from training.cli.train_smoke import train
@@ -53,6 +58,11 @@ QUEUE_PENDING = Gauge(
 )
 DRIFT_EVENTS = Counter("drift_events_total", "Detected runtime distribution shifts", ["signal"])
 DRIFT_MAGNITUDE = Gauge("drift_magnitude", "Most recent drift magnitude", ["signal"])
+EXPLANATIONS = Counter(
+    "incident_explanations_total",
+    "On-demand incident explanations",
+    ["provider", "outcome"],
+)
 
 
 class FeedbackRequest(BaseModel):
@@ -131,6 +141,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.repository = repository
     app.state.engine = engine
     app.state.drift_monitor = drift_monitor
+    app.state.explanation_service = explanation_service_from_env()
     consumer: DetectionConsumer | None = None
     app.state.consumer = None
     if os.getenv("AEGISFLOW_CONSUME_REDIS", "0") == "1":
@@ -185,6 +196,10 @@ async def correlation_id(request: Request, call_next: Any) -> Response:
 
 def repository(request: Request) -> Repository:
     return cast(Repository, request.app.state.repository)
+
+
+def explanation_service(request: Request) -> ExplanationService:
+    return cast(ExplanationService, request.app.state.explanation_service)
 
 
 def mutation_auth(x_api_key: Annotated[str | None, Header()] = None) -> None:
@@ -269,6 +284,25 @@ def get_incident(
     if item is None:
         raise HTTPException(status_code=404, detail={"code": "incident_not_found"})
     return item
+
+
+@app.get("/api/v1/incidents/{incident_id}/explanation")
+def get_incident_explanation(
+    incident_id: UUID,
+    repo: Annotated[Repository, Depends(repository)],
+    service: Annotated[ExplanationService, Depends(explanation_service)],
+) -> dict[str, Any]:
+    context = repo.incident_explanation_context(str(incident_id))
+    if context is None:
+        raise HTTPException(status_code=404, detail={"code": "incident_not_found"})
+    result = service.generate(
+        incident_id=context["incident_id"],
+        incident_version=context["incident_version"],
+        payload=context["payload"],
+    )
+    outcome = "cached" if result.cached else "fallback" if result.fallback else "generated"
+    EXPLANATIONS.labels(result.provider, outcome).inc()
+    return result.as_dict()
 
 
 @app.post("/api/v1/incidents/{incident_id}/status", dependencies=[Depends(mutation_auth)])

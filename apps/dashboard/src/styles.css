@@ -113,6 +113,14 @@ textarea { min-height: 86px; resize: vertical; }
 .incident-card h3, .host-card h3 { font-size: 23px; margin: 28px 0 8px; }
 .incident-card ul { color: var(--muted); padding-left: 18px; }
 .incident-card small { color: var(--muted); }
+.incident-card__explain { display: block; margin-top: 18px; }
+.explanation { display: grid; gap: 12px; }
+.explanation__label { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+.explanation .badge--ai_generated { border-color: var(--coral); color: #ff9d8d; }
+.explanation .badge--deterministic { border-color: var(--teal); color: #7fddd9; }
+.explanation > p { font-size: 15px; line-height: 1.65; }
+.explanation li { margin-bottom: 8px; color: var(--muted); }
+.explanation > small { color: var(--muted); }
 .host-card { position: relative; overflow: hidden; }
 .host-card__pulse { position: absolute; right: 18px; top: 18px; width: 11px; height: 11px; border: 1px solid var(--teal); border-radius: 50%; }
 .host-card__pulse.is-alerting { background: var(--coral); border-color: var(--coral); box-shadow: 0 0 0 7px #ff735c17; }

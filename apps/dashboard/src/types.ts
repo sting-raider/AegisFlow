@@ -53,6 +53,18 @@ export interface Incident {
   grouping_reasons: string[];
 }
 
+export interface IncidentExplanation {
+  text: string;
+  provider: string;
+  requested_provider: string;
+  ai_generated: boolean;
+  fallback: boolean;
+  cached: boolean;
+  incident_version_hash: string;
+  generated_at: string;
+  limitations: string[];
+}
+
 export interface Flow {
   event_id: string;
   timestamp_start: string;

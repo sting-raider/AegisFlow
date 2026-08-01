@@ -42,3 +42,10 @@ flow rate, duration, byte volume, packet length, and alert rate. A threshold cro
 is stored idempotently before acknowledgement and exported as Prometheus count and
 magnitude metrics. These windows observe distributions only: they never alter the
 benign training baseline, create training labels, retrain, or promote a model.
+
+Incident explanations form a separate on-demand read path. The repository derives an
+endpoint-free aggregate envelope, the explanation service recursively applies its
+allow-list, and either a deterministic template or explicitly configured provider
+renders advisory text. Successful provider text is cached by the incident version.
+Nothing in this path is imported by or called from the detector, and the result is never
+consumed as an action.

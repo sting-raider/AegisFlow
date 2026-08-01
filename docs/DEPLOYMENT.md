@@ -13,6 +13,13 @@ target, and trusted registry or image-promotion permissions before non-demo use.
 Place TLS and organizational authentication at the reverse proxy. Back up PostgreSQL with
 `pg_dump -Fc` and restore into a clean compatible database with `pg_restore`.
 
+AI explanations remain disabled unless `AEGISFLOW_EXPLANATION_PROVIDER` is explicitly
+set. Keep provider keys in an orchestrator secret, never an image or committed `.env`,
+and use a reviewed explicit model ID. Remote provider URLs require HTTPS. Local provider
+mode accepts loopback only, so it is intended for an API process and compatible model
+server on the same host. See [`AI_EXPLANATIONS.md`](AI_EXPLANATIONS.md) for all bounds
+and fallback behavior.
+
 Validate configuration:
 
 ```bash
