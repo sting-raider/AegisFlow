@@ -11,10 +11,10 @@ marked complete only when implementation and proportionate verification both exi
 | Live/NFStream extraction | NFStream 6.6.0 completed-flow adapter; two-flow bounded PCAP test; one-flow non-root Linux loopback test; dedicated `NET_RAW` image target; Windows fallback | Complete |
 | Suricata | Pinned replay/live profiles; real isolated replay; six-type allow-listed parser; partial-line errors; bounded dedupe; health; correlation; checksum-pinned rule updater | Complete |
 | Feature parity | Versioned fixed registry, serialized scaler, parity/range tests | Complete for current 18-feature schema; property coverage needs expansion |
-| Supervised model | Grouped holdout compares logistic regression, random forest and MLP; selected classifier uses grouped-fold sigmoid calibration; bundle records per-class/macro/weighted, PR/ROC-AUC, calibration, confusion, importance and single/batch CPU latency | Complete for deterministic smoke scope; independent-dataset evidence remains under dataset tooling |
-| Unknown/open-set model | Benign-only Isolation Forest plus benign-only PyTorch denoising autoencoder, validation-tail normalization, reason-coded fusion and synthetic novelty evaluation | Complete for deterministic smoke scope; held-out-family/cross-dataset evidence remains under dataset tooling |
+| Supervised model | Grouped holdout compares logistic regression, random forest and MLP; selected classifier uses grouped-fold sigmoid calibration; bundle records per-class/macro/weighted, PR/ROC-AUC, calibration, confusion, importance and single/batch CPU latency | Complete for deterministic smoke scope; the public-data gate is implemented but no external score is claimed without reviewed files |
+| Unknown/open-set model | Benign-only Isolation Forest plus benign-only PyTorch denoising autoencoder, validation-tail normalization, reason-coded fusion and synthetic novelty evaluation | Complete for deterministic smoke scope; held-family/cross-dataset gates are implemented but external scores are not bundled |
 | Model bundles | V1 recovery compatibility; v2 complete checksums and artifact hashes; schema/order validation; atomic promotion/history; explicit rollback and visible previous-valid fallback | Complete |
-| Dataset tooling | Checksum-verified resumable generic downloader | **Incomplete:** named dataset/CSV adapters, quality reports, grouped/time/held-out/cross-dataset evaluation harness |
+| Dataset tooling | Official-source catalog; hardened provenance downloader; CIC-IDS2017/CSE-CIC-IDS2018/UNSW-NB15/NFStream adapters; quality/leakage/overlap/drift reports; time/day/source/family/cross-dataset evaluation gate | Complete; no production-quality public-dataset scores are claimed until users supply reviewed files |
 | Risk fusion | Versioned configurable weights/thresholds and boundary tests | Complete |
 | Drift | Tested bounded mean-shift detector and database table/API | **Incomplete:** runtime monitoring of required signals, persisted drift events, metrics and candidate gating |
 | Analyst feedback | Immutable original result, eligibility gate, audit entry | Complete; retraining-candidate query/export remains |
@@ -25,8 +25,8 @@ marked complete only when implementation and proportionate verification both exi
 | Dashboard | Seven navigation views, live alerts, feedback, responsive states | **Incomplete:** all brief-listed overview analytics, alert pause/filters/ack, incident detail, exports, host/model/system depth |
 | Security | Threat model, bounded inputs, local ports, non-root/read-only containers, CI scans | **Incomplete:** HTTP/body/WebSocket limits, structured redacted logging and explicit queue backpressure counters |
 | Observability | Detection/alert/latency/WebSocket/database/model/queue metrics | **Incomplete:** remaining required sensor/signature/processing/drift counters and structured JSON service logs |
-| Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix | Complete except previous-model fallback |
-| Automated tests | 28 Python tests plus Vitest/Playwright and Compose fault injection | **Incomplete:** full Redis/Postgres path in CI, expanded contract/UI/property/performance coverage |
+| Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix, previous-valid model fallback | Complete |
+| Automated tests | 50 Python tests plus Vitest/Playwright, Redis/PostgreSQL recovery, migration, model-fallback and Compose fault injection | **Incomplete:** expanded property, UI and performance coverage remains |
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
 | CI/CD | Python/frontend/Compose/integration/migration/audit/Trivy/gitleaks jobs | Complete; final remote run must be verified after publication |
 | Documentation | Required topic files and screenshots exist | **Incomplete:** refresh after remaining implementation and remove outdated completion claims |

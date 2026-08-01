@@ -57,6 +57,7 @@ make install
 make train-smoke
 uv run python -m apps.api.main
 npm --prefix apps/dashboard run dev
+uv run python -m training.cli.evaluate_dataset --help
 ```
 
 ## Commands

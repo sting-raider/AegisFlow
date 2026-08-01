@@ -1,0 +1,17 @@
+{
+  "BENIGN": "benign",
+  "Bot": "botnet",
+  "DDoS": "ddos",
+  "DoS GoldenEye": "dos",
+  "DoS Hulk": "dos",
+  "DoS Slowhttptest": "dos",
+  "DoS slowloris": "dos",
+  "FTP-Patator": "brute_force",
+  "Heartbleed": "heartbleed",
+  "Infiltration": "infiltration",
+  "PortScan": "port_scan",
+  "SSH-Patator": "brute_force",
+  "Web Attack - Brute Force": "web_attack",
+  "Web Attack - Sql Injection": "web_attack",
+  "Web Attack - XSS": "web_attack"
+}

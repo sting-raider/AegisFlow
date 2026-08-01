@@ -11,7 +11,7 @@ build/
 *.egg-info/
 .env
 .runtime/
-data/
+/data/
 *.pcap
 *.pcapng
 !tests/fixtures/
@@ -32,4 +32,5 @@ models/registry/**/*
 !models/registry/aegisflow-smoke/0.2.0/
 !models/registry/aegisflow-smoke/0.2.0/**
 graphify-out/
+reports/
 .upstream/

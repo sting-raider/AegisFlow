@@ -94,3 +94,13 @@ keep Linux live capture behind an explicit interface plus narrowly declared
 capabilities. EVE ingestion retains only allow-listed or hashed metadata, surfaces
 malformed records, and correlates without making Suricata mandatory for demo mode.
 Automatic rule downloads and unrestricted raw EVE persistence were rejected.
+
+## D-011 — Canonical public-data adapters with explicit approximation
+
+Map CIC-IDS2017 and CSE-CIC-IDS2018 CICFlowMeter columns, UNSW-NB15 flow columns, and
+generic NFStream CSV into the same 18-feature registry used at runtime. CIC time units
+are converted explicitly. UNSW fields with no defensible equivalent are zero-filled
+and recorded as adapter notes instead of inventing values. Identifiers are analyzed for
+leakage but never enter the feature array or persisted report. Automated source
+downloads require HTTPS plus a user-reviewed checksum; silently choosing a convenient
+mirror or publishing fabricated public-dataset metrics was rejected.

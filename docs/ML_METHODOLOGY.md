@@ -26,3 +26,11 @@ time-, capture-day-, or source-file-grouped. Preprocessing fits only the trainin
 Promotion requires schema compatibility, checksum validation, a bounded benign
 false-positive target, improvement without material regression on critical classes,
 and a rollback pointer. Drift and analyst feedback only create candidates.
+
+`training.cli.evaluate_dataset` is the public-data gate. It first writes a quality and
+leakage report, refuses non-finite canonical features or fewer than two normalized
+classes, and supports time, capture-day, source-file, held-family, and cross-dataset
+evaluation. Its class-weighted logistic model is a transparent evaluation baseline,
+not an automatically promoted production candidate. Unknown-confidence selection uses
+the three-percent low-confidence validation tail; the final test set never sets that
+threshold.

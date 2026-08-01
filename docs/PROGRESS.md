@@ -14,7 +14,8 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 31 tests pass, Ruff passes, and strict MyPy passes. The last full measured
+- Python: 50 tests pass, Ruff passes across the repository, and strict MyPy passes
+  across 46 source files. The last full measured
   coverage baseline before bundle v2 was 82%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
@@ -39,7 +40,8 @@ Last updated: 2026-08-01.
   contains the verified bundle-v2 milestone. The first remote run passed Python,
   dashboard, Compose and integration/E2E jobs; its security job failed before checkout
   because the Trivy action tag omitted the required `v` prefix. CI now pins the verified
-  `aquasecurity/trivy-action@v0.36.0` release and awaits the replacement remote run.
+  `aquasecurity/trivy-action@v0.36.0` release. Replacement run `30697502689` and the
+  NFStream/Suricata milestone run `30698780511` completed successfully.
 - NFStream 6.6.0 processes the bundled PCAP into two canonical flows inside a Linux
   container with networking disabled and all capabilities dropped. The dedicated live
   stage runs as UID 10001 and, with only `NET_RAW`, captured one repeated loopback-only
@@ -50,6 +52,11 @@ Last updated: 2026-08-01.
   flow records. The incremental reader parsed all four with zero errors, hashed the DNS
   name, and correlated the alert to one of two flows. Ten focused tests plus Ruff and
   strict MyPy pass for the NFStream/Suricata slice.
+- Dataset tooling now has an official-source catalog, checksum/size/provenance-enforced
+  HTTPS downloader, named CIC-IDS2017/CSE-CIC-IDS2018/UNSW-NB15 and generic NFStream
+  CSV adapters, sanitized quality/leakage reports, time/day/source/family splits, and
+  compatible cross-dataset drift/evaluation. Fixture tests exercise every adapter and
+  evaluation path; no public-dataset performance number is claimed without the data.
 
 ## Hard blockers and fallbacks
 
@@ -58,9 +65,6 @@ Last updated: 2026-08-01.
 
 ## Highest-priority required backlog
 
-- Dataset and evaluation tooling. Acceptance: named CIC-IDS2017, CSE-CIC-IDS2018,
-  UNSW-NB15 and generic flow-CSV adapters; quality/leakage reports; grouped/time,
-  leave-family-out and cross-dataset evaluation.
 - Runtime drift, explanation providers, richer incidents/API/export/dashboard,
   remaining structured observability and input/backpressure hardening tracked in
   `docs/COMPLETION_AUDIT.md`.

@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "policy": {
+    "full_datasets_committed": false,
+    "silent_mirror_substitution": false,
+    "checksum_required_for_automated_download": true
+  },
+  "datasets": {
+    "cic_ids2017": {
+      "adapter": "cic_ids2017",
+      "official_page": "https://www.unb.ca/cic/datasets/ids-2017.html",
+      "retrieval": "Follow the official page to obtain MachineLearningCSV.zip; record a reviewed SHA-256 before using the downloader.",
+      "capture_boundaries": "2017-07-03 through 2017-07-07; source CSV/day grouping is required.",
+      "license_and_citation": "Use is governed by the official page; cite Sharafaldin, Lashkari, and Ghorbani (ICISSP 2018).",
+      "expected_layout": "One or more CICFlowMeter CSV files with Label and preferably Timestamp columns."
+    },
+    "cse_cic_ids2018": {
+      "adapter": "cse_cic_ids2018",
+      "official_page": "https://www.unb.ca/cic/datasets/ids-2018.html",
+      "retrieval": "The official page documents anonymous AWS S3 access. Inventory objects first and record a reviewed checksum for every selected CSV; do not sync unbounded data through AegisFlow.",
+      "capture_boundaries": "Daily captures from 2018-02-14 through 2018-03-02; preserve source-file/day groups.",
+      "license_and_citation": "Redistribution requires citation and a link to the official UNB page.",
+      "expected_layout": "One or more CICFlowMeter-V3 CSV files with Label and Timestamp columns."
+    },
+    "unsw_nb15": {
+      "adapter": "unsw_nb15",
+      "official_page": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",
+      "retrieval": "Use the official UNSW links for the published CSV partitions; record SHA-256 locally before import.",
+      "capture_boundaries": "Preserve the official training/testing partition or original source-file grouping.",
+      "license_and_citation": "Academic use is granted on the official page; commercial use requires author agreement and the named papers must be cited.",
+      "expected_layout": "UNSW_NB15_training-set.csv, UNSW_NB15_testing-set.csv, or the four original CSV files with attack_cat and label."
+    },
+    "nfstream_csv": {
+      "adapter": "nfstream_csv",
+      "official_page": null,
+      "retrieval": "User-provided local flow CSV only; provide a label column and retain its local checksum manifest.",
+      "capture_boundaries": "Provide a source-file, capture-day, or explicit group column.",
+      "license_and_citation": "User is responsible for authorization and provenance.",
+      "expected_layout": "Canonical AegisFlow columns or NFStream bidirectional/src2dst/dst2src column names."
+    },
+    "synthetic_smoke": {
+      "adapter": "bundled_generator",
+      "official_page": null,
+      "retrieval": "Generated locally by training.cli.train_smoke with seed 431.",
+      "capture_boundaries": "Twelve deterministic source groups.",
+      "license_and_citation": "Apache-2.0 repository fixture.",
+      "expected_layout": "Generated in memory; no dataset file is committed."
+    }
+  }
+}

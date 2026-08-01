@@ -1,0 +1,12 @@
+{
+  "Analysis": "analysis",
+  "Backdoor": "backdoor",
+  "DoS": "dos",
+  "Exploits": "exploits",
+  "Fuzzers": "fuzzers",
+  "Generic": "generic",
+  "Normal": "benign",
+  "Reconnaissance": "port_scan",
+  "Shellcode": "shellcode",
+  "Worms": "worms"
+}
