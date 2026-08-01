@@ -1,0 +1,446 @@
+{
+  "adapter_notes": [],
+  "dataset": "cse_cic_ids2018",
+  "evaluation": {
+    "anomaly_percentile_summary": {
+      "p50": 0.4624737451454207,
+      "p95": 0.958186615881271,
+      "p99": 0.9930558375634517
+    },
+    "benign_false_positive_rate": 0.011530627091517533,
+    "brier_multiclass_known_families": 0.2828123562584998,
+    "expected_calibration_error_known_families": 0.09255961690624348,
+    "false_alerts_per_replay_hour": 280.2209944751381,
+    "feature_order": [
+      "duration_ms",
+      "packets_forward",
+      "packets_reverse",
+      "bytes_forward",
+      "bytes_reverse",
+      "packet_rate",
+      "byte_rate",
+      "packet_length_mean",
+      "packet_length_std",
+      "iat_mean",
+      "iat_std",
+      "tcp_syn_count",
+      "tcp_rst_count",
+      "destination_port",
+      "forward_reverse_byte_ratio",
+      "syn_ack_ratio",
+      "packets_total",
+      "bytes_total"
+    ],
+    "fit_manifest": {
+      "anomaly_models": [
+        "IsolationForest",
+        "CPU denoising autoencoder"
+      ],
+      "autoencoder_fit_benign_rows": 50000,
+      "calibration_benign_rows": 24625,
+      "calibration_cdf_knots": 1054,
+      "calibration_rows": 52509,
+      "calibration_split": {
+        "calibration_groups": 1,
+        "calibration_start": "2018-03-01T09:37:11.000000000",
+        "fit_end": "2018-03-01T09:37:11.000000000",
+        "fit_groups": 1,
+        "group_overlap": 1,
+        "method": "chronological calibration; grouped calibration infeasible"
+      },
+      "classifier_family": "sigmoid-calibrated class-weighted logistic regression",
+      "fit_benign_rows": 156169,
+      "fit_rows": 210035,
+      "fusion_version": "3.0.0",
+      "outer_train_rows": 262544
+    },
+    "flows_per_second": 4311.367588635644,
+    "fusion_comparison": {
+      "baseline_config": {
+        "anomaly_threshold": 0.7,
+        "anomaly_weight": 0.27,
+        "benign_max_risk": 30.0,
+        "context_weight": 0.1,
+        "critical_risk": 90.0,
+        "high_risk": 72.0,
+        "known_threshold": 0.72,
+        "known_weight": 0.43,
+        "review_max_risk": 54.0,
+        "signature_weight": 0.2,
+        "version": "3.0.0-baseline"
+      },
+      "baseline_macro_f1": 0.22171753618881862,
+      "baseline_observed_label_macro_f1": 0.22171753618881862,
+      "deployed_config": {
+        "anomaly_threshold": 0.74,
+        "anomaly_weight": 0.27,
+        "benign_max_risk": 30.0,
+        "context_weight": 0.1,
+        "critical_risk": 90.0,
+        "high_risk": 72.0,
+        "known_threshold": 0.72,
+        "known_weight": 0.43,
+        "review_max_risk": 54.0,
+        "signature_weight": 0.2,
+        "version": "3.0.0"
+      },
+      "deployed_macro_f1": 0.22660940627084722,
+      "deployed_observed_label_macro_f1": 0.3021458750277963,
+      "macro_f1_label_scope": [
+        "benign",
+        "known_attack",
+        "suspicious_unknown",
+        "needs_review"
+      ]
+    },
+    "harness": "exact deployed hybrid pipeline",
+    "known_family_classification": {
+      "accuracy": 0.8376677788442495,
+      "benign": {
+        "f1-score": 0.9116639998673509,
+        "precision": 0.8376933038775044,
+        "recall": 0.9999636257820457,
+        "support": 54984.0
+      },
+      "infiltration": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 10653.0
+      },
+      "macro avg": {
+        "f1-score": 0.45583199993367546,
+        "precision": 0.4188466519387522,
+        "recall": 0.49998181289102284,
+        "support": 65637.0
+      },
+      "weighted avg": {
+        "f1-score": 0.7636993367872758,
+        "precision": 0.7017342142450249,
+        "recall": 0.8376677788442495,
+        "support": 65637.0
+      }
+    },
+    "known_unknown_confusion": {
+      "needs_review": 700,
+      "true_known_predicted_known": 65637,
+      "true_known_predicted_unknown": 0,
+      "true_unknown_predicted_known": 0,
+      "true_unknown_predicted_unknown": 0
+    },
+    "latency_ms": {
+      "batch_per_flow": 0.23194496396825573,
+      "batch_total": 15224.171599984402,
+      "end_to_end_scope": "canonical feature array through exact hybrid verdict",
+      "p50_single": 9.119400012423284,
+      "p95_single": 14.38085501577006,
+      "p99_single": 15.17920599202625
+    },
+    "limitations": [
+      "Dataset adapters may approximate source fields documented in adapter_notes.",
+      "No signature or rolling contextual evidence is synthesized for CSV rows.",
+      "needs_review is a detector decision state, not a ground-truth dataset class."
+    ],
+    "macro_f1": 0.22660940627084722,
+    "observed_label_macro_f1": 0.3021458750277963,
+    "pr_auc_macro": 0.5844388654704288,
+    "queue_lag": {
+      "measured": false,
+      "reason": "offline dataset evaluation does not use the Redis runtime"
+    },
+    "readiness_gate": {
+      "automatic_promotion_allowed": false,
+      "criteria": {
+        "benign_false_positive_rate": {
+          "operator": "<=",
+          "status": "fail",
+          "threshold": 0.01,
+          "value": 0.011530627091517533
+        },
+        "expected_calibration_error": {
+          "operator": "<=",
+          "status": "pass",
+          "threshold": 0.1,
+          "value": 0.09255961690624348
+        },
+        "false_alerts_per_replay_hour": {
+          "operator": "<=",
+          "status": "fail",
+          "threshold": 10.0,
+          "value": 280.2209944751381
+        },
+        "observed_label_macro_f1": {
+          "operator": ">=",
+          "status": "fail",
+          "threshold": 0.6,
+          "value": 0.3021458750277963
+        },
+        "suspicious_unknown_detection_rate": {
+          "operator": ">=",
+          "status": "not_applicable",
+          "threshold": 0.5,
+          "value": null
+        },
+        "train_test_overlap_fraction": {
+          "operator": "<=",
+          "status": "fail",
+          "threshold": 0.01,
+          "value": 0.20343708579002698
+        },
+        "unknown_detection_or_review_rate": {
+          "operator": ">=",
+          "status": "not_applicable",
+          "threshold": 0.8,
+          "value": null
+        }
+      },
+      "policy": "A single report can block a candidate but cannot authorize promotion; all required split modes and human review remain mandatory.",
+      "status": "fail"
+    },
+    "replay_span_hours": 2.2625,
+    "resource_use": {
+      "fit_cpu_seconds": 8.796875,
+      "fit_wall_seconds": 8.264746500004549,
+      "inference_cpu_seconds": 14.8125,
+      "inference_rss_delta_bytes": 16994304,
+      "rss_delta_bytes": 82194432
+    },
+    "roc_auc_macro": 0.6854595678766126,
+    "seed": 431,
+    "shared_inference_path": "packages.detection.hybrid.HybridPredictor",
+    "suspicious_unknown_detection_rate": null,
+    "test_rows": 65637,
+    "testing_dataset": "cse_cic_ids2018",
+    "testing_fingerprint": "21c2c9dcaceadf3465c32300e7c145d25508f12e3ff4dbd468cd30bedd5a56ee",
+    "train_rows": 262544,
+    "train_test_overlap": {
+      "overlap_fraction": 0.20343708579002698,
+      "overlap_rows": 13353,
+      "test_rows": 65637
+    },
+    "training_classes": [
+      "benign",
+      "infiltration"
+    ],
+    "training_dataset": "cse_cic_ids2018",
+    "training_fingerprint": "21c2c9dcaceadf3465c32300e7c145d25508f12e3ff4dbd468cd30bedd5a56ee",
+    "unknown_detection_or_review_rate": null,
+    "unknown_test_families": [],
+    "verdict_classification": {
+      "accuracy": 0.828039063333181,
+      "benign": {
+        "f1-score": 0.9064376250833889,
+        "precision": 0.8369779475175557,
+        "recall": 0.9884693729084825,
+        "support": 54984.0
+      },
+      "known_attack": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 10653.0
+      },
+      "macro avg": {
+        "f1-score": 0.22660940627084722,
+        "precision": 0.20924448687938893,
+        "recall": 0.24711734322712062,
+        "support": 65637.0
+      },
+      "needs_review": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 0.0
+      },
+      "suspicious_unknown": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 0.0
+      },
+      "weighted avg": {
+        "f1-score": 0.7593212117797135,
+        "precision": 0.7011349614745538,
+        "recall": 0.828039063333181,
+        "support": 65637.0
+      }
+    },
+    "verdict_confusion_matrix": {
+      "labels": [
+        "benign",
+        "known_attack",
+        "suspicious_unknown",
+        "needs_review"
+      ],
+      "values": [
+        [
+          54350,
+          1,
+          0,
+          633
+        ],
+        [
+          10586,
+          0,
+          0,
+          67
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "verdict_counts": {
+      "benign": 64936,
+      "known_attack": 1,
+      "needs_review": 700,
+      "suspicious_unknown": 0
+    },
+    "weighted_f1": 0.7593212117797135
+  },
+  "evaluation_bundle": {
+    "bundle_schema_version": 3,
+    "model_name": "aegisflow-smoke",
+    "version": "0.3.0"
+  },
+  "fingerprint": "21c2c9dcaceadf3465c32300e7c145d25508f12e3ff4dbd468cd30bedd5a56ee",
+  "provenance": [
+    {
+      "declared_manifest": {
+        "capture_boundaries": "Official Thursday 2018-03-01 processed-traffic partition; benign and infiltration flows.",
+        "dataset": "CSE-CIC-IDS2018",
+        "filename": "Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv",
+        "license": "Redistribution is permitted with citation and a link to the official CSE-CIC-IDS2018 AWS page.",
+        "official_download": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv",
+        "retrieved_at": "2026-08-01T16:47:55Z",
+        "sha256": "b0534c5d7d8b41e03df71c6966c995d116a8ed28e61f377c8b14cdf5d28f4edf",
+        "size_bytes": 107842858,
+        "source_page": "https://www.unb.ca/cic/datasets/ids-2018.html",
+        "transformation_history": [
+          "Downloaded without modification from the official anonymous AWS bucket.",
+          "SHA-256 calculated locally before AegisFlow import."
+        ]
+      },
+      "filename": "Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv",
+      "sha256": "b0534c5d7d8b41e03df71c6966c995d116a8ed28e61f377c8b14cdf5d28f4edf",
+      "size_bytes": 107842858
+    }
+  ],
+  "quality": {
+    "adapter_notes": [],
+    "blocking_issues": [],
+    "class_distribution": {
+      "benign": 235778,
+      "infiltration": 92403
+    },
+    "constant_columns": [],
+    "dataset": "cse_cic_ids2018",
+    "duplicate_rows": 45872,
+    "excluded_rows": [
+      {
+        "count": 25,
+        "reason": "repeated_csv_header"
+      },
+      {
+        "count": 2919,
+        "reason": "nonfinite_or_out_of_registry_canonical_features"
+      }
+    ],
+    "fingerprint": "21c2c9dcaceadf3465c32300e7c145d25508f12e3ff4dbd468cd30bedd5a56ee",
+    "identifier_columns": [],
+    "infinite_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "missing_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "out_of_range_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "raw_to_normalized_labels": {
+      "Benign": {
+        "benign": 235778
+      },
+      "Infilteration": {
+        "infiltration": 92403
+      }
+    },
+    "rows": 328181,
+    "suspiciously_predictive_columns": [],
+    "warnings": [
+      "45872 duplicate canonical rows"
+    ]
+  },
+  "schema_version": "1.1.0",
+  "split": {
+    "group_overlap": 1,
+    "held_out_family": null,
+    "strategy": "time",
+    "test_groups": 1,
+    "test_indices_sha256": "fc60a86ddcf9b58d79fd1b27a209955481f7b779f462b10870408be6a5b2aff7",
+    "test_rows": 65637,
+    "train_groups": 1,
+    "train_indices_sha256": "c34ad750fe4dd397c1269451d004f63866625c66a6c63ae8942e6083a65532ec",
+    "train_rows": 262544
+  }
+}

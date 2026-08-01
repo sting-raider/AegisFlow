@@ -87,7 +87,7 @@ make reset
 The latest local validation on 2026-08-01 passed:
 
 - Ruff and strict MyPy across 56 Python source files;
-- 112 Python tests with 84% last-measured backend coverage;
+- 113 Python tests with 84% last-measured backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
 - clean Compose image builds, database migration, offline replay, REST/metrics checks,
@@ -124,12 +124,15 @@ quality. Public datasets are downloaded separately and never committed. See
 [`docs/ML_METHODOLOGY.md`](docs/ML_METHODOLOGY.md) and
 [`docs/DATASETS.md`](docs/DATASETS.md).
 
-The repository includes a reproducible exact-hybrid report for the official UNSW-NB15
-training/testing partition. It scored 175,341 training and 82,332 testing rows through
-the same batch predictor used by runtime detection. The report is deliberately candid:
-four-state macro F1 was 0.156 and benign false-positive rate was 64.4%, so this model is
-not suitable for operational promotion. See the
-[`official evaluation report`](docs/evaluation/unsw-nb15-official-split.json).
+The repository includes reproducible exact-hybrid reports for the official UNSW-NB15
+partitions and an official time-bearing CSE-CIC-IDS2018 capture. They cover published
+train/test, chronological, leave-one-family-out, and genuinely cross-dataset modes through
+the same batch predictor used by runtime detection. The evidence is deliberately candid:
+the UNSW official split has a 64.4% benign false-positive rate; only 2.1% of a held-out
+`exploits` family is directly detected as suspicious unknown; and UNSW-to-CSE transfer
+classifies every benign CSE flow as non-benign. Every report fails the explicit readiness
+gate, so no evaluated model is eligible for operational promotion. See
+[`docs/evaluation`](docs/evaluation/) and the methodology notes below.
 
 ## Security and privacy
 
@@ -157,9 +160,10 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
 ## Known limitations
 
 - The bundled model is synthetic smoke data, not a production model.
-- The exact-hybrid official UNSW-NB15 evaluation has an unacceptably high 64.4% benign
-  false-positive rate. Held-family, time-based, and true cross-dataset evidence remain
-  unfinished; the published report is negative evidence, not a performance claim.
+- The real-data evaluation matrix is complete enough to reject the current model, not to
+  approve it. UNSW official-split FPR is 64.4%; held-family direct unknown detection is
+  2.1%; UNSW-to-CSE benign FPR is 100%; and the CSE chronological test misses essentially
+  all later infiltration flows. These are negative evidence, not performance claims.
 - API access control currently uses an optional shared key for mutations and does not yet
   provide authenticated user identities, RBAC, SSO/OIDC, or tenant isolation.
 - Runtime detection is single-message/single-worker by default; the measured overload

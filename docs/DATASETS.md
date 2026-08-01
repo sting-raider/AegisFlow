@@ -42,6 +42,13 @@ flag counts) are set to zero and recorded as adapter notes. These approximations
 considered when interpreting results. Raw IPs, flow IDs, and other identifiers are
 profiled for leakage but excluded from the feature array and report.
 
+Official CSE-CIC-IDS2018 AWS files concatenate per-machine CSV shards. The adapter removes
+only rows whose label cell is the repeated CSV header, then excludes canonical rows with
+non-finite or registry-invalid features instead of coercing them. Both reasons and counts
+are machine-readable in `quality.excluded_rows`. For the reviewed Thursday file this is
+25 repeated headers and 2,919 invalid CICFlowMeter rate rows; the remaining 328,181 rows
+are evaluated. The source misspelling `Infilteration` is normalized to `infiltration`.
+
 Run a gate with an explicit non-row-random split:
 
 ```bash
@@ -77,5 +84,5 @@ detection, false alerts per replay hour when timestamps span time, latency, thro
 and process resource deltas. Offline reports explicitly mark Redis queue lag as not
 measured; runtime benchmarking covers that separate scope. The evaluation harness uses
 the detector's shared exact-hybrid batch predictor. The reviewed official UNSW result is
-committed at `docs/evaluation/unsw-nb15-official-split.json`; source CSVs and sidecar
-manifests remain ignored under `data/`.
+committed with held-family, CSE chronological, and true cross-dataset reports under
+`docs/evaluation/`; source CSVs and sidecar manifests remain ignored under `data/`.

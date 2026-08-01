@@ -244,3 +244,34 @@ Relying on a developer's `core.autocrlf` setting was rejected after a Windows-ge
 checksum passed locally but failed on Linux CI when checkout normalization changed JSON
 line endings. A generated-bundle regression test now requires platform-independent LF
 for all new text artifacts.
+
+## D-022 — Audit invalid public-data rows instead of coercing them
+
+Treat repeated CSE-CIC-IDS2018 shard headers as non-records and exclude CICFlowMeter rows
+whose canonical features are non-finite or outside the versioned registry. Record each
+reason and count in `quality.excluded_rows`, retain the untouched source checksum, and
+include exclusions in the canonical dataset fingerprint. Mapping invalid rates to zero
+or benign was rejected because it would hide malformed evidence and distort both the
+benign baseline and false-positive measurements. Blocking the entire 328,181-row valid
+partition because 2,919 rows have undefined rates was also rejected once a narrow,
+auditable exclusion policy was available.
+
+When source groups cannot separate internal calibration, use a chronological tail if
+every timestamp is valid and both fit requirements and benign calibration support hold.
+Only then fall back to stratified rows. This preserves time order for the reviewed CSE
+file without pretending equal-timestamp shard boundaries are independent captures.
+
+## D-023 — Public reports are rejection gates, never promotion authority
+
+Report schema 1.1 evaluates transparent default review thresholds for observed-label
+macro F1, benign false-positive rate, direct and review-assisted unknown detection,
+calibration error, replay-hour false alerts, and canonical overlap. Missing measures are
+explicitly not applicable. Any failed criterion rejects a candidate; even a full pass
+sets `automatic_promotion_allowed` to false because all required modes and human review
+remain necessary.
+
+Freeze the published UNSW official, held-`exploits`, CSE chronological, and UNSW-to-CSE
+results as final evidence. Using their severe failures to tune the same candidate was
+rejected as test leakage. A future multi-source challenger needs new fit/calibration
+partitions and must be compared against these reports only once its configuration is
+locked.

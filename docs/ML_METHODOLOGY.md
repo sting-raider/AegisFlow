@@ -57,7 +57,21 @@ four-state macro F1 is 0.156, benign false-positive rate is 64.4%, 59,268 of 82,
 flows require review, and no family is unknown because both published partitions contain
 the same attack families. The report also records 39.6% canonical train/test row overlap
 and unavailable-field approximations. It therefore validates the harness, not model
-readiness; held-family and true cross-dataset experiments remain required.
+readiness. Complementary held-family and true cross-dataset experiments were then run.
+
+Those remaining modes are now published. The leave-`exploits`-out and UNSW-to-CSE
+results fail unknown detection and benign false-positive expectations, while the CSE
+chronological split shows acceptable-looking aggregate accuracy can hide zero attack-
+family recall. This evidence blocks promotion and motivates a feature-compatible,
+multi-dataset challenger; it must be selected on new fit/calibration evidence, never by
+tuning against these final reports.
+
+Report schema 1.1 adds audited row exclusions and a transparent readiness gate. Default
+review thresholds are observed-label macro F1 >= 0.60, benign FPR <= 1%, direct unknown
+detection >= 50%, unknown detection-or-review >= 80%, ECE <= 0.10, false alerts <= 10
+per replay hour, and canonical overlap <= 1%. A missing metric is not applicable rather
+than fabricated. A report can reject a candidate but `automatic_promotion_allowed` is
+always false; passing every metric still requires all modes and human approval.
 
 ## Runtime drift
 

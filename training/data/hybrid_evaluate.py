@@ -32,7 +32,7 @@ VERDICT_LABELS = ("benign", "known_attack", "suspicious_unknown", "needs_review"
 
 
 def _fit_calibration_indices(
-    labels: np.ndarray, groups: np.ndarray
+    labels: np.ndarray, groups: np.ndarray, timestamps: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray, dict[str, Any]]:
     indices = np.arange(len(labels))
     unique_groups = set(map(str, groups))
@@ -56,6 +56,31 @@ def _fit_calibration_indices(
                         "group_overlap": len(fit_groups & calibration_groups),
                     },
                 )
+    if len(timestamps) == len(labels) and not np.isnat(timestamps).any():
+        ordered = np.argsort(timestamps, kind="stable")
+        boundary = int(len(ordered) * 0.8)
+        fit = ordered[:boundary]
+        calibration = ordered[boundary:]
+        if (
+            len(fit)
+            and len(calibration)
+            and set(labels[fit]) == set(labels)
+            and np.sum(labels[calibration] == "benign") >= 2
+        ):
+            return (
+                fit,
+                calibration,
+                {
+                    "method": "chronological calibration; grouped calibration infeasible",
+                    "fit_groups": len(set(map(str, groups[fit]))),
+                    "calibration_groups": len(set(map(str, groups[calibration]))),
+                    "group_overlap": len(
+                        set(map(str, groups[fit])) & set(map(str, groups[calibration]))
+                    ),
+                    "fit_end": str(timestamps[fit].max()),
+                    "calibration_start": str(timestamps[calibration].min()),
+                },
+            )
     counts = Counter(map(str, labels))
     if len(counts) >= 2 and min(counts.values()) >= 3:
         fit, calibration = next(
@@ -89,6 +114,7 @@ def _fit_bundle(
     outer_features = dataset.features[train_indices]
     outer_labels = dataset.labels[train_indices]
     outer_groups = dataset.groups[train_indices]
+    outer_timestamps = dataset.timestamps[train_indices]
     if not np.all(np.isfinite(outer_features)):
         raise ValueError("exact hybrid training refuses non-finite features")
     if "benign" not in set(outer_labels):
@@ -96,7 +122,7 @@ def _fit_bundle(
     if len(set(outer_labels)) < 2:
         raise ValueError("exact hybrid training requires benign and attack classes")
     fit_indices, calibration_indices, calibration_split = _fit_calibration_indices(
-        outer_labels, outer_groups
+        outer_labels, outer_groups, outer_timestamps
     )
     x_fit_raw = outer_features[fit_indices]
     y_fit = outer_labels[fit_indices]
@@ -301,6 +327,21 @@ def evaluate_hybrid_gate(
     confusion = confusion_matrix(truth, predictions, labels=list(VERDICT_LABELS))
     known_truth = truth != "suspicious_unknown"
     predicted_unknown = predictions == "suspicious_unknown"
+    fixed_macro_f1 = float(report["macro avg"]["f1-score"])
+    observed_macro_f1 = float(observed_report["macro avg"]["f1-score"])
+    weighted_f1 = float(report["weighted avg"]["f1-score"])
+    overlap_report = train_test_overlap(
+        training.features[train_indices], testing.features[test_indices]
+    )
+    readiness_gate = _readiness_gate(
+        observed_macro_f1=observed_macro_f1,
+        benign_false_positive_rate=benign_false_positive,
+        suspicious_unknown_detection_rate=suspicious_unknown_rate,
+        unknown_detection_or_review_rate=unknown_review_rate,
+        expected_calibration_error=ece,
+        false_alerts_per_replay_hour=false_alerts_per_hour,
+        overlap_fraction=float(overlap_report["overlap_fraction"]),
+    )
     return {
         "harness": "exact deployed hybrid pipeline",
         "shared_inference_path": "packages.detection.hybrid.HybridPredictor",
@@ -321,9 +362,9 @@ def evaluate_hybrid_gate(
             "values": confusion.tolist(),
         },
         "verdict_counts": {label: int(np.sum(predictions == label)) for label in VERDICT_LABELS},
-        "macro_f1": float(report["macro avg"]["f1-score"]),
-        "observed_label_macro_f1": float(observed_report["macro avg"]["f1-score"]),
-        "weighted_f1": float(report["weighted avg"]["f1-score"]),
+        "macro_f1": fixed_macro_f1,
+        "observed_label_macro_f1": observed_macro_f1,
+        "weighted_f1": weighted_f1,
         "known_family_classification": family_report,
         "pr_auc_macro": pr_auc,
         "roc_auc_macro": roc_auc,
@@ -373,14 +414,73 @@ def evaluate_hybrid_gate(
             "measured": False,
             "reason": "offline dataset evaluation does not use the Redis runtime",
         },
-        "train_test_overlap": train_test_overlap(
-            training.features[train_indices], testing.features[test_indices]
-        ),
+        "train_test_overlap": overlap_report,
+        "readiness_gate": readiness_gate,
         "limitations": [
             "Dataset adapters may approximate source fields documented in adapter_notes.",
             "No signature or rolling contextual evidence is synthesized for CSV rows.",
             "needs_review is a detector decision state, not a ground-truth dataset class.",
         ],
+    }
+
+
+def _readiness_gate(
+    *,
+    observed_macro_f1: float,
+    benign_false_positive_rate: float | None,
+    suspicious_unknown_detection_rate: float | None,
+    unknown_detection_or_review_rate: float | None,
+    expected_calibration_error: float | None,
+    false_alerts_per_replay_hour: float | None,
+    overlap_fraction: float,
+) -> dict[str, Any]:
+    criteria = {
+        "observed_label_macro_f1": _minimum_criterion(observed_macro_f1, 0.60),
+        "benign_false_positive_rate": _maximum_criterion(
+            benign_false_positive_rate, 0.01
+        ),
+        "suspicious_unknown_detection_rate": _minimum_criterion(
+            suspicious_unknown_detection_rate, 0.50
+        ),
+        "unknown_detection_or_review_rate": _minimum_criterion(
+            unknown_detection_or_review_rate, 0.80
+        ),
+        "expected_calibration_error": _maximum_criterion(
+            expected_calibration_error, 0.10
+        ),
+        "false_alerts_per_replay_hour": _maximum_criterion(
+            false_alerts_per_replay_hour, 10.0
+        ),
+        "train_test_overlap_fraction": _maximum_criterion(overlap_fraction, 0.01),
+    }
+    applicable = [item for item in criteria.values() if item["status"] != "not_applicable"]
+    passed = bool(applicable) and all(item["status"] == "pass" for item in applicable)
+    return {
+        "status": "pass" if passed else "fail",
+        "automatic_promotion_allowed": False,
+        "criteria": criteria,
+        "policy": (
+            "A single report can block a candidate but cannot authorize promotion; "
+            "all required split modes and human review remain mandatory."
+        ),
+    }
+
+
+def _minimum_criterion(value: float | None, minimum: float) -> dict[str, Any]:
+    return {
+        "value": value,
+        "operator": ">=",
+        "threshold": minimum,
+        "status": "not_applicable" if value is None else "pass" if value >= minimum else "fail",
+    }
+
+
+def _maximum_criterion(value: float | None, maximum: float) -> dict[str, Any]:
+    return {
+        "value": value,
+        "operator": "<=",
+        "threshold": maximum,
+        "status": "not_applicable" if value is None else "pass" if value <= maximum else "fail",
     }
 
 

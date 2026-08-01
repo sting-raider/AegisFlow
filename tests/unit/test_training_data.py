@@ -92,6 +92,33 @@ def test_cse_and_generic_nfstream_adapters_are_registered(tmp_path: Path) -> Non
     assert generic.groups.tolist() == ["one", "two"]
 
 
+def test_cse_adapter_audits_repeated_headers_and_nonfinite_cic_rows(
+    tmp_path: Path,
+) -> None:
+    frame = _cic_frame().iloc[[0, 1]].copy()
+    frame.loc[frame.index[1], "Label"] = "Infilteration"
+    repeated_header = pd.DataFrame([{column: column for column in frame.columns}])
+    nonfinite = frame.iloc[[0]].copy()
+    nonfinite["Flow Packets/s"] = np.inf
+    nonfinite["Flow Bytes/s"] = np.inf
+    path = tmp_path / "official-cse-shards.csv"
+    pd.concat([frame, repeated_header, nonfinite], ignore_index=True).to_csv(path, index=False)
+
+    dataset = load_dataset("cse_cic_ids2018", [path])
+
+    assert dataset.labels.tolist() == ["benign", "infiltration"]
+    assert [(item.reason, item.count) for item in dataset.row_exclusions] == [
+        ("repeated_csv_header", 1),
+        ("nonfinite_or_out_of_registry_canonical_features", 1),
+    ]
+    report = quality_report(dataset)
+    assert report.excluded_rows == (
+        {"reason": "repeated_csv_header", "count": 1},
+        {"reason": "nonfinite_or_out_of_registry_canonical_features", "count": 1},
+    )
+    assert not report.blocking_issues
+
+
 def test_official_dataset_catalog_has_all_supported_adapters() -> None:
     catalog = json.loads(Path("configs/datasets/catalog.json").read_text(encoding="utf-8"))
     assert set(catalog["datasets"]) == {
@@ -291,6 +318,7 @@ def test_exact_hybrid_evaluation_uses_all_deployed_signals_and_held_family(
         "suspicious_unknown",
         "needs_review",
     ]
+    assert grouped_evaluation["readiness_gate"]["automatic_promotion_allowed"] is False
 
     held = create_split(dataset, "leave_family_out", held_out_family="dos")
     held_evaluation = evaluate_hybrid_gate(
@@ -302,6 +330,25 @@ def test_exact_hybrid_evaluation_uses_all_deployed_signals_and_held_family(
     )
     assert held_evaluation["unknown_test_families"] == ["dos"]
     assert held_evaluation["suspicious_unknown_detection_rate"] is not None
+    assert (
+        held_evaluation["readiness_gate"]["criteria"][
+            "suspicious_unknown_detection_rate"
+        ]["status"]
+        in {"pass", "fail"}
+    )
+
+    one_source = replace(dataset, groups=np.full(dataset.row_count, "one-source"))
+    timed = create_split(one_source, "time")
+    timed_evaluation = evaluate_hybrid_gate(
+        one_source,
+        one_source,
+        timed.train_indices,
+        timed.test_indices,
+        bundle,
+    )
+    assert timed_evaluation["fit_manifest"]["calibration_split"]["method"].startswith(
+        "chronological calibration"
+    )
 
 
 def test_dataset_evaluation_cli_writes_a_complete_report(
@@ -334,6 +381,7 @@ def test_dataset_evaluation_cli_writes_a_complete_report(
     )
     evaluate_dataset_main()
     report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["schema_version"] == "1.1.0"
     assert report["split"]["group_overlap"] == 0
     assert "train_indices" not in report["split"]
     assert report["evaluation"]["harness"] == "exact deployed hybrid pipeline"

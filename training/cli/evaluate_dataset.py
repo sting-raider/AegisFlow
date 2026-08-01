@@ -67,7 +67,7 @@ def main() -> None:
     )
     quality = quality_report(dataset)
     payload: dict[str, Any] = {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "dataset": dataset.name,
         "fingerprint": dataset.fingerprint,
         "provenance": [asdict(item) for item in dataset.provenance],

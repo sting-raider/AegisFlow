@@ -26,6 +26,7 @@ class QualityReport:
     identifier_columns: tuple[str, ...]
     suspiciously_predictive_columns: tuple[dict[str, Any], ...]
     adapter_notes: tuple[str, ...]
+    excluded_rows: tuple[dict[str, str | int], ...]
     warnings: tuple[str, ...]
     blocking_issues: tuple[str, ...]
 
@@ -100,6 +101,9 @@ def quality_report(dataset: CanonicalDataset) -> QualityReport:
         identifier_columns=identifiers,
         suspiciously_predictive_columns=suspicious,
         adapter_notes=dataset.adapter_notes,
+        excluded_rows=tuple(
+            {"reason": item.reason, "count": item.count} for item in dataset.row_exclusions
+        ),
         warnings=tuple(warnings),
         blocking_issues=tuple(issues),
     )

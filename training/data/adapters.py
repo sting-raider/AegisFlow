@@ -10,8 +10,13 @@ from typing import Any, Literal
 import numpy as np
 import pandas as pd
 
-from packages.features.registry import FEATURE_NAMES
-from training.data.models import CanonicalDataset, InputProvenance, SourceColumnProfile
+from packages.features.registry import FEATURE_NAMES, FEATURE_REGISTRY
+from training.data.models import (
+    CanonicalDataset,
+    InputProvenance,
+    RowExclusion,
+    SourceColumnProfile,
+)
 
 DatasetKind = Literal["cic_ids2017", "cse_cic_ids2018", "unsw_nb15", "nfstream_csv"]
 MAX_INPUT_BYTES = 8 * 1024 * 1024 * 1024
@@ -91,7 +96,7 @@ LABEL_FAMILIES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("port_scan", ("portscan", "port scan", "reconnaissance")),
     ("ddos", ("ddos", "distributed denial")),
     ("dos", ("dos", "denial of service", "hulk", "slowloris", "goldeneye")),
-    ("infiltration", ("infiltration",)),
+    ("infiltration", ("infiltration", "infilteration")),
     ("botnet", ("botnet", " bot", "bot ")),
     ("heartbleed", ("heartbleed",)),
 )
@@ -164,10 +169,11 @@ def _source_profiles(
     for column in frame.columns:
         if column == label_column:
             continue
-        values = frame[column].fillna("<missing>").astype(str)
-        unique_count = int(values.nunique(dropna=False))
+        source = frame[column]
+        unique_count = int(source.nunique(dropna=False))
         purity = 0.0
         if unique_count and unique_count <= min(10_000, rows):
+            values = source.fillna("<missing>").astype(str)
             grouped = pd.DataFrame({"value": values, "label": labels}).groupby("value")["label"]
             purity = float(grouped.value_counts().groupby(level=0).max().sum() / rows)
         profiles.append(
@@ -322,6 +328,15 @@ def load_dataset(
     raw = pd.concat(frames, ignore_index=True)
     lookup = {_key(str(column)): str(column) for column in raw.columns}
     resolved_label = _label_column(kind, lookup, label_column)
+    exclusions: list[RowExclusion] = []
+    if kind in {"cic_ids2017", "cse_cic_ids2018"}:
+        repeated_header = (
+            raw[resolved_label].fillna("").astype(str).map(_key) == _key(resolved_label)
+        )
+        repeated_count = int(repeated_header.sum())
+        if repeated_count:
+            exclusions.append(RowExclusion("repeated_csv_header", repeated_count))
+            raw = raw.loc[~repeated_header].copy()
     raw_labels = raw[resolved_label].fillna("unlabeled").astype(str)
     if kind == "unsw_nb15":
         fallback = _resolve_column(lookup, ("label",))
@@ -337,6 +352,23 @@ def load_dataset(
         rules,
         allow_missing_destination_port=kind == "unsw_nb15",
     )
+    if kind in {"cic_ids2017", "cse_cic_ids2018"}:
+        invalid = ~np.isfinite(canonical.to_numpy(dtype=np.float64)).all(axis=1)
+        for index, spec in enumerate(FEATURE_REGISTRY):
+            values = canonical.iloc[:, index].to_numpy(dtype=np.float64)
+            invalid |= (values < spec.minimum) | (values > spec.maximum)
+        invalid_count = int(invalid.sum())
+        if invalid_count:
+            exclusions.append(
+                RowExclusion(
+                    "nonfinite_or_out_of_registry_canonical_features", invalid_count
+                )
+            )
+            keep = ~invalid
+            raw = raw.loc[keep].copy()
+            raw_labels = raw_labels.loc[keep]
+            labels = labels.loc[keep]
+            canonical = canonical.loc[keep]
     if group_column:
         resolved_group = lookup.get(_key(group_column))
         if resolved_group is None:
@@ -362,4 +394,5 @@ def load_dataset(
         source_profiles=profiles,
         provenance=tuple(provenances),
         adapter_notes=notes,
+        row_exclusions=tuple(exclusions),
     )

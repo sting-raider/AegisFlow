@@ -143,7 +143,7 @@ Last updated: 2026-08-01.
   evaluator retrains the calibrated classifier, benign-only Isolation Forest and CPU
   denoising autoencoder, builds a benign empirical CDF, and applies the bundle-loaded
   fusion rule in batches. Focused parity coverage proves a runtime single-flow result
-  matches batch scoring; the full local gate passes 112 Python tests, Ruff, strict MyPy
+  matches batch scoring; the full local gate passes 113 Python tests, Ruff, strict MyPy
   across 56 source files, dashboard lint/build, and four dashboard tests.
 - The reviewed official UNSW-NB15 training/testing partitions were downloaded through
   UNSW's public SharePoint path and retained only under ignored `data/`. SHA-256 and
@@ -157,19 +157,36 @@ Last updated: 2026-08-01.
   materially limit interpretation. Baseline and deployed thresholds tie on fixed-label
   macro F1; the apparent observed-label difference comes from which verdict labels are
   present, so it is not claimed as an improvement.
+- Public split coverage now includes all requested evaluation modes that the reviewed
+  sources support. Leaving all 44,525 `exploits` rows out of UNSW fitting/calibration
+  yields 2.1% direct suspicious-unknown detection and 38.6% detection-or-review. A true
+  UNSW-to-CSE-CIC-IDS2018 run scores 328,181 valid independent flows with zero canonical
+  overlap, but produces 100% benign FPR, 18.9% direct unknown detection, about 19,649
+  false alerts/hour, and saturated anomaly percentiles. A CSE chronological test has
+  1.15% benign FPR but essentially zero later infiltration recall. These reports reject
+  the current model; none is a production claim.
+- Official CSE ingestion now audits 25 repeated shard headers and 2,919 non-finite or
+  registry-invalid CICFlowMeter rate rows instead of turning them into a class or benign
+  result. The source misspelling `Infilteration` maps to `infiltration`. Exact leakage
+  profiling no longer stringifies high-cardinality columns, and a one-source time split
+  uses chronological internal calibration before its untouched final test.
+- Evaluation report schema 1.1 records row exclusions and an explicit review gate for
+  macro F1, benign FPR, unknown detection/review, calibration, replay-hour false alerts,
+  and overlap. Every published report fails. The gate can reject but never promote a
+  model automatically.
 
 ## Hard blockers and fallbacks
 
-- Production-readiness is not yet proven. The exact official UNSW-NB15 result fails an
-  acceptable false-positive standard, contains no unknown family, and cannot provide a
-  time-based false-alert rate. Windows cannot validate authorized live capture, so
-  isolated Linux-container evidence remains required for that path.
+- Production-readiness is not yet proven. Official split, held-family, chronological,
+  and true cross-dataset evidence all reject the current model for different reasons;
+  tuning against those final reports would be test leakage. Windows cannot validate
+  authorized live capture, so isolated Linux-container evidence remains required for
+  that path.
 
 ## Highest-priority required backlog
 
-- Run reviewed public held-family and genuinely different cross-dataset experiments,
-  add a time-bearing CIC source, and use the failure evidence to recalibrate/retrain
-  without test leakage or automatic promotion.
-- Add profiling, batching/worker scaling, enterprise
+- Build a feature-compatible multi-source challenger with fresh fit/calibration evidence
+  and governed review; keep all published public reports frozen as final tests.
+- Add runtime profiling, batching/worker scaling, enterprise
   auth/RBAC, production deployment assets, governed champion/challenger promotion, and
   the editorial dashboard transformation.

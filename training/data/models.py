@@ -26,6 +26,12 @@ class InputProvenance:
 
 
 @dataclass(frozen=True)
+class RowExclusion:
+    reason: str
+    count: int
+
+
+@dataclass(frozen=True)
 class CanonicalDataset:
     name: str
     features: np.ndarray
@@ -38,6 +44,7 @@ class CanonicalDataset:
     source_profiles: tuple[SourceColumnProfile, ...]
     provenance: tuple[InputProvenance, ...]
     adapter_notes: tuple[str, ...] = ()
+    row_exclusions: tuple[RowExclusion, ...] = ()
 
     def __post_init__(self) -> None:
         rows = len(self.labels)
@@ -56,8 +63,11 @@ class CanonicalDataset:
         import hashlib
 
         digest = hashlib.sha256()
-        for item in self.provenance:
-            digest.update(item.sha256.encode("ascii"))
+        for provenance in self.provenance:
+            digest.update(provenance.sha256.encode("ascii"))
         digest.update(self.name.encode("utf-8"))
         digest.update(str(self.row_count).encode("ascii"))
+        for exclusion in self.row_exclusions:
+            digest.update(exclusion.reason.encode("utf-8"))
+            digest.update(str(exclusion.count).encode("ascii"))
         return digest.hexdigest()
