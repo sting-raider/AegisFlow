@@ -23,6 +23,24 @@ def test_training_and_inference_transform_are_identical(bundle: ModelBundle) -> 
     assert reloaded.anomaly_calibration is not None
 
 
+def test_generated_bundle_text_artifacts_use_platform_independent_lf(
+    bundle: ModelBundle,
+) -> None:
+    text_artifacts = [
+        "feature_schema.json",
+        "label_mapping.json",
+        "thresholds.json",
+        "calibration.json",
+        "metrics.json",
+        "training_config.yaml",
+        "training_data_manifest.json",
+        "manifest.json",
+        "checksums.sha256",
+    ]
+    for filename in text_artifacts:
+        assert b"\r\n" not in (bundle.root / filename).read_bytes(), filename
+
+
 def test_detection_reports_empirical_anomaly_percentile(bundle: ModelBundle) -> None:
     flow = next(iter(DemoAdapter().flows()))
     result = DetectionEngine(bundle).detect(flow)

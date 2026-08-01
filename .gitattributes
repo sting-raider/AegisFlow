@@ -1,0 +1,2 @@
+# Model checksums cover exact bytes. Never let Git rewrite artifact line endings.
+models/registry/** -text -whitespace

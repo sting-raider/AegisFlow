@@ -2,8 +2,8 @@
   "bundle_schema_version": 3,
   "model_name": "aegisflow-smoke",
   "version": "0.3.0",
-  "created_at": "2026-08-01T15:51:53.994566+00:00",
-  "git_commit": "f14a15554fc1fcea2f5cf7ad0cbde3f261e3d2f1",
+  "created_at": "2026-08-01T16:30:11.148833+00:00",
+  "git_commit": "4993081aa7b140bff9a1bb04ff65b74cb2286178",
   "python_version": "3.12.9",
   "dependency_versions": {
     "joblib": "1.5.1",
@@ -61,7 +61,7 @@
     "classifier.joblib": "98e84d7bcce0168d7633a12af0e96386c451fe0ba694b7276844509919d1e05f",
     "anomaly.joblib": "8293707a7ae4bd0ded108d2e5715a6e1e82e631cc52b05d08ea1cf8c98ed4fe0",
     "autoencoder.pt": "2a83090c711ee9ce35a944c2ad44ad07a3059d7cbaee219fac34ac01f25b0a79",
-    "calibration.json": "a63d47f7accb12ca34d0add6bead742a64c0d3156870894d9934235ab29fc360"
+    "calibration.json": "26cb86333af5c7c5c6267e7aaeb1dba139ddb81367d902a75a7c91b71504c14f"
   },
   "artifact_format": "joblib-local-trusted+torch-state-dict"
 }

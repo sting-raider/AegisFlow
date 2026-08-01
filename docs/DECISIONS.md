@@ -233,3 +233,14 @@ configuration can change which zero-support verdict labels appear and thereby ch
 denominator without improving supported-class performance. The official UNSW partitions
 also share every family and have substantial canonical overlap, so they do not replace
 held-family or genuinely cross-dataset evaluation.
+
+## D-021 — Preserve model-registry bytes across Git checkouts
+
+Treat every file under `models/registry/` as a byte-preserved artifact because bundle
+checksums cover exact serialized bytes, including human-readable metadata. Disable Git
+text conversion for that subtree and make new training output write LF explicitly. Keep
+the legacy v1/v2 byte representation intact so their historical checksums remain valid.
+Relying on a developer's `core.autocrlf` setting was rejected after a Windows-generated
+checksum passed locally but failed on Linux CI when checkout normalization changed JSON
+line endings. A generated-bundle regression test now requires platform-independent LF
+for all new text artifacts.

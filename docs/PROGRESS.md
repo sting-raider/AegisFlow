@@ -143,7 +143,7 @@ Last updated: 2026-08-01.
   evaluator retrains the calibrated classifier, benign-only Isolation Forest and CPU
   denoising autoencoder, builds a benign empirical CDF, and applies the bundle-loaded
   fusion rule in batches. Focused parity coverage proves a runtime single-flow result
-  matches batch scoring; the full local gate passes 111 Python tests, Ruff, strict MyPy
+  matches batch scoring; the full local gate passes 112 Python tests, Ruff, strict MyPy
   across 56 source files, dashboard lint/build, and four dashboard tests.
 - The reviewed official UNSW-NB15 training/testing partitions were downloaded through
   UNSW's public SharePoint path and retained only under ignored `data/`. SHA-256 and

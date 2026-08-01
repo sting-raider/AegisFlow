@@ -87,7 +87,7 @@ make reset
 The latest local validation on 2026-08-01 passed:
 
 - Ruff and strict MyPy across 56 Python source files;
-- 111 Python tests with 84% last-measured backend coverage;
+- 112 Python tests with 84% last-measured backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
 - clean Compose image builds, database migration, offline replay, REST/metrics checks,

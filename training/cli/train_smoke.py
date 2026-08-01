@@ -45,6 +45,11 @@ KNOWN_THRESHOLD = 0.72
 ANOMALY_THRESHOLD = 0.70
 
 
+def _write_text_lf(path: Path, content: str) -> None:
+    with path.open("w", encoding="utf-8", newline="\n") as stream:
+        stream.write(content)
+
+
 def _dataset() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     rng = np.random.default_rng(SEED)
     rows: list[np.ndarray] = []
@@ -618,13 +623,11 @@ def train(output_root: Path) -> dict[str, Any]:
         joblib.dump(classifier, staged / "classifier.joblib")
         joblib.dump(anomaly, staged / "anomaly.joblib")
         torch.save(autoencoder.artifact(), staged / "autoencoder.pt")
-        (staged / "feature_schema.json").write_text(
-            json.dumps(feature_schema(), indent=2) + "\n", encoding="utf-8"
+        _write_text_lf(
+            staged / "feature_schema.json", json.dumps(feature_schema(), indent=2) + "\n"
         )
         labels = {str(index): str(label) for index, label in enumerate(classes)}
-        (staged / "label_mapping.json").write_text(
-            json.dumps(labels, indent=2) + "\n", encoding="utf-8"
-        )
+        _write_text_lf(staged / "label_mapping.json", json.dumps(labels, indent=2) + "\n")
         thresholds = {
             **fusion_config.to_dict(),
             "anomaly_normalization_tail_score": ANOMALY_THRESHOLD,
@@ -637,9 +640,7 @@ def train(output_root: Path) -> dict[str, Any]:
             "normalization": "calibration benign p50 maps to 0; tail budget maps to 0.70",
             "selection_target": "3% benign calibration tail budget on deterministic smoke data",
         }
-        (staged / "thresholds.json").write_text(
-            json.dumps(thresholds, indent=2) + "\n", encoding="utf-8"
-        )
+        _write_text_lf(staged / "thresholds.json", json.dumps(thresholds, indent=2) + "\n")
         calibration_payload = {
             "schema_version": "1.0.0",
             "method": "bounded_empirical_cdf_right_rank_linear_interpolation",
@@ -647,11 +648,12 @@ def train(output_root: Path) -> dict[str, Any]:
             "signal": "max(normalized_isolation_score, normalized_reconstruction_score)",
             "combined_anomaly_score": anomaly_calibration.to_dict(),
         }
-        (staged / "calibration.json").write_text(
-            json.dumps(calibration_payload, indent=2) + "\n", encoding="utf-8"
+        _write_text_lf(
+            staged / "calibration.json", json.dumps(calibration_payload, indent=2) + "\n"
         )
-        (staged / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
-        (staged / "training_config.yaml").write_text(
+        _write_text_lf(staged / "metrics.json", json.dumps(metrics, indent=2) + "\n")
+        _write_text_lf(
+            staged / "training_config.yaml",
             "\n".join(
                 [
                     f"seed: {SEED}",
@@ -666,7 +668,6 @@ def train(output_root: Path) -> dict[str, Any]:
                     "",
                 ]
             ),
-            encoding="utf-8",
         )
         data_manifest = {
             "name": "bundled-synthetic-smoke",
@@ -687,8 +688,8 @@ def train(output_root: Path) -> dict[str, Any]:
             "dataset_fingerprint": "synthetic-seed-431-v3",
             "not_for_performance_claims": True,
         }
-        (staged / "training_data_manifest.json").write_text(
-            json.dumps(data_manifest, indent=2) + "\n", encoding="utf-8"
+        _write_text_lf(
+            staged / "training_data_manifest.json", json.dumps(data_manifest, indent=2) + "\n"
         )
         artifact_names = [
             "preprocessor.joblib",
@@ -736,13 +737,11 @@ def train(output_root: Path) -> dict[str, Any]:
             "artifact_hashes": artifact_hashes,
             "artifact_format": "joblib-local-trusted+torch-state-dict",
         }
-        (staged / "manifest.json").write_text(
-            json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
-        )
+        _write_text_lf(staged / "manifest.json", json.dumps(manifest, indent=2) + "\n")
         files = sorted(path for path in staged.iterdir() if path.name != "checksums.sha256")
-        (staged / "checksums.sha256").write_text(
+        _write_text_lf(
+            staged / "checksums.sha256",
             "".join(f"{sha256_file(path)}  {path.name}\n" for path in files),
-            encoding="utf-8",
         )
         _atomic_replace_directory(staged, target)
         promote_bundle(output_root, MODEL_NAME, VERSION)
