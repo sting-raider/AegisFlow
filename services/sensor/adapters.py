@@ -254,6 +254,161 @@ class PcapAdapter(SensorAdapter):
         )
 
 
+def _nf_value(flow: Any, name: str, default: Any = 0) -> Any:
+    value = getattr(flow, name, default)
+    return default if value is None else value
+
+
+def _convert_nfstream_flow(flow: Any, capture_mode: CaptureMode, sensor_id: str) -> FlowEvent:
+    original_source = (str(flow.src_ip), int(flow.src_port))
+    original_destination = (str(flow.dst_ip), int(flow.dst_port))
+    source, destination = sorted((original_source, original_destination))
+    source_is_src2dst = source == original_source
+    if source_is_src2dst:
+        packets_forward = int(_nf_value(flow, "src2dst_packets"))
+        packets_reverse = int(_nf_value(flow, "dst2src_packets"))
+        bytes_forward = int(_nf_value(flow, "src2dst_bytes"))
+        bytes_reverse = int(_nf_value(flow, "dst2src_bytes"))
+    else:
+        packets_forward = int(_nf_value(flow, "dst2src_packets"))
+        packets_reverse = int(_nf_value(flow, "src2dst_packets"))
+        bytes_forward = int(_nf_value(flow, "dst2src_bytes"))
+        bytes_reverse = int(_nf_value(flow, "src2dst_bytes"))
+
+    duration_ms = max(float(_nf_value(flow, "bidirectional_duration_ms", 0.001)), 0.001)
+    packets = max(int(_nf_value(flow, "bidirectional_packets")), 1)
+    total_bytes = max(int(_nf_value(flow, "bidirectional_bytes")), 0)
+    first_seen_ms = int(_nf_value(flow, "bidirectional_first_seen_ms"))
+    last_seen_ms = max(int(_nf_value(flow, "bidirectional_last_seen_ms")), first_seen_ms)
+    protocol_number = int(_nf_value(flow, "protocol"))
+    protocol = {6: "TCP", 17: "UDP", 1: "ICMP", 58: "ICMPV6"}.get(
+        protocol_number, str(protocol_number)
+    )
+    splt_length = min(packets, 20)
+    raw_sizes = list(_nf_value(flow, "splt_ps", []))[:splt_length]
+    raw_directions = list(_nf_value(flow, "splt_direction", []))[:splt_length]
+    raw_iats = list(_nf_value(flow, "splt_piat_ms", []))[:splt_length]
+    sizes = [max(int(value), 0) for value in raw_sizes]
+    directions = [
+        (1 if int(value) == 0 else -1) * (1 if source_is_src2dst else -1)
+        for value in raw_directions
+    ]
+    iats = [max(float(value), 0.0) for value in raw_iats]
+    application = str(_nf_value(flow, "application_name", "")).strip() or None
+    metadata: dict[str, str | int | float | bool] = {
+        "nfstream_expiration_id": int(_nf_value(flow, "expiration_id")),
+        "application_is_guessed": bool(_nf_value(flow, "application_is_guessed", False)),
+        "application_confidence": float(_nf_value(flow, "application_confidence", 0.0)),
+    }
+    category = str(_nf_value(flow, "application_category_name", "")).strip()
+    if category:
+        metadata["application_category"] = category[:128]
+    key = (*source, *destination, protocol)
+    return FlowEvent(
+        event_id=uuid5(
+            NAMESPACE_URL,
+            f"aegisflow-nfstream:{capture_mode.value}:{sensor_id}:{first_seen_ms}:{key}",
+        ),
+        sensor_id=sensor_id,
+        capture_mode=capture_mode,
+        timestamp_start=datetime.fromtimestamp(first_seen_ms / 1000, UTC),
+        timestamp_end=datetime.fromtimestamp(last_seen_ms / 1000, UTC),
+        duration_ms=duration_ms,
+        src_ip=ip_address(source[0]),
+        dst_ip=ip_address(destination[0]),
+        src_port=source[1],
+        dst_port=destination[1],
+        ip_version=int(_nf_value(flow, "ip_version")),
+        protocol=protocol,
+        application_protocol=application[:64] if application else None,
+        direction="unknown",
+        packets_forward=packets_forward,
+        packets_reverse=packets_reverse,
+        bytes_forward=bytes_forward,
+        bytes_reverse=bytes_reverse,
+        packet_rate=packets / (duration_ms / 1000),
+        byte_rate=total_bytes / (duration_ms / 1000),
+        packet_length_min=max(float(_nf_value(flow, "bidirectional_min_ps")), 0.0),
+        packet_length_max=max(float(_nf_value(flow, "bidirectional_max_ps")), 0.0),
+        packet_length_mean=max(float(_nf_value(flow, "bidirectional_mean_ps")), 0.0),
+        packet_length_std=max(float(_nf_value(flow, "bidirectional_stddev_ps")), 0.0),
+        iat_min=max(float(_nf_value(flow, "bidirectional_min_piat_ms")), 0.0),
+        iat_max=max(float(_nf_value(flow, "bidirectional_max_piat_ms")), 0.0),
+        iat_mean=max(float(_nf_value(flow, "bidirectional_mean_piat_ms")), 0.0),
+        iat_std=max(float(_nf_value(flow, "bidirectional_stddev_piat_ms")), 0.0),
+        tcp_syn_count=int(_nf_value(flow, "bidirectional_syn_packets")),
+        tcp_ack_count=int(_nf_value(flow, "bidirectional_ack_packets")),
+        tcp_fin_count=int(_nf_value(flow, "bidirectional_fin_packets")),
+        tcp_rst_count=int(_nf_value(flow, "bidirectional_rst_packets")),
+        tcp_psh_count=int(_nf_value(flow, "bidirectional_psh_packets")),
+        first_packet_sizes=sizes,
+        first_packet_directions=directions,
+        first_packet_interarrival_times=iats,
+        community_flow_id=_community_id(key),
+        source_adapter="nfstream-6.6.0",
+        protocol_metadata=metadata,
+    )
+
+
+class NfstreamAdapter(SensorAdapter):
+    """NFStream completed-flow adapter for bounded PCAP or explicit Linux live capture."""
+
+    def __init__(
+        self,
+        source: Path | str,
+        *,
+        capture_mode: CaptureMode = CaptureMode.PCAP,
+        sensor_id: str = "nfstream-sensor",
+        idle_timeout: int = 120,
+        active_timeout: int = 1800,
+        max_flows: int = 0,
+    ) -> None:
+        if capture_mode == CaptureMode.DEMO:
+            raise ValueError("NFStream is available only for PCAP or live capture")
+        if capture_mode == CaptureMode.LIVE:
+            if platform.system() != "Linux":
+                raise RuntimeError("live capture is supported only on Linux; use demo or PCAP mode")
+            if not isinstance(source, str) or not source.strip():
+                raise ValueError("live capture requires an explicit interface")
+            self.source = source.strip()
+        else:
+            path = Path(source).resolve()
+            if not path.is_file():
+                raise FileNotFoundError(path)
+            if path.suffix.lower() not in {".pcap", ".pcapng"}:
+                raise ValueError("capture must have .pcap or .pcapng extension")
+            if path.stat().st_size > 512 * 1024 * 1024:
+                raise ValueError("capture exceeds the 512 MiB offline safety limit")
+            self.source = str(path)
+        self.capture_mode = capture_mode
+        self.sensor_id = sensor_id
+        self.idle_timeout = idle_timeout
+        self.active_timeout = active_timeout
+        self.max_flows = max_flows
+
+    def flows(self) -> Iterable[FlowEvent]:
+        try:
+            from nfstream import NFStreamer
+        except (ImportError, OSError) as exc:
+            raise RuntimeError(
+                "NFStream native capture engine is unavailable; use Scapy PCAP or the "
+                "documented Suricata EVE adapter"
+            ) from exc
+        streamer = NFStreamer(
+            source=self.source,
+            promiscuous_mode=self.capture_mode != CaptureMode.LIVE,
+            statistical_analysis=True,
+            splt_analysis=20,
+            n_dissections=20,
+            idle_timeout=self.idle_timeout,
+            active_timeout=self.active_timeout,
+            max_nflows=self.max_flows,
+            n_meters=1 if self.capture_mode == CaptureMode.LIVE else 0,
+        )
+        for flow in streamer:
+            yield _convert_nfstream_flow(flow, self.capture_mode, self.sensor_id)
+
+
 class LiveAdapter(SensorAdapter):
     def __init__(self, interface: str | None) -> None:
         if not interface:
@@ -263,7 +418,8 @@ class LiveAdapter(SensorAdapter):
         self.interface = interface
 
     def flows(self) -> Iterable[FlowEvent]:
-        raise RuntimeError(
-            "live capture adapter is intentionally disabled until CAP_NET_RAW and interface "
-            "authorization are verified; use the documented Suricata EVE flow adapter"
-        )
+        return NfstreamAdapter(
+            self.interface,
+            capture_mode=CaptureMode.LIVE,
+            sensor_id="live-nfstream-sensor",
+        ).flows()

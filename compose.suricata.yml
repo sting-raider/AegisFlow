@@ -1,0 +1,23 @@
+name: aegisflow-suricata
+
+services:
+  suricata-replay:
+    image: jasonish/suricata:8.0.6
+    command:
+      - -r
+      - /captures/input.pcap
+      - -l
+      - /var/log/suricata
+      - -S
+      - /etc/suricata/rules/aegisflow-demo.rules
+    volumes:
+      - ${SURICATA_PCAP:?set SURICATA_PCAP explicitly}:/captures/input.pcap:ro
+      - ./configs/suricata/rules/aegisflow-demo.rules:/etc/suricata/rules/aegisflow-demo.rules:ro
+      - ./.runtime/suricata:/var/log/suricata
+    network_mode: none
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    cap_add: ["DAC_OVERRIDE"]
+    profiles: ["suricata"]

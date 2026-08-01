@@ -20,6 +20,11 @@ CLI. The one-process demo composes the same adapters, contracts, feature pipelin
 detection engine, and repository used by distributed mode, so it is useful in CI
 without pretending to validate infrastructure recovery.
 
+Scapy provides the deterministic, portable PCAP fallback. NFStream 6.6.0 is the
+completed-flow adapter for higher-fidelity PCAP and explicit Linux live capture.
+Suricata 8.0.6 runs independently for signature evidence; its allow-listed EVE output
+is correlated by community ID first, then normalized endpoints and bounded time.
+
 Data contracts reject invalid input at boundaries. Events are idempotent by UUID.
 Feature order and transformations are versioned; model bundles carry checksums,
 thresholds, labels, metrics, and provenance. Payload storage and active response are

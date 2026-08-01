@@ -68,14 +68,16 @@ make test
 make train-smoke
 make replay PCAP=/absolute/path/capture.pcap
 make live INTERFACE=eth0
+make suricata-replay PCAP=/absolute/path/capture.pcap
 make benchmark
 make reset
 ```
 
 `make live` is Linux-only, requires an explicit interface, and prints an authorization
-warning. The initial live adapter fails closed until capture capabilities and the
-interface are verified; Suricata EVE flow ingestion is the documented production
-path. Never replay malicious traffic onto a real network.
+warning. It builds a dedicated non-root NFStream sensor target with only `NET_RAW`;
+the API and detector continue to drop every capability. The Suricata replay profile
+has no network and accepts only an explicitly mounted PCAP. Never replay malicious
+traffic onto a real network.
 
 ## Training and models
 
@@ -110,8 +112,9 @@ Read the full [`threat model`](docs/THREAT_MODEL.md) before live deployment.
 ## Known limitations
 
 - The bundled model is synthetic smoke data, not a production model.
-- The Scapy PCAP adapter is deterministic but deliberately compact; high-throughput
-  deployment should use validated Suricata/Zeek/NFStream flow output.
+- The Scapy PCAP adapter is deterministic but deliberately compact. NFStream 6.6.0 is
+  validated for PCAP and explicit Linux live interfaces; its Windows native engine is
+  unavailable, so Windows falls back to Scapy replay.
 - Windows supports demo and PCAP replay, not live capture.
 - The bundled Isolation Forest and autoencoder are calibrated only against deterministic
   synthetic smoke data; independent public-dataset evaluation remains required before

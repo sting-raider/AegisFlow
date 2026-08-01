@@ -74,3 +74,23 @@ bounded version history, explicit rollback uses the same validation path, and st
 falls back to a previous valid version with a surfaced warning. Bundle v1 remains
 loadable solely as a recovery target. A mandatory v2-only migration was rejected because
 it would remove the known-good fallback during rollout.
+
+## D-009 — NFStream live target with portable PCAP fallback
+
+Use NFStream 6.6.0 for completed-flow PCAP and explicit Linux live capture, while
+retaining the deterministic Scapy adapter as the portable fallback. Live capture uses
+a separate Docker build target so `cap_net_raw` is present only on that target's Python
+interpreter; granting it to the shared backend interpreter made ordinary
+`cap_drop: ALL` containers fail at exec. The live container remains non-root,
+non-promiscuous, read-only, and receives only `NET_RAW`. NFStream's Windows native
+engine does not load reliably, so forcing it as the only adapter was rejected.
+
+## D-010 — Independent, pinned Suricata evidence
+
+Run Suricata as optional infrastructure rather than an application dependency. Pin
+8.0.6, use an isolated no-network profile with only `DAC_OVERRIDE` for PCAP rule
+evaluation (the image config is mode `0600` and fresh output binds are root-owned), and
+keep Linux live capture behind an explicit interface plus narrowly declared
+capabilities. EVE ingestion retains only allow-listed or hashed metadata, surfaces
+malformed records, and correlates without making Suricata mandatory for demo mode.
+Automatic rule downloads and unrestricted raw EVE persistence were rejected.

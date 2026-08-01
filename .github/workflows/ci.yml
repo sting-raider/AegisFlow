@@ -23,6 +23,7 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy packages services apps/api training scripts
       - run: uv run pytest --cov=packages --cov=services --cov=apps.api
+      - run: uv run python scripts/evaluate_nfstream.py --pcap tests/fixtures/demo.pcap
       - run: uv run python -m training.cli.train_smoke
       - run: AEGISFLOW_DATABASE_URL=sqlite:///ci-migration.db uv run alembic upgrade head
 
@@ -49,7 +50,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose -f compose.yml -f compose.demo.yml config --quiet
+      - run: INTERFACE=eth0 docker compose -f compose.yml -f compose.live.yml --profile live config --quiet
+      - run: SURICATA_PCAP="$PWD/tests/fixtures/demo.pcap" docker compose -f compose.suricata.yml --profile suricata config --quiet
       - run: docker compose -f compose.yml -f compose.demo.yml build
+      - run: docker build -f infra/docker/backend.Dockerfile --target sensor-live -t aegisflow-sensor-live:ci .
+      - run: >-
+          docker run --rm --network none --read-only
+          --security-opt no-new-privileges --cap-drop ALL --cap-add NET_RAW
+          --entrypoint python aegisflow-sensor-live:ci
+          scripts/evaluate_nfstream.py --interface lo --loopback-probe
 
   integration:
     runs-on: ubuntu-24.04

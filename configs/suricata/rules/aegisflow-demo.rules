@@ -1,0 +1,1 @@
+alert tcp 10.20.0.0/16 any -> 198.51.100.0/24 443 (msg:"AEGISFLOW safe demo TLS connection"; flow:to_server; sid:9000001; rev:1;)

@@ -40,6 +40,16 @@ Last updated: 2026-08-01.
   dashboard, Compose and integration/E2E jobs; its security job failed before checkout
   because the Trivy action tag omitted the required `v` prefix. CI now pins the verified
   `aquasecurity/trivy-action@v0.36.0` release and awaits the replacement remote run.
+- NFStream 6.6.0 processes the bundled PCAP into two canonical flows inside a Linux
+  container with networking disabled and all capabilities dropped. The dedicated live
+  stage runs as UID 10001 and, with only `NET_RAW`, captured one repeated loopback-only
+  UDP flow. The ordinary backend still executes with every capability dropped. Native
+  NFStream does not load on Windows, where Scapy remains the documented PCAP fallback.
+- Pinned Suricata 8.0.6 replayed the bundled three-packet fixture with no network and
+  only `DAC_OVERRIDE`, loaded one safe rule, and emitted one alert, one DNS record, and two
+  flow records. The incremental reader parsed all four with zero errors, hashed the DNS
+  name, and correlated the alert to one of two flows. Ten focused tests plus Ruff and
+  strict MyPy pass for the NFStream/Suricata slice.
 
 ## Hard blockers and fallbacks
 
@@ -48,10 +58,6 @@ Last updated: 2026-08-01.
 
 ## Highest-priority required backlog
 
-- Real NFStream Linux-container evaluation and adapter. Acceptance: fixture PCAP and an
-  explicitly selected isolated/local interface work without temporary-PCAP looping.
-- Full Suricata integration. Acceptance: alert/anomaly/flow/DNS/TLS/HTTP allow-listed
-  EVE parsing, correlation, deduplication, health, fixtures, and an optional Compose profile.
 - Dataset and evaluation tooling. Acceptance: named CIC-IDS2017, CSE-CIC-IDS2018,
   UNSW-NB15 and generic flow-CSV adapters; quality/leakage reports; grouped/time,
   leave-family-out and cross-dataset evaluation.

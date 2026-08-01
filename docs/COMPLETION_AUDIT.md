@@ -8,8 +8,8 @@ marked complete only when implementation and proportionate verification both exi
 | Upstream audit and attribution | `UPSTREAM.md`, `docs/UPSTREAM_AUDIT.md`, Apache-2.0 root license | Complete |
 | Canonical contracts | Pydantic v2 contracts and generated JSON-schema contract tests | Complete |
 | Demo and PCAP sensor modes | Deterministic fixtures, bounded Scapy PCAP reader, replay tests | Complete |
-| Live/NFStream extraction | Linux guard exists; live adapter deliberately raises; NFStream is not evaluated | **Incomplete:** implement and evaluate NFStream fixture and isolated-interface paths |
-| Suricata | Bounded alert parser and fixture test | **Incomplete:** EVE flow/DNS/TLS/HTTP/anomaly parsing, reader dedupe/correlation, health and Compose profile |
+| Live/NFStream extraction | NFStream 6.6.0 completed-flow adapter; two-flow bounded PCAP test; one-flow non-root Linux loopback test; dedicated `NET_RAW` image target; Windows fallback | Complete |
+| Suricata | Pinned replay/live profiles; real isolated replay; six-type allow-listed parser; partial-line errors; bounded dedupe; health; correlation; checksum-pinned rule updater | Complete |
 | Feature parity | Versioned fixed registry, serialized scaler, parity/range tests | Complete for current 18-feature schema; property coverage needs expansion |
 | Supervised model | Grouped holdout compares logistic regression, random forest and MLP; selected classifier uses grouped-fold sigmoid calibration; bundle records per-class/macro/weighted, PR/ROC-AUC, calibration, confusion, importance and single/batch CPU latency | Complete for deterministic smoke scope; independent-dataset evidence remains under dataset tooling |
 | Unknown/open-set model | Benign-only Isolation Forest plus benign-only PyTorch denoising autoencoder, validation-tail normalization, reason-coded fusion and synthetic novelty evaluation | Complete for deterministic smoke scope; held-out-family/cross-dataset evidence remains under dataset tooling |
@@ -30,7 +30,7 @@ marked complete only when implementation and proportionate verification both exi
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
 | CI/CD | Python/frontend/Compose/integration/migration/audit/Trivy/gitleaks jobs | Complete; final remote run must be verified after publication |
 | Documentation | Required topic files and screenshots exist | **Incomplete:** refresh after remaining implementation and remove outdated completion claims |
-| GitHub publication | Authenticated GitHub CLI; no remote configured | **Incomplete:** create repository, push branch/default branch, verify Actions and repository visibility |
+| GitHub publication | Public `sting-raider/AegisFlow` repository and `main` default branch | Complete; final remote run still tracked under CI/CD |
 
 The project is not complete while any row is marked incomplete. `docs/PROGRESS.md` must
 remain consistent with this matrix as work lands.

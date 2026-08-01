@@ -1,8 +1,11 @@
 PYTHON ?= python
 UV ?= uv
 COMPOSE = docker compose -f compose.yml -f compose.demo.yml
+LIVE_COMPOSE = docker compose -f compose.yml -f compose.live.yml
+SURICATA_COMPOSE = docker compose -f compose.suricata.yml
 
-.PHONY: install lint typecheck test train-smoke demo demo-stop replay live benchmark reset
+.PHONY: install lint typecheck test train-smoke demo demo-stop replay live live-stop \
+	suricata-replay benchmark reset
 
 install:
 	$(UV) sync --extra dev
@@ -44,7 +47,16 @@ ifndef INTERFACE
 	$(error INTERFACE=eth0 is required)
 endif
 	@echo PRIVACY WARNING: Capture only an explicitly authorized local Linux interface.
-	$(UV) run python -m services.sensor.main --mode live --interface "$(INTERFACE)"
+	INTERFACE="$(INTERFACE)" $(LIVE_COMPOSE) --profile live up --build
+
+live-stop:
+	$(LIVE_COMPOSE) --profile live down
+
+suricata-replay:
+ifndef PCAP
+	$(error PCAP=/path/to/file.pcap is required)
+endif
+	SURICATA_PCAP="$(PCAP)" $(SURICATA_COMPOSE) --profile suricata run --rm suricata-replay
 
 benchmark:
 	$(UV) run python -m scripts.benchmark

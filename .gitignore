@@ -10,9 +10,12 @@ dist/
 build/
 *.egg-info/
 .env
+.runtime/
 data/
 *.pcap
 *.pcapng
+!tests/fixtures/
+!tests/fixtures/demo.pcap
 *.db
 *.sqlite*
 node_modules/

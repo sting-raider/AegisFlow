@@ -1,7 +1,32 @@
 services:
+  redis:
+    ports:
+      - "127.0.0.1:6379:6379"
+
   sensor:
+    build:
+      target: sensor-live
     command: ["python", "-m", "services.sensor.main", "--mode", "live", "--interface", "${INTERFACE:?set INTERFACE explicitly}"]
     network_mode: host
+    environment:
+      AEGISFLOW_REDIS_URL: redis://127.0.0.1:6379/0
     cap_drop: ["ALL"]
     cap_add: ["NET_RAW"]
     profiles: ["live"]
+
+  suricata-live:
+    image: jasonish/suricata:8.0.6
+    command:
+      - -i
+      - ${INTERFACE:?set INTERFACE explicitly}
+      - -l
+      - /var/log/suricata
+    network_mode: host
+    volumes:
+      - ./.runtime/suricata:/var/log/suricata
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    cap_add: ["NET_RAW", "NET_ADMIN", "DAC_OVERRIDE"]
+    profiles: ["suricata-live"]
