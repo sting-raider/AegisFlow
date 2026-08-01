@@ -1,0 +1,9 @@
+seed: 431
+split: source_group
+classifier: logistic_regression
+calibration: sigmoid_group_kfold
+anomaly_baseline: isolation_forest_benign_only
+advanced_anomaly: denoising_autoencoder_benign_only
+autoencoder_epochs: 120
+autoencoder_noise_std: 0.06
+device: cpu

@@ -1,0 +1,57 @@
+{
+  "bundle_schema_version": 2,
+  "model_name": "aegisflow-smoke",
+  "version": "0.2.0",
+  "created_at": "2026-08-01T11:08:29.636384+00:00",
+  "git_commit": "679507ca9a9db52858f8e02cf7967e2caadcb18a",
+  "python_version": "3.12.9",
+  "dependency_versions": {
+    "joblib": "1.5.1",
+    "numpy": "2.3.2",
+    "scikit_learn": "1.7.1",
+    "torch": "2.13.0+cpu"
+  },
+  "feature_schema_version": "1.0.0",
+  "dataset_fingerprints": [
+    "synthetic-seed-431-v2"
+  ],
+  "training_seed": 431,
+  "model_classes": [
+    "benign",
+    "brute_force",
+    "port_scan"
+  ],
+  "thresholds": {
+    "version": "2.0.0",
+    "known_threshold": 0.72,
+    "anomaly_threshold": 0.7,
+    "isolation_decision_benign_median": -0.01373677968594611,
+    "isolation_decision_benign_p03": -0.05506203234736519,
+    "reconstruction_error_benign_p50": 0.07262618839740753,
+    "reconstruction_error_benign_p97": 0.189524307847023,
+    "reconstruction_error_benign_p99": 0.2121082991361618,
+    "open_set_validation_scale": 0.9081057466160366,
+    "normalization": "validation benign p50 maps to 0; tail budget maps to 0.70",
+    "selection_target": "3% held-out benign tail budget on deterministic smoke data"
+  },
+  "calibration_method": "sigmoid calibration with grouped training-fold CV",
+  "validation_metrics": {
+    "macro_f1": 1.0,
+    "weighted_f1": 1.0,
+    "benign_false_positive_rate": 0.0380952380952381,
+    "unknown_attack_detection_rate_synthetic": 1.0
+  },
+  "known_limitations": [
+    "Synthetic smoke data is not evidence of production detection quality",
+    "No packet payload or raw IP-address features are used",
+    "Unknown detection identifies statistical novelty, not guaranteed zero-days",
+    "Public-dataset and cross-dataset evaluation must precede production promotion"
+  ],
+  "artifact_hashes": {
+    "preprocessor.joblib": "20242f35254b4f43fa27c599ad8aaa63b8d2a66ae3350118fcdce6d6d0098ca8",
+    "classifier.joblib": "eeb57eec04a48242bae81f1edf2d33e9ba8335a26cca5c9a269630b00675b94f",
+    "anomaly.joblib": "746f22611cec9725cbbda5ee9e5356d9a47d4bddcff4769f85e7e088361863c7",
+    "autoencoder.pt": "7ccdc77d00b32e403a50c5d61c82919ba0000d9f8dab80c835949b68dd4c5bb4"
+  },
+  "artifact_format": "joblib-local-trusted+torch-state-dict"
+}

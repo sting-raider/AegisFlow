@@ -17,6 +17,7 @@ COPY training ./training
 COPY scripts ./scripts
 COPY migrations ./migrations
 RUN python -m pip install --upgrade pip==25.1.1 \
+    && python -m pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu \
     && python -m pip install .
 COPY models/registry ./models/registry
 

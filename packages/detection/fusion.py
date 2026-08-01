@@ -28,6 +28,7 @@ class FusionInput:
     signature_score: float = 0.0
     contextual_score: float = 0.0
     model_disagreement: float = 0.0
+    reconstruction_score: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -60,13 +61,15 @@ def fuse_risk(signals: FusionInput, config: FusionConfig | None = None) -> Fusio
         signals.signature_score,
         signals.contextual_score,
         signals.model_disagreement,
+        signals.reconstruction_score,
     )
     if any(v < 0 or v > 1 for v in values):
         raise ValueError("fusion signals must be in [0, 1]")
 
+    open_set_signal = max(signals.anomaly_score, signals.reconstruction_score)
     risk = 100 * (
         config.known_weight * signals.known_attack_probability
-        + config.anomaly_weight * signals.anomaly_score
+        + config.anomaly_weight * open_set_signal
         + config.signature_weight * signals.signature_score
         + config.context_weight * signals.contextual_score
     )
@@ -79,6 +82,8 @@ def fuse_risk(signals: FusionInput, config: FusionConfig | None = None) -> Fusio
         reasons.append("HIGH_KNOWN_ATTACK_PROBABILITY")
     if signals.anomaly_score >= config.anomaly_threshold:
         reasons.append("ISOLATION_OUTLIER")
+    if signals.reconstruction_score >= config.anomaly_threshold:
+        reasons.append("HIGH_RECONSTRUCTION_ERROR")
     if signals.classifier_confidence < 0.58:
         reasons.append("LOW_CLASSIFIER_CONFIDENCE")
     if signals.contextual_score >= 0.65:
@@ -92,11 +97,11 @@ def fuse_risk(signals: FusionInput, config: FusionConfig | None = None) -> Fusio
     ):
         verdict = Verdict.KNOWN_ATTACK
     elif (
-        signals.anomaly_score >= config.anomaly_threshold
+        open_set_signal >= config.anomaly_threshold
         and signals.known_attack_probability < config.known_threshold
     ):
         verdict = Verdict.SUSPICIOUS_UNKNOWN
-    elif risk <= config.benign_max_risk and signals.anomaly_score < config.anomaly_threshold:
+    elif risk <= config.benign_max_risk and open_set_signal < config.anomaly_threshold:
         verdict = Verdict.BENIGN
     else:
         verdict = Verdict.NEEDS_REVIEW

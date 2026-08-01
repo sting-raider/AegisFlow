@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from packages.model_bundle import ModelBundle
+from packages.model_bundle import ModelBundle, load_production_bundle
 from training.cli.train_smoke import train
 
 
@@ -18,4 +18,4 @@ def registry(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Path]:
 
 @pytest.fixture(scope="session")
 def bundle(registry: Path) -> ModelBundle:
-    return ModelBundle.load(registry / "aegisflow-smoke" / "0.1.0")
+    return load_production_bundle(registry)

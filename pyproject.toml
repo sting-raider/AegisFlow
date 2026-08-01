@@ -15,6 +15,8 @@ dependencies = [
   "httpx==0.28.1",
   "joblib==1.5.1",
   "numpy==2.3.2",
+  "nfstream==6.6.0",
+  "psutil==7.2.2",
   "prometheus-client==0.22.1",
   "psycopg[binary]==3.2.9",
   "pydantic==2.11.7",
@@ -23,6 +25,7 @@ dependencies = [
   "scikit-learn==1.7.1",
   "sqlalchemy==2.0.41",
   "structlog==25.4.0",
+  "torch==2.13.0",
   "uvicorn[standard]==0.35.0",
 ]
 
@@ -43,6 +46,14 @@ aegisflow-train-smoke = "training.cli.train_smoke:main"
 [tool.hatch.build.targets.wheel]
 packages = ["apps", "packages", "services", "training", "scripts"]
 
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers"
 testpaths = ["tests"]
@@ -62,6 +73,6 @@ exclude = ["apps/dashboard"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["joblib", "sklearn", "sklearn.*", "scapy", "scapy.*"]
+module = ["joblib", "sklearn", "sklearn.*", "scapy", "scapy.*", "nfstream"]
 ignore_missing_imports = true
 follow_imports = "skip"

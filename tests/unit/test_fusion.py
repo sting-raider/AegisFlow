@@ -42,6 +42,20 @@ def test_weak_signal_cannot_create_critical_alert() -> None:
     assert outcome.risk < 50
 
 
+def test_reconstruction_anomaly_can_trigger_unknown_without_isolation_outlier() -> None:
+    outcome = fuse_risk(
+        FusionInput(
+            known_attack_probability=0.10,
+            classifier_confidence=0.48,
+            anomaly_score=0.25,
+            reconstruction_score=0.91,
+        )
+    )
+    assert outcome.verdict == Verdict.SUSPICIOUS_UNKNOWN
+    assert "HIGH_RECONSTRUCTION_ERROR" in outcome.reasons
+    assert "ISOLATION_OUTLIER" not in outcome.reasons
+
+
 def test_invalid_signal_is_rejected() -> None:
     with pytest.raises(ValueError):
         fuse_risk(

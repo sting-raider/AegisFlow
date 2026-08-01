@@ -7,6 +7,7 @@ from uuid import NAMESPACE_URL, uuid5
 import numpy as np
 
 from packages.contracts import DetectionResult, FlowEvent, SignatureEvent
+from packages.detection.autoencoder import reconstruction_errors
 from packages.detection.fusion import FusionConfig, FusionInput, fuse_risk
 from packages.features import flow_to_vector
 from packages.model_bundle import ModelBundle
@@ -47,10 +48,40 @@ class DetectionEngine:
         confidence = float(max(probabilities))
 
         decision = float(self.bundle.anomaly.decision_function(transformed)[0])
-        center = float(self.bundle.thresholds.get("anomaly_decision_center", 0.0))
-        scale = max(float(self.bundle.thresholds.get("anomaly_decision_scale", 0.1)), 1e-6)
-        anomaly_score = 1.0 / (1.0 + math.exp((decision - center) / scale))
-        anomaly_score = float(np.clip(anomaly_score, 0.0, 1.0))
+        if "isolation_decision_benign_median" in self.bundle.thresholds:
+            center = float(self.bundle.thresholds["isolation_decision_benign_median"])
+            tail = float(self.bundle.thresholds["isolation_decision_benign_p03"])
+            denominator = max(center - tail, 1e-9)
+            isolation_score = float(
+                np.clip(((center - decision) / denominator) * self.fusion.anomaly_threshold, 0, 1)
+            )
+        else:
+            center = float(self.bundle.thresholds.get("anomaly_decision_center", 0.0))
+            scale = max(float(self.bundle.thresholds.get("anomaly_decision_scale", 0.1)), 1e-6)
+            isolation_score = 1.0 / (1.0 + math.exp((decision - center) / scale))
+            isolation_score = float(np.clip(isolation_score, 0.0, 1.0))
+
+        reconstruction_error = 0.0
+        reconstruction_score = 0.0
+        if self.bundle.autoencoder is not None:
+            reconstruction_error = float(
+                reconstruction_errors(self.bundle.autoencoder, transformed)[0]
+            )
+            reconstruction_center = float(self.bundle.thresholds["reconstruction_error_benign_p50"])
+            reconstruction_tail = float(self.bundle.thresholds["reconstruction_error_benign_p97"])
+            denominator = max(reconstruction_tail - reconstruction_center, 1e-9)
+            reconstruction_score = float(
+                np.clip(
+                    ((reconstruction_error - reconstruction_center) / denominator)
+                    * self.fusion.anomaly_threshold,
+                    0,
+                    1,
+                )
+            )
+        validation_scale = float(self.bundle.thresholds.get("open_set_validation_scale", 1.0))
+        isolation_score = float(np.clip(isolation_score * validation_scale, 0, 1))
+        reconstruction_score = float(np.clip(reconstruction_score * validation_scale, 0, 1))
+        anomaly_score = max(isolation_score, reconstruction_score)
 
         signature_score = 0.0
         if signature is not None:
@@ -68,10 +99,11 @@ class DetectionEngine:
             FusionInput(
                 known_attack_probability=known_probability,
                 classifier_confidence=confidence,
-                anomaly_score=anomaly_score,
+                anomaly_score=isolation_score,
                 signature_score=signature_score,
                 contextual_score=contextual_score,
                 model_disagreement=disagreement,
+                reconstruction_score=reconstruction_score,
             ),
             self.fusion,
         )
@@ -86,13 +118,17 @@ class DetectionEngine:
                 NAMESPACE_URL, f"aegisflow-detection:{flow.event_id}:{self.bundle.version}"
             ),
             flow_event_id=flow.event_id,
-            known_attack_label=known_label if known_probability >= 0.5 else None,
+            known_attack_label=(
+                known_label if known_probability >= self.fusion.known_threshold else None
+            ),
             known_attack_probability=round(known_probability, 8),
             class_probabilities={k: round(v, 8) for k, v in class_probabilities.items()},
             classifier_confidence=round(confidence, 8),
             anomaly_score=round(anomaly_score, 8),
             anomaly_percentile=round(anomaly_score, 8),
-            open_set_score=round(anomaly_score * (1.0 - confidence), 8),
+            open_set_score=round(anomaly_score * _classifier_uncertainty(probabilities), 8),
+            reconstruction_error=round(reconstruction_error, 8),
+            reconstruction_score=round(reconstruction_score, 8),
             signature_score=signature_score,
             contextual_score=contextual_score,
             final_risk_score=outcome.risk,
@@ -106,3 +142,15 @@ class DetectionEngine:
             inference_latency_ms=elapsed_ms,
             processing_latency_ms=total_ms,
         )
+
+
+def _classifier_uncertainty(probabilities: np.ndarray) -> float:
+    if len(probabilities) <= 1:
+        return 1.0 - float(probabilities[0])
+    ordered = np.sort(probabilities)
+    margin_uncertainty = 1.0 - float(ordered[-1] - ordered[-2])
+    entropy = -float(np.sum(probabilities * np.log(np.clip(probabilities, 1e-12, 1.0))))
+    normalized_entropy = entropy / math.log(len(probabilities))
+    return float(
+        np.clip(max(1.0 - float(ordered[-1]), margin_uncertainty, normalized_entropy), 0, 1)
+    )

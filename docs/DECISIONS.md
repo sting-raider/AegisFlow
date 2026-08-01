@@ -23,9 +23,9 @@ explicit.
 
 ## D-004 — Conservative open-set baseline
 
-Use calibrated supervised probabilities plus an Isolation Forest trained only on
-benign smoke data. No anomaly is called a zero-day. Autoencoder work is optional
-until the baseline is measurable.
+Use calibrated supervised probabilities plus an Isolation Forest and compact denoising
+autoencoder trained only on benign smoke data. No anomaly is called a zero-day. Both
+anomaly signals are normalized against a held-out benign tail budget before fusion.
 
 ## D-005 — Dashboard visual language
 
@@ -63,3 +63,14 @@ replay idempotent. This favors visible at-least-once delivery over silent event 
 Compose uses `unless-stopped` for the long-running stateful and application services.
 Queue lag and pending counts are observable through the API, dashboard, and Prometheus.
 Automatic blocking remains prohibited regardless of recovery or detection outcome.
+
+## D-008 — Versioned dual-signal bundles with safe fallback
+
+Bundle schema v2 adds a CPU-only PyTorch denoising autoencoder state dictionary while
+retaining the trusted-local joblib artifacts. The manifest duplicates hashes for the four
+executable model artifacts in addition to the complete checksum file. A candidate is
+fully validated before `production.json` is atomically replaced; promotion records a
+bounded version history, explicit rollback uses the same validation path, and startup
+falls back to a previous valid version with a surfaced warning. Bundle v1 remains
+loadable solely as a recovery target. A mandatory v2-only migration was rejected because
+it would remove the known-good fallback during rollout.

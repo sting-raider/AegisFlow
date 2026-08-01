@@ -151,6 +151,8 @@ class DetectionResult(ContractModel):
     anomaly_score: Annotated[float, Field(ge=0, le=1)]
     anomaly_percentile: Annotated[float, Field(ge=0, le=1)]
     open_set_score: Annotated[float, Field(ge=0, le=1)]
+    reconstruction_error: NonNegativeFloat = 0.0
+    reconstruction_score: Annotated[float, Field(ge=0, le=1)] = 0.0
     signature_score: Annotated[float, Field(ge=0, le=1)]
     contextual_score: Annotated[float, Field(ge=0, le=1)]
     final_risk_score: Annotated[float, Field(ge=0, le=100)]

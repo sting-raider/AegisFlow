@@ -1,0 +1,155 @@
+{
+  "scope": "deterministic synthetic smoke test only",
+  "candidate_macro_f1": {
+    "logistic_regression": 1.0,
+    "random_forest": 1.0,
+    "mlp": 1.0
+  },
+  "selected": "logistic_regression",
+  "classification_report": {
+    "benign": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 105.0
+    },
+    "brute_force": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 30.0
+    },
+    "port_scan": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 36.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 171.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 171.0
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "benign",
+      "brute_force",
+      "port_scan"
+    ],
+    "values": [
+      [
+        105,
+        0,
+        0
+      ],
+      [
+        0,
+        30,
+        0
+      ],
+      [
+        0,
+        0,
+        36
+      ]
+    ]
+  },
+  "macro_f1": 1.0,
+  "weighted_f1": 1.0,
+  "macro_pr_auc_ovr": 1.0,
+  "macro_roc_auc_ovr": 1.0,
+  "benign_false_positive_rate": 0.0380952380952381,
+  "unknown_attack_detection_rate_synthetic": 1.0,
+  "known_vs_unknown_confusion": {
+    "labels": [
+      "known_attack",
+      "synthetic_unknown"
+    ],
+    "predicted_columns": [
+      "known_or_review",
+      "suspicious_unknown"
+    ],
+    "values": [
+      [
+        65,
+        1
+      ],
+      [
+        0,
+        80
+      ]
+    ]
+  },
+  "calibration": {
+    "multiclass_brier_score": 0.003438140963091823,
+    "expected_calibration_error_10_bins": 0.025107773629012196
+  },
+  "feature_importance": [
+    {
+      "feature": "tcp_syn_count",
+      "importance": 0.4453037962281541
+    },
+    {
+      "feature": "packets_forward",
+      "importance": 0.3800485609162565
+    },
+    {
+      "feature": "packets_reverse",
+      "importance": 0.3727887641511873
+    },
+    {
+      "feature": "syn_ack_ratio",
+      "importance": 0.3334237739111363
+    },
+    {
+      "feature": "packet_rate",
+      "importance": 0.3326615468921246
+    },
+    {
+      "feature": "forward_reverse_byte_ratio",
+      "importance": 0.32869834815939786
+    },
+    {
+      "feature": "destination_port",
+      "importance": 0.3170118591286029
+    },
+    {
+      "feature": "bytes_forward",
+      "importance": 0.30211343769044474
+    },
+    {
+      "feature": "tcp_rst_count",
+      "importance": 0.2980600126006573
+    },
+    {
+      "feature": "packets_total",
+      "importance": 0.28934795857254686
+    }
+  ],
+  "latency": {
+    "single_flow_p50_ms": 2.256200008559972,
+    "single_flow_p95_ms": 3.183390000776853,
+    "single_flow_p99_ms": 3.4855610108934325,
+    "batch_size": 128.0,
+    "batch_p50_ms": 2.280400018207729,
+    "batch_p95_ms": 3.116120002232491,
+    "batch_p99_ms": 3.3881159999873485
+  },
+  "autoencoder": {
+    "trained_on_benign_rows": 315,
+    "held_out_benign_rows": 105,
+    "reconstruction_error_p50": 0.07262618839740753,
+    "reconstruction_error_p97": 0.189524307847023,
+    "reconstruction_error_p99": 0.2121082991361618
+  },
+  "test_rows": 171
+}

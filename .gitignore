@@ -26,5 +26,7 @@ models/registry/**/*
 !models/registry/aegisflow-smoke/production.json
 !models/registry/aegisflow-smoke/0.1.0/
 !models/registry/aegisflow-smoke/0.1.0/**
+!models/registry/aegisflow-smoke/0.2.0/
+!models/registry/aegisflow-smoke/0.2.0/**
 graphify-out/
 .upstream/

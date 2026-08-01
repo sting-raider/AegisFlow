@@ -18,7 +18,7 @@ flowchart LR
   T["Demo / PCAP / explicit live"] --> S["Sensor"]
   E["Suricata EVE"] --> S
   S --> R1["Redis flow stream"]
-  R1 --> D["Detector\nclassifier + Isolation Forest + fusion"]
+  R1 --> D["Detector\ncalibrated classifier + Isolation Forest + autoencoder + fusion"]
   D --> R2["Detection stream"]
   R2 --> A["FastAPI / incidents"]
   A --> P["PostgreSQL"]
@@ -79,11 +79,14 @@ path. Never replay malicious traffic onto a real network.
 
 ## Training and models
 
-`make train-smoke` benchmarks logistic regression and a tree model on deterministic
+`make train-smoke` benchmarks logistic regression, a tree model, and a compact MLP on deterministic
 synthetic data, uses a source-group split, fits preprocessing on the training fold
-only, and trains Isolation Forest on benign training rows. The chosen bundle includes
-the feature schema, preprocessing, classifier, anomaly model, labels, thresholds,
-metrics, training provenance, manifest, and SHA-256 checksums.
+only, calibrates the selected classifier with grouped training-fold CV, and trains both
+Isolation Forest and a compact denoising autoencoder on benign rows only. Bundle v2
+includes the feature schema, preprocessing, classifier, both anomaly models, labels,
+validation-derived thresholds, metrics, training provenance, artifact hashes, and
+SHA-256 checksums. Production promotion is atomic and records rollback history; a
+corrupt current bundle falls back visibly to the previous valid version.
 
 Smoke metrics are only installation evidence. They are not claims about operational
 quality. Public datasets are downloaded separately and never committed. See
@@ -110,8 +113,9 @@ Read the full [`threat model`](docs/THREAT_MODEL.md) before live deployment.
 - The Scapy PCAP adapter is deterministic but deliberately compact; high-throughput
   deployment should use validated Suricata/Zeek/NFStream flow output.
 - Windows supports demo and PCAP replay, not live capture.
-- The baseline anomaly model is Isolation Forest. The denoising autoencoder is tracked
-  as optional work in `docs/PROGRESS.md`.
+- The bundled Isolation Forest and autoencoder are calibrated only against deterministic
+  synthetic smoke data; independent public-dataset evaluation remains required before
+  operational use.
 - Redis/PostgreSQL restart recovery uses consumer groups, stale-entry claiming, durable
   acknowledgement, bounded retries, and idempotent event IDs. The Compose fault matrix is
   documented in `docs/PROGRESS.md`.

@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "known_threshold": 0.72,
+  "anomaly_threshold": 0.7,
+  "isolation_decision_benign_median": -0.01373677968594611,
+  "isolation_decision_benign_p03": -0.05506203234736519,
+  "reconstruction_error_benign_p50": 0.07262618839740753,
+  "reconstruction_error_benign_p97": 0.189524307847023,
+  "reconstruction_error_benign_p99": 0.2121082991361618,
+  "open_set_validation_scale": 0.9081057466160366,
+  "normalization": "validation benign p50 maps to 0; tail budget maps to 0.70",
+  "selection_target": "3% held-out benign tail budget on deterministic smoke data"
+}

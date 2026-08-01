@@ -14,6 +14,8 @@ export interface Detection {
   reason_codes: string[];
   explanation: string;
   anomaly_score: number;
+  reconstruction_error: number;
+  reconstruction_score: number;
   known_attack_probability: number;
   signature_score: number;
   classifier_model_version: string;
