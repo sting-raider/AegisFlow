@@ -36,8 +36,10 @@ Last updated: 2026-08-01.
   promotes `production.json` atomically with history, supports explicit rollback, and
   visibly falls back from a corrupt current version to the previous valid v0.1.0 bundle.
 - Public GitHub repository created at `https://github.com/sting-raider/AegisFlow`; `main`
-  contains the last verified recovery milestone. Bundle v2 remains local until its
-  generated provenance is refreshed after the implementation commit.
+  contains the verified bundle-v2 milestone. The first remote run passed Python,
+  dashboard, Compose and integration/E2E jobs; its security job failed before checkout
+  because the Trivy action tag omitted the required `v` prefix. CI now pins the verified
+  `aquasecurity/trivy-action@v0.36.0` release and awaits the replacement remote run.
 
 ## Hard blockers and fallbacks
 
