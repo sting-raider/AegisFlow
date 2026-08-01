@@ -5,7 +5,7 @@ LIVE_COMPOSE = docker compose -f compose.yml -f compose.live.yml
 SURICATA_COMPOSE = docker compose -f compose.suricata.yml
 
 .PHONY: install lint typecheck test train-smoke demo demo-stop replay live live-stop \
-	suricata-replay benchmark reset
+	suricata-replay benchmark retention-cleanup reset
 
 install:
 	$(UV) sync --extra dev
@@ -60,6 +60,9 @@ endif
 
 benchmark:
 	$(UV) run python -m scripts.benchmark
+
+retention-cleanup:
+	$(UV) run python -m scripts.retention_cleanup
 
 reset:
 	$(COMPOSE) down -v

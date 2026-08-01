@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import asyncio
+import csv
 import hashlib
+import io
+import json
 import os
+import secrets
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Any, Literal, cast
 from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
@@ -22,19 +27,25 @@ from fastapi import (
     WebSocketDisconnect,
 )
 from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from pydantic import BaseModel, ConfigDict, Field
 
 from apps.api.consumer import DetectionConsumer
 from apps.api.database import Repository
+from apps.api.retention import RetentionWorker, retention_status, retention_worker_from_env
+from packages.common import FLOW_EXPORT_FIELDS, anonymize_ip, sanitize_flow_export
 from packages.contracts import (
     AnalystFeedback,
     FeedbackDisposition,
     Severity,
     SignatureEvent,
+    Verdict,
 )
 from packages.detection import DetectionEngine
+from packages.features import FEATURE_NAMES
 from packages.incidents import (
     DriftEvent,
     ExplanationService,
@@ -76,6 +87,11 @@ class FeedbackRequest(BaseModel):
 class IncidentStatusRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     status: Literal["open", "investigating", "contained", "closed"]
+
+
+class AcknowledgeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    actor: str = Field(min_length=1, max_length=128)
 
 
 def _record_drift_metric(event: DriftEvent) -> None:
@@ -142,6 +158,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.engine = engine
     app.state.drift_monitor = drift_monitor
     app.state.explanation_service = explanation_service_from_env()
+    repository.record_health_event(
+        "api",
+        "ready",
+        {"mode": "demo" if os.getenv("AEGISFLOW_DEMO", "1") == "1" else "production"},
+    )
+    retention_worker = retention_worker_from_env(repository)
+    app.state.retention_worker = retention_worker
+    if retention_worker is not None:
+        retention_worker.start()
     consumer: DetectionConsumer | None = None
     app.state.consumer = None
     if os.getenv("AEGISFLOW_CONSUME_REDIS", "0") == "1":
@@ -159,6 +184,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
     if consumer is not None:
         consumer.stop()
+    if retention_worker is not None:
+        retention_worker.stop()
+    repository.record_health_event("api", "stopped")
 
 
 app = FastAPI(
@@ -184,9 +212,62 @@ app.add_middleware(
 )
 
 
+@app.exception_handler(HTTPException)
+async def http_error(request: Request, exc: HTTPException) -> JSONResponse:
+    detail: dict[str, Any] = exc.detail if isinstance(exc.detail, dict) else {}
+    code = str(detail.get("code", "http_error"))
+    message = str(detail.get("message", "Request could not be completed"))
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": {
+                "code": code,
+                "message": message,
+                "correlation_id": getattr(request.state, "correlation_id", None),
+            }
+        },
+        headers=exc.headers,
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+    details = [
+        {"location": list(item["loc"]), "type": item["type"], "message": item["msg"]}
+        for item in exc.errors()
+    ]
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": {
+                "code": "validation_error",
+                "message": "Request validation failed",
+                "correlation_id": getattr(request.state, "correlation_id", None),
+                "details": details,
+            }
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+    del exc
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": {
+                "code": "internal_error",
+                "message": "An internal processing error occurred",
+                "correlation_id": getattr(request.state, "correlation_id", None),
+            }
+        },
+    )
+
+
 @app.middleware("http")
 async def correlation_id(request: Request, call_next: Any) -> Response:
     correlation = request.headers.get("X-Correlation-ID", str(uuid4()))[:128]
+    request.state.correlation_id = correlation
     response: Response = await call_next(request)
     response.headers["X-Correlation-ID"] = correlation
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -206,6 +287,61 @@ def mutation_auth(x_api_key: Annotated[str | None, Header()] = None) -> None:
     expected = os.getenv("AEGISFLOW_API_KEY")
     if expected and x_api_key != expected:
         raise HTTPException(status_code=401, detail={"code": "invalid_api_key"})
+
+
+def _utc_range(
+    start: datetime | None, end: datetime | None
+) -> tuple[datetime | None, datetime | None]:
+    for name, value in (("start", start), ("end", end)):
+        if value is not None and value.tzinfo is None:
+            raise HTTPException(
+                status_code=422,
+                detail={"code": "timezone_required", "message": f"{name} must include a timezone"},
+            )
+    normalized_start = start.astimezone(UTC) if start else None
+    normalized_end = end.astimezone(UTC) if end else None
+    if normalized_start and normalized_end and normalized_start > normalized_end:
+        raise HTTPException(
+            status_code=422,
+            detail={"code": "invalid_date_range", "message": "start must not follow end"},
+        )
+    return normalized_start, normalized_end
+
+
+def _protocol(value: str | None) -> str | None:
+    return value.upper() if value else None
+
+
+def _csv_response(
+    rows: list[dict[str, Any]], fieldnames: list[str], filename: str
+) -> Response:
+    output = io.StringIO(newline="")
+    writer = csv.DictWriter(output, fieldnames=fieldnames, extrasaction="ignore")
+    writer.writeheader()
+    for row in rows:
+        writer.writerow({key: _safe_csv_value(row.get(key)) for key in fieldnames})
+    return Response(
+        output.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+def _safe_csv_value(value: Any) -> str | int | float:
+    if value is None:
+        return ""
+    if isinstance(value, datetime):
+        return value.astimezone(UTC).isoformat()
+    if isinstance(value, list | tuple | dict):
+        value = json.dumps(jsonable_encoder(value), sort_keys=True, separators=(",", ":"))
+    if isinstance(value, str):
+        value = " ".join(value.replace("\x00", " ").split())
+        return f"'{value}" if value.startswith(("=", "+", "-", "@")) else value
+    if isinstance(value, bool):
+        return str(value).lower()
+    if isinstance(value, int | float):
+        return value
+    return str(value)
 
 
 @app.get("/health/live")
@@ -232,12 +368,41 @@ def list_alerts(
     repo: Annotated[Repository, Depends(repository)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
-    severity: str | None = None,
-    verdict: str | None = None,
-    host: str | None = None,
+    severity: Severity | None = None,
+    verdict: Verdict | None = None,
+    protocol: Annotated[str | None, Query(min_length=1, max_length=32)] = None,
+    host: Annotated[str | None, Query(min_length=1, max_length=64)] = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
 ) -> dict[str, Any]:
-    items = repo.alerts(offset=offset, limit=limit, severity=severity, verdict=verdict, host=host)
-    return {"items": items, "offset": offset, "limit": limit, "count": len(items)}
+    start, end = _utc_range(start, end)
+    severity_value = severity.value if severity else None
+    verdict_value = verdict.value if verdict else None
+    protocol_value = _protocol(protocol)
+    items = repo.alerts(
+        offset=offset,
+        limit=limit,
+        severity=severity_value,
+        verdict=verdict_value,
+        protocol=protocol_value,
+        host=host,
+        start=start,
+        end=end,
+    )
+    return {
+        "items": items,
+        "offset": offset,
+        "limit": limit,
+        "count": len(items),
+        "total": repo.alert_count(
+            severity=severity_value,
+            verdict=verdict_value,
+            protocol=protocol_value,
+            host=host,
+            start=start,
+            end=end,
+        ),
+    }
 
 
 @app.get("/api/v1/alerts/{alert_id}")
@@ -246,6 +411,17 @@ def get_alert(alert_id: UUID, repo: Annotated[Repository, Depends(repository)]) 
     if item is None:
         raise HTTPException(status_code=404, detail={"code": "alert_not_found"})
     return item
+
+
+@app.post("/api/v1/alerts/{alert_id}/acknowledge", dependencies=[Depends(mutation_auth)])
+def acknowledge_alert(
+    alert_id: UUID,
+    body: AcknowledgeRequest,
+    repo: Annotated[Repository, Depends(repository)],
+) -> dict[str, Any]:
+    if not repo.acknowledge_alert(str(alert_id), body.actor):
+        raise HTTPException(status_code=404, detail={"code": "alert_not_found"})
+    return {"id": str(alert_id), "acknowledged": True, "actor": body.actor}
 
 
 @app.post("/api/v1/alerts/{alert_id}/feedback", dependencies=[Depends(mutation_auth)])
@@ -321,9 +497,30 @@ def list_flows(
     repo: Annotated[Repository, Depends(repository)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    protocol: Annotated[str | None, Query(min_length=1, max_length=32)] = None,
+    host: Annotated[str | None, Query(min_length=1, max_length=64)] = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
 ) -> dict[str, Any]:
-    items = repo.flows(offset=offset, limit=limit)
-    return {"items": items, "offset": offset, "limit": limit, "count": len(items)}
+    start, end = _utc_range(start, end)
+    protocol_value = _protocol(protocol)
+    items = repo.flows(
+        offset=offset,
+        limit=limit,
+        protocol=protocol_value,
+        host=host,
+        start=start,
+        end=end,
+    )
+    return {
+        "items": items,
+        "offset": offset,
+        "limit": limit,
+        "count": len(items),
+        "total": repo.flow_count(
+            protocol=protocol_value, host=host, start=start, end=end
+        ),
+    }
 
 
 @app.get("/api/v1/flows/{event_id}")
@@ -332,6 +529,156 @@ def get_flow(event_id: UUID, repo: Annotated[Repository, Depends(repository)]) -
     if item is None:
         raise HTTPException(status_code=404, detail={"code": "flow_not_found"})
     return item
+
+
+@app.get("/api/v1/retraining-candidates")
+def list_retraining_candidates(
+    repo: Annotated[Repository, Depends(repository)],
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=500)] = 200,
+) -> dict[str, Any]:
+    items = repo.retraining_candidates(offset=offset, limit=limit)
+    return {"items": items, "offset": offset, "limit": limit, "count": len(items)}
+
+
+@app.get("/api/v1/exports/flows.csv")
+def export_flows(
+    repo: Annotated[Repository, Depends(repository)],
+    event_id: Annotated[list[UUID] | None, Query(max_length=200)] = None,
+    anonymize_ips: bool = True,
+    x_api_key: Annotated[str | None, Header()] = None,
+    protocol: Annotated[str | None, Query(min_length=1, max_length=32)] = None,
+    host: Annotated[str | None, Query(min_length=1, max_length=64)] = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+) -> Response:
+    if not anonymize_ips:
+        mutation_auth(x_api_key)
+    start, end = _utc_range(start, end)
+    payloads = repo.flows(
+        limit=200,
+        event_ids=[str(value) for value in event_id] if event_id is not None else None,
+        protocol=_protocol(protocol),
+        host=host,
+        start=start,
+        end=end,
+    )
+    salt = secrets.token_bytes(32)
+    rows = [
+        sanitize_flow_export(payload, anonymize_ips=anonymize_ips, salt=salt)
+        for payload in payloads
+    ]
+    return _csv_response(rows, list(FLOW_EXPORT_FIELDS), "aegisflow-flows.csv")
+
+
+@app.get("/api/v1/exports/alerts.csv")
+def export_alerts(
+    repo: Annotated[Repository, Depends(repository)],
+    alert_id: Annotated[list[UUID] | None, Query(max_length=200)] = None,
+    anonymize_ips: bool = True,
+    x_api_key: Annotated[str | None, Header()] = None,
+    severity: Severity | None = None,
+    verdict: Verdict | None = None,
+    protocol: Annotated[str | None, Query(min_length=1, max_length=32)] = None,
+    host: Annotated[str | None, Query(min_length=1, max_length=64)] = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+) -> Response:
+    if not anonymize_ips:
+        mutation_auth(x_api_key)
+    start, end = _utc_range(start, end)
+    items = (
+        [item for value in alert_id if (item := repo.alert(str(value))) is not None]
+        if alert_id is not None
+        else repo.alerts(
+            limit=200,
+            severity=severity.value if severity else None,
+            verdict=verdict.value if verdict else None,
+            protocol=_protocol(protocol),
+            host=host,
+            start=start,
+            end=end,
+        )
+    )
+    salt = secrets.token_bytes(32)
+    rows: list[dict[str, Any]] = []
+    for item in items:
+        detection = item["detection"]
+        flow = item["flow"]
+        rows.append(
+            {
+                "alert_id": item["id"],
+                "created_at": item["created_at"],
+                "verdict": item["verdict"],
+                "severity": item["severity"],
+                "risk": item["risk"],
+                "acknowledged": item["acknowledged"],
+                "src_ip": (
+                    anonymize_ip(flow["src_ip"], salt)
+                    if anonymize_ips
+                    else flow["src_ip"]
+                ),
+                "dst_ip": (
+                    anonymize_ip(flow["dst_ip"], salt)
+                    if anonymize_ips
+                    else flow["dst_ip"]
+                ),
+                "src_port": flow["src_port"],
+                "dst_port": flow["dst_port"],
+                "protocol": flow["protocol"],
+                "reason_codes": detection.get("reason_codes", []),
+                "known_attack_probability": detection.get("known_attack_probability"),
+                "anomaly_score": detection.get("anomaly_score"),
+                "signature_score": detection.get("signature_score"),
+                "model_version": detection.get("classifier_model_version"),
+            }
+        )
+    fields = [
+        "alert_id",
+        "created_at",
+        "verdict",
+        "severity",
+        "risk",
+        "acknowledged",
+        "src_ip",
+        "dst_ip",
+        "src_port",
+        "dst_port",
+        "protocol",
+        "reason_codes",
+        "known_attack_probability",
+        "anomaly_score",
+        "signature_score",
+        "model_version",
+    ]
+    return _csv_response(rows, fields, "aegisflow-alerts.csv")
+
+
+@app.get("/api/v1/exports/retraining-candidates.csv")
+def export_retraining_candidates(
+    repo: Annotated[Repository, Depends(repository)],
+) -> Response:
+    candidates = repo.retraining_candidates(limit=500)
+    feature_names = list(FEATURE_NAMES)
+    rows = [
+        {
+            **{key: value for key, value in candidate.items() if key != "features"},
+            **candidate["features"],
+        }
+        for candidate in candidates
+    ]
+    fields = [
+        "feedback_id",
+        "alert_id",
+        "timestamp",
+        "disposition",
+        "model_version",
+        "feature_schema_version",
+        "original_verdict",
+        "original_risk",
+        *feature_names,
+    ]
+    return _csv_response(rows, fields, "aegisflow-retraining-candidates.csv")
 
 
 @app.get("/api/v1/hosts")
@@ -382,7 +729,15 @@ def _system_status(app: FastAPI, repo: Repository) -> dict[str, Any]:
         consumer.queue_status if consumer is not None else {"pending": 0, "lag": 0, "consumers": 0}
     )
     _record_queue_metrics(queue)
-    return {**status, "queue": queue}
+    worker = cast(
+        RetentionWorker | None, getattr(app.state, "retention_worker", None)
+    )
+    return {
+        **status,
+        "queue": queue,
+        "retention": retention_status(worker),
+        "recent_health_events": repo.health_events(limit=10),
+    }
 
 
 def _record_queue_metrics(queue: dict[str, int]) -> None:

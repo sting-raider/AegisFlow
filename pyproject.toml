@@ -45,6 +45,7 @@ aegisflow-api = "apps.api.main:run"
 aegisflow-sensor = "services.sensor.main:run"
 aegisflow-detector = "services.detector.main:run"
 aegisflow-train-smoke = "training.cli.train_smoke:main"
+aegisflow-retention-cleanup = "scripts.retention_cleanup:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["apps", "packages", "services", "training", "scripts"]

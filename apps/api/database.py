@@ -19,11 +19,13 @@ from sqlalchemy import (
     Text,
     create_engine,
     delete,
+    func,
     select,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 from packages.contracts import AnalystFeedback, DetectionResult, FlowEvent, SignatureEvent, Verdict
+from packages.features.registry import flow_to_mapping
 from packages.incidents import (
     AlertGroupingContext,
     DriftEvent,
@@ -402,6 +404,9 @@ class Repository:
         severity: str | None = None,
         verdict: str | None = None,
         host: str | None = None,
+        protocol: str | None = None,
+        start: datetime | None = None,
+        end: datetime | None = None,
     ) -> list[dict[str, Any]]:
         with self.session() as session:
             statement = (
@@ -418,7 +423,43 @@ class Repository:
                 statement = statement.where(AlertRow.verdict == verdict)
             if host:
                 statement = statement.where((FlowRow.src_ip == host) | (FlowRow.dst_ip == host))
+            if protocol:
+                statement = statement.where(FlowRow.protocol == protocol)
+            if start:
+                statement = statement.where(AlertRow.created_at >= start)
+            if end:
+                statement = statement.where(AlertRow.created_at <= end)
             return [self._alert_dict(*row) for row in session.execute(statement).all()]
+
+    def alert_count(
+        self,
+        *,
+        severity: str | None = None,
+        verdict: str | None = None,
+        host: str | None = None,
+        protocol: str | None = None,
+        start: datetime | None = None,
+        end: datetime | None = None,
+    ) -> int:
+        with self.session() as session:
+            statement = (
+                select(func.count(AlertRow.id))
+                .select_from(AlertRow)
+                .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
+            )
+            if severity:
+                statement = statement.where(AlertRow.severity == severity)
+            if verdict:
+                statement = statement.where(AlertRow.verdict == verdict)
+            if host:
+                statement = statement.where((FlowRow.src_ip == host) | (FlowRow.dst_ip == host))
+            if protocol:
+                statement = statement.where(FlowRow.protocol == protocol)
+            if start:
+                statement = statement.where(AlertRow.created_at >= start)
+            if end:
+                statement = statement.where(AlertRow.created_at <= end)
+            return int(session.scalar(statement) or 0)
 
     def alert(self, alert_id: str) -> dict[str, Any] | None:
         with self.session() as session:
@@ -429,6 +470,25 @@ class Repository:
                 .where(AlertRow.id == alert_id)
             ).first()
             return self._alert_dict(*row) if row else None
+
+    def acknowledge_alert(self, alert_id: str, actor: str) -> bool:
+        with self.session() as session:
+            row = session.get(AlertRow, alert_id)
+            if row is None:
+                return False
+            if not row.acknowledged:
+                row.acknowledged = True
+                session.add(
+                    AuditLogRow(
+                        id=str(uuid4()),
+                        actor=actor,
+                        action="alert_acknowledged",
+                        timestamp=datetime.now(UTC),
+                        target_id=alert_id,
+                        details={},
+                    )
+                )
+            return True
 
     @staticmethod
     def _alert_dict(alert: AlertRow, detection: DetectionRow, flow: FlowRow) -> dict[str, Any]:
@@ -451,20 +511,72 @@ class Repository:
             "detection": detection.payload,
         }
 
-    def flows(self, *, offset: int = 0, limit: int = 50) -> list[dict[str, Any]]:
+    def flows(
+        self,
+        *,
+        offset: int = 0,
+        limit: int = 50,
+        host: str | None = None,
+        protocol: str | None = None,
+        start: datetime | None = None,
+        end: datetime | None = None,
+        event_ids: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
         with self.session() as session:
-            rows = session.scalars(
-                select(FlowRow)
-                .order_by(FlowRow.timestamp_start.desc())
-                .offset(offset)
-                .limit(min(limit, 200))
-            )
+            statement = select(FlowRow).order_by(FlowRow.timestamp_start.desc())
+            if host:
+                statement = statement.where((FlowRow.src_ip == host) | (FlowRow.dst_ip == host))
+            if protocol:
+                statement = statement.where(FlowRow.protocol == protocol)
+            if start:
+                statement = statement.where(FlowRow.timestamp_start >= start)
+            if end:
+                statement = statement.where(FlowRow.timestamp_start <= end)
+            if event_ids is not None:
+                statement = statement.where(FlowRow.event_id.in_(event_ids))
+            rows = session.scalars(statement.offset(offset).limit(min(limit, 200)))
             return [row.payload for row in rows]
+
+    def flow_count(
+        self,
+        *,
+        host: str | None = None,
+        protocol: str | None = None,
+        start: datetime | None = None,
+        end: datetime | None = None,
+    ) -> int:
+        with self.session() as session:
+            statement = select(func.count(FlowRow.event_id))
+            if host:
+                statement = statement.where((FlowRow.src_ip == host) | (FlowRow.dst_ip == host))
+            if protocol:
+                statement = statement.where(FlowRow.protocol == protocol)
+            if start:
+                statement = statement.where(FlowRow.timestamp_start >= start)
+            if end:
+                statement = statement.where(FlowRow.timestamp_start <= end)
+            return int(session.scalar(statement) or 0)
 
     def flow(self, event_id: str) -> dict[str, Any] | None:
         with self.session() as session:
             row = session.get(FlowRow, event_id)
-            return row.payload if row else None
+            if row is None:
+                return None
+            detection = session.scalar(
+                select(DetectionRow).where(DetectionRow.flow_event_id == event_id)
+            )
+            alert = session.scalar(select(AlertRow).where(AlertRow.flow_event_id == event_id))
+            signatures = session.scalars(
+                select(SignatureRow).where(
+                    SignatureRow.community_flow_id == row.community_flow_id
+                )
+            ).all()
+            return {
+                **row.payload,
+                "detection": detection.payload if detection else None,
+                "alert_id": alert.id if alert else None,
+                "signatures": [signature.payload for signature in signatures],
+            }
 
     def incidents(self) -> list[dict[str, Any]]:
         with self.session() as session:
@@ -719,6 +831,78 @@ class Repository:
                 )
             )
 
+    def retraining_candidates(
+        self, *, offset: int = 0, limit: int = 200
+    ) -> list[dict[str, Any]]:
+        """Return eligible benign candidates without endpoints or analyst comments."""
+
+        with self.session() as session:
+            rows = session.execute(
+                select(FeedbackRow, AlertRow, DetectionRow, FlowRow)
+                .join(AlertRow, AlertRow.id == FeedbackRow.alert_id)
+                .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
+                .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
+                .where(
+                    FeedbackRow.eligible_for_retraining.is_(True),
+                    FeedbackRow.disposition == "benign_new_behaviour",
+                )
+                .order_by(FeedbackRow.timestamp.asc())
+                .offset(offset)
+                .limit(min(limit, 500))
+            ).all()
+            candidates: list[dict[str, Any]] = []
+            for feedback, alert, detection, flow in rows:
+                validated_flow = FlowEvent.model_validate(flow.payload)
+                candidates.append(
+                    {
+                        "feedback_id": feedback.id,
+                        "alert_id": alert.id,
+                        "timestamp": feedback.timestamp,
+                        "disposition": feedback.disposition,
+                        "model_version": feedback.model_version,
+                        "feature_schema_version": detection.payload.get(
+                            "feature_schema_version"
+                        ),
+                        "original_verdict": detection.verdict,
+                        "original_risk": detection.risk,
+                        "features": flow_to_mapping(validated_flow),
+                    }
+                )
+            return candidates
+
+    def record_health_event(
+        self, service: str, status: str, details: dict[str, Any] | None = None
+    ) -> str:
+        event_id = str(uuid4())
+        with self.session() as session:
+            session.add(
+                SystemHealthRow(
+                    id=event_id,
+                    service=service[:64],
+                    status=status[:32],
+                    timestamp=datetime.now(UTC),
+                    details=details or {},
+                )
+            )
+        return event_id
+
+    def health_events(self, limit: int = 50) -> list[dict[str, Any]]:
+        with self.session() as session:
+            rows = session.scalars(
+                select(SystemHealthRow)
+                .order_by(SystemHealthRow.timestamp.desc())
+                .limit(min(limit, 200))
+            )
+            return [
+                {
+                    "id": row.id,
+                    "service": row.service,
+                    "status": row.status,
+                    "timestamp": row.timestamp,
+                    "details": row.details,
+                }
+                for row in rows
+            ]
     def hosts(self) -> list[dict[str, Any]]:
         with self.session() as session:
             flows = session.scalars(select(FlowRow)).all()
@@ -848,6 +1032,27 @@ class Repository:
                     select(DetectionRow.event_id).where(DetectionRow.flow_event_id.in_(old_flows))
                 )
             )
+            old_alerts = list(
+                session.scalars(
+                    select(AlertRow.id).where(AlertRow.detection_id.in_(old_detections))
+                )
+            )
+            counts["feedback"] = (
+                session.execute(
+                    delete(FeedbackRow).where(FeedbackRow.alert_id.in_(old_alerts))
+                ).rowcount
+                or 0
+            )
+            old_alert_set = set(old_alerts)
+            removed_incidents = 0
+            for incident in session.scalars(select(IncidentRow)).all():
+                remaining = [item for item in incident.alert_ids if item not in old_alert_set]
+                if not remaining:
+                    session.delete(incident)
+                    removed_incidents += 1
+                elif remaining != incident.alert_ids:
+                    incident.alert_ids = remaining
+            counts["incidents"] = removed_incidents
             counts["alerts"] = (
                 session.execute(
                     delete(AlertRow).where(AlertRow.detection_id.in_(old_detections))
@@ -870,6 +1075,22 @@ class Repository:
                 ).rowcount
                 or 0
             )
-            session.execute(delete(SystemHealthRow).where(SystemHealthRow.timestamp < cutoff))
-            session.execute(delete(AuditLogRow).where(AuditLogRow.timestamp < cutoff))
+            counts["drift_events"] = (
+                session.execute(
+                    delete(DriftEventRow).where(DriftEventRow.detected_at < cutoff)
+                ).rowcount
+                or 0
+            )
+            counts["health_events"] = (
+                session.execute(
+                    delete(SystemHealthRow).where(SystemHealthRow.timestamp < cutoff)
+                ).rowcount
+                or 0
+            )
+            counts["audit_events"] = (
+                session.execute(
+                    delete(AuditLogRow).where(AuditLogRow.timestamp < cutoff)
+                ).rowcount
+                or 0
+            )
         return counts

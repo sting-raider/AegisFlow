@@ -142,3 +142,18 @@ wins; recency breaks ties through query ordering.
 This avoids a migration full of denormalized lists that could drift from the source
 records. A slightly higher read cost is accepted for honest, reconstructable incident
 detail and the small bounded operational/demo scope.
+
+## D-015 — Bounded retention and purpose-specific sanitized exports
+
+Run operational retention in the API process only after the first configured interval,
+and expose the same cleanup as a one-shot command for external schedulers. Delete
+foreign-key dependants first, remove empty incidents, and write success or redacted error
+health events. This keeps the demo self-contained without performing surprise cleanup at
+startup; larger deployments can disable the worker and schedule the idempotent command.
+
+Exports use fixed purpose-specific column allow-lists and bounded row counts. Address
+pseudonyms default on and use an ephemeral per-export HMAC salt, preserving joins within
+one report without enabling durable cross-report tracking. Retraining exports contain
+only analyst-approved benign-new-behaviour features in registry order. Persisting export
+salts, exporting full JSON blobs, or including analyst comments/identities was rejected
+because those choices add privacy risk without helping model training.

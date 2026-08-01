@@ -4,19 +4,22 @@ from datetime import UTC, datetime, timedelta
 from ipaddress import ip_address
 from pathlib import Path
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from sqlalchemy import event
 
 from apps.api.database import Repository
-from packages.contracts import Severity, Verdict
+from packages.contracts import AnalystFeedback, FeedbackDisposition, Severity, Verdict
 from packages.detection import DetectionEngine
 from packages.incidents import DriftEvent, RuntimeDriftMonitor
+from packages.model_bundle import ModelBundle
 from scripts.generate_demo_pcaps import generate
 from services.sensor import DemoAdapter, PcapAdapter
 
 
-def test_demo_detection_persistence_and_idempotency(bundle, tmp_path: Path) -> None:
+def test_demo_detection_persistence_and_idempotency(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'pipeline.db').as_posix()}")
     repository.create_schema()
     engine = DetectionEngine(bundle)
@@ -40,7 +43,9 @@ def test_demo_detection_persistence_and_idempotency(bundle, tmp_path: Path) -> N
     assert context["payload"]["aggregated_features"]["flow_count"] >= 1
 
 
-def test_parent_rows_flush_before_foreign_key_dependants(bundle, tmp_path: Path) -> None:
+def test_parent_rows_flush_before_foreign_key_dependants(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'flush-order.db').as_posix()}")
     repository.create_schema()
     statements: list[str] = []
@@ -69,7 +74,9 @@ def test_parent_rows_flush_before_foreign_key_dependants(bundle, tmp_path: Path)
     assert inserts.index("detection_results") < inserts.index("alerts")
 
 
-def test_incidents_group_on_explainable_rules_and_return_timeline(bundle, tmp_path: Path) -> None:
+def test_incidents_group_on_explainable_rules_and_return_timeline(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'incidents.db').as_posix()}")
     repository.create_schema()
     base_flow = next(iter(DemoAdapter().flows()))
@@ -157,18 +164,43 @@ def test_synthetic_pcap_replay_is_deterministic(tmp_path: Path) -> None:
     assert all(flow.capture_mode.value == "pcap" for flow in first)
 
 
-def test_retention_cleanup_removes_expired_flow(bundle, tmp_path: Path) -> None:
+def test_retention_cleanup_removes_expired_flow(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'retention.db').as_posix()}")
     repository.create_schema()
-    flow = next(iter(DemoAdapter().flows()))
-    detection = DetectionEngine(bundle).detect(flow)
+    flow, detection = next(
+        (candidate, result)
+        for candidate in DemoAdapter().flows()
+        if (result := DetectionEngine(bundle).detect(candidate)).verdict != Verdict.BENIGN
+    )
     repository.ingest(flow, detection)
+    alert = repository.alerts()[0]
+    repository.add_feedback(
+        AnalystFeedback(
+            alert_id=UUID(alert["id"]),
+            actor="retention-test",
+            disposition=FeedbackDisposition.BENIGN_NEW_BEHAVIOUR,
+            original_model_result=alert["detection"],
+            model_version=alert["detection"]["classifier_model_version"],
+            eligible_for_retraining=True,
+        )
+    )
+    repository.record_health_event("test", "ok")
     counts = repository.cleanup_before(datetime(2027, 1, 1, tzinfo=UTC))
     assert counts["flows"] == 1
+    assert counts["feedback"] == 1
+    assert counts["incidents"] == 1
+    assert counts["audit_events"] == 1
+    assert counts["health_events"] == 1
     assert repository.status()["flows"] == 0
+    assert repository.retraining_candidates() == []
+    assert repository.health_events() == []
 
 
-def test_runtime_drift_events_are_persisted_idempotently(bundle, tmp_path: Path) -> None:
+def test_runtime_drift_events_are_persisted_idempotently(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'drift.db').as_posix()}")
     repository.create_schema()
     monitor = RuntimeDriftMonitor("0.2.0", window_size=8)

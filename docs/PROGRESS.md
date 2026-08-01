@@ -14,7 +14,7 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 77 tests pass, Ruff passes across the repository, and strict MyPy passes
+- Python: 82 tests pass, Ruff passes across the repository, and strict MyPy passes
   across 47 source files. The last full measured
   coverage baseline before bundle v2 was 82%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
@@ -81,6 +81,17 @@ Last updated: 2026-08-01.
   summary, alerts, and chronological timeline from durable source records. The dashboard
   exposes that evidence and status controls. Pure-rule tests cover every required rule,
   and repository/API/UI tests cover the integrated timeline.
+- Retention is now configurable and scheduled after the first interval, with the same
+  dependency-safe cleanup available as a one-shot command. Runs write bounded health
+  events, remove feedback before alerts, and repair or remove affected incidents. Flow
+  and alert CSV exports are row-bounded and column-allow-listed, pseudonymize addresses
+  with an ephemeral per-export salt by default, require the configured API key for raw
+  addresses, and escape spreadsheet formulas. Analyst-approved benign-new-behaviour
+  feedback has a separate endpoint-free fixed-feature query/export. API list filtering,
+  totals, alert acknowledgement, rich flow detail, UTC range validation, structured
+  redacted global errors, retention/system status, and correlation IDs have focused
+  integration coverage. Concrete PostgreSQL backup and restore-test commands are
+  documented.
 
 ## Hard blockers and fallbacks
 
@@ -89,6 +100,6 @@ Last updated: 2026-08-01.
 
 ## Highest-priority required backlog
 
-- Richer incidents/API/export/dashboard, remaining structured observability and
-  input/backpressure hardening tracked in
+- Dashboard completion, remaining structured observability and input/backpressure
+  hardening tracked in
   `docs/COMPLETION_AUDIT.md`.
