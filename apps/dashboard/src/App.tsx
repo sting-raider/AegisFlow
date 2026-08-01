@@ -331,7 +331,19 @@ export function App() {
   else if (view === "flows") content = <Flows flows={flows} />;
   else if (view === "hosts") content = <Hosts hosts={hosts} />;
   else if (view === "models") content = <Models models={models} drift={drift} />;
-  else content = <div className="metric-grid"><Metric label="Database" value={data.status.data?.database ?? "checking"} note="persistent store" /><Metric label="Sensors" value={data.status.data?.sensors ?? "—"} note="reporting" /><Metric label="Flows" value={data.status.data?.flows ?? "—"} note="stored" /><Metric label="WebSocket" value={data.connected ? "linked" : "reconnecting"} note="live alert stream" /></div>;
+  else if (view === "system") content = (
+    <div className="metric-grid">
+      <Metric label="Database" value={data.status.data?.database ?? "checking"} note="persistent store" />
+      <Metric
+        label="Detection queue"
+        value={(data.status.data?.queue?.lag ?? 0) + (data.status.data?.queue?.pending ?? 0)}
+        note="lag + pending"
+      />
+      <Metric label="Flows" value={data.status.data?.flows ?? "—"} note="stored" />
+      <Metric label="WebSocket" value={data.connected ? "linked" : "reconnecting"} note="live alert stream" />
+    </div>
+  );
+  else content = null;
 
   return (
     <div className="shell">

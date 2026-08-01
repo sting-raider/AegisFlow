@@ -7,6 +7,10 @@ system status. Mutations record alert feedback and incident status. List endpoin
 bound `limit` to 200. `X-Correlation-ID` is echoed or generated. If
 `AEGISFLOW_API_KEY` is set, mutations require `X-API-Key`.
 
+System status includes `queue.pending`, `queue.lag`, and `queue.consumers` for the
+detection-to-API consumer group. Prometheus exposes the same work state as `queue_pending`
+and `queue_lag`.
+
 WebSockets:
 
 - `/api/v1/stream/alerts`

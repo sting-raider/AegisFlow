@@ -112,8 +112,9 @@ Read the full [`threat model`](docs/THREAT_MODEL.md) before live deployment.
 - Windows supports demo and PCAP replay, not live capture.
 - The baseline anomaly model is Isolation Forest. The denoising autoencoder is tracked
   as optional work in `docs/PROGRESS.md`.
-- Redis/PostgreSQL restart recovery is implemented around consumer groups and idempotent
-  IDs, but the full fault-injection matrix remains an explicit backlog item.
+- Redis/PostgreSQL restart recovery uses consumer groups, stale-entry claiming, durable
+  acknowledgement, bounded retries, and idempotent event IDs. The Compose fault matrix is
+  documented in `docs/PROGRESS.md`.
 - No active response or automatic blocking is implemented.
 
 ## Upstream and license

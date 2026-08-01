@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { cloneElement, isValidElement, type ReactElement } from "react";
 import { expect, test, vi } from "vitest";
 import { App } from "./App";
@@ -38,7 +38,15 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   return {
     ok: true,
     json: async () => isStatus
-      ? { database: "ready", sensors: 1, flows: 0, alerts: 0, incidents: 0, mode: "demo" }
+      ? {
+          database: "ready",
+          sensors: 1,
+          flows: 0,
+          alerts: 0,
+          incidents: 0,
+          mode: "demo",
+          queue: { pending: 0, lag: 0, consumers: 1 }
+        }
       : { items: [], count: 0 }
   };
 }));
@@ -47,4 +55,6 @@ test("renders the operations dashboard and demo disclosure", async () => {
   render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
   expect(screen.getByRole("heading", { name: "Overview" })).toBeTruthy();
   expect(await screen.findByText("Demo traffic")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /System health/ }));
+  expect(screen.getByText("Detection queue")).toBeTruthy();
 });

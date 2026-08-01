@@ -94,6 +94,11 @@ export interface SystemStatus {
   alerts: number;
   incidents: number;
   mode: "demo" | "production";
+  queue: {
+    pending: number;
+    lag: number;
+    consumers: number;
+  };
 }
 
 export interface Page<T> {

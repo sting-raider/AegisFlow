@@ -3,6 +3,7 @@ name: aegisflow
 services:
   postgres:
     image: postgres:16.4-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: aegisflow
       POSTGRES_USER: aegisflow
@@ -18,6 +19,7 @@ services:
 
   redis:
     image: redis:7.2.5-alpine
+    restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
     volumes:
       - redis-data:/data
@@ -33,6 +35,7 @@ services:
       context: .
       dockerfile: infra/docker/backend.Dockerfile
     command: ["sh", "-c", "alembic upgrade head && uvicorn apps.api.main:app --host 0.0.0.0 --port 8000"]
+    restart: unless-stopped
     environment:
       AEGISFLOW_DATABASE_URL: postgresql+psycopg://aegisflow:${AEGISFLOW_DB_PASSWORD:-aegisflow-demo-only}@postgres:5432/aegisflow
       AEGISFLOW_REDIS_URL: redis://redis:6379/0
@@ -41,6 +44,7 @@ services:
       AEGISFLOW_DEMO_SEED: "0"
       AEGISFLOW_MODEL_REGISTRY: /app/models/registry
       AEGISFLOW_API_KEY: ${AEGISFLOW_API_KEY:-}
+      AEGISFLOW_PENDING_IDLE_MS: ${AEGISFLOW_PENDING_IDLE_MS:-30000}
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -56,9 +60,11 @@ services:
       context: .
       dockerfile: infra/docker/backend.Dockerfile
     command: ["python", "-m", "services.detector.main"]
+    restart: unless-stopped
     environment:
       AEGISFLOW_REDIS_URL: redis://redis:6379/0
       AEGISFLOW_MODEL_REGISTRY: /app/models/registry
+      AEGISFLOW_PENDING_IDLE_MS: ${AEGISFLOW_PENDING_IDLE_MS:-30000}
     depends_on:
       redis: { condition: service_healthy }
     read_only: true
@@ -85,6 +91,7 @@ services:
     build:
       context: ./apps/dashboard
       dockerfile: ../../infra/docker/dashboard.Dockerfile
+    restart: unless-stopped
     ports:
       - "127.0.0.1:5173:8080"
     depends_on:

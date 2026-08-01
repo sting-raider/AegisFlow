@@ -49,3 +49,17 @@ remain valid only when they are immutable, access-controlled, and mounted read-o
 PostgreSQL and Redis are reachable only on the Compose network. Only the API and
 dashboard bind loopback host ports, which avoids collisions and removes unnecessary
 host exposure.
+
+## D-007 — At-least-once recovery with acknowledgement after durability
+
+Redis stream entries are acknowledged only after the downstream result is published or
+the database transaction commits. A schema-invalid event is published to the dead-letter
+stream before acknowledgement. Transient Redis failures use bounded exponential backoff;
+transient database failures use bounded retries and leave the entry pending after the
+retry budget is exhausted. Consumers claim entries that exceed a configurable idle time
+(`AEGISFLOW_PENDING_IDLE_MS`, 30 seconds by default), and database UUID constraints make
+replay idempotent. This favors visible at-least-once delivery over silent event loss.
+
+Compose uses `unless-stopped` for the long-running stateful and application services.
+Queue lag and pending counts are observable through the API, dashboard, and Prometheus.
+Automatic blocking remains prohibited regardless of recovery or detection outcome.

@@ -15,6 +15,12 @@ def test_api_vertical_slice(monkeypatch, registry: Path, tmp_path: Path) -> None
     monkeypatch.delenv("AEGISFLOW_API_KEY", raising=False)
     with TestClient(app) as client:
         assert client.get("/health/ready").json() == {"status": "ready"}
+        assert client.get("/api/v1/system/status").json()["queue"] == {
+            "pending": 0,
+            "lag": 0,
+            "consumers": 0,
+        }
+        assert "queue_lag" in client.get("/metrics").text
         alerts = client.get("/api/v1/alerts").json()["items"]
         assert alerts
         assert {item["verdict"] for item in alerts} >= {"known_attack", "suspicious_unknown"}

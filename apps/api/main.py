@@ -46,6 +46,10 @@ INFERENCE = Histogram("inference_latency_seconds", "Single-flow inference latenc
 WEBSOCKETS = Gauge("websocket_connections", "Current WebSocket connections")
 DATABASE_ERRORS = Counter("database_errors_total", "Database errors")
 MODEL_LOAD_FAILURES = Counter("model_load_failures_total", "Model bundle load failures")
+QUEUE_LAG = Gauge("queue_lag", "Undelivered Redis stream entries", ["stream", "group"])
+QUEUE_PENDING = Gauge(
+    "queue_pending", "Delivered but unacknowledged stream entries", ["stream", "group"]
+)
 
 
 class FeedbackRequest(BaseModel):
@@ -110,10 +114,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.repository = repository
     app.state.engine = engine
     consumer: DetectionConsumer | None = None
+    app.state.consumer = None
     if os.getenv("AEGISFLOW_CONSUME_REDIS", "0") == "1":
         consumer = DetectionConsumer(
-            repository, os.getenv("AEGISFLOW_REDIS_URL", "redis://redis:6379/0")
+            repository,
+            os.getenv("AEGISFLOW_REDIS_URL", "redis://redis:6379/0"),
+            on_database_error=DATABASE_ERRORS.inc,
         )
+        app.state.consumer = consumer
         consumer.start()
     if os.getenv("AEGISFLOW_DEMO_SEED", "1") == "1":
         _seed_demo(repository, engine)
@@ -177,7 +185,10 @@ def ready(repo: Annotated[Repository, Depends(repository)]) -> dict[str, str]:
 
 
 @app.get("/metrics")
-def metrics() -> Response:
+def metrics(request: Request) -> Response:
+    consumer = cast(DetectionConsumer | None, getattr(request.app.state, "consumer", None))
+    if consumer is not None:
+        _record_queue_metrics(consumer.queue_status)
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
@@ -304,8 +315,25 @@ def drift_events(repo: Annotated[Repository, Depends(repository)]) -> dict[str, 
 
 
 @app.get("/api/v1/system/status")
-def system_status(repo: Annotated[Repository, Depends(repository)]) -> dict[str, Any]:
-    return repo.status()
+def system_status(
+    request: Request, repo: Annotated[Repository, Depends(repository)]
+) -> dict[str, Any]:
+    return _system_status(request.app, repo)
+
+
+def _system_status(app: FastAPI, repo: Repository) -> dict[str, Any]:
+    status = repo.status()
+    consumer = cast(DetectionConsumer | None, getattr(app.state, "consumer", None))
+    queue = (
+        consumer.queue_status if consumer is not None else {"pending": 0, "lag": 0, "consumers": 0}
+    )
+    _record_queue_metrics(queue)
+    return {**status, "queue": queue}
+
+
+def _record_queue_metrics(queue: dict[str, int]) -> None:
+    QUEUE_LAG.labels("aegisflow:detections", "api-core").set(queue["lag"])
+    QUEUE_PENDING.labels("aegisflow:detections", "api-core").set(queue["pending"])
 
 
 async def _stream(websocket: WebSocket, kind: Literal["alerts", "system"]) -> None:
@@ -318,7 +346,7 @@ async def _stream(websocket: WebSocket, kind: Literal["alerts", "system"]) -> No
             payload: Any = (
                 {"type": "alerts", "items": repo.alerts(limit=20)}
                 if kind == "alerts"
-                else {"type": "system", **repo.status()}
+                else {"type": "system", **_system_status(websocket.app, repo)}
             )
             payload = jsonable_encoder(payload)
             serialized = str(payload)

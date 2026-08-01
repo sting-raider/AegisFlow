@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-07-30.
+Last updated: 2026-08-01.
 
 ## Verified
 
@@ -14,13 +14,18 @@ Last updated: 2026-07-30.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 23 tests pass, Ruff passes, strict MyPy passes, measured coverage is 81%.
+- Python: 28 tests pass, Ruff passes, strict MyPy passes, measured coverage is 82%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
   network; API/dashboard bind to loopback.
 - Synthetic inference benchmark: 2,000 flows, 331.8 flows/s, 3.39 ms p95 and
   3.92 ms p99 on the recorded Windows host. Queue growth was not measured.
+- Redis/PostgreSQL recovery matrix passes against Compose: an abandoned detector entry
+  is claimed, a three-event backlog drains, Redis restarts without replacing consumers,
+  PostgreSQL downtime leaves its event pending and records retry errors, and recovery
+  persists it after restart. Replaying the six deterministic IDs adds no duplicate rows.
+- Queue lag and pending counts are exposed by Prometheus and the System Health API/UI.
 
 ## Hard blockers and fallbacks
 
@@ -36,5 +41,3 @@ Last updated: 2026-07-30.
   remains default.
 - External explanation provider. Acceptance: disabled by default, sanitized schema,
   timeout/retry/rate cap/cache, deterministic fallback, no detector latency impact.
-- Full Redis/PostgreSQL restart matrix. Acceptance: consumer-group recovery,
-  idempotent replay, database retry, queue backlog assertions.
