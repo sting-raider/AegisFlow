@@ -92,6 +92,16 @@ Last updated: 2026-08-01.
   redacted global errors, retention/system status, and correlation IDs have focused
   integration coverage. Concrete PostgreSQL backup and restore-test commands are
   documented.
+- Dashboard completeness now covers real overview throughput/severity/verdict/protocol/
+  host/queue/model/drift analytics; live pause, filters, evidence provenance,
+  acknowledgement and feedback; incident notes/timeline/status/explanation; paginated
+  flow endpoint/protocol/time filters, selected anonymized export, detection/signature/
+  feature detail; derived host risk/activity/protocol/alert history; model validation and
+  score distributions; and retention/health ledgers. Incident notes persist as bounded
+  audit events and remain excluded from detection, retraining and explanations. Browser
+  QA exercised desktop and mobile layouts with no page overflow or console errors, and
+  four component tests cover core analyst interactions. Missing backend telemetry stays
+  visibly `not reported` until the observability slice supplies it.
 
 ## Hard blockers and fallbacks
 

@@ -36,6 +36,12 @@ from packages.incidents import (
 )
 
 
+def _as_utc(value: datetime) -> datetime:
+    """Restore the UTC marker that SQLite drops from timezone-aware columns."""
+
+    return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+
+
 class Base(DeclarativeBase):
     pass
 
@@ -494,7 +500,7 @@ class Repository:
     def _alert_dict(alert: AlertRow, detection: DetectionRow, flow: FlowRow) -> dict[str, Any]:
         return {
             "id": alert.id,
-            "created_at": alert.created_at,
+            "created_at": _as_utc(alert.created_at),
             "verdict": alert.verdict,
             "severity": alert.severity,
             "risk": alert.risk,
@@ -506,7 +512,7 @@ class Repository:
                 "src_port": flow.src_port,
                 "dst_port": flow.dst_port,
                 "protocol": flow.protocol,
-                "timestamp_start": flow.timestamp_start,
+                "timestamp_start": _as_utc(flow.timestamp_start),
             },
             "detection": detection.payload,
         }
@@ -634,7 +640,7 @@ class Repository:
             timeline.append(
                 {
                     "alert_id": alert.id,
-                    "timestamp": alert.created_at,
+                    "timestamp": _as_utc(alert.created_at),
                     "verdict": alert.verdict,
                     "severity": alert.severity,
                     "risk": alert.risk,
@@ -663,8 +669,8 @@ class Repository:
             "source_host": incident.source_host,
             "source_hosts": sorted({flow.src_ip for _, _, flow in rows}),
             "destination_hosts": sorted({flow.dst_ip for _, _, flow in rows}),
-            "created_at": incident.created_at,
-            "updated_at": incident.updated_at,
+            "created_at": _as_utc(incident.created_at),
+            "updated_at": _as_utc(incident.updated_at),
             "alert_ids": incident.alert_ids,
             "alert_count": len(rows),
             "acknowledged_alerts": sum(alert.acknowledged for alert, _, _ in rows),
@@ -684,6 +690,7 @@ class Repository:
         }
         if include_alerts:
             result["alerts"] = [self._alert_dict(*row) for row in rows]
+            result["analyst_notes"] = self._incident_notes(session, incident.id)
         return result
 
     def incident_explanation_context(self, incident_id: str) -> dict[str, Any] | None:
@@ -752,7 +759,7 @@ class Repository:
             }
             return {
                 "incident_id": incident.id,
-                "incident_version": incident.updated_at.isoformat(),
+                "incident_version": _as_utc(incident.updated_at).isoformat(),
                 "payload": payload,
             }
 
@@ -802,6 +809,46 @@ class Repository:
             row.status = status
             row.updated_at = datetime.now(UTC)
             return True
+
+    def add_incident_note(self, incident_id: str, actor: str, note: str) -> dict[str, Any] | None:
+        timestamp = datetime.now(UTC)
+        note_id = str(uuid4())
+        with self.session() as session:
+            incident = session.get(IncidentRow, incident_id)
+            if incident is None:
+                return None
+            session.add(
+                AuditLogRow(
+                    id=note_id,
+                    actor=actor,
+                    action="incident_note_added",
+                    timestamp=timestamp,
+                    target_id=incident_id,
+                    details={"note": note},
+                )
+            )
+            incident.updated_at = timestamp
+        return {"id": note_id, "actor": actor, "note": note, "timestamp": timestamp}
+
+    @staticmethod
+    def _incident_notes(session: Session, incident_id: str) -> list[dict[str, Any]]:
+        rows = session.scalars(
+            select(AuditLogRow)
+            .where(
+                AuditLogRow.action == "incident_note_added",
+                AuditLogRow.target_id == incident_id,
+            )
+            .order_by(AuditLogRow.timestamp.asc())
+        )
+        return [
+            {
+                "id": row.id,
+                "actor": row.actor,
+                "note": str(row.details.get("note", "")),
+                "timestamp": _as_utc(row.timestamp),
+            }
+            for row in rows
+        ]
 
     def add_feedback(self, feedback: AnalystFeedback) -> None:
         with self.session() as session:
@@ -898,7 +945,7 @@ class Repository:
                     "id": row.id,
                     "service": row.service,
                     "status": row.status,
-                    "timestamp": row.timestamp,
+                    "timestamp": _as_utc(row.timestamp),
                     "details": row.details,
                 }
                 for row in rows
@@ -940,7 +987,7 @@ class Repository:
                 {
                     "id": row.id,
                     "signal": row.signal,
-                    "detected_at": row.detected_at,
+                    "detected_at": _as_utc(row.detected_at),
                     "magnitude": row.magnitude,
                     "model_version": row.model_version,
                     **row.payload,
@@ -993,7 +1040,7 @@ class Repository:
                     "model_name": row.model_name,
                     "version": row.version,
                     "production": row.production,
-                    "loaded_at": row.loaded_at,
+                    "loaded_at": _as_utc(row.loaded_at),
                     "metadata": row.metadata_json,
                 }
                 for row in rows

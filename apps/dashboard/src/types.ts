@@ -62,6 +62,14 @@ export interface Incident {
   escalation_count: number;
   timeline: IncidentTimelineEntry[];
   alerts?: Alert[];
+  analyst_notes?: IncidentNote[];
+}
+
+export interface IncidentNote {
+  id: string;
+  actor: string;
+  note: string;
+  timestamp: string;
 }
 
 export interface IncidentTimelineEntry {
@@ -91,6 +99,7 @@ export interface IncidentExplanation {
 export interface Flow {
   event_id: string;
   timestamp_start: string;
+  timestamp_end: string;
   src_ip: string;
   dst_ip: string;
   src_port: number;
@@ -100,7 +109,34 @@ export interface Flow {
   packets_reverse: number;
   bytes_forward: number;
   bytes_reverse: number;
+  duration_ms: number;
+  packet_rate: number;
+  byte_rate: number;
+  packet_length_mean: number;
+  packet_length_std: number;
+  iat_mean: number;
+  iat_std: number;
+  tcp_syn_count: number;
+  tcp_ack_count: number;
+  tcp_fin_count: number;
+  tcp_rst_count: number;
+  application_protocol: string | null;
+  direction: string;
+  source_adapter: string;
+  feature_extractor_version: string;
   protocol_metadata: Record<string, string | number | boolean>;
+}
+
+export interface FlowDetail extends Flow {
+  detection: Detection | null;
+  alert_id: string | null;
+  signatures: Array<{
+    signature_id: string;
+    signature_name: string;
+    category: string;
+    severity: Severity;
+    source: string;
+  }>;
 }
 
 export interface Host {
@@ -136,9 +172,40 @@ export interface SystemStatus {
     lag: number;
     consumers: number;
   };
+  retention: {
+    enabled: boolean;
+    days?: number;
+    interval_seconds?: number;
+  };
+  recent_health_events: HealthEvent[];
+  throughput_per_second?: number;
+  dropped_records?: number;
+  suricata_status?: string;
+  worker_latency_ms?: number;
+}
+
+export interface HealthEvent {
+  id: string;
+  service: string;
+  status: string;
+  timestamp: string;
+  details: Record<string, unknown>;
+}
+
+export interface DriftEvent {
+  id: string;
+  signal: string;
+  detected_at: string;
+  magnitude: number;
+  model_version: string;
+  recommended_action?: string;
+  automatic_action_allowed?: boolean;
 }
 
 export interface Page<T> {
   items: T[];
   count: number;
+  total?: number;
+  offset?: number;
+  limit?: number;
 }

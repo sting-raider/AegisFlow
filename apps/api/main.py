@@ -89,6 +89,12 @@ class IncidentStatusRequest(BaseModel):
     status: Literal["open", "investigating", "contained", "closed"]
 
 
+class IncidentNoteRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    actor: str = Field(min_length=1, max_length=128)
+    note: str = Field(min_length=1, max_length=2000)
+
+
 class AcknowledgeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     actor: str = Field(min_length=1, max_length=128)
@@ -490,6 +496,18 @@ def set_incident_status(
     if not repo.set_incident_status(str(incident_id), body.status):
         raise HTTPException(status_code=404, detail={"code": "incident_not_found"})
     return {"id": str(incident_id), "status": body.status}
+
+
+@app.post("/api/v1/incidents/{incident_id}/notes", dependencies=[Depends(mutation_auth)])
+def add_incident_note(
+    incident_id: UUID,
+    body: IncidentNoteRequest,
+    repo: Annotated[Repository, Depends(repository)],
+) -> dict[str, Any]:
+    note = repo.add_incident_note(str(incident_id), body.actor, body.note)
+    if note is None:
+        raise HTTPException(status_code=404, detail={"code": "incident_not_found"})
+    return note
 
 
 @app.get("/api/v1/flows")

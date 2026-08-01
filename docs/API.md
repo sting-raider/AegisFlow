@@ -49,6 +49,9 @@ sets, attack stages, escalation count, maximum risk, acknowledgement summary, an
 chronological timeline. `GET /api/v1/incidents/{incident_id}` additionally returns the
 full related alerts. `POST /api/v1/incidents/{incident_id}/status` accepts only `open`,
 `investigating`, `contained`, or `closed` and advances the incident version.
+`POST /api/v1/incidents/{incident_id}/notes` records a bounded analyst note as an audit
+event and advances the incident version; incident detail returns the chronological note
+ledger. Notes never enter detection, explanation prompts, or retraining candidates.
 
 Incident explanations are fetched on demand from
 `GET /api/v1/incidents/{incident_id}/explanation`. The response identifies the requested

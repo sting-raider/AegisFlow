@@ -153,6 +153,20 @@ def test_api_vertical_slice(
         assert incident_detail["alerts"]
         assert incident_detail["attack_stages"]
         assert incident_detail["alert_count"] == len(incident_detail["alert_ids"])
+        note = client.post(
+            f"/api/v1/incidents/{incidents[0]['id']}/notes",
+            json={"actor": "test-analyst", "note": "Review authentication sequence"},
+        )
+        assert note.status_code == 200
+        noted_incident = client.get(f"/api/v1/incidents/{incidents[0]['id']}").json()
+        assert noted_incident["analyst_notes"] == [
+            {
+                "id": note.json()["id"],
+                "actor": "test-analyst",
+                "note": "Review authentication sequence",
+                "timestamp": note.json()["timestamp"],
+            }
+        ]
         status_update = client.post(
             f"/api/v1/incidents/{incidents[0]['id']}/status",
             json={"status": "investigating"},
