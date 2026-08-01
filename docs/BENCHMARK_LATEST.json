@@ -1,18 +1,36 @@
 {
-  "scope": "single-process synthetic inference benchmark",
-  "flows": 2000,
-  "flows_per_second": 331.84374208236017,
-  "latency_ms": {
-    "p50": 2.8885499996249564,
-    "p95": 3.3903199997439515,
-    "p99": 3.915212994761532
+  "scope": "single-process bounded-queue synthetic burst benchmark",
+  "generated_flows": 2000,
+  "processed_flows": 1685,
+  "flows_per_second": 74.49899722799967,
+  "inference_latency_ms": {
+    "p50": 14.546799997333437,
+    "p95": 21.023080003215,
+    "p99": 26.650676009012386
   },
-  "elapsed_seconds": 6.026933000001009,
+  "processing_latency_ms": {
+    "p50": 4124.574499990558,
+    "p95": 4357.897259999299,
+    "p99": 4382.780919980723
+  },
+  "elapsed_seconds": 22.617754100007005,
+  "queue": {
+    "capacity": 256,
+    "maximum_depth": 256,
+    "growth_from_empty": 256,
+    "final_depth": 0
+  },
+  "dropped_events": 315,
+  "resource_usage": {
+    "cpu_seconds": 21.96875,
+    "average_process_cpu_percent": 97.1305546203334,
+    "rss_start_bytes": 318623744,
+    "rss_peak_bytes": 319397888,
+    "rss_end_bytes": 319348736
+  },
   "machine": {
     "platform": "Windows-11-10.0.26200-SP0",
     "python": "3.12.9",
     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel"
-  },
-  "queue_growth": "not measured by single-process benchmark",
-  "dropped_events": 0
+  }
 }

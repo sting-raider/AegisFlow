@@ -14,15 +14,18 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 82 tests pass, Ruff passes across the repository, and strict MyPy passes
-  across 47 source files. The last full measured
-  coverage baseline before bundle v2 was 82%.
+- Python: 93 tests pass, Ruff passes across the repository, strict MyPy passes across
+  51 source files, and the current measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
   network; API/dashboard bind to loopback.
-- Synthetic inference benchmark: 2,000 flows, 331.8 flows/s, 3.39 ms p95 and 3.92 ms
-  p99 on the recorded Windows host. Queue growth was not measured in that run.
+- Bounded-queue burst benchmark on the recorded Windows host generated 2,000 flows,
+  processed 1,685 at 74.5 flows/s, explicitly dropped 315 after the 256-event queue
+  saturated, and drained to zero. Inference measured 14.55/21.02/26.65 ms p50/p95/p99;
+  queue-inclusive processing measured 4,124.57/4,357.90/4,382.78 ms. Average process CPU
+  was 97.13% with a 319.4 MB RSS peak. This is a local synthetic overload measurement,
+  not a production capacity claim.
 - Redis/PostgreSQL recovery matrix passes against Compose: abandoned detector work is
   claimed, a three-event backlog drains, Redis restarts without replacing consumers,
   PostgreSQL downtime leaves its event pending and records retry errors, and recovery
@@ -101,7 +104,20 @@ Last updated: 2026-08-01.
   audit events and remain excluded from detection, retraining and explanations. Browser
   QA exercised desktop and mobile layouts with no page overflow or console errors, and
   four component tests cover core analyst interactions. Missing backend telemetry stays
-  visibly `not reported` until the observability slice supplies it.
+  visibly `not reported` rather than being fabricated.
+- Ingress hardening now caps mutation bodies, WebSocket origins/connections/frames, Redis
+  stream length, and serialized stream messages. Oversized WebSocket frames and malformed
+  events become visible processing errors; dead letters retain only a hash and bounded
+  structure, never the untrusted envelope. Queue capacity utilization and threshold
+  transitions are explicit. Sensor, detector, API, access, and runtime logs are redacted
+  one-line JSON with the required operational fields. Prometheus now exposes every
+  brief-listed flow/signature/detection/alert/latency/queue/model/WebSocket/drift/database
+  metric, while system status feeds real throughput, drops, latency, signature/Suricata,
+  capacity, retention, and health values to the dashboard.
+- Feature parity now includes 256 deterministic randomized valid-flow trials proving
+  registry order and endpoint-identity independence, plus nonfinite/out-of-range tests.
+  The repeatable bounded-queue performance test verifies event conservation, queue
+  bounds, latency percentiles, CPU, and memory without an arbitrary CI threshold.
 
 ## Hard blockers and fallbacks
 
@@ -110,6 +126,5 @@ Last updated: 2026-08-01.
 
 ## Highest-priority required backlog
 
-- Dashboard completion, remaining structured observability and input/backpressure
-  hardening tracked in
-  `docs/COMPLETION_AUDIT.md`.
+- Publish the final hardening/documentation commits and verify the resulting public CI
+  run tracked in `docs/COMPLETION_AUDIT.md`.

@@ -12,6 +12,8 @@ timestamps and reversed ranges are rejected. `X-Correlation-ID` is echoed or gen
 Errors use a stable `error` envelope containing `code`, a safe `message`, and the
 correlation ID. Validation errors include field locations and error types without
 echoing request values. Unexpected exceptions return a redacted `internal_error`.
+Mutation bodies default to a 64 KiB cap. Correlation IDs accept only bounded letters,
+digits, dot, underscore, and hyphen; invalid values are replaced instead of reflected.
 
 Operational exports are bounded to 200 rows:
 
@@ -30,10 +32,12 @@ address anonymization requires the matching `X-API-Key` header.
 `POST /api/v1/alerts/{alert_id}/acknowledge` records the first acknowledgement in the
 audit log. Repeated acknowledgements are idempotent.
 
-System status includes `queue.pending`, `queue.lag`, and `queue.consumers` for the
+System status includes `queue.pending`, `queue.lag`, `queue.consumers`, capacity,
+utilization, backpressure state/transition count, current throughput, explicit drops,
+worker latency, signature-event count, and Suricata observation state for the
 detection-to-API consumer group. Prometheus exposes the same work state as `queue_pending`
-and `queue_lag`. It also reports bounded recent health events and effective retention
-configuration.
+and `queue_lag`, plus every required flow/signature/detection/latency/drift/error metric.
+It also reports bounded recent health events and effective retention configuration.
 
 WebSockets:
 
@@ -43,6 +47,9 @@ WebSockets:
 Clients reconnect with bounded delay. Safe CORS defaults allow only local dashboard
 origins. Production deployments must configure explicit origins and an API key or
 place the API behind organizational authentication.
+WebSockets enforce the same origin allow-list, default to 32 concurrent connections,
+and cap outbound frames at 256 KiB. An oversized frame becomes a visible
+`processing_error`; it is never silently presented as an empty benign result.
 
 Incident list responses include derived alert counts, endpoint sets, reason/signature
 sets, attack stages, escalation count, maximum risk, acknowledgement summary, and a

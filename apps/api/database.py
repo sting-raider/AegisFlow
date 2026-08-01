@@ -973,6 +973,7 @@ class Repository:
                 "database": "ready",
                 "sensors": len(session.scalars(select(SensorRow)).all()),
                 "flows": len(session.scalars(select(FlowRow)).all()),
+                "signature_events": len(session.scalars(select(SignatureRow)).all()),
                 "alerts": len(session.scalars(select(AlertRow)).all()),
                 "incidents": len(session.scalars(select(IncidentRow)).all()),
                 "mode": "demo" if os.getenv("AEGISFLOW_DEMO", "1") == "1" else "production",

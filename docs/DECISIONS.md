@@ -157,3 +157,18 @@ one report without enabling durable cross-report tracking. Retraining exports co
 only analyst-approved benign-new-behaviour features in registry order. Persisting export
 salts, exporting full JSON blobs, or including analyst comments/identities was rejected
 because those choices add privacy risk without helping model training.
+
+## D-016 — Bounded ingress with hash-only failure evidence
+
+Apply independent limits at each trust boundary: 64 KiB mutation bodies, allow-listed
+and connection-bounded WebSockets with 256 KiB outbound frames, 1 MiB serialized stream
+messages, and a bounded Redis stream. Queue capacity is observable as utilization plus
+transition counts; explicit drops have their own metric. These defaults suit the
+single-host demo and remain configurable for measured deployments.
+
+Malformed queue entries retain only source, error class, expected-field presence,
+unexpected-field count, and a SHA-256 of canonical input. Copying the rejected envelope
+into a dead-letter stream was rejected because attacker-controlled fields could smuggle
+payloads or secrets into durable infrastructure. All service events use a fixed JSON
+shape and redact addresses, credential patterns, and control characters. Operational
+debug convenience does not outweigh the no-payload/no-secret invariants.

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from starlette.websockets import WebSocketDisconnect
 
 from apps.api.main import app
 
@@ -20,14 +21,34 @@ def test_api_vertical_slice(
     monkeypatch.delenv("AEGISFLOW_API_KEY", raising=False)
     with TestClient(app, raise_server_exceptions=False) as client:
         assert client.get("/health/ready").json() == {"status": "ready"}
-        assert client.get("/api/v1/system/status").json()["queue"] == {
+        initial_queue = client.get("/api/v1/system/status").json()["queue"]
+        assert {key: initial_queue[key] for key in ("pending", "lag", "consumers")} == {
             "pending": 0,
             "lag": 0,
             "consumers": 0,
         }
+        assert initial_queue["capacity"] == 100_000
+        assert initial_queue["backpressure"] is False
         metrics = client.get("/metrics").text
-        assert "queue_lag" in metrics
-        assert "drift_events_total" in metrics
+        for metric_name in (
+            "flows_received_total",
+            "flows_validated_total",
+            "flows_rejected_total",
+            "flows_dropped_total",
+            "detections_total",
+            "alerts_total",
+            "unknown_alerts_total",
+            "signature_events_total",
+            "inference_latency_seconds",
+            "processing_latency_seconds",
+            "queue_lag",
+            "model_load_failures_total",
+            "websocket_connections",
+            "drift_events_total",
+            "database_errors_total",
+            "queue_backpressure_events_total",
+        ):
+            assert metric_name in metrics
         assert client.get("/api/v1/drift-events").status_code == 200
         alerts = client.get("/api/v1/alerts").json()["items"]
         assert alerts
@@ -167,6 +188,23 @@ def test_api_vertical_slice(
                 "timestamp": note.json()["timestamp"],
             }
         ]
+        with monkeypatch.context() as body_limit:
+            body_limit.setenv("AEGISFLOW_HTTP_MAX_BODY_BYTES", "1024")
+            oversized = client.post(
+                f"/api/v1/incidents/{incidents[0]['id']}/notes",
+                json={"actor": "test-analyst", "note": "x" * 1500},
+                headers={"X-Correlation-ID": "body-limit-test"},
+            )
+        assert oversized.status_code == 413
+        assert oversized.json()["error"] == {
+            "code": "request_body_too_large",
+            "message": "Request could not be completed",
+            "correlation_id": "body-limit-test",
+        }
+        replaced_correlation = client.get(
+            "/health/live", headers={"X-Correlation-ID": "invalid correlation value"}
+        ).headers["X-Correlation-ID"]
+        assert replaced_correlation != "invalid correlation value"
         status_update = client.post(
             f"/api/v1/incidents/{incidents[0]['id']}/status",
             json={"status": "investigating"},
@@ -184,7 +222,12 @@ def test_api_vertical_slice(
         assert "cannot authorize" in explanation["text"]
         assert "incident_explanations_total" in client.get("/metrics").text
         assert client.get("/api/v1/models/current").status_code == 200
-        assert client.get("/api/v1/system/status").json()["retention"] == {"enabled": False}
+        system = client.get("/api/v1/system/status").json()
+        assert system["retention"] == {"enabled": False}
+        assert system["suricata_status"] == "fixture"
+        assert system["dropped_records"] == 0
+        assert system["throughput_per_second"] == 0.0
+        assert system["worker_latency_ms"] is None
         with monkeypatch.context() as failure:
             failure.setattr(
                 app.state.repository,
@@ -205,3 +248,24 @@ def test_api_vertical_slice(
             message = websocket.receive_json()
             assert message["type"] == "alerts"
             assert message["items"]
+        with pytest.raises(WebSocketDisconnect) as rejected_origin:
+            with client.websocket_connect(
+                "/api/v1/stream/alerts", headers={"origin": "https://untrusted.example"}
+            ):
+                pass
+        assert rejected_origin.value.code == 1008
+        with monkeypatch.context() as connection_limit:
+            connection_limit.setenv("AEGISFLOW_WEBSOCKET_MAX_CONNECTIONS", "1")
+            with client.websocket_connect("/api/v1/stream/alerts"):
+                with pytest.raises(WebSocketDisconnect) as rejected_connection:
+                    with client.websocket_connect("/api/v1/stream/alerts"):
+                        pass
+        assert rejected_connection.value.code == 1013
+        with monkeypatch.context() as payload_limit:
+            payload_limit.setenv("AEGISFLOW_WEBSOCKET_MAX_PAYLOAD_BYTES", "4096")
+            with client.websocket_connect("/api/v1/stream/alerts") as websocket:
+                limited_message = websocket.receive_json()
+        assert limited_message == {
+            "type": "processing_error",
+            "error": {"code": "websocket_payload_too_large"},
+        }

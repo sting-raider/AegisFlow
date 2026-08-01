@@ -152,6 +152,7 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
           database: "ready",
           sensors: 1,
           flows: 0,
+          signature_events: 0,
           alerts: 0,
           incidents: 0,
           mode: "demo",

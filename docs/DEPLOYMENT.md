@@ -8,6 +8,20 @@ Long-running services use `restart: unless-stopped`. Stream consumers retry Redi
 bounded backoff and reclaim abandoned work after `AEGISFLOW_PENDING_IDLE_MS` (30 seconds
 by default). Keep this timeout above normal processing latency in production.
 
+Ingress and queue limits are configurable with `AEGISFLOW_HTTP_MAX_BODY_BYTES`,
+`AEGISFLOW_WEBSOCKET_MAX_CONNECTIONS`, `AEGISFLOW_WEBSOCKET_MAX_PAYLOAD_BYTES`,
+`AEGISFLOW_STREAM_MAXLEN`, `AEGISFLOW_STREAM_MAX_PAYLOAD_BYTES`, and
+`AEGISFLOW_BACKPRESSURE_THRESHOLD`. Defaults are intentionally conservative for the
+single-host demo. Size them from measured traffic and memory, keep reverse-proxy limits
+at least as strict, and alert on `queue_capacity_utilization`,
+`queue_backpressure_events_total`, and `flows_dropped_total`.
+
+Application, sensor, detector, API access, and API runtime events are emitted as one-line
+JSON with timestamp, level, service, event type, correlation/flow/model identifiers, and
+error code. Missing fields are explicit nulls. Credential patterns, control characters,
+and addresses are redacted; malformed queue records are represented only by a SHA-256
+and bounded structural summary.
+
 Set a strong `AEGISFLOW_DB_PASSWORD`, API key, explicit CORS origins, retention, backup
 target, and trusted registry or image-promotion permissions before non-demo use.
 Place TLS and organizational authentication at the reverse proxy. Back up PostgreSQL with

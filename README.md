@@ -50,6 +50,11 @@ The bundled traffic is synthetic and non-destructive. It produces ordinary flows
 a known-signature fixture, scan-like fan-out, a burst, and a statistically unusual
 outbound transfer. Stop with `make demo-stop`.
 
+The current clean validation replay persists 6 flows, 1 signature event, 5 alerts
+(including distinct known-attack and suspicious-unknown results), and 1 incident. A
+second replay leaves those counts unchanged because event IDs are deterministic and
+database writes are idempotent.
+
 Local development:
 
 ```bash
@@ -73,6 +78,24 @@ make suricata-replay PCAP=/absolute/path/capture.pcap
 make benchmark
 make reset
 ```
+
+## Verified status
+
+The final local validation on 2026-08-01 passed:
+
+- Ruff and strict MyPy across 51 Python source files;
+- 93 Python tests with 84% measured backend coverage;
+- dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
+- `npm audit --audit-level=high` with no reported vulnerabilities;
+- clean Compose image builds, database migration, offline replay, REST/metrics checks,
+  and independent Redis/PostgreSQL restart recovery;
+- a bounded-queue overload benchmark with explicit drops, queue drain, latency, CPU,
+  and memory reporting.
+
+See [`docs/PROGRESS.md`](docs/PROGRESS.md),
+[`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md), and
+[`docs/BENCHMARK_LATEST.json`](docs/BENCHMARK_LATEST.json) for the measured evidence and
+its limitations.
 
 `make live` is Linux-only, requires an explicit interface, and prints an authorization
 warning. It builds a dedicated non-root NFStream sensor target with only `NET_RAW`;
@@ -107,6 +130,11 @@ quality. Public datasets are downloaded separately and never committed. See
 - Analyst feedback never mutates an original detection.
 - Drift cannot retrain or promote a model.
 - Optional explanation providers receive only sanitized structured fields.
+- Mutation bodies, stream messages, stream length, and WebSocket connections/frames are
+  bounded; rejected queue records retain only a structural summary and SHA-256 hash.
+- Sensor, detector, API, access, and runtime application events use redacted one-line
+  JSON logs, while Prometheus exposes flow, detection, queue, model, drift, WebSocket,
+  and database health.
 
 Optional incident explanations are disabled by default and run only when requested from
 an incident. The deterministic explanation always remains available; configured remote

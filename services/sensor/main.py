@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import json
 import os
 import time
 from collections.abc import Iterable
 from pathlib import Path
 from uuid import NAMESPACE_URL, UUID, uuid5
 
+from packages.common import log_event, service_logger
 from packages.common.bus import RedisStreamBus
 from packages.contracts import FlowEvent, Severity, SignatureEvent
 from packages.detection.suricata import EveJsonReader, EveReadBatch, correlate_eve_event
@@ -22,6 +22,7 @@ from services.sensor.adapters import (
 
 FLOW_STREAM = "aegisflow:flows"
 MAX_EVE_FILE_BYTES = 256 * 1024 * 1024
+LOGGER = service_logger("sensor")
 
 
 def load_eve_file(path: Path) -> EveReadBatch:
@@ -75,42 +76,32 @@ def run() -> None:
     elif args.mode == "live":
         if args.eve is not None:
             parser.error("--eve snapshot correlation is available only in demo/PCAP mode")
-        print(
-            "PRIVACY WARNING: live capture requires authorization for the explicit "
-            "local interface; "
-            "packet payloads are not persisted."
-        )
+        log_event(LOGGER, "live_capture_privacy_warning", level="warning")
         adapter = LiveAdapter(args.interface)
     else:
         adapter = DemoAdapter()
-    bus = RedisStreamBus(os.getenv("AEGISFLOW_REDIS_URL", "redis://localhost:6379/0"))
+    bus = RedisStreamBus(
+        os.getenv("AEGISFLOW_REDIS_URL", "redis://localhost:6379/0"),
+        maxlen=int(os.getenv("AEGISFLOW_STREAM_MAXLEN", "100000")),
+        max_payload_bytes=int(os.getenv("AEGISFLOW_STREAM_MAX_PAYLOAD_BYTES", "1048576")),
+        on_backpressure=lambda stream: log_event(
+            LOGGER, "queue_capacity_pressure", level="warning", error_code=stream
+        ),
+    )
     flow_source: Iterable[FlowEvent] = adapter.flows()
     correlated: dict[UUID, SignatureEvent] = {}
     if args.eve is not None:
         buffered_flows = list(flow_source)
         batch = load_eve_file(args.eve)
         for error in batch.errors:
-            print(
-                json.dumps(
-                    {
-                        "event_type": "suricata_processing_error",
-                        "error": error.error,
-                        "line_hash": error.line_hash,
-                    }
-                )
+            log_event(
+                LOGGER,
+                "suricata_processing_error",
+                level="error",
+                error_code=error.error,
             )
         correlated = correlate_signatures(buffered_flows, batch)
-        print(
-            json.dumps(
-                {
-                    "event_type": "suricata_eve_summary",
-                    "events": len(batch.events),
-                    "errors": len(batch.errors),
-                    "duplicates": batch.duplicates,
-                    "correlated_signatures": len(correlated),
-                }
-            )
-        )
+        log_event(LOGGER, "suricata_eve_summary")
         flow_source = buffered_flows
     for flow in flow_source:
         envelope: dict[str, object] = {"flow": flow.model_dump(mode="json")}
@@ -132,7 +123,7 @@ def run() -> None:
         if signature is not None:
             envelope["signature"] = signature.model_dump(mode="json")
         bus.publish(FLOW_STREAM, envelope)
-        print(f"published {flow.event_id} {flow.protocol_metadata.get('scenario', '')}")
+        log_event(LOGGER, "flow_published", flow_id=str(flow.event_id))
         if args.mode == "demo":
             time.sleep(0.15)
 

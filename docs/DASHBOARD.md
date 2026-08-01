@@ -21,8 +21,9 @@ opens associated detection/signature/feature evidence, and exports explicitly se
 records through the default-anonymized API. Host detail derives risk, recent activity,
 fan-out, protocol use, and alert history from stored flows and alerts. Model/drift shows
 the production pointer, schema, validation metrics, observed score distribution, drift
-ledger, and model health errors. System health reports only backend-provided values and
-labels unavailable telemetry as `not reported` rather than fabricating it.
+ledger, and model health errors. System health reports backend throughput, explicit
+drops, worker latency, Suricata/signature state, queue capacity pressure, retention, and
+recent health events; an unavailable value remains `not reported` rather than fabricated.
 
 Incident cards open a detail drawer backed by the incident detail API. It shows alert
 count, acknowledgement count, maximum risk, escalation count, explainable grouping

@@ -142,6 +142,7 @@ export interface FlowDetail extends Flow {
 export interface Host {
   host: string;
   flows: number;
+  signature_events: number;
   destinations: number;
   alerting: boolean;
 }
@@ -171,6 +172,10 @@ export interface SystemStatus {
     pending: number;
     lag: number;
     consumers: number;
+    capacity?: number;
+    utilization?: number;
+    backpressure?: boolean;
+    backpressure_events?: number;
   };
   retention: {
     enabled: boolean;
@@ -181,7 +186,7 @@ export interface SystemStatus {
   throughput_per_second?: number;
   dropped_records?: number;
   suricata_status?: string;
-  worker_latency_ms?: number;
+  worker_latency_ms?: number | null;
 }
 
 export interface HealthEvent {

@@ -1,11 +1,30 @@
 from __future__ import annotations
 
+import hashlib
 import json
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from typing import Any, cast
 
 from redis import Redis
 from redis.exceptions import ResponseError
+
+
+class MessageTooLargeError(ValueError):
+    pass
+
+
+def safe_dead_letter(
+    source: str, envelope: dict[str, object], error_code: str
+) -> dict[str, object]:
+    canonical = json.dumps(envelope, default=str, sort_keys=True, separators=(",", ":"))
+    expected_fields = sorted(set(envelope) & {"flow", "signature", "detection"})
+    return {
+        "source": source,
+        "error_code": error_code,
+        "event_sha256": hashlib.sha256(canonical.encode()).hexdigest(),
+        "expected_fields_present": expected_fields,
+        "unexpected_field_count": len(set(envelope) - set(expected_fields)),
+    }
 
 
 class RedisStreamBus:
@@ -14,21 +33,31 @@ class RedisStreamBus:
         url: str,
         *,
         maxlen: int = 100_000,
+        max_payload_bytes: int = 1_048_576,
         claim_idle_ms: int = 30_000,
         client: Redis | None = None,
+        on_backpressure: Callable[[str], None] | None = None,
     ) -> None:
         self.redis: Redis = client or Redis.from_url(url, decode_responses=True)
-        self.maxlen = maxlen
+        self.maxlen = max(100, maxlen)
+        self.max_payload_bytes = max(1024, max_payload_bytes)
         self.claim_idle_ms = claim_idle_ms
+        self.on_backpressure = on_backpressure
 
     def ping(self) -> bool:
         return bool(self.redis.ping())
 
     def publish(self, stream: str, payload: dict[str, Any]) -> str:
+        serialized = json.dumps(payload, separators=(",", ":"))
+        if len(serialized.encode()) > self.max_payload_bytes:
+            raise MessageTooLargeError("stream payload exceeds configured byte limit")
+        stream_length = int(cast(Any, self.redis.xlen(stream)))
+        if self.on_backpressure is not None and stream_length >= self.maxlen:
+            self.on_backpressure(stream)
         return str(
             self.redis.xadd(
                 stream,
-                {"payload": json.dumps(payload, separators=(",", ":"))},
+                {"payload": serialized},
                 maxlen=self.maxlen,
                 approximate=True,
             )
