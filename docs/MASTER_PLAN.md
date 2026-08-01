@@ -11,8 +11,7 @@
 | 6 | Incidents, feedback, WebSockets, dashboard pages | Complete |
 | 7 | Drift and safe optional explanations | Complete |
 | 8 | Malformed-input/recovery tests, threat model, CI scans | Complete |
-| 9 | Full validation and final measured status | Local validation complete; final public CI pending |
+| 9 | Full validation and final measured status | Complete |
 
-This phase table does not substitute for the authoritative requirement audit. Required
-remaining work is tracked in `docs/COMPLETION_AUDIT.md`; the project is not complete while
-that matrix contains an incomplete row.
+This phase table does not substitute for the authoritative requirement audit. The
+requirement-by-requirement evidence is recorded in `docs/COMPLETION_AUDIT.md`.

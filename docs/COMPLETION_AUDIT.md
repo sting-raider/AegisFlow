@@ -28,9 +28,9 @@ marked complete only when implementation and proportionate verification both exi
 | Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix, previous-valid model fallback | Complete |
 | Automated tests | 93 Python tests plus four Vitest interactions and Playwright E2E; randomized feature parity/bounds; Redis/PostgreSQL recovery; migration/model fallback/Compose fault injection; bounded-queue performance conservation/resource test | Complete |
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
-| CI/CD | Python/frontend/Compose/integration/migration/audit/Trivy/gitleaks jobs | **Incomplete:** publish the final hardening milestone and verify its remote run |
+| CI/CD | Python/frontend/Compose/integration/migration/audit/Trivy/gitleaks jobs; public run `30703942894` passed every job for hardening commit `fd25b15` | Complete |
 | Documentation | Required topic files, current desktop/mobile screenshots, README validation snapshot, measured limitations, demo and faculty sequence | Complete |
-| GitHub publication | Public `sting-raider/AegisFlow` repository and `main` default branch | Complete; final remote run still tracked under CI/CD |
+| GitHub publication | Public `sting-raider/AegisFlow` repository and `main` default branch | Complete |
 
-The project is not complete while any row is marked incomplete. `docs/PROGRESS.md` must
-remain consistent with this matrix as work lands.
+All rows are complete as of 2026-08-01. Future changes must update this matrix and
+`docs/PROGRESS.md` together when they alter the verified scope.

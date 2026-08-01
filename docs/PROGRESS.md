@@ -118,6 +118,9 @@ Last updated: 2026-08-01.
   registry order and endpoint-identity independence, plus nonfinite/out-of-range tests.
   The repeatable bounded-queue performance test verifies event conservation, queue
   bounds, latency percentiles, CPU, and memory without an arbitrary CI threshold.
+- Final hardening commit `fd25b15` is published on public `main`; GitHub Actions run
+  `30703942894` passed Python/coverage/NFStream/training/migration, dashboard/audit,
+  Compose/live-loopback, integration/Playwright, gitleaks, and Trivy jobs.
 
 ## Hard blockers and fallbacks
 
@@ -126,5 +129,6 @@ Last updated: 2026-08-01.
 
 ## Highest-priority required backlog
 
-- Publish the final hardening/documentation commits and verify the resulting public CI
-  run tracked in `docs/COMPLETION_AUDIT.md`.
+- None for the authoritative build brief. Operational use still requires reviewed
+  public datasets, environment-specific threshold validation, and an authorized Linux
+  deployment; those are documented limitations, not bundled demo requirements.
