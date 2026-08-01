@@ -1,7 +1,29 @@
 import pytest
 
 from packages.contracts import Severity, Verdict
-from packages.detection.fusion import FusionInput, fuse_risk
+from packages.detection.fusion import FusionConfig, FusionInput, fuse_risk
+
+
+def test_fusion_configuration_loads_every_weight_and_threshold() -> None:
+    config = FusionConfig.from_mapping(
+        {
+            "version": "test",
+            "known_weight": 0.4,
+            "anomaly_weight": 0.3,
+            "signature_weight": 0.2,
+            "context_weight": 0.1,
+            "known_threshold": 0.8,
+            "anomaly_threshold": 0.75,
+            "benign_max_risk": 25,
+            "review_max_risk": 50,
+            "high_risk": 70,
+            "critical_risk": 90,
+        }
+    )
+    assert config.to_dict()["known_weight"] == 0.4
+    assert config.known_threshold == 0.8
+    with pytest.raises(ValueError, match="sum to one"):
+        FusionConfig(known_weight=0.5)
 
 
 def test_known_attack_requires_strong_known_or_signature_evidence() -> None:

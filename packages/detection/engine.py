@@ -17,11 +17,13 @@ class DetectionEngine:
     def __init__(self, bundle: ModelBundle) -> None:
         self.bundle = bundle
         raw = bundle.thresholds
-        self.fusion = FusionConfig(
-            version=str(raw.get("version", "1.0.0")),
-            known_threshold=float(raw.get("known_threshold", 0.72)),
-            anomaly_threshold=float(raw.get("anomaly_threshold", 0.70)),
-        )
+        self.fusion = FusionConfig.from_mapping(raw)
+        calibration = bundle.anomaly_calibration
+        if calibration is None:
+            raise ValueError(
+                "model bundle lacks benign empirical anomaly calibration; promote a v3 bundle"
+            )
+        self.anomaly_calibration = calibration
 
     def detect(
         self,
@@ -82,6 +84,7 @@ class DetectionEngine:
         isolation_score = float(np.clip(isolation_score * validation_scale, 0, 1))
         reconstruction_score = float(np.clip(reconstruction_score * validation_scale, 0, 1))
         anomaly_score = max(isolation_score, reconstruction_score)
+        anomaly_percentile = self.anomaly_calibration.percentile(anomaly_score)
 
         signature_score = 0.0
         if signature is not None:
@@ -125,7 +128,7 @@ class DetectionEngine:
             class_probabilities={k: round(v, 8) for k, v in class_probabilities.items()},
             classifier_confidence=round(confidence, 8),
             anomaly_score=round(anomaly_score, 8),
-            anomaly_percentile=round(anomaly_score, 8),
+            anomaly_percentile=round(anomaly_percentile, 8),
             open_set_score=round(anomaly_score * _classifier_uncertainty(probabilities), 8),
             reconstruction_error=round(reconstruction_error, 8),
             reconstruction_score=round(reconstruction_score, 8),

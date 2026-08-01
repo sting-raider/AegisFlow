@@ -1,0 +1,21 @@
+{
+  "version": "3.0.0",
+  "known_weight": 0.43,
+  "anomaly_weight": 0.27,
+  "signature_weight": 0.2,
+  "context_weight": 0.1,
+  "known_threshold": 0.72,
+  "anomaly_threshold": 0.74,
+  "benign_max_risk": 30.0,
+  "review_max_risk": 54.0,
+  "high_risk": 72.0,
+  "critical_risk": 90.0,
+  "isolation_decision_benign_median": -0.013612482167481454,
+  "isolation_decision_benign_p03": -0.059120699535357944,
+  "reconstruction_error_benign_p50": 0.08092871308326721,
+  "reconstruction_error_benign_p97": 0.24140140414237976,
+  "reconstruction_error_benign_p99": 0.2989373505115509,
+  "open_set_validation_scale": 0.828949481616522,
+  "normalization": "calibration benign p50 maps to 0; tail budget maps to 0.70",
+  "selection_target": "3% benign calibration tail budget on deterministic smoke data"
+}

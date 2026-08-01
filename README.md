@@ -83,8 +83,8 @@ make reset
 
 The final local validation on 2026-08-01 passed:
 
-- Ruff and strict MyPy across 51 Python source files;
-- 93 Python tests with 84% measured backend coverage;
+- Ruff and strict MyPy across 53 Python source files;
+- 108 Python tests with 84% last-measured backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
 - clean Compose image builds, database migration, offline replay, REST/metrics checks,
@@ -105,14 +105,16 @@ traffic onto a real network.
 
 ## Training and models
 
-`make train-smoke` benchmarks logistic regression, a tree model, and a compact MLP on deterministic
-synthetic data, uses a source-group split, fits preprocessing on the training fold
-only, calibrates the selected classifier with grouped training-fold CV, and trains both
-Isolation Forest and a compact denoising autoencoder on benign rows only. Bundle v2
+`make train-smoke` benchmarks logistic regression, a tree model, and a compact MLP on
+deterministic synthetic data, uses disjoint grouped train/calibration/test partitions,
+fits preprocessing on training rows only, calibrates the selected classifier with grouped
+training-fold CV, and trains both Isolation Forest and a compact denoising autoencoder on
+benign rows only. Bundle v3
 includes the feature schema, preprocessing, classifier, both anomaly models, labels,
-validation-derived thresholds, metrics, training provenance, artifact hashes, and
-SHA-256 checksums. Production promotion is atomic and records rollback history; a
-corrupt current bundle falls back visibly to the previous valid version.
+calibration-derived thresholds, a benign empirical anomaly CDF, fusion comparison metrics,
+training provenance, artifact hashes, and SHA-256 checksums. Production promotion is
+atomic and records rollback history. The detector requires a calibrated v3 bundle; older
+v1/v2 history remains available for migration inspection but cannot perform inference.
 
 Smoke metrics are only installation evidence. They are not claims about operational
 quality. Public datasets are downloaded separately and never committed. See

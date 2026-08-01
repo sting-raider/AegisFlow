@@ -198,3 +198,19 @@ it silently changes destination-port and directional features. Treating Suricata
 numeric `flow_id` as Community ID was also rejected; when no complete tuple exists it is
 retained only as a namespaced, hashed Suricata-local identity. The standard SHA-1 digest
 is used solely for protocol interoperability, never for a security decision.
+
+## D-019 — Benign empirical CDF and calibrated interpretable fusion
+
+Bundle schema v3 adds a checksum-covered `calibration.json` containing at most 2,049
+monotonic knots from the combined anomaly scores of a benign-only grouped calibration
+partition. Runtime `anomaly_percentile` is the right-rank empirical CDF estimate, while
+`anomaly_score` remains the normalized decision signal. Reusing the normalized score as
+a percentile was rejected because scale position is not population rank. Using observed
+runtime traffic as the reference was rejected because suspicious traffic could poison it.
+
+Keep the rule-based fusion decision, load every weight and threshold from the bundle, and
+select among a bounded transparent grid on final-verdict macro F1. Report the unchanged
+baseline and selected configuration on a separate grouped test partition. For smoke v3,
+the selected rule retained all baseline weights and raised only the anomaly threshold from
+0.70 to 0.74. This synthetic comparison proves the machinery, not operational superiority;
+public held-family and cross-dataset evaluation remains mandatory.

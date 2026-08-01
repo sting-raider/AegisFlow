@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from packages.contracts import Severity, Verdict
 
@@ -18,6 +19,63 @@ class FusionConfig:
     review_max_risk: float = 54.0
     high_risk: float = 72.0
     critical_risk: float = 90.0
+
+    def __post_init__(self) -> None:
+        if not self.version:
+            raise ValueError("fusion version cannot be empty")
+        unit_values = (
+            self.known_weight,
+            self.anomaly_weight,
+            self.signature_weight,
+            self.context_weight,
+            self.known_threshold,
+            self.anomaly_threshold,
+        )
+        if any(value < 0 or value > 1 for value in unit_values):
+            raise ValueError("fusion weights and signal thresholds must be in [0, 1]")
+        if abs(sum(unit_values[:4]) - 1.0) > 1e-9:
+            raise ValueError("fusion weights must sum to one")
+        if not (
+            0
+            <= self.benign_max_risk
+            < self.review_max_risk
+            < self.high_risk
+            < self.critical_risk
+            <= 100
+        ):
+            raise ValueError("fusion risk thresholds must be strictly ordered in [0, 100]")
+
+    @classmethod
+    def from_mapping(cls, value: dict[str, Any]) -> FusionConfig:
+        defaults = cls()
+        return cls(
+            version=str(value.get("version", defaults.version)),
+            known_weight=float(value.get("known_weight", defaults.known_weight)),
+            anomaly_weight=float(value.get("anomaly_weight", defaults.anomaly_weight)),
+            signature_weight=float(value.get("signature_weight", defaults.signature_weight)),
+            context_weight=float(value.get("context_weight", defaults.context_weight)),
+            known_threshold=float(value.get("known_threshold", defaults.known_threshold)),
+            anomaly_threshold=float(value.get("anomaly_threshold", defaults.anomaly_threshold)),
+            benign_max_risk=float(value.get("benign_max_risk", defaults.benign_max_risk)),
+            review_max_risk=float(value.get("review_max_risk", defaults.review_max_risk)),
+            high_risk=float(value.get("high_risk", defaults.high_risk)),
+            critical_risk=float(value.get("critical_risk", defaults.critical_risk)),
+        )
+
+    def to_dict(self) -> dict[str, str | float]:
+        return {
+            "version": self.version,
+            "known_weight": self.known_weight,
+            "anomaly_weight": self.anomaly_weight,
+            "signature_weight": self.signature_weight,
+            "context_weight": self.context_weight,
+            "known_threshold": self.known_threshold,
+            "anomaly_threshold": self.anomaly_threshold,
+            "benign_max_risk": self.benign_max_risk,
+            "review_max_risk": self.review_max_risk,
+            "high_risk": self.high_risk,
+            "critical_risk": self.critical_risk,
+        }
 
 
 @dataclass(frozen=True)

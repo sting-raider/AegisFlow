@@ -1,0 +1,66 @@
+{
+  "bundle_schema_version": 3,
+  "model_name": "aegisflow-smoke",
+  "version": "0.3.0",
+  "created_at": "2026-08-01T15:42:45.017775+00:00",
+  "git_commit": "51f37f624c515c7a0b4b75c3d71b4da72a7c3177",
+  "python_version": "3.12.9",
+  "dependency_versions": {
+    "joblib": "1.5.1",
+    "numpy": "2.3.2",
+    "scikit_learn": "1.7.1",
+    "torch": "2.13.0+cpu"
+  },
+  "feature_schema_version": "1.0.0",
+  "dataset_fingerprints": [
+    "synthetic-seed-431-v3"
+  ],
+  "training_seed": 431,
+  "model_classes": [
+    "benign",
+    "brute_force",
+    "port_scan"
+  ],
+  "thresholds": {
+    "version": "3.0.0",
+    "known_weight": 0.43,
+    "anomaly_weight": 0.27,
+    "signature_weight": 0.2,
+    "context_weight": 0.1,
+    "known_threshold": 0.72,
+    "anomaly_threshold": 0.74,
+    "benign_max_risk": 30.0,
+    "review_max_risk": 54.0,
+    "high_risk": 72.0,
+    "critical_risk": 90.0,
+    "isolation_decision_benign_median": -0.013612482167481454,
+    "isolation_decision_benign_p03": -0.059120699535357944,
+    "reconstruction_error_benign_p50": 0.08092871308326721,
+    "reconstruction_error_benign_p97": 0.24140140414237976,
+    "reconstruction_error_benign_p99": 0.2989373505115509,
+    "open_set_validation_scale": 0.828949481616522,
+    "normalization": "calibration benign p50 maps to 0; tail budget maps to 0.70",
+    "selection_target": "3% benign calibration tail budget on deterministic smoke data"
+  },
+  "calibration_method": "sigmoid grouped training-fold CV plus benign-only empirical anomaly CDF",
+  "validation_metrics": {
+    "macro_f1": 1.0,
+    "weighted_f1": 1.0,
+    "benign_false_positive_rate": 0.01904761904761905,
+    "unknown_attack_detection_rate_synthetic": 1.0
+  },
+  "known_limitations": [
+    "Synthetic smoke data is not evidence of production detection quality",
+    "No packet payload or raw IP-address features are used",
+    "Unknown detection identifies statistical novelty, not guaranteed zero-days",
+    "Public-dataset and cross-dataset evaluation must precede production promotion"
+  ],
+  "artifact_hashes": {
+    "preprocessor.joblib": "98e41718623c70c5da6a3fb36577faddd1c60316055ced3a45a6a882c585b800",
+    "classifier.joblib": "98e84d7bcce0168d7633a12af0e96386c451fe0ba694b7276844509919d1e05f",
+    "anomaly.joblib": "8293707a7ae4bd0ded108d2e5715a6e1e82e631cc52b05d08ea1cf8c98ed4fe0",
+    "autoencoder.pt": "2a83090c711ee9ce35a944c2ad44ad07a3059d7cbaee219fac34ac01f25b0a79",
+    "calibration.json": "a63d47f7accb12ca34d0add6bead742a64c0d3156870894d9934235ab29fc360"
+  },
+  "artifact_format": "joblib-local-trusted+torch-state-dict"
+}

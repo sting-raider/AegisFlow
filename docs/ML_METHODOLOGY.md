@@ -2,15 +2,30 @@
 
 ## Smoke pipeline
 
-The deterministic smoke generator uses seed 431 and source groups. A grouped holdout
-prevents rows from the same synthetic capture group appearing on both sides. Standard
-scaling is fitted only on training rows. Logistic regression, a class-weighted random
-forest, and a compact MLP are compared using macro F1. The selected classifier is
+The deterministic smoke generator uses seed 431 and disjoint source-group train,
+calibration, and test partitions. No synthetic capture group crosses a partition.
+Standard scaling is fitted only on training rows. Logistic regression, a class-weighted
+random forest, and a compact MLP are compared using calibration-partition macro F1. The
+selected classifier is
 sigmoid-calibrated with grouped folds drawn only from the training partition and retains
 multiclass attack-family probabilities. Isolation Forest and a compact PyTorch denoising
 autoencoder are fitted only on benign training rows.
 
-The held-out benign tail selects normalized open-set thresholds; the smoke bundle records
+The benign-only calibration partition selects open-set normalization and persists a
+bounded empirical CDF of the combined anomaly score. At runtime, `anomaly_percentile`
+is the right-rank CDF estimate against that reference population; it is independent from
+the normalized `anomaly_score`. At most 2,049 monotonic knots are retained, with linear
+interpolation between knots and the source sample count recorded.
+
+The interpretable fusion rule remains the decision mechanism. All weights and thresholds
+load from `thresholds.json`. Smoke training compares the baseline with 81 candidate
+weight/threshold configurations on final verdict macro F1 using the calibration partition
+plus explicitly synthetic unknown fixtures, then reports both configurations on the
+untouched grouped test partition. This validates the selection machinery only; public
+held-family and cross-dataset evidence is required before treating the selected values as
+operationally justified.
+
+The smoke bundle records
 per-class, macro/weighted, PR-AUC, ROC-AUC, calibration, confusion, benign false-positive,
 synthetic-novelty, feature-importance, and single/batch CPU latency evidence. Results in
 `metrics.json` are explicitly synthetic smoke evidence, not real-world performance.

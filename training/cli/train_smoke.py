@@ -32,12 +32,14 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler, label_binarize
 
 from packages.detection.autoencoder import DenoisingAutoencoder, reconstruction_errors
+from packages.detection.fusion import FusionConfig, FusionInput, fuse_risk
 from packages.features.registry import FEATURE_NAMES, feature_schema
 from packages.model_bundle.bundle import promote_bundle, sha256_file
+from packages.model_bundle.calibration import EmpiricalCDF
 
 SEED = 431
 MODEL_NAME = "aegisflow-smoke"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 KNOWN_THRESHOLD = 0.72
 ANOMALY_THRESHOLD = 0.70
 
@@ -203,6 +205,96 @@ def _calibration_metrics(
     }
 
 
+def _fusion_inputs(
+    probabilities: np.ndarray,
+    isolation_scores: np.ndarray,
+    reconstruction_scores: np.ndarray,
+    classes: np.ndarray,
+) -> list[FusionInput]:
+    benign_indices = np.where(classes == "benign")[0]
+    if len(benign_indices) != 1:
+        raise ValueError("fusion evaluation requires exactly one benign class")
+    benign_index = int(benign_indices[0])
+    rows: list[FusionInput] = []
+    for probability, isolation, reconstruction in zip(
+        probabilities, isolation_scores, reconstruction_scores, strict=True
+    ):
+        known_probability = 1.0 - float(probability[benign_index])
+        confidence = float(np.max(probability))
+        anomaly_score = max(float(isolation), float(reconstruction))
+        rows.append(
+            FusionInput(
+                known_attack_probability=known_probability,
+                classifier_confidence=confidence,
+                anomaly_score=float(isolation),
+                reconstruction_score=float(reconstruction),
+                model_disagreement=abs(known_probability - anomaly_score),
+            )
+        )
+    return rows
+
+
+def _fusion_metrics(
+    targets: np.ndarray, signals: list[FusionInput], config: FusionConfig
+) -> dict[str, Any]:
+    predictions = np.asarray([fuse_risk(signal, config).verdict.value for signal in signals])
+    labels = ["benign", "known_attack", "suspicious_unknown", "needs_review"]
+    return {
+        "macro_f1": float(
+            f1_score(targets, predictions, labels=labels, average="macro", zero_division=0)
+        ),
+        "weighted_f1": float(f1_score(targets, predictions, average="weighted", zero_division=0)),
+        "confusion_matrix": {
+            "labels": labels,
+            "values": confusion_matrix(targets, predictions, labels=labels).tolist(),
+        },
+        "verdict_counts": {label: int(np.sum(predictions == label)) for label in labels},
+    }
+
+
+def _select_fusion_config(
+    targets: np.ndarray, signals: list[FusionInput]
+) -> tuple[FusionConfig, dict[str, Any]]:
+    baseline = FusionConfig(version="3.0.0-baseline")
+    candidates = [baseline]
+    for known_weight in (0.38, 0.43, 0.48):
+        anomaly_weight = round(0.70 - known_weight, 2)
+        for known_threshold in (0.68, 0.72, 0.76):
+            for anomaly_threshold in (0.66, 0.70, 0.74):
+                for benign_max_risk in (26.0, 30.0, 34.0):
+                    candidates.append(
+                        FusionConfig(
+                            version="3.0.0-candidate",
+                            known_weight=known_weight,
+                            anomaly_weight=anomaly_weight,
+                            known_threshold=known_threshold,
+                            anomaly_threshold=anomaly_threshold,
+                            benign_max_risk=benign_max_risk,
+                        )
+                    )
+    scored = [(config, _fusion_metrics(targets, signals, config)) for config in candidates]
+    selected, selected_metrics = max(
+        scored,
+        key=lambda item: (
+            item[1]["macro_f1"],
+            item[1]["weighted_f1"],
+            -abs(item[0].known_weight - baseline.known_weight),
+            -abs(item[0].known_threshold - baseline.known_threshold),
+            -abs(item[0].anomaly_threshold - baseline.anomaly_threshold),
+            -abs(item[0].benign_max_risk - baseline.benign_max_risk),
+        ),
+    )
+    selected = FusionConfig.from_mapping({**selected.to_dict(), "version": "3.0.0"})
+    return selected, {
+        "candidate_count": len(candidates),
+        "selection_objective": "macro F1 over final verdicts on grouped calibration data",
+        "baseline_config": baseline.to_dict(),
+        "baseline_calibration_metrics": _fusion_metrics(targets, signals, baseline),
+        "selected_config": selected.to_dict(),
+        "selected_calibration_metrics": selected_metrics,
+    }
+
+
 def _latency_metrics(classifier: Any, rows: np.ndarray) -> dict[str, float]:
     single_samples: list[float] = []
     for row in rows[: min(150, len(rows))]:
@@ -257,13 +349,22 @@ def _atomic_replace_directory(staged: Path, target: Path) -> None:
 
 def train(output_root: Path) -> dict[str, Any]:
     x, y, groups = _dataset()
-    train_idx, test_idx = next(
+    development_idx, test_idx = next(
         GroupShuffleSplit(n_splits=1, test_size=0.25, random_state=SEED).split(x, y, groups)
     )
+    relative_train_idx, relative_calibration_idx = next(
+        GroupShuffleSplit(n_splits=1, test_size=0.25, random_state=SEED + 1).split(
+            x[development_idx], y[development_idx], groups[development_idx]
+        )
+    )
+    train_idx = development_idx[relative_train_idx]
+    calibration_idx = development_idx[relative_calibration_idx]
     scaler = StandardScaler().fit(x[train_idx])
     x_train = scaler.transform(x[train_idx])
+    x_calibration = scaler.transform(x[calibration_idx])
     x_test = scaler.transform(x[test_idx])
     y_train = y[train_idx]
+    y_calibration = y[calibration_idx]
     y_test = y[test_idx]
     candidates = {
         "logistic_regression": LogisticRegression(
@@ -289,7 +390,9 @@ def train(output_root: Path) -> dict[str, Any]:
     for name, candidate in candidates.items():
         candidate.fit(x_train, y_train)
         fitted[name] = candidate
-        scores[name] = float(f1_score(y_test, candidate.predict(x_test), average="macro"))
+        scores[name] = float(
+            f1_score(y_calibration, candidate.predict(x_calibration), average="macro")
+        )
     selected_name = max(scores, key=scores.__getitem__)
 
     group_kfold = GroupKFold(n_splits=3)
@@ -310,31 +413,36 @@ def train(output_root: Path) -> dict[str, Any]:
     binary = label_binarize(y_test, classes=classes)
 
     benign_train = x_train[y_train == "benign"]
-    benign_validation = x_test[y_test == "benign"]
+    benign_calibration = x_calibration[y_calibration == "benign"]
     anomaly = IsolationForest(
         n_estimators=160,
         contamination="auto",
         random_state=SEED,
         n_jobs=1,
     ).fit(benign_train)
-    benign_decisions = anomaly.decision_function(benign_validation)
+    benign_decisions = anomaly.decision_function(benign_calibration)
     decision_median = float(np.percentile(benign_decisions, 50))
     decision_p03 = float(np.percentile(benign_decisions, 3))
 
     autoencoder = _train_autoencoder(benign_train)
-    benign_errors = reconstruction_errors(autoencoder, benign_validation)
+    benign_errors = reconstruction_errors(autoencoder, benign_calibration)
     reconstruction_p50 = float(np.percentile(benign_errors, 50))
     reconstruction_p97 = float(np.percentile(benign_errors, 97))
     reconstruction_p99 = float(np.percentile(benign_errors, 99))
 
     benign_if_scores = _normalized_low_score(
-        anomaly.decision_function(benign_validation), decision_median, decision_p03
+        anomaly.decision_function(benign_calibration), decision_median, decision_p03
     )
     benign_ae_scores = _normalized_high_score(benign_errors, reconstruction_p50, reconstruction_p97)
     combined_validation_p97 = float(
         np.percentile(np.maximum(benign_if_scores, benign_ae_scores), 97)
     )
     open_set_validation_scale = ANOMALY_THRESHOLD / max(combined_validation_p97, 1e-9)
+    calibrated_benign_scores = np.maximum(
+        np.clip(benign_if_scores * open_set_validation_scale, 0.0, 1.0),
+        np.clip(benign_ae_scores * open_set_validation_scale, 0.0, 1.0),
+    )
+    anomaly_calibration = EmpiricalCDF.fit(calibrated_benign_scores)
 
     test_if_scores = (
         _normalized_low_score(anomaly.decision_function(x_test), decision_median, decision_p03)
@@ -350,10 +458,6 @@ def train(output_root: Path) -> dict[str, Any]:
     test_ae_scores = np.clip(test_ae_scores, 0.0, 1.0)
     test_anomaly_scores = np.maximum(test_if_scores, test_ae_scores)
     benign_mask = y_test == "benign"
-    benign_false_positive_rate = float(
-        np.mean(test_anomaly_scores[benign_mask] >= ANOMALY_THRESHOLD)
-    )
-
     raw_unknown = _synthetic_unknowns(x[test_idx][benign_mask])
     unknown_scaled = scaler.transform(raw_unknown)
     unknown_probabilities = classifier.predict_proba(unknown_scaled)
@@ -376,13 +480,104 @@ def train(output_root: Path) -> dict[str, Any]:
     unknown_if_scores = np.clip(unknown_if_scores, 0.0, 1.0)
     unknown_ae_scores = np.clip(unknown_ae_scores, 0.0, 1.0)
     unknown_scores = np.maximum(unknown_if_scores, unknown_ae_scores)
-    unknown_flags = (unknown_scores >= ANOMALY_THRESHOLD) & (
-        unknown_known_probability < KNOWN_THRESHOLD
+
+    calibration_probabilities = classifier.predict_proba(x_calibration)
+    calibration_if_scores = np.clip(
+        _normalized_low_score(
+            anomaly.decision_function(x_calibration), decision_median, decision_p03
+        )
+        * open_set_validation_scale,
+        0.0,
+        1.0,
+    )
+    calibration_ae_scores = np.clip(
+        _normalized_high_score(
+            reconstruction_errors(autoencoder, x_calibration),
+            reconstruction_p50,
+            reconstruction_p97,
+        )
+        * open_set_validation_scale,
+        0.0,
+        1.0,
+    )
+    raw_calibration_unknown = _synthetic_unknowns(x[calibration_idx][y_calibration == "benign"])
+    scaled_calibration_unknown = scaler.transform(raw_calibration_unknown)
+    calibration_unknown_probabilities = classifier.predict_proba(scaled_calibration_unknown)
+    calibration_unknown_if_scores = np.clip(
+        _normalized_low_score(
+            anomaly.decision_function(scaled_calibration_unknown),
+            decision_median,
+            decision_p03,
+        )
+        * open_set_validation_scale,
+        0.0,
+        1.0,
+    )
+    calibration_unknown_ae_scores = np.clip(
+        _normalized_high_score(
+            reconstruction_errors(autoencoder, scaled_calibration_unknown),
+            reconstruction_p50,
+            reconstruction_p97,
+        )
+        * open_set_validation_scale,
+        0.0,
+        1.0,
+    )
+    calibration_targets = np.concatenate(
+        (
+            np.where(y_calibration == "benign", "benign", "known_attack"),
+            np.full(len(scaled_calibration_unknown), "suspicious_unknown"),
+        )
+    )
+    calibration_signals = _fusion_inputs(
+        calibration_probabilities,
+        calibration_if_scores,
+        calibration_ae_scores,
+        classes,
+    ) + _fusion_inputs(
+        calibration_unknown_probabilities,
+        calibration_unknown_if_scores,
+        calibration_unknown_ae_scores,
+        classes,
+    )
+    fusion_config, fusion_evidence = _select_fusion_config(calibration_targets, calibration_signals)
+    test_targets = np.concatenate(
+        (
+            np.where(y_test == "benign", "benign", "known_attack"),
+            np.full(len(unknown_scaled), "suspicious_unknown"),
+        )
+    )
+    test_signals = _fusion_inputs(
+        probabilities,
+        test_if_scores,
+        test_ae_scores,
+        classes,
+    ) + _fusion_inputs(
+        unknown_probabilities,
+        unknown_if_scores,
+        unknown_ae_scores,
+        classes,
+    )
+    fusion_evidence.update(
+        {
+            "baseline_test_metrics": _fusion_metrics(test_targets, test_signals, FusionConfig()),
+            "selected_test_metrics": _fusion_metrics(test_targets, test_signals, fusion_config),
+            "limitations": (
+                "Synthetic smoke evidence validates the configuration loop only; "
+                "public held-family and cross-dataset evidence is still required."
+            ),
+        }
+    )
+    benign_false_positive_rate = float(
+        np.mean(test_anomaly_scores[benign_mask] >= fusion_config.anomaly_threshold)
+    )
+    unknown_flags = (unknown_scores >= fusion_config.anomaly_threshold) & (
+        unknown_known_probability < fusion_config.known_threshold
     )
     known_attack_mask = y_test != "benign"
     known_probabilities = 1.0 - probabilities[:, benign_class_index]
-    known_unknown_flags = (test_anomaly_scores >= ANOMALY_THRESHOLD) & (
-        known_probabilities < KNOWN_THRESHOLD
+    known_unknown_flags = (test_anomaly_scores >= fusion_config.anomaly_threshold) & (
+        known_probabilities < fusion_config.known_threshold
     )
     known_vs_unknown_confusion = [
         [
@@ -412,11 +607,18 @@ def train(output_root: Path) -> dict[str, Any]:
             "values": known_vs_unknown_confusion,
         },
         "calibration": _calibration_metrics(y_test, probabilities, classes),
+        "anomaly_calibration": {
+            "method": "benign calibration empirical CDF",
+            "sample_count": anomaly_calibration.sample_count,
+            "knot_count": len(anomaly_calibration.values),
+            "reference_population": "benign_calibration_only",
+        },
+        "fusion_evaluation": fusion_evidence,
         "feature_importance": _feature_importance(fitted[selected_name]),
         "latency": _latency_metrics(classifier, x_test),
         "autoencoder": {
             "trained_on_benign_rows": len(benign_train),
-            "held_out_benign_rows": len(benign_validation),
+            "calibration_benign_rows": len(benign_calibration),
             "reconstruction_error_p50": reconstruction_p50,
             "reconstruction_error_p97": reconstruction_p97,
             "reconstruction_error_p99": reconstruction_p99,
@@ -441,27 +643,35 @@ def train(output_root: Path) -> dict[str, Any]:
             json.dumps(labels, indent=2) + "\n", encoding="utf-8"
         )
         thresholds = {
-            "version": "2.0.0",
-            "known_threshold": KNOWN_THRESHOLD,
-            "anomaly_threshold": ANOMALY_THRESHOLD,
+            **fusion_config.to_dict(),
             "isolation_decision_benign_median": decision_median,
             "isolation_decision_benign_p03": decision_p03,
             "reconstruction_error_benign_p50": reconstruction_p50,
             "reconstruction_error_benign_p97": reconstruction_p97,
             "reconstruction_error_benign_p99": reconstruction_p99,
             "open_set_validation_scale": open_set_validation_scale,
-            "normalization": "validation benign p50 maps to 0; tail budget maps to 0.70",
-            "selection_target": "3% held-out benign tail budget on deterministic smoke data",
+            "normalization": "calibration benign p50 maps to 0; tail budget maps to 0.70",
+            "selection_target": "3% benign calibration tail budget on deterministic smoke data",
         }
         (staged / "thresholds.json").write_text(
             json.dumps(thresholds, indent=2) + "\n", encoding="utf-8"
+        )
+        calibration_payload = {
+            "schema_version": "1.0.0",
+            "method": "bounded_empirical_cdf_right_rank_linear_interpolation",
+            "reference_population": "benign_calibration_only",
+            "signal": "max(normalized_isolation_score, normalized_reconstruction_score)",
+            "combined_anomaly_score": anomaly_calibration.to_dict(),
+        }
+        (staged / "calibration.json").write_text(
+            json.dumps(calibration_payload, indent=2) + "\n", encoding="utf-8"
         )
         (staged / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
         (staged / "training_config.yaml").write_text(
             "\n".join(
                 [
                     f"seed: {SEED}",
-                    "split: source_group",
+                    "split: grouped_train_calibration_test",
                     f"classifier: {selected_name}",
                     "calibration: sigmoid_group_kfold",
                     "anomaly_baseline: isolation_forest_benign_only",
@@ -482,13 +692,15 @@ def train(output_root: Path) -> dict[str, Any]:
             "feature_count": len(FEATURE_NAMES),
             "seed": SEED,
             "split": {
-                "strategy": "source_group",
+                "strategy": "grouped_train_calibration_test",
                 "train_rows": len(train_idx),
+                "calibration_rows": len(calibration_idx),
                 "test_rows": len(test_idx),
                 "train_groups": sorted(set(int(value) for value in groups[train_idx])),
+                "calibration_groups": sorted(set(int(value) for value in groups[calibration_idx])),
                 "test_groups": sorted(set(int(value) for value in groups[test_idx])),
             },
-            "dataset_fingerprint": "synthetic-seed-431-v2",
+            "dataset_fingerprint": "synthetic-seed-431-v3",
             "not_for_performance_claims": True,
         }
         (staged / "training_data_manifest.json").write_text(
@@ -499,10 +711,11 @@ def train(output_root: Path) -> dict[str, Any]:
             "classifier.joblib",
             "anomaly.joblib",
             "autoencoder.pt",
+            "calibration.json",
         ]
         artifact_hashes = {name: sha256_file(staged / name) for name in artifact_names}
         manifest = {
-            "bundle_schema_version": 2,
+            "bundle_schema_version": 3,
             "model_name": MODEL_NAME,
             "version": VERSION,
             "created_at": datetime.now(UTC).isoformat(),
@@ -515,11 +728,13 @@ def train(output_root: Path) -> dict[str, Any]:
                 "torch": torch.__version__,
             },
             "feature_schema_version": "1.0.0",
-            "dataset_fingerprints": ["synthetic-seed-431-v2"],
+            "dataset_fingerprints": ["synthetic-seed-431-v3"],
             "training_seed": SEED,
             "model_classes": classes.tolist(),
             "thresholds": thresholds,
-            "calibration_method": "sigmoid calibration with grouped training-fold CV",
+            "calibration_method": (
+                "sigmoid grouped training-fold CV plus benign-only empirical anomaly CDF"
+            ),
             "validation_metrics": {
                 "macro_f1": metrics["macro_f1"],
                 "weighted_f1": metrics["weighted_f1"],

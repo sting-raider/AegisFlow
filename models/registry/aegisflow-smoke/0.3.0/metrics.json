@@ -1,0 +1,368 @@
+{
+  "scope": "deterministic synthetic smoke test only",
+  "candidate_macro_f1": {
+    "logistic_regression": 1.0,
+    "random_forest": 1.0,
+    "mlp": 1.0
+  },
+  "selected": "logistic_regression",
+  "classification_report": {
+    "benign": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 105.0
+    },
+    "brute_force": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 30.0
+    },
+    "port_scan": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 36.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 171.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 171.0
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "benign",
+      "brute_force",
+      "port_scan"
+    ],
+    "values": [
+      [
+        105,
+        0,
+        0
+      ],
+      [
+        0,
+        30,
+        0
+      ],
+      [
+        0,
+        0,
+        36
+      ]
+    ]
+  },
+  "macro_f1": 1.0,
+  "weighted_f1": 1.0,
+  "macro_pr_auc_ovr": 1.0,
+  "macro_roc_auc_ovr": 1.0,
+  "benign_false_positive_rate": 0.01904761904761905,
+  "unknown_attack_detection_rate_synthetic": 1.0,
+  "known_vs_unknown_confusion": {
+    "labels": [
+      "known_attack",
+      "synthetic_unknown"
+    ],
+    "predicted_columns": [
+      "known_or_review",
+      "suspicious_unknown"
+    ],
+    "values": [
+      [
+        65,
+        1
+      ],
+      [
+        0,
+        80
+      ]
+    ]
+  },
+  "calibration": {
+    "multiclass_brier_score": 0.0049779425256956935,
+    "expected_calibration_error_10_bins": 0.034760377184075986
+  },
+  "anomaly_calibration": {
+    "method": "benign calibration empirical CDF",
+    "sample_count": 105,
+    "knot_count": 69,
+    "reference_population": "benign_calibration_only"
+  },
+  "fusion_evaluation": {
+    "candidate_count": 82,
+    "selection_objective": "macro F1 over final verdicts on grouped calibration data",
+    "baseline_config": {
+      "version": "3.0.0-baseline",
+      "known_weight": 0.43,
+      "anomaly_weight": 0.27,
+      "signature_weight": 0.2,
+      "context_weight": 0.1,
+      "known_threshold": 0.72,
+      "anomaly_threshold": 0.7,
+      "benign_max_risk": 30.0,
+      "review_max_risk": 54.0,
+      "high_risk": 72.0,
+      "critical_risk": 90.0
+    },
+    "baseline_calibration_metrics": {
+      "macro_f1": 0.7390480700923514,
+      "weighted_f1": 0.9841033686707116,
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "known_attack",
+          "suspicious_unknown",
+          "needs_review"
+        ],
+        "values": [
+          [
+            101,
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            66,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            80,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "verdict_counts": {
+        "benign": 101,
+        "known_attack": 66,
+        "suspicious_unknown": 84,
+        "needs_review": 0
+      }
+    },
+    "selected_config": {
+      "version": "3.0.0",
+      "known_weight": 0.43,
+      "anomaly_weight": 0.27,
+      "signature_weight": 0.2,
+      "context_weight": 0.1,
+      "known_threshold": 0.72,
+      "anomaly_threshold": 0.74,
+      "benign_max_risk": 30.0,
+      "review_max_risk": 54.0,
+      "high_risk": 72.0,
+      "critical_risk": 90.0
+    },
+    "selected_calibration_metrics": {
+      "macro_f1": 0.7417755846003379,
+      "weighted_f1": 0.98807118817342,
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "known_attack",
+          "suspicious_unknown",
+          "needs_review"
+        ],
+        "values": [
+          [
+            102,
+            0,
+            3,
+            0
+          ],
+          [
+            0,
+            66,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            80,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "verdict_counts": {
+        "benign": 102,
+        "known_attack": 66,
+        "suspicious_unknown": 83,
+        "needs_review": 0
+      }
+    },
+    "baseline_test_metrics": {
+      "macro_f1": 0.7383708536720283,
+      "weighted_f1": 0.9841562731612628,
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "known_attack",
+          "suspicious_unknown",
+          "needs_review"
+        ],
+        "values": [
+          [
+            102,
+            0,
+            3,
+            0
+          ],
+          [
+            0,
+            65,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            80,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "verdict_counts": {
+        "benign": 102,
+        "known_attack": 65,
+        "suspicious_unknown": 84,
+        "needs_review": 0
+      }
+    },
+    "selected_test_metrics": {
+      "macro_f1": 0.741086529905724,
+      "weighted_f1": 0.9881042835994209,
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "known_attack",
+          "suspicious_unknown",
+          "needs_review"
+        ],
+        "values": [
+          [
+            103,
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            65,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            80,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "verdict_counts": {
+        "benign": 103,
+        "known_attack": 65,
+        "suspicious_unknown": 83,
+        "needs_review": 0
+      }
+    },
+    "limitations": "Synthetic smoke evidence validates the configuration loop only; public held-family and cross-dataset evidence is still required."
+  },
+  "feature_importance": [
+    {
+      "feature": "tcp_syn_count",
+      "importance": 0.4227669638534682
+    },
+    {
+      "feature": "packets_forward",
+      "importance": 0.36082989494576295
+    },
+    {
+      "feature": "packets_reverse",
+      "importance": 0.3242655141410613
+    },
+    {
+      "feature": "packet_rate",
+      "importance": 0.30823360122007365
+    },
+    {
+      "feature": "syn_ack_ratio",
+      "importance": 0.3076034543863785
+    },
+    {
+      "feature": "forward_reverse_byte_ratio",
+      "importance": 0.30320692543352723
+    },
+    {
+      "feature": "tcp_rst_count",
+      "importance": 0.2959077564518694
+    },
+    {
+      "feature": "destination_port",
+      "importance": 0.2884105107385179
+    },
+    {
+      "feature": "bytes_forward",
+      "importance": 0.28723723305119325
+    },
+    {
+      "feature": "packet_length_std",
+      "importance": 0.28599429143086147
+    }
+  ],
+  "latency": {
+    "single_flow_p50_ms": 2.427350002108142,
+    "single_flow_p95_ms": 3.7493750060093585,
+    "single_flow_p99_ms": 4.457725986721923,
+    "batch_size": 128.0,
+    "batch_p50_ms": 2.237499982584268,
+    "batch_p95_ms": 3.2059399993158872,
+    "batch_p99_ms": 3.532459989655762
+  },
+  "autoencoder": {
+    "trained_on_benign_rows": 210,
+    "calibration_benign_rows": 105,
+    "reconstruction_error_p50": 0.08092871308326721,
+    "reconstruction_error_p97": 0.24140140414237976,
+    "reconstruction_error_p99": 0.2989373505115509
+  },
+  "test_rows": 171
+}

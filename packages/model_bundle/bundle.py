@@ -13,6 +13,7 @@ import joblib
 import torch
 
 from packages.features.registry import FEATURE_NAMES
+from packages.model_bundle.calibration import EmpiricalCDF
 
 if TYPE_CHECKING:
     from packages.detection.autoencoder import DenoisingAutoencoder
@@ -31,6 +32,7 @@ BASE_REQUIRED_FILES = {
     "checksums.sha256",
 }
 V2_REQUIRED_FILES = BASE_REQUIRED_FILES | {"autoencoder.pt"}
+V3_REQUIRED_FILES = V2_REQUIRED_FILES | {"calibration.json"}
 MAX_POINTER_HISTORY = 5
 
 
@@ -81,6 +83,7 @@ class ModelBundle:
     classifier: Any
     anomaly: Any
     autoencoder: DenoisingAutoencoder | None = None
+    anomaly_calibration: EmpiricalCDF | None = None
     load_warning: str | None = None
 
     @property
@@ -95,7 +98,13 @@ class ModelBundle:
         if manifest.get("version") != root.name:
             raise BundleError("bundle directory and manifest versions do not match")
         bundle_schema = int(manifest.get("bundle_schema_version", 1))
-        required = V2_REQUIRED_FILES if bundle_schema >= 2 else BASE_REQUIRED_FILES
+        required = (
+            V3_REQUIRED_FILES
+            if bundle_schema >= 3
+            else V2_REQUIRED_FILES
+            if bundle_schema >= 2
+            else BASE_REQUIRED_FILES
+        )
         missing = required - {path.name for path in root.iterdir()}
         if missing:
             raise BundleError(f"model bundle missing files: {', '.join(sorted(missing))}")
@@ -121,12 +130,15 @@ class ModelBundle:
             artifact_hashes = manifest.get("artifact_hashes")
             if not isinstance(artifact_hashes, dict):
                 raise BundleError("bundle manifest is missing artifact hashes")
-            for filename in (
+            artifact_files = [
                 "preprocessor.joblib",
                 "classifier.joblib",
                 "anomaly.joblib",
                 "autoencoder.pt",
-            ):
+            ]
+            if bundle_schema >= 3:
+                artifact_files.append("calibration.json")
+            for filename in artifact_files:
                 artifact_digest = artifact_hashes.get(filename)
                 if (
                     not isinstance(artifact_digest, str)
@@ -151,6 +163,21 @@ class ModelBundle:
             except (OSError, RuntimeError, TypeError, KeyError, ValueError) as exc:
                 raise BundleError("invalid autoencoder artifact") from exc
 
+        anomaly_calibration: EmpiricalCDF | None = None
+        if bundle_schema >= 3:
+            calibration = _read_json(root / "calibration.json", "anomaly calibration")
+            if calibration.get("schema_version") != "1.0.0":
+                raise BundleError("unsupported anomaly calibration schema")
+            if calibration.get("reference_population") != "benign_calibration_only":
+                raise BundleError("anomaly calibration must use a benign-only reference")
+            signal = calibration.get("combined_anomaly_score")
+            if not isinstance(signal, dict):
+                raise BundleError("anomaly calibration is missing the combined score CDF")
+            try:
+                anomaly_calibration = EmpiricalCDF.from_dict(signal)
+            except ValueError as exc:
+                raise BundleError("invalid empirical anomaly calibration") from exc
+
         return cls(
             root=root,
             manifest=manifest,
@@ -163,6 +190,7 @@ class ModelBundle:
             classifier=joblib.load(root / "classifier.joblib"),
             anomaly=joblib.load(root / "anomaly.joblib"),
             autoencoder=autoencoder,
+            anomaly_calibration=anomaly_calibration,
         )
 
 

@@ -1,0 +1,34 @@
+{
+  "name": "bundled-synthetic-smoke",
+  "generated": true,
+  "rows": 684,
+  "groups": 12,
+  "feature_count": 18,
+  "seed": 431,
+  "split": {
+    "strategy": "grouped_train_calibration_test",
+    "train_rows": 342,
+    "calibration_rows": 171,
+    "test_rows": 171,
+    "train_groups": [
+      0,
+      5,
+      6,
+      8,
+      10,
+      11
+    ],
+    "calibration_groups": [
+      1,
+      2,
+      7
+    ],
+    "test_groups": [
+      3,
+      4,
+      9
+    ]
+  },
+  "dataset_fingerprint": "synthetic-seed-431-v3",
+  "not_for_performance_claims": true
+}

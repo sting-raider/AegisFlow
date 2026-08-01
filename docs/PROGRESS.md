@@ -14,8 +14,8 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 103 tests pass, Ruff passes across the repository, strict MyPy passes across
-  52 source files, and the last measured backend coverage is 84%.
+- Python: 108 tests pass, Ruff passes across the repository, strict MyPy passes across
+  53 source files, and the last measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -31,11 +31,20 @@ Last updated: 2026-08-01.
   PostgreSQL downtime leaves its event pending and records retry errors, and recovery
   persists it after restart. Replaying six deterministic IDs adds no duplicate rows.
 - Queue lag and pending counts are exposed by Prometheus and the System Health API/UI.
-- Smoke bundle v0.2.0 compares logistic regression, random forest, and MLP candidates;
+- Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic
-  holdout measured 4/105 benign anomaly flags and 80/80 novel-behaviour fixture flags;
+  final grouped test measured 2/105 benign anomaly flags and 80/80 novel-behaviour fixture flags;
   these are installation evidence only, not production-quality claims.
+- Bundle v3 separates grouped train, calibration, and final test source groups. It stores
+  a bounded 105-sample benign-only empirical CDF (69 distinct knots), so the runtime
+  percentile is no longer an alias for the normalized anomaly score. A checked demo flow
+  scored `0.355581` at empirical percentile `0.78123823`.
+- Every fusion weight and threshold now loads from the checksummed bundle. The smoke-only
+  selection loop compared 82 transparent configurations; it retained baseline weights
+  and changed the anomaly threshold from `0.70` to `0.74`. On the untouched synthetic
+  grouped test partition, final-verdict macro F1 was `0.73837` for the baseline and
+  `0.74109` for the selected rule. These values validate machinery, not real traffic.
 - Bundle v2 verifies complete checksums plus manifest artifact hashes before loading,
   promotes `production.json` atomically with history, supports explicit rollback, and
   visibly falls back from a corrupt current version to the previous valid v0.1.0 bundle.
@@ -142,6 +151,7 @@ Last updated: 2026-08-01.
 
 - Replace the simplified public-data gate with exact deployed-hybrid evaluation and run it
   on reviewed public data without committing large datasets.
-- Add empirical anomaly percentiles, evidence-backed configurable fusion, profiling,
-  batching/worker scaling, enterprise auth/RBAC, production deployment assets, governed
-  champion/challenger promotion, and the editorial dashboard transformation.
+- Validate anomaly calibration and the configurable fusion comparison on reviewed public
+  held-family/cross-dataset data; then add profiling, batching/worker scaling, enterprise
+  auth/RBAC, production deployment assets, governed champion/challenger promotion, and
+  the editorial dashboard transformation.
