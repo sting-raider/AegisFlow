@@ -1,0 +1,803 @@
+{
+  "adapter_notes": [
+    "destination_port=0 because the official UNSW training/testing partitions do not publish transport ports",
+    "packet_length_mean is directionally packet-weighted",
+    "byte_rate converts and sums UNSW directional bit/s load fields",
+    "iat_mean is directionally packet-weighted",
+    "packet_length_std=0 because the source schema does not provide it",
+    "iat_std=0 because the source schema does not provide it",
+    "tcp_syn_count=0 because the source schema does not provide it",
+    "tcp_rst_count=0 because the source schema does not provide it",
+    "tcp_ack_count=0 because the source schema does not provide it"
+  ],
+  "cross_adapter_notes": [
+    "destination_port=0 because the official UNSW training/testing partitions do not publish transport ports",
+    "packet_length_mean is directionally packet-weighted",
+    "byte_rate converts and sums UNSW directional bit/s load fields",
+    "iat_mean is directionally packet-weighted",
+    "packet_length_std=0 because the source schema does not provide it",
+    "iat_std=0 because the source schema does not provide it",
+    "tcp_syn_count=0 because the source schema does not provide it",
+    "tcp_rst_count=0 because the source schema does not provide it",
+    "tcp_ack_count=0 because the source schema does not provide it"
+  ],
+  "cross_dataset_overlap": {
+    "overlap_fraction": 0.39615216440752077,
+    "overlap_rows": 32616,
+    "test_rows": 82332
+  },
+  "cross_provenance": [
+    {
+      "declared_manifest": {
+        "capture_boundaries": "Official published testing partition, 82332 records.",
+        "dataset": "UNSW-NB15",
+        "filename": "UNSW_NB15_testing-set.csv",
+        "license": "Academic/public use granted with required citations on the official UNSW page; commercial use requires author agreement.",
+        "official_download": "UNSW Research-linked public SharePoint / UNSW-NB15 dataset / CSV Files / Training and Testing Sets",
+        "retrieved_at": "2026-08-01T15:32:22Z",
+        "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559",
+        "size_bytes": 15380800,
+        "source_page": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",
+        "transformation_history": [
+          "Downloaded without modification through the official public SharePoint folder.",
+          "SHA-256 calculated locally before AegisFlow import."
+        ]
+      },
+      "filename": "UNSW_NB15_testing-set.csv",
+      "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559",
+      "size_bytes": 15380800
+    }
+  ],
+  "cross_quality": {
+    "adapter_notes": [
+      "destination_port=0 because the official UNSW training/testing partitions do not publish transport ports",
+      "packet_length_mean is directionally packet-weighted",
+      "byte_rate converts and sums UNSW directional bit/s load fields",
+      "iat_mean is directionally packet-weighted",
+      "packet_length_std=0 because the source schema does not provide it",
+      "iat_std=0 because the source schema does not provide it",
+      "tcp_syn_count=0 because the source schema does not provide it",
+      "tcp_rst_count=0 because the source schema does not provide it",
+      "tcp_ack_count=0 because the source schema does not provide it"
+    ],
+    "blocking_issues": [],
+    "class_distribution": {
+      "analysis": 677,
+      "backdoor": 583,
+      "benign": 37000,
+      "dos": 4089,
+      "exploits": 11132,
+      "fuzzers": 6062,
+      "generic": 18871,
+      "port_scan": 3496,
+      "shellcode": 378,
+      "worms": 44
+    },
+    "constant_columns": [
+      "packet_length_std",
+      "iat_std",
+      "tcp_syn_count",
+      "tcp_rst_count",
+      "destination_port",
+      "syn_ack_ratio"
+    ],
+    "dataset": "unsw_nb15",
+    "duplicate_rows": 35874,
+    "fingerprint": "66224c6e1515be3e1f2bb5563220d6d0f2efd647825d0a48b6eaf0a7b06a9954",
+    "identifier_columns": [
+      "id"
+    ],
+    "infinite_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "missing_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "out_of_range_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "raw_to_normalized_labels": {
+      "Analysis": {
+        "analysis": 677
+      },
+      "Backdoor": {
+        "backdoor": 583
+      },
+      "DoS": {
+        "dos": 4089
+      },
+      "Exploits": {
+        "exploits": 11132
+      },
+      "Fuzzers": {
+        "fuzzers": 6062
+      },
+      "Generic": {
+        "generic": 18871
+      },
+      "Normal": {
+        "benign": 37000
+      },
+      "Reconnaissance": {
+        "port_scan": 3496
+      },
+      "Shellcode": {
+        "shellcode": 378
+      },
+      "Worms": {
+        "worms": 44
+      }
+    },
+    "rows": 82332,
+    "suspiciously_predictive_columns": [],
+    "warnings": [
+      "35874 duplicate canonical rows",
+      "canonical features contain constant columns"
+    ]
+  },
+  "dataset": "unsw_nb15",
+  "evaluation": {
+    "anomaly_percentile_summary": {
+      "p50": 0.6952984898943501,
+      "p95": 1.0,
+      "p99": 1.0
+    },
+    "benign_false_positive_rate": 0.6437027027027027,
+    "brier_multiclass_known_families": 0.5954902008563011,
+    "expected_calibration_error_known_families": 0.21558755836164795,
+    "false_alerts_per_replay_hour": null,
+    "feature_order": [
+      "duration_ms",
+      "packets_forward",
+      "packets_reverse",
+      "bytes_forward",
+      "bytes_reverse",
+      "packet_rate",
+      "byte_rate",
+      "packet_length_mean",
+      "packet_length_std",
+      "iat_mean",
+      "iat_std",
+      "tcp_syn_count",
+      "tcp_rst_count",
+      "destination_port",
+      "forward_reverse_byte_ratio",
+      "syn_ack_ratio",
+      "packets_total",
+      "bytes_total"
+    ],
+    "fit_manifest": {
+      "anomaly_models": [
+        "IsolationForest",
+        "CPU denoising autoencoder"
+      ],
+      "autoencoder_fit_benign_rows": 44800,
+      "calibration_benign_rows": 11200,
+      "calibration_cdf_knots": 1055,
+      "calibration_rows": 35069,
+      "calibration_split": {
+        "calibration_groups": 1,
+        "fit_groups": 1,
+        "group_overlap": 1,
+        "method": "stratified row fallback; grouped calibration infeasible"
+      },
+      "classifier_family": "sigmoid-calibrated class-weighted logistic regression",
+      "fit_benign_rows": 44800,
+      "fit_rows": 140272,
+      "fusion_version": "3.0.0",
+      "outer_train_rows": 175341
+    },
+    "flows_per_second": 2070.4392232667346,
+    "fusion_comparison": {
+      "baseline_config": {
+        "anomaly_threshold": 0.7,
+        "anomaly_weight": 0.27,
+        "benign_max_risk": 30.0,
+        "context_weight": 0.1,
+        "critical_risk": 90.0,
+        "high_risk": 72.0,
+        "known_threshold": 0.72,
+        "known_weight": 0.43,
+        "review_max_risk": 54.0,
+        "signature_weight": 0.2,
+        "version": "3.0.0-baseline"
+      },
+      "baseline_macro_f1": 0.15561535162169166,
+      "baseline_observed_label_macro_f1": 0.15561535162169166,
+      "deployed_config": {
+        "anomaly_threshold": 0.74,
+        "anomaly_weight": 0.27,
+        "benign_max_risk": 30.0,
+        "context_weight": 0.1,
+        "critical_risk": 90.0,
+        "high_risk": 72.0,
+        "known_threshold": 0.72,
+        "known_weight": 0.43,
+        "review_max_risk": 54.0,
+        "signature_weight": 0.2,
+        "version": "3.0.0"
+      },
+      "deployed_macro_f1": 0.15561535162169166,
+      "deployed_observed_label_macro_f1": 0.20748713549558886,
+      "macro_f1_label_scope": [
+        "benign",
+        "known_attack",
+        "suspicious_unknown",
+        "needs_review"
+      ]
+    },
+    "harness": "exact deployed hybrid pipeline",
+    "known_family_classification": {
+      "accuracy": 0.6028518680464461,
+      "analysis": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 677.0
+      },
+      "backdoor": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 583.0
+      },
+      "benign": {
+        "f1-score": 0.6817263055018769,
+        "precision": 0.5786357980468309,
+        "recall": 0.8295135135135135,
+        "support": 37000.0
+      },
+      "dos": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 4089.0
+      },
+      "exploits": {
+        "f1-score": 0.11069725864123957,
+        "precision": 0.3241710296684119,
+        "recall": 0.06674452030183256,
+        "support": 11132.0
+      },
+      "fuzzers": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 6062.0
+      },
+      "generic": {
+        "f1-score": 0.7935206784538578,
+        "precision": 0.6740869694051411,
+        "recall": 0.9643898044618727,
+        "support": 18871.0
+      },
+      "macro avg": {
+        "f1-score": 0.15859442425969741,
+        "precision": 0.1576893797120384,
+        "recall": 0.1860647838277219,
+        "support": 82332.0
+      },
+      "port_scan": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 3496.0
+      },
+      "shellcode": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 378.0
+      },
+      "weighted avg": {
+        "f1-score": 0.5032148363924898,
+        "precision": 0.45837452788279065,
+        "recall": 0.6028518680464461,
+        "support": 82332.0
+      },
+      "worms": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 44.0
+      }
+    },
+    "known_unknown_confusion": {
+      "needs_review": 59268,
+      "true_known_predicted_known": 82332,
+      "true_known_predicted_unknown": 0,
+      "true_unknown_predicted_known": 0,
+      "true_unknown_predicted_unknown": 0
+    },
+    "latency_ms": {
+      "batch_per_flow": 0.4829893042801817,
+      "batch_total": 39765.47539999592,
+      "end_to_end_scope": "canonical feature array through exact hybrid verdict",
+      "p50_single": 18.406299990601838,
+      "p95_single": 25.77788499766029,
+      "p99_single": 26.860125011589844
+    },
+    "limitations": [
+      "Dataset adapters may approximate source fields documented in adapter_notes.",
+      "No signature or rolling contextual evidence is synthesized for CSV rows.",
+      "needs_review is a detector decision state, not a ground-truth dataset class."
+    ],
+    "macro_f1": 0.15561535162169166,
+    "observed_label_macro_f1": 0.20748713549558886,
+    "pr_auc_macro": 0.21413417153470457,
+    "queue_lag": {
+      "measured": false,
+      "reason": "offline dataset evaluation does not use the Redis runtime"
+    },
+    "replay_span_hours": null,
+    "resource_use": {
+      "fit_cpu_seconds": 86.734375,
+      "fit_wall_seconds": 69.87614950002171,
+      "inference_cpu_seconds": 37.875,
+      "inference_rss_delta_bytes": 6246400,
+      "rss_delta_bytes": 113401856
+    },
+    "roc_auc_macro": 0.7638423134938785,
+    "seed": 431,
+    "shared_inference_path": "packages.detection.hybrid.HybridPredictor",
+    "suspicious_unknown_detection_rate": null,
+    "test_rows": 82332,
+    "testing_dataset": "unsw_nb15",
+    "testing_fingerprint": "66224c6e1515be3e1f2bb5563220d6d0f2efd647825d0a48b6eaf0a7b06a9954",
+    "train_rows": 175341,
+    "train_test_overlap": {
+      "overlap_fraction": 0.39615216440752077,
+      "overlap_rows": 32616,
+      "test_rows": 82332
+    },
+    "training_classes": [
+      "analysis",
+      "backdoor",
+      "benign",
+      "dos",
+      "exploits",
+      "fuzzers",
+      "generic",
+      "port_scan",
+      "shellcode",
+      "worms"
+    ],
+    "training_dataset": "unsw_nb15",
+    "training_fingerprint": "b9fd4bdc63e9854dfa067f083f5b0d15514e9d9fa68dec4316ffaa9389c1582a",
+    "unknown_detection_or_review_rate": null,
+    "unknown_test_families": [],
+    "verdict_classification": {
+      "accuracy": 0.20446484963319245,
+      "benign": {
+        "f1-score": 0.4766605199407022,
+        "precision": 0.7198318226493393,
+        "recall": 0.3562972972972973,
+        "support": 37000.0
+      },
+      "known_attack": {
+        "f1-score": 0.14580088654606446,
+        "precision": 0.7686315789473684,
+        "recall": 0.08053913350392658,
+        "support": 45332.0
+      },
+      "macro avg": {
+        "f1-score": 0.15561535162169166,
+        "precision": 0.37211585039917694,
+        "recall": 0.10920910770030598,
+        "support": 82332.0
+      },
+      "needs_review": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 0.0
+      },
+      "suspicious_unknown": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 0.0
+      },
+      "weighted avg": {
+        "f1-score": 0.2944892025787321,
+        "precision": 0.7467009689412095,
+        "recall": 0.20446484963319245,
+        "support": 82332.0
+      }
+    },
+    "verdict_confusion_matrix": {
+      "labels": [
+        "benign",
+        "known_attack",
+        "suspicious_unknown",
+        "needs_review"
+      ],
+      "values": [
+        [
+          13183,
+          1099,
+          0,
+          22718
+        ],
+        [
+          5131,
+          3651,
+          0,
+          36550
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "verdict_counts": {
+      "benign": 18314,
+      "known_attack": 4750,
+      "needs_review": 59268,
+      "suspicious_unknown": 0
+    },
+    "weighted_f1": 0.2944892025787321
+  },
+  "evaluation_bundle": {
+    "bundle_schema_version": 3,
+    "model_name": "aegisflow-smoke",
+    "version": "0.3.0"
+  },
+  "evaluation_mode": "official_published_partition",
+  "feature_drift": {
+    "comparison": "unsw_nb15",
+    "comparison_fingerprint": "66224c6e1515be3e1f2bb5563220d6d0f2efd647825d0a48b6eaf0a7b06a9954",
+    "features": {
+      "byte_rate": {
+        "comparison_mean": 8147445.484132387,
+        "comparison_missing": 0,
+        "reference_mean": 9265654.846031358,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.0486354037507411
+      },
+      "bytes_forward": {
+        "comparison_mean": 7993.908164504688,
+        "comparison_missing": 0,
+        "reference_mean": 8844.843835725815,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.004912733463187183
+      },
+      "bytes_reverse": {
+        "comparison_mean": 13233.78556332896,
+        "comparison_missing": 0,
+        "reference_mean": 14928.918564397374,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.011483557773926784
+      },
+      "bytes_total": {
+        "comparison_mean": 21227.693727833648,
+        "comparison_missing": 0,
+        "reference_mean": 23773.76240012319,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.011132991969691319
+      },
+      "destination_port": {
+        "comparison_mean": 0.0,
+        "comparison_missing": 0,
+        "reference_mean": 0.0,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.0
+      },
+      "duration_ms": {
+        "comparison_mean": 1006.7561463464997,
+        "comparison_missing": 0,
+        "reference_mean": 1359.3886921256296,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.062249058573469844
+      },
+      "forward_reverse_byte_ratio": {
+        "comparison_mean": 156.6196566134861,
+        "comparison_missing": 0,
+        "reference_mean": 241.4587767042691,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.061361491401470895
+      },
+      "iat_mean": {
+        "comparison_mean": 765.3125506097218,
+        "comparison_missing": 0,
+        "reference_mean": 991.6549522448424,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.03357269703018895
+      },
+      "iat_std": {
+        "comparison_mean": 0.0,
+        "comparison_missing": 0,
+        "reference_mean": 0.0,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.0
+      },
+      "packet_length_mean": {
+        "comparison_mean": 169.30675852573518,
+        "comparison_missing": 0,
+        "reference_mean": 173.19947794739372,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.01811840904081745
+      },
+      "packet_length_std": {
+        "comparison_mean": 0.0,
+        "comparison_missing": 0,
+        "reference_mean": 0.0,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.0
+      },
+      "packet_rate": {
+        "comparison_mean": 82410.88673910811,
+        "comparison_missing": 0,
+        "reference_mean": 95406.18710518941,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.08264941980460892
+      },
+      "packets_forward": {
+        "comparison_mean": 18.666472331535733,
+        "comparison_missing": 0,
+        "reference_mean": 20.29866374664226,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.012053741481250503
+      },
+      "packets_reverse": {
+        "comparison_mean": 17.54593596657436,
+        "comparison_missing": 0,
+        "reference_mean": 18.969590683297117,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.012604632556957034
+      },
+      "packets_total": {
+        "comparison_mean": 36.21240829811009,
+        "comparison_missing": 0,
+        "reference_mean": 39.268254429939375,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.014788341748969543
+      },
+      "syn_ack_ratio": {
+        "comparison_mean": 0.0,
+        "comparison_missing": 0,
+        "reference_mean": 0.0,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.0
+      },
+      "tcp_rst_count": {
+        "comparison_mean": 0.0,
+        "comparison_missing": 0,
+        "reference_mean": 0.0,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.0
+      },
+      "tcp_syn_count": {
+        "comparison_mean": 0.0,
+        "comparison_missing": 0,
+        "reference_mean": 0.0,
+        "reference_missing": 0,
+        "standardized_mean_shift": 0.0
+      }
+    },
+    "reference": "unsw_nb15",
+    "reference_fingerprint": "b9fd4bdc63e9854dfa067f083f5b0d15514e9d9fa68dec4316ffaa9389c1582a"
+  },
+  "fingerprint": "b9fd4bdc63e9854dfa067f083f5b0d15514e9d9fa68dec4316ffaa9389c1582a",
+  "provenance": [
+    {
+      "declared_manifest": {
+        "capture_boundaries": "Official published training partition, 175341 records.",
+        "dataset": "UNSW-NB15",
+        "filename": "UNSW_NB15_training-set.csv",
+        "license": "Academic/public use granted with required citations on the official UNSW page; commercial use requires author agreement.",
+        "official_download": "UNSW Research-linked public SharePoint / UNSW-NB15 dataset / CSV Files / Training and Testing Sets",
+        "retrieved_at": "2026-08-01T15:33:31Z",
+        "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa",
+        "size_bytes": 32293018,
+        "source_page": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",
+        "transformation_history": [
+          "Downloaded without modification through the official public SharePoint folder.",
+          "SHA-256 calculated locally before AegisFlow import."
+        ]
+      },
+      "filename": "UNSW_NB15_training-set.csv",
+      "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa",
+      "size_bytes": 32293018
+    }
+  ],
+  "quality": {
+    "adapter_notes": [
+      "destination_port=0 because the official UNSW training/testing partitions do not publish transport ports",
+      "packet_length_mean is directionally packet-weighted",
+      "byte_rate converts and sums UNSW directional bit/s load fields",
+      "iat_mean is directionally packet-weighted",
+      "packet_length_std=0 because the source schema does not provide it",
+      "iat_std=0 because the source schema does not provide it",
+      "tcp_syn_count=0 because the source schema does not provide it",
+      "tcp_rst_count=0 because the source schema does not provide it",
+      "tcp_ack_count=0 because the source schema does not provide it"
+    ],
+    "blocking_issues": [],
+    "class_distribution": {
+      "analysis": 2000,
+      "backdoor": 1746,
+      "benign": 56000,
+      "dos": 12264,
+      "exploits": 33393,
+      "fuzzers": 18184,
+      "generic": 40000,
+      "port_scan": 10491,
+      "shellcode": 1133,
+      "worms": 130
+    },
+    "constant_columns": [
+      "packet_length_std",
+      "iat_std",
+      "tcp_syn_count",
+      "tcp_rst_count",
+      "destination_port",
+      "syn_ack_ratio"
+    ],
+    "dataset": "unsw_nb15",
+    "duplicate_rows": 86364,
+    "fingerprint": "b9fd4bdc63e9854dfa067f083f5b0d15514e9d9fa68dec4316ffaa9389c1582a",
+    "identifier_columns": [
+      "id"
+    ],
+    "infinite_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "missing_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "out_of_range_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "raw_to_normalized_labels": {
+      "Analysis": {
+        "analysis": 2000
+      },
+      "Backdoor": {
+        "backdoor": 1746
+      },
+      "DoS": {
+        "dos": 12264
+      },
+      "Exploits": {
+        "exploits": 33393
+      },
+      "Fuzzers": {
+        "fuzzers": 18184
+      },
+      "Generic": {
+        "generic": 40000
+      },
+      "Normal": {
+        "benign": 56000
+      },
+      "Reconnaissance": {
+        "port_scan": 10491
+      },
+      "Shellcode": {
+        "shellcode": 1133
+      },
+      "Worms": {
+        "worms": 130
+      }
+    },
+    "rows": 175341,
+    "suspiciously_predictive_columns": [],
+    "warnings": [
+      "86364 duplicate canonical rows",
+      "canonical features contain constant columns"
+    ]
+  },
+  "schema_version": "1.0.0"
+}

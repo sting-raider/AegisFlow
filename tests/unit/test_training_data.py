@@ -10,9 +10,11 @@ import pandas as pd
 import pytest
 
 from packages.features.registry import FEATURE_NAMES
+from packages.model_bundle import ModelBundle
 from training.cli.evaluate_dataset import main as evaluate_dataset_main
 from training.data.adapters import load_dataset
 from training.data.evaluate import evaluate_logistic_gate
+from training.data.hybrid_evaluate import evaluate_hybrid_gate
 from training.data.models import CanonicalDataset, InputProvenance
 from training.data.quality import feature_drift, quality_report, train_test_overlap
 from training.data.splits import create_split
@@ -133,6 +135,8 @@ def test_unsw_adapter_documents_unavailable_fields(tmp_path: Path) -> None:
             "sbytes": [200, 800],
             "dbytes": [100, 200],
             "rate": [15, 20],
+            "sload": [800, 1600],
+            "dload": [400, 800],
             "smean": [100, 100],
             "dmean": [100, 100],
             "sinpkt": [5, 7],
@@ -144,7 +148,38 @@ def test_unsw_adapter_documents_unavailable_fields(tmp_path: Path) -> None:
     ).to_csv(path, index=False)
     dataset = load_dataset("unsw_nb15", [path])
     assert dataset.labels.tolist() == ["benign", "exploits"]
+    assert dataset.features[:, FEATURE_NAMES.index("byte_rate")].tolist() == [150.0, 300.0]
     assert any("tcp_syn_count=0" in note for note in dataset.adapter_notes)
+
+
+def test_official_unsw_partition_without_ports_is_explicitly_approximated(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "official-partition.csv"
+    pd.DataFrame(
+        {
+            "id": [1, 2],
+            "dur": [0.2, 0.5],
+            "spkts": [2, 8],
+            "dpkts": [1, 2],
+            "sbytes": [200, 800],
+            "dbytes": [100, 200],
+            "rate": [15, 20],
+            "smean": [100, 100],
+            "dmean": [100, 100],
+            "sinpkt": [5, 7],
+            "dinpkt": [5, 7],
+            "attack_cat": ["Normal", "Exploits"],
+            "label": [0, 1],
+        }
+    ).to_csv(path, index=False)
+    dataset = load_dataset("unsw_nb15", [path])
+    destination_port = FEATURE_NAMES.index("destination_port")
+    assert dataset.features[:, destination_port].tolist() == [0.0, 0.0]
+    assert any("official UNSW" in note for note in dataset.adapter_notes)
+    assert next(
+        profile for profile in dataset.source_profiles if profile.name == "id"
+    ).identifier_like
 
 
 def test_manifest_checksum_is_enforced(tmp_path: Path) -> None:
@@ -208,9 +243,7 @@ def test_quality_overlap_drift_and_evaluation_are_reported() -> None:
     training = _canonical()
     testing = _canonical(seed=9, name="other")
     split = create_split(training, "source_file")
-    evaluation = evaluate_logistic_gate(
-        training, training, split.train_indices, split.test_indices
-    )
+    evaluation = evaluate_logistic_gate(training, training, split.train_indices, split.test_indices)
     assert evaluation["macro_f1"] >= 0.0
     assert evaluation["queue_lag"]["measured"] is False
     assert evaluation["latency_ms"]["p95_single"] >= 0.0
@@ -225,6 +258,50 @@ def test_quality_overlap_drift_and_evaluation_are_reported() -> None:
         np.arange(testing.row_count),
     )
     assert cross_evaluation["testing_dataset"] == "other"
+
+
+def test_exact_hybrid_evaluation_uses_all_deployed_signals_and_held_family(
+    bundle: ModelBundle,
+) -> None:
+    dataset = _canonical()
+    grouped = create_split(dataset, "source_file")
+    grouped_evaluation = evaluate_hybrid_gate(
+        dataset,
+        dataset,
+        grouped.train_indices,
+        grouped.test_indices,
+        bundle,
+    )
+    assert grouped_evaluation["harness"] == "exact deployed hybrid pipeline"
+    assert grouped_evaluation["shared_inference_path"].endswith("HybridPredictor")
+    assert set(grouped_evaluation["verdict_counts"]) == {
+        "benign",
+        "known_attack",
+        "suspicious_unknown",
+        "needs_review",
+    }
+    assert grouped_evaluation["fit_manifest"]["calibration_benign_rows"] >= 2
+    assert grouped_evaluation["train_test_overlap"]["overlap_rows"] == 0
+    assert grouped_evaluation["macro_f1"] == pytest.approx(
+        grouped_evaluation["verdict_classification"]["macro avg"]["f1-score"]
+    )
+    assert grouped_evaluation["fusion_comparison"]["macro_f1_label_scope"] == [
+        "benign",
+        "known_attack",
+        "suspicious_unknown",
+        "needs_review",
+    ]
+
+    held = create_split(dataset, "leave_family_out", held_out_family="dos")
+    held_evaluation = evaluate_hybrid_gate(
+        dataset,
+        dataset,
+        held.train_indices,
+        held.test_indices,
+        bundle,
+    )
+    assert held_evaluation["unknown_test_families"] == ["dos"]
+    assert held_evaluation["suspicious_unknown_detection_rate"] is not None
 
 
 def test_dataset_evaluation_cli_writes_a_complete_report(
@@ -258,5 +335,8 @@ def test_dataset_evaluation_cli_writes_a_complete_report(
     evaluate_dataset_main()
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["split"]["group_overlap"] == 0
+    assert "train_indices" not in report["split"]
+    assert report["evaluation"]["harness"] == "exact deployed hybrid pipeline"
+    assert report["evaluation_bundle"]["bundle_schema_version"] == 3
     assert report["evaluation"]["feature_order"] == list(FEATURE_NAMES)
     assert report["quality"]["rows"] == 60

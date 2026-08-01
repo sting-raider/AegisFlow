@@ -10,6 +10,7 @@
   "review_max_risk": 54.0,
   "high_risk": 72.0,
   "critical_risk": 90.0,
+  "anomaly_normalization_tail_score": 0.7,
   "isolation_decision_benign_median": -0.013612482167481454,
   "isolation_decision_benign_p03": -0.059120699535357944,
   "reconstruction_error_benign_p50": 0.08092871308326721,

@@ -57,6 +57,8 @@ UNSW_RULES: dict[str, ColumnRule] = {
     "bytes_forward": _rule("sbytes"),
     "bytes_reverse": _rule("dbytes"),
     "packet_rate": _rule("rate"),
+    "byte_rate_forward": _rule("sload", scale=0.125),
+    "byte_rate_reverse": _rule("dload", scale=0.125),
     "packet_length_mean_forward": _rule("smean"),
     "packet_length_mean_reverse": _rule("dmean"),
     "iat_mean_forward": _rule("sinpkt"),
@@ -148,7 +150,7 @@ def _numeric(
 
 def _identifier_like(name: str) -> bool:
     normalized = _key(name)
-    return any(
+    return normalized in {"id", "recordid"} or any(
         token in normalized
         for token in ("srcip", "sourceip", "dstip", "destinationip", "flowid", "sessionid")
     )
@@ -203,7 +205,11 @@ def _timestamps(frame: pd.DataFrame, lookup: dict[str, str], requested: str | No
 
 
 def _canonical_features(
-    frame: pd.DataFrame, lookup: dict[str, str], rules: dict[str, ColumnRule]
+    frame: pd.DataFrame,
+    lookup: dict[str, str],
+    rules: dict[str, ColumnRule],
+    *,
+    allow_missing_destination_port: bool = False,
 ) -> tuple[pd.DataFrame, tuple[str, ...]]:
     notes: list[str] = []
     values: dict[str, pd.Series[float]] = {}
@@ -211,6 +217,13 @@ def _canonical_features(
         numeric = _numeric(frame, lookup, rule)
         if numeric is not None:
             values[feature] = numeric
+
+    if allow_missing_destination_port and "destination_port" not in values:
+        values["destination_port"] = pd.Series(np.zeros(len(frame)), index=frame.index, dtype=float)
+        notes.append(
+            "destination_port=0 because the official UNSW training/testing partitions "
+            "do not publish transport ports"
+        )
 
     required = (
         "duration_ms",
@@ -235,6 +248,9 @@ def _canonical_features(
             + values["packet_length_mean_reverse"] * values["packets_reverse"]
         ) / packets_total.where(packets_total > 0)
         notes.append("packet_length_mean is directionally packet-weighted")
+    if {"byte_rate_forward", "byte_rate_reverse"}.issubset(values):
+        values["byte_rate"] = values["byte_rate_forward"] + values["byte_rate_reverse"]
+        notes.append("byte_rate converts and sums UNSW directional bit/s load fields")
     if {"iat_mean_forward", "iat_mean_reverse"}.issubset(values):
         values["iat_mean"] = (
             values["iat_mean_forward"] * values["packets_forward"]
@@ -254,17 +270,13 @@ def _canonical_features(
         if unavailable not in values:
             values[unavailable] = pd.Series(np.zeros(len(frame)), index=frame.index, dtype=float)
             notes.append(f"{unavailable}=0 because the source schema does not provide it")
-    values["forward_reverse_byte_ratio"] = values["bytes_forward"] / values[
-        "bytes_reverse"
-    ].clip(lower=1.0)
-    if "tcp_ack_count" not in values:
-        values["tcp_ack_count"] = pd.Series(
-            np.zeros(len(frame)), index=frame.index, dtype=float
-        )
-        notes.append("tcp_ack_count=0 because the source schema does not provide it")
-    values["syn_ack_ratio"] = values["tcp_syn_count"] / values["tcp_ack_count"].clip(
+    values["forward_reverse_byte_ratio"] = values["bytes_forward"] / values["bytes_reverse"].clip(
         lower=1.0
     )
+    if "tcp_ack_count" not in values:
+        values["tcp_ack_count"] = pd.Series(np.zeros(len(frame)), index=frame.index, dtype=float)
+        notes.append("tcp_ack_count=0 because the source schema does not provide it")
+    values["syn_ack_ratio"] = values["tcp_syn_count"] / values["tcp_ack_count"].clip(lower=1.0)
     values["packets_total"] = packets_total
     values["bytes_total"] = bytes_total
     canonical = pd.DataFrame({name: values[name] for name in FEATURE_NAMES}, index=frame.index)
@@ -319,7 +331,12 @@ def load_dataset(
                 ~missing_attack_category, raw[fallback].fillna("unlabeled").astype(str)
             )
     labels = raw_labels.map(normalize_label)
-    canonical, notes = _canonical_features(raw, lookup, rules)
+    canonical, notes = _canonical_features(
+        raw,
+        lookup,
+        rules,
+        allow_missing_destination_port=kind == "unsw_nb15",
+    )
     if group_column:
         resolved_group = lookup.get(_key(group_column))
         if resolved_group is None:

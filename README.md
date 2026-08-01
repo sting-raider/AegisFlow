@@ -1,5 +1,8 @@
 # AegisFlow
 
+[![CI](https://github.com/sting-raider/AegisFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/sting-raider/AegisFlow/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+
 AegisFlow is an adaptive hybrid network intrusion detection system for deterministic
 PCAP replay, explicit Linux live capture, explainable risk fusion, incident grouping,
 and a real-time analyst dashboard.
@@ -81,10 +84,10 @@ make reset
 
 ## Verified status
 
-The final local validation on 2026-08-01 passed:
+The latest local validation on 2026-08-01 passed:
 
-- Ruff and strict MyPy across 53 Python source files;
-- 108 Python tests with 84% last-measured backend coverage;
+- Ruff and strict MyPy across 56 Python source files;
+- 111 Python tests with 84% last-measured backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
 - clean Compose image builds, database migration, offline replay, REST/metrics checks,
@@ -121,6 +124,13 @@ quality. Public datasets are downloaded separately and never committed. See
 [`docs/ML_METHODOLOGY.md`](docs/ML_METHODOLOGY.md) and
 [`docs/DATASETS.md`](docs/DATASETS.md).
 
+The repository includes a reproducible exact-hybrid report for the official UNSW-NB15
+training/testing partition. It scored 175,341 training and 82,332 testing rows through
+the same batch predictor used by runtime detection. The report is deliberately candid:
+four-state macro F1 was 0.156 and benign false-positive rate was 64.4%, so this model is
+not suitable for operational promotion. See the
+[`official evaluation report`](docs/evaluation/unsw-nb15-official-split.json).
+
 ## Security and privacy
 
 - Packet payloads are not retained.
@@ -147,8 +157,9 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
 ## Known limitations
 
 - The bundled model is synthetic smoke data, not a production model.
-- The current public-data command is an evaluation gate for a simplified logistic model,
-  not yet the exact deployed hybrid pipeline; no reviewed real-dataset result is bundled.
+- The exact-hybrid official UNSW-NB15 evaluation has an unacceptably high 64.4% benign
+  false-positive rate. Held-family, time-based, and true cross-dataset evidence remain
+  unfinished; the published report is negative evidence, not a performance claim.
 - API access control currently uses an optional shared key for mutations and does not yet
   provide authenticated user identities, RBAC, SSO/OIDC, or tenant isolation.
 - Runtime detection is single-message/single-worker by default; the measured overload
@@ -157,9 +168,9 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
   validated for PCAP and explicit Linux live interfaces; its Windows native engine is
   unavailable, so Windows falls back to Scapy replay.
 - Windows supports demo and PCAP replay, not live capture.
-- The bundled Isolation Forest and autoencoder are calibrated only against deterministic
-  synthetic smoke data; independent public-dataset evaluation remains required before
-  operational use.
+- The deployed smoke bundle remains calibrated against deterministic synthetic data.
+  Public evaluation retrains the identical model families and fusion path for the
+  reviewed dataset but does not promote the result.
 - Redis/PostgreSQL restart recovery uses consumer groups, stale-entry claiming, durable
   acknowledgement, bounded retries, and idempotent event IDs. The Compose fault matrix is
   documented in `docs/PROGRESS.md`.

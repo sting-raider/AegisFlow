@@ -44,11 +44,20 @@ and a rollback pointer. Drift and analyst feedback only create candidates.
 
 `training.cli.evaluate_dataset` is the public-data gate. It first writes a quality and
 leakage report, refuses non-finite canonical features or fewer than two normalized
-classes, and supports time, capture-day, source-file, held-family, and cross-dataset
-evaluation. Its class-weighted logistic model is a transparent evaluation baseline,
-not an automatically promoted production candidate. Unknown-confidence selection uses
-the three-percent low-confidence validation tail; the final test set never sets that
-threshold.
+classes, and supports time, capture-day, source-file, held-family, official published
+partition, and cross-dataset evaluation. It fits the same calibrated class-weighted
+logistic classifier, benign-only Isolation Forest, CPU denoising autoencoder, empirical
+CDF, and configured fusion used by runtime detection. Evaluation and runtime share
+`packages.detection.hybrid.HybridPredictor`, avoiding a second scoring implementation.
+No CSV signature or rolling-context evidence is fabricated. The final test set never
+sets a model threshold and evaluation never promotes a candidate automatically.
+
+The official UNSW-NB15 training/testing report is negative operational evidence:
+four-state macro F1 is 0.156, benign false-positive rate is 64.4%, 59,268 of 82,332 test
+flows require review, and no family is unknown because both published partitions contain
+the same attack families. The report also records 39.6% canonical train/test row overlap
+and unavailable-field approximations. It therefore validates the harness, not model
+readiness; held-family and true cross-dataset experiments remain required.
 
 ## Runtime drift
 

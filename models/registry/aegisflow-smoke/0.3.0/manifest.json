@@ -2,8 +2,8 @@
   "bundle_schema_version": 3,
   "model_name": "aegisflow-smoke",
   "version": "0.3.0",
-  "created_at": "2026-08-01T15:42:45.017775+00:00",
-  "git_commit": "51f37f624c515c7a0b4b75c3d71b4da72a7c3177",
+  "created_at": "2026-08-01T15:51:53.994566+00:00",
+  "git_commit": "f14a15554fc1fcea2f5cf7ad0cbde3f261e3d2f1",
   "python_version": "3.12.9",
   "dependency_versions": {
     "joblib": "1.5.1",
@@ -33,6 +33,7 @@
     "review_max_risk": 54.0,
     "high_risk": 72.0,
     "critical_risk": 90.0,
+    "anomaly_normalization_tail_score": 0.7,
     "isolation_decision_benign_median": -0.013612482167481454,
     "isolation_decision_benign_p03": -0.059120699535357944,
     "reconstruction_error_benign_p50": 0.08092871308326721,

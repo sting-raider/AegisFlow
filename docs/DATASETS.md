@@ -35,10 +35,12 @@ uv run python scripts/download_dataset.py \
 
 `training.data.adapters` converts supported CSV schemas into the exact fixed feature
 order used at inference. CIC duration/IAT microseconds are converted to milliseconds.
-UNSW-NB15 fields without an equivalent (packet-length/IAT dispersion and TCP flag
-counts) are set to zero and recorded as adapter notes; these approximations must be
-considered when interpreting cross-dataset drift. Raw IPs, flow IDs, and other
-identifiers are profiled for leakage but excluded from the feature array and report.
+The official UNSW-NB15 training/testing partitions omit transport ports, so destination
+port is set to zero; directional `sload`/`dload` bit rates are converted to bytes per
+second and summed. Fields without an equivalent (packet-length/IAT dispersion and TCP
+flag counts) are set to zero and recorded as adapter notes. These approximations must be
+considered when interpreting results. Raw IPs, flow IDs, and other identifiers are
+profiled for leakage but excluded from the feature array and report.
 
 Run a gate with an explicit non-row-random split:
 
@@ -56,6 +58,13 @@ uv run python -m training.cli.evaluate_dataset \
   --split leave_family_out \
   --held-out-family dos \
   --output reports/cic2017-held-dos.json
+
+uv run python -m training.cli.evaluate_dataset \
+  --dataset unsw_nb15 \
+  --input data/unsw_nb15/UNSW_NB15_training-set.csv \
+  --cross-dataset unsw_nb15 \
+  --cross-input data/unsw_nb15/UNSW_NB15_testing-set.csv \
+  --output reports/unsw-nb15-official-split.json
 ```
 
 Time, capture-day, source-file-grouped, leave-one-family-out, and compatible
@@ -66,4 +75,7 @@ leakage checks, train/test overlap, cross-dataset feature drift, per-class and a
 metrics, PR/ROC AUC when defined, calibration, benign false-positive rate, unknown
 detection, false alerts per replay hour when timestamps span time, latency, throughput,
 and process resource deltas. Offline reports explicitly mark Redis queue lag as not
-measured; runtime benchmarking covers that separate scope.
+measured; runtime benchmarking covers that separate scope. The evaluation harness uses
+the detector's shared exact-hybrid batch predictor. The reviewed official UNSW result is
+committed at `docs/evaluation/unsw-nb15-official-split.json`; source CSVs and sidecar
+manifests remain ignored under `data/`.

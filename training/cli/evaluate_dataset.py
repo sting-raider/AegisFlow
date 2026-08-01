@@ -8,8 +8,9 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, cast
 
+from packages.model_bundle import load_production_bundle
 from training.data.adapters import DatasetKind, load_dataset
-from training.data.evaluate import evaluate_logistic_gate
+from training.data.hybrid_evaluate import evaluate_hybrid_gate
 from training.data.quality import feature_drift, quality_report, train_test_overlap
 from training.data.splits import SplitStrategy, create_split, cross_dataset_split
 
@@ -51,6 +52,8 @@ def main() -> None:
     parser.add_argument("--cross-input", type=Path, action="append")
     parser.add_argument("--cross-label-column")
     parser.add_argument("--max-rows", type=int, default=5_000_000)
+    parser.add_argument("--model-registry", type=Path, default=Path("models/registry"))
+    parser.add_argument("--model-name", default="aegisflow-smoke")
     parser.add_argument("--output", type=Path, default=Path("reports/dataset-evaluation.json"))
     args = parser.parse_args()
 
@@ -69,6 +72,7 @@ def main() -> None:
         "fingerprint": dataset.fingerprint,
         "provenance": [asdict(item) for item in dataset.provenance],
         "quality": quality.as_dict(),
+        "adapter_notes": list(dataset.adapter_notes),
     }
     if quality.blocking_issues:
         payload["evaluation"] = {"status": "blocked", "reasons": quality.blocking_issues}
@@ -86,6 +90,12 @@ def main() -> None:
         )
         comparison_quality = quality_report(comparison)
         payload["cross_quality"] = comparison_quality.as_dict()
+        payload["cross_provenance"] = [asdict(item) for item in comparison.provenance]
+        payload["evaluation_mode"] = (
+            "official_published_partition"
+            if dataset.name == comparison.name
+            else "cross_dataset"
+        )
         if comparison_quality.blocking_issues:
             payload["evaluation"] = {
                 "status": "blocked",
@@ -98,7 +108,16 @@ def main() -> None:
         train, test = cross_dataset_split(dataset, comparison)
         payload["feature_drift"] = feature_drift(dataset, comparison)
         payload["cross_dataset_overlap"] = train_test_overlap(dataset.features, comparison.features)
-        payload["evaluation"] = evaluate_logistic_gate(dataset, comparison, train, test)
+        payload["cross_adapter_notes"] = list(comparison.adapter_notes)
+        deployed_bundle = load_production_bundle(args.model_registry, args.model_name)
+        payload["evaluation_bundle"] = {
+            "model_name": args.model_name,
+            "version": deployed_bundle.version,
+            "bundle_schema_version": deployed_bundle.manifest.get("bundle_schema_version"),
+        }
+        payload["evaluation"] = evaluate_hybrid_gate(
+            dataset, comparison, train, test, deployed_bundle
+        )
     else:
         split = create_split(
             dataset,
@@ -107,8 +126,18 @@ def main() -> None:
             held_out_family=args.held_out_family,
         )
         payload["split"] = split.manifest()
-        payload["evaluation"] = evaluate_logistic_gate(
-            dataset, dataset, split.train_indices, split.test_indices
+        deployed_bundle = load_production_bundle(args.model_registry, args.model_name)
+        payload["evaluation_bundle"] = {
+            "model_name": args.model_name,
+            "version": deployed_bundle.version,
+            "bundle_schema_version": deployed_bundle.manifest.get("bundle_schema_version"),
+        }
+        payload["evaluation"] = evaluate_hybrid_gate(
+            dataset,
+            dataset,
+            split.train_indices,
+            split.test_indices,
+            deployed_bundle,
         )
     _atomic_json(args.output, payload)
     print(args.output.resolve())

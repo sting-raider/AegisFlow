@@ -349,13 +349,13 @@
     }
   ],
   "latency": {
-    "single_flow_p50_ms": 2.427350002108142,
-    "single_flow_p95_ms": 3.7493750060093585,
-    "single_flow_p99_ms": 4.457725986721923,
+    "single_flow_p50_ms": 2.0605500030796975,
+    "single_flow_p95_ms": 3.006295002705882,
+    "single_flow_p99_ms": 4.848280013247839,
     "batch_size": 128.0,
-    "batch_p50_ms": 2.237499982584268,
-    "batch_p95_ms": 3.2059399993158872,
-    "batch_p99_ms": 3.532459989655762
+    "batch_p50_ms": 2.265900024212897,
+    "batch_p95_ms": 3.7677000043913704,
+    "batch_p99_ms": 5.140636018477377
   },
   "autoencoder": {
     "trained_on_benign_rows": 210,

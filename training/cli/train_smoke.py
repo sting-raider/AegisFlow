@@ -31,11 +31,12 @@ from sklearn.model_selection import GroupKFold, GroupShuffleSplit
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler, label_binarize
 
-from packages.detection.autoencoder import DenoisingAutoencoder, reconstruction_errors
+from packages.detection.autoencoder import reconstruction_errors
 from packages.detection.fusion import FusionConfig, FusionInput, fuse_risk
 from packages.features.registry import FEATURE_NAMES, feature_schema
 from packages.model_bundle.bundle import promote_bundle, sha256_file
 from packages.model_bundle.calibration import EmpiricalCDF
+from training.hybrid import train_autoencoder
 
 SEED = 431
 MODEL_NAME = "aegisflow-smoke"
@@ -154,24 +155,6 @@ def _git_commit() -> str:
         ).strip()
     except (OSError, subprocess.CalledProcessError):
         return "uncommitted"
-
-
-def _train_autoencoder(benign_train: np.ndarray) -> DenoisingAutoencoder:
-    torch.manual_seed(SEED)
-    torch.set_num_threads(1)
-    model = DenoisingAutoencoder(len(FEATURE_NAMES))
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.004, weight_decay=1e-5)
-    clean = torch.as_tensor(benign_train, dtype=torch.float32)
-    generator = torch.Generator(device="cpu").manual_seed(SEED)
-    model.train()
-    for _ in range(120):
-        noisy = clean + torch.randn(clean.shape, generator=generator) * 0.06
-        optimizer.zero_grad(set_to_none=True)
-        loss = torch.mean((model(noisy) - clean) ** 2)
-        loss.backward()  # type: ignore[no-untyped-call]
-        optimizer.step()
-    model.eval()
-    return model
 
 
 def _normalized_high_score(values: np.ndarray, median: float, percentile: float) -> np.ndarray:
@@ -424,7 +407,7 @@ def train(output_root: Path) -> dict[str, Any]:
     decision_median = float(np.percentile(benign_decisions, 50))
     decision_p03 = float(np.percentile(benign_decisions, 3))
 
-    autoencoder = _train_autoencoder(benign_train)
+    autoencoder = train_autoencoder(benign_train, seed=SEED)
     benign_errors = reconstruction_errors(autoencoder, benign_calibration)
     reconstruction_p50 = float(np.percentile(benign_errors, 50))
     reconstruction_p97 = float(np.percentile(benign_errors, 97))
@@ -644,6 +627,7 @@ def train(output_root: Path) -> dict[str, Any]:
         )
         thresholds = {
             **fusion_config.to_dict(),
+            "anomaly_normalization_tail_score": ANOMALY_THRESHOLD,
             "isolation_decision_benign_median": decision_median,
             "isolation_decision_benign_p03": decision_p03,
             "reconstruction_error_benign_p50": reconstruction_p50,

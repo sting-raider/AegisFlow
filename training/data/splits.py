@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import asdict, dataclass
 from typing import Any, Literal
 
@@ -23,8 +24,16 @@ class DatasetSplit:
 
     def manifest(self) -> dict[str, Any]:
         values = asdict(self)
-        values["train_indices"] = self.train_indices.tolist()
-        values["test_indices"] = self.test_indices.tolist()
+        values["train_rows"] = len(self.train_indices)
+        values["test_rows"] = len(self.test_indices)
+        values["train_indices_sha256"] = hashlib.sha256(
+            self.train_indices.astype("<i8", copy=False).tobytes()
+        ).hexdigest()
+        values["test_indices_sha256"] = hashlib.sha256(
+            self.test_indices.astype("<i8", copy=False).tobytes()
+        ).hexdigest()
+        del values["train_indices"]
+        del values["test_indices"]
         return values
 
 

@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from packages.detection import DetectionEngine
+from packages.detection import DetectionEngine, HybridPredictor
 from packages.features import flow_to_vector
 from packages.model_bundle import BundleError, ModelBundle, load_production_bundle
 from services.sensor import DemoAdapter
@@ -30,6 +30,36 @@ def test_detection_reports_empirical_anomaly_percentile(bundle: ModelBundle) -> 
     assert result.anomaly_percentile == pytest.approx(
         bundle.anomaly_calibration.percentile(result.anomaly_score), abs=1e-7
     )
+
+
+def test_runtime_single_flow_and_shared_batch_hybrid_paths_are_identical(
+    bundle: ModelBundle,
+) -> None:
+    flows = list(DemoAdapter().flows())
+    raw = np.vstack([flow_to_vector(flow) for flow in flows])
+    contexts = np.asarray(
+        [
+            min(float(flow.protocol_metadata.get("distinct_destination_ports", 0)) / 25.0, 1.0)
+            for flow in flows
+        ]
+    )
+    batch = HybridPredictor(bundle).predict(raw, contextual_scores=contexts)
+    singles = [DetectionEngine(bundle).detect(flow) for flow in flows]
+
+    np.testing.assert_allclose(
+        batch.anomaly_scores,
+        [result.anomaly_score for result in singles],
+        atol=1e-8,
+    )
+    np.testing.assert_allclose(
+        batch.anomaly_percentiles,
+        [result.anomaly_percentile for result in singles],
+        atol=1e-8,
+    )
+    assert [outcome.verdict for outcome in batch.outcomes] == [result.verdict for result in singles]
+    assert [outcome.risk for outcome in batch.outcomes] == [
+        result.final_risk_score for result in singles
+    ]
 
 
 def test_corrupted_artifact_fails_before_deserialization(

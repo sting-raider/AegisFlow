@@ -214,3 +214,22 @@ baseline and selected configuration on a separate grouped test partition. For sm
 the selected rule retained all baseline weights and raised only the anomaly threshold from
 0.70 to 0.74. This synthetic comparison proves the machinery, not operational superiority;
 public held-family and cross-dataset evaluation remains mandatory.
+
+## D-020 — One exact hybrid scorer and publish negative evaluation evidence
+
+Use `packages.detection.hybrid.HybridPredictor` for both runtime detection and offline
+public-data evaluation. Evaluation retrains the same classifier and benign-only anomaly
+model families, derives calibration from a disjoint fold, and passes canonical arrays
+through the same fusion implementation. CSV rows do not receive fabricated signature or
+rolling-context signals. Keeping a simpler logistic-only evaluator was rejected because
+it could not measure the detector actually being deployed and invited scoring drift.
+
+Publish the sanitized official UNSW-NB15 training/testing report even though it fails
+operational expectations. Its high benign false-positive rate and review volume are
+decision evidence, not a marketing metric. Compare fusion configurations on the same
+fixed four-verdict label set; additionally expose observed-label macro F1 only as a
+diagnostic. Treating an observed-label change as an improvement was rejected because a
+configuration can change which zero-support verdict labels appear and thereby change the
+denominator without improving supported-class performance. The official UNSW partitions
+also share every family and have substantial canonical overlap, so they do not replace
+held-family or genuinely cross-dataset evaluation.

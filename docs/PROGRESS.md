@@ -139,19 +139,37 @@ Last updated: 2026-08-01.
   UDP, and IPv6 reference vectors. An isolated pinned Suricata 8.0.6 replay emitted the
   same two IDs as the Scapy sensor for the bundled PCAP; direction reconciliation yielded
   two oriented flows, one correlated signature, and zero EVE processing errors.
+- Exact public evaluation now shares `HybridPredictor` with runtime inference. The
+  evaluator retrains the calibrated classifier, benign-only Isolation Forest and CPU
+  denoising autoencoder, builds a benign empirical CDF, and applies the bundle-loaded
+  fusion rule in batches. Focused parity coverage proves a runtime single-flow result
+  matches batch scoring; the full local gate passes 111 Python tests, Ruff, strict MyPy
+  across 56 source files, dashboard lint/build, and four dashboard tests.
+- The reviewed official UNSW-NB15 training/testing partitions were downloaded through
+  UNSW's public SharePoint path and retained only under ignored `data/`. SHA-256 and
+  provenance sidecars identify 175,341 training and 82,332 testing rows. The sanitized
+  exact-hybrid report is committed at
+  `docs/evaluation/unsw-nb15-official-split.json`.
+- The first public result is negative readiness evidence: fixed four-verdict macro F1 is
+  0.156, weighted F1 is 0.294, benign false-positive rate is 64.4%, and 59,268 test rows
+  enter `needs_review`. Batch scoring measured 2,070 flows/s on the published local Windows run,
+  but 39.6% canonical train/test overlap and missing transport/flag/dispersion fields
+  materially limit interpretation. Baseline and deployed thresholds tie on fixed-label
+  macro F1; the apparent observed-label difference comes from which verdict labels are
+  present, so it is not claimed as an improvement.
 
 ## Hard blockers and fallbacks
 
-- Production-readiness is not yet proven. No reviewed public dataset is currently present,
-  and the existing public-data command evaluates a simplified logistic gate rather than
-  the exact deployed hybrid detector. Windows cannot validate authorized live capture, so
+- Production-readiness is not yet proven. The exact official UNSW-NB15 result fails an
+  acceptable false-positive standard, contains no unknown family, and cannot provide a
+  time-based false-alert rate. Windows cannot validate authorized live capture, so
   isolated Linux-container evidence remains required for that path.
 
 ## Highest-priority required backlog
 
-- Replace the simplified public-data gate with exact deployed-hybrid evaluation and run it
-  on reviewed public data without committing large datasets.
-- Validate anomaly calibration and the configurable fusion comparison on reviewed public
-  held-family/cross-dataset data; then add profiling, batching/worker scaling, enterprise
+- Run reviewed public held-family and genuinely different cross-dataset experiments,
+  add a time-bearing CIC source, and use the failure evidence to recalibrate/retrain
+  without test leakage or automatic promotion.
+- Add profiling, batching/worker scaling, enterprise
   auth/RBAC, production deployment assets, governed champion/challenger promotion, and
   the editorial dashboard transformation.
