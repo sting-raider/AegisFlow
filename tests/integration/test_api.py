@@ -20,7 +20,10 @@ def test_api_vertical_slice(monkeypatch, registry: Path, tmp_path: Path) -> None
             "lag": 0,
             "consumers": 0,
         }
-        assert "queue_lag" in client.get("/metrics").text
+        metrics = client.get("/metrics").text
+        assert "queue_lag" in metrics
+        assert "drift_events_total" in metrics
+        assert client.get("/api/v1/drift-events").status_code == 200
         alerts = client.get("/api/v1/alerts").json()["items"]
         assert alerts
         assert {item["verdict"] for item in alerts} >= {"known_attack", "suspicious_unknown"}

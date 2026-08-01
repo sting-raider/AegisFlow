@@ -24,6 +24,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 from packages.contracts import AnalystFeedback, DetectionResult, FlowEvent, SignatureEvent, Verdict
+from packages.incidents import DriftEvent
 
 
 class Base(DeclarativeBase):
@@ -468,6 +469,40 @@ class Repository:
                 }
                 for row in rows
             ]
+
+    def detection_exists(self, event_id: str) -> bool:
+        with self.session() as session:
+            return session.get(DetectionRow, event_id) is not None
+
+    def record_drift_event(self, event: DriftEvent) -> bool:
+        event_id = str(event.event_id)
+        with self.session() as session:
+            if session.get(DriftEventRow, event_id) is not None:
+                return False
+            session.add(
+                DriftEventRow(
+                    id=event_id,
+                    signal=event.signal,
+                    detected_at=event.detection_time,
+                    magnitude=event.magnitude,
+                    model_version=event.model_version,
+                    payload={
+                        "reference_window": event.reference_window,
+                        "recent_window": event.recent_window,
+                        "reference_mean": event.reference_mean,
+                        "recent_mean": event.recent_mean,
+                        "trigger_detection_id": (
+                            str(event.trigger_detection_id)
+                            if event.trigger_detection_id is not None
+                            else None
+                        ),
+                        "recommended_action": event.recommended_action,
+                        "automatic_action_allowed": event.automatic_action_allowed,
+                        "eligible_for_retraining": event.eligible_for_retraining,
+                    },
+                )
+            )
+            return True
 
     def models(self) -> list[dict[str, Any]]:
         with self.session() as session:

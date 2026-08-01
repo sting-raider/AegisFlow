@@ -104,3 +104,13 @@ and recorded as adapter notes instead of inventing values. Identifiers are analy
 leakage but never enter the feature array or persisted report. Automated source
 downloads require HTTPS plus a user-reviewed checksum; silently choosing a convenient
 mirror or publishing fabricated public-dataset metrics was rejected.
+
+## D-012 — Durable distribution monitoring without adaptive mutation
+
+Use bounded two-window mean-shift monitors for anomaly, confidence, flow-rate,
+selected stable features, and alert-rate distributions. Normalize rate and heavy-tailed
+flow fields before comparison, deduplicate observations by detection UUID, and persist
+deterministically identified crossings before acknowledging the detection stream.
+Events are review recommendations with both automatic-action and retraining flags fixed
+false. Updating a learned benign baseline from observed traffic was rejected because it
+would allow suspicious traffic to poison the detector.

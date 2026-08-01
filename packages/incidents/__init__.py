@@ -1,3 +1,3 @@
-from packages.incidents.drift import DriftEvent, WindowDriftDetector
+from packages.incidents.drift import DriftEvent, RuntimeDriftMonitor, WindowDriftDetector
 
-__all__ = ["DriftEvent", "WindowDriftDetector"]
+__all__ = ["DriftEvent", "RuntimeDriftMonitor", "WindowDriftDetector"]

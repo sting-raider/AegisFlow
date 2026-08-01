@@ -34,3 +34,18 @@ evaluation. Its class-weighted logistic model is a transparent evaluation baseli
 not an automatically promoted production candidate. Unknown-confidence selection uses
 the three-percent low-confidence validation tail; the final test set never sets that
 threshold.
+
+## Runtime drift
+
+`RuntimeDriftMonitor` maintains two bounded windows per signal. The default is 64
+reference plus 64 recent observations and can be changed with
+`AEGISFLOW_DRIFT_WINDOW` (minimum 8). Signals are anomaly score, classifier confidence,
+normalized flow rate, normalized duration, normalized total bytes, normalized packet
+length mean, and rolling alert rate. Each event records both means, window sizes,
+magnitude, model version, triggering detection ID, and a review-only recommendation.
+
+Drift rows use deterministic IDs and are written before the Redis detection is
+acknowledged. `/api/v1/drift-events`, `drift_events_total`, and `drift_magnitude` expose
+the result. `automatic_action_allowed` and `eligible_for_retraining` are always false.
+The windows include all operational traffic as distribution observations; no traffic,
+suspicious or otherwise, is inserted into a benign training baseline by this monitor.

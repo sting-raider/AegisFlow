@@ -35,6 +35,7 @@ from packages.contracts import (
     SignatureEvent,
 )
 from packages.detection import DetectionEngine
+from packages.incidents import DriftEvent, RuntimeDriftMonitor
 from packages.model_bundle import BundleError, load_production_bundle
 from services.sensor import DemoAdapter
 from training.cli.train_smoke import train
@@ -50,6 +51,8 @@ QUEUE_LAG = Gauge("queue_lag", "Undelivered Redis stream entries", ["stream", "g
 QUEUE_PENDING = Gauge(
     "queue_pending", "Delivered but unacknowledged stream entries", ["stream", "group"]
 )
+DRIFT_EVENTS = Counter("drift_events_total", "Detected runtime distribution shifts", ["signal"])
+DRIFT_MAGNITUDE = Gauge("drift_magnitude", "Most recent drift magnitude", ["signal"])
 
 
 class FeedbackRequest(BaseModel):
@@ -65,7 +68,14 @@ class IncidentStatusRequest(BaseModel):
     status: Literal["open", "investigating", "contained", "closed"]
 
 
-def _seed_demo(repository: Repository, engine: DetectionEngine) -> None:
+def _record_drift_metric(event: DriftEvent) -> None:
+    DRIFT_EVENTS.labels(event.signal).inc()
+    DRIFT_MAGNITUDE.labels(event.signal).set(event.magnitude)
+
+
+def _seed_demo(
+    repository: Repository, engine: DetectionEngine, drift_monitor: RuntimeDriftMonitor
+) -> None:
     for flow in DemoAdapter().flows():
         signature = None
         if flow.protocol_metadata.get("scenario") == "known-signature":
@@ -94,6 +104,9 @@ def _seed_demo(repository: Repository, engine: DetectionEngine) -> None:
             ALERTS.labels(detection.severity.value).inc()
             if detection.verdict.value == "suspicious_unknown":
                 UNKNOWN_ALERTS.inc()
+        for event in drift_monitor.observe(flow, detection):
+            if repository.record_drift_event(event):
+                _record_drift_metric(event)
 
 
 @asynccontextmanager
@@ -110,9 +123,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         train(registry)
         bundle = load_production_bundle(registry)
     engine = DetectionEngine(bundle)
+    drift_monitor = RuntimeDriftMonitor(
+        str(bundle.manifest["version"]),
+        window_size=int(os.getenv("AEGISFLOW_DRIFT_WINDOW", "64")),
+    )
     repository.record_model(bundle.manifest)
     app.state.repository = repository
     app.state.engine = engine
+    app.state.drift_monitor = drift_monitor
     consumer: DetectionConsumer | None = None
     app.state.consumer = None
     if os.getenv("AEGISFLOW_CONSUME_REDIS", "0") == "1":
@@ -120,11 +138,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             repository,
             os.getenv("AEGISFLOW_REDIS_URL", "redis://redis:6379/0"),
             on_database_error=DATABASE_ERRORS.inc,
+            drift_monitor=drift_monitor,
+            on_drift_event=_record_drift_metric,
         )
         app.state.consumer = consumer
         consumer.start()
     if os.getenv("AEGISFLOW_DEMO_SEED", "1") == "1":
-        _seed_demo(repository, engine)
+        _seed_demo(repository, engine, drift_monitor)
     yield
     if consumer is not None:
         consumer.stop()

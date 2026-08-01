@@ -14,7 +14,7 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 50 tests pass, Ruff passes across the repository, and strict MyPy passes
+- Python: 53 tests pass, Ruff passes across the repository, and strict MyPy passes
   across 46 source files. The last full measured
   coverage baseline before bundle v2 was 82%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
@@ -57,6 +57,11 @@ Last updated: 2026-08-01.
   CSV adapters, sanitized quality/leakage reports, time/day/source/family splits, and
   compatible cross-dataset drift/evaluation. Fixture tests exercise every adapter and
   evaluation path; no public-dataset performance number is claimed without the data.
+- Runtime drift now observes anomaly score, known confidence, normalized flow rate,
+  duration, total bytes, packet length, and alert rate through bounded two-window
+  monitors. New crossings are persisted idempotently before Redis acknowledgement and
+  exposed by API/dashboard plus Prometheus count/magnitude metrics. Stored events
+  explicitly prohibit automatic action and retraining eligibility.
 
 ## Hard blockers and fallbacks
 
@@ -65,6 +70,6 @@ Last updated: 2026-08-01.
 
 ## Highest-priority required backlog
 
-- Runtime drift, explanation providers, richer incidents/API/export/dashboard,
+- Explanation providers, richer incidents/API/export/dashboard,
   remaining structured observability and input/backpressure hardening tracked in
   `docs/COMPLETION_AUDIT.md`.

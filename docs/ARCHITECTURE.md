@@ -35,3 +35,10 @@ only after publishing the next-stage event or committing the database transactio
 pending entries are reclaimed after 30 seconds by default. Malformed events are first
 written to the dead-letter stream; database/Redis outages remain visible as pending or
 lagging queue work and retry metrics rather than being mislabeled benign.
+
+The API-side durable consumer also feeds a bounded runtime drift monitor after a new
+detection is persisted. It watches anomaly score, known-class confidence, normalized
+flow rate, duration, byte volume, packet length, and alert rate. A threshold crossing
+is stored idempotently before acknowledgement and exported as Prometheus count and
+magnitude metrics. These windows observe distributions only: they never alter the
+benign training baseline, create training labels, retrain, or promote a model.

@@ -12,6 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from apps.api.database import Repository
 from packages.common.bus import RedisStreamBus
 from packages.contracts import DetectionResult, FlowEvent, SignatureEvent
+from packages.incidents import DriftEvent, RuntimeDriftMonitor
 
 
 class DetectionConsumer:
@@ -24,6 +25,8 @@ class DetectionConsumer:
         database_attempts: int = 3,
         retry_base_seconds: float = 0.1,
         on_database_error: Callable[[], None] | None = None,
+        drift_monitor: RuntimeDriftMonitor | None = None,
+        on_drift_event: Callable[[DriftEvent], None] | None = None,
     ) -> None:
         self.repository = repository
         self.bus = bus or RedisStreamBus(
@@ -33,6 +36,8 @@ class DetectionConsumer:
         self.database_attempts = max(1, database_attempts)
         self.retry_base_seconds = max(0.0, retry_base_seconds)
         self.on_database_error = on_database_error
+        self.drift_monitor = drift_monitor
+        self.on_drift_event = on_drift_event
         self.queue_status = {"pending": 0, "lag": 0, "consumers": 0}
         self.stop_event = Event()
         self.thread = Thread(target=self._run, name="detection-consumer", daemon=True)
@@ -82,9 +87,23 @@ class DetectionConsumer:
             self.bus.acknowledge("aegisflow:detections", "api-core", message_id)
             return True
 
+        monitor = self.drift_monitor
+        is_new_detection: bool | None = False if monitor is None else None
+        pending_drift_events: tuple[DriftEvent, ...] | None = None
         for attempt in range(self.database_attempts):
             try:
+                if is_new_detection is None:
+                    is_new_detection = not self.repository.detection_exists(
+                        str(detection.event_id)
+                    )
                 self.repository.ingest(flow, detection, signature)
+                if is_new_detection:
+                    if pending_drift_events is None:
+                        assert monitor is not None
+                        pending_drift_events = monitor.observe(flow, detection)
+                    for event in pending_drift_events:
+                        if self.repository.record_drift_event(event) and self.on_drift_event:
+                            self.on_drift_event(event)
                 self.bus.acknowledge("aegisflow:detections", "api-core", message_id)
                 return True
             except SQLAlchemyError:

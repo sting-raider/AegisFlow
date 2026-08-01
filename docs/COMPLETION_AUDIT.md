@@ -16,7 +16,7 @@ marked complete only when implementation and proportionate verification both exi
 | Model bundles | V1 recovery compatibility; v2 complete checksums and artifact hashes; schema/order validation; atomic promotion/history; explicit rollback and visible previous-valid fallback | Complete |
 | Dataset tooling | Official-source catalog; hardened provenance downloader; CIC-IDS2017/CSE-CIC-IDS2018/UNSW-NB15/NFStream adapters; quality/leakage/overlap/drift reports; time/day/source/family/cross-dataset evaluation gate | Complete; no production-quality public-dataset scores are claimed until users supply reviewed files |
 | Risk fusion | Versioned configurable weights/thresholds and boundary tests | Complete |
-| Drift | Tested bounded mean-shift detector and database table/API | **Incomplete:** runtime monitoring of required signals, persisted drift events, metrics and candidate gating |
+| Drift | Bounded runtime monitoring of anomaly/confidence/flow-rate/three stable features/alert-rate; deterministic persisted events; API/dashboard; count/magnitude metrics; explicit no-action/no-retraining gates | Complete |
 | Analyst feedback | Immutable original result, eligibility gate, audit entry | Complete; retraining-candidate query/export remains |
 | Incidents | Deterministic source/time grouping | **Incomplete:** destination/signature/reason/stage/escalation grouping evidence and incident timeline/detail controls |
 | Explanation layer | Deterministic template and allow-list sanitizer | **Incomplete:** OpenAI-compatible/local providers, timeout/retry/rate limit/cache/fallback, API/UI and AI label |
@@ -26,7 +26,7 @@ marked complete only when implementation and proportionate verification both exi
 | Security | Threat model, bounded inputs, local ports, non-root/read-only containers, CI scans | **Incomplete:** HTTP/body/WebSocket limits, structured redacted logging and explicit queue backpressure counters |
 | Observability | Detection/alert/latency/WebSocket/database/model/queue metrics | **Incomplete:** remaining required sensor/signature/processing/drift counters and structured JSON service logs |
 | Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix, previous-valid model fallback | Complete |
-| Automated tests | 50 Python tests plus Vitest/Playwright, Redis/PostgreSQL recovery, migration, model-fallback and Compose fault injection | **Incomplete:** expanded property, UI and performance coverage remains |
+| Automated tests | 53 Python tests plus Vitest/Playwright, Redis/PostgreSQL recovery, migration, model-fallback and Compose fault injection | **Incomplete:** expanded property, UI and performance coverage remains |
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
 | CI/CD | Python/frontend/Compose/integration/migration/audit/Trivy/gitleaks jobs | Complete; final remote run must be verified after publication |
 | Documentation | Required topic files and screenshots exist | **Incomplete:** refresh after remaining implementation and remove outdated completion claims |
