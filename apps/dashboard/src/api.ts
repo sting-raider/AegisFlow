@@ -21,8 +21,18 @@ export const api = {
   alerts: (query = "") => get<Page<Alert>>(`/api/v1/alerts${query}`),
   alert: (id: string) => get<Alert>(`/api/v1/alerts/${id}`),
   incidents: () => get<Page<Incident>>("/api/v1/incidents"),
+  incident: (id: string) => get<Incident>(`/api/v1/incidents/${id}`),
   incidentExplanation: (id: string) =>
     get<IncidentExplanation>(`/api/v1/incidents/${id}/explanation`),
+  setIncidentStatus: async (id: string, status: string) => {
+    const response = await fetch(`${API}/api/v1/incidents/${id}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) throw new Error("Incident status could not be updated");
+    return response.json() as Promise<{ id: string; status: string }>;
+  },
   flows: () => get<Page<Flow>>("/api/v1/flows"),
   hosts: () => get<Page<Host>>("/api/v1/hosts"),
   models: () => get<Page<ModelVersion>>("/api/v1/models"),

@@ -14,8 +14,8 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 63 tests pass, Ruff passes across the repository, and strict MyPy passes
-  across 46 source files. The last full measured
+- Python: 77 tests pass, Ruff passes across the repository, and strict MyPy passes
+  across 47 source files. The last full measured
   coverage baseline before bundle v2 was 82%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
@@ -42,6 +42,8 @@ Last updated: 2026-08-01.
   because the Trivy action tag omitted the required `v` prefix. CI now pins the verified
   `aquasecurity/trivy-action@v0.36.0` release. Replacement run `30697502689` and the
   NFStream/Suricata milestone run `30698780511` completed successfully.
+- Optional-explanation milestone run `30700581424` passed Python, dashboard, security,
+  Compose/live-container, and end-to-end integration jobs on public `main`.
 - NFStream 6.6.0 processes the bundled PCAP into two canonical flows inside a Linux
   container with networking disabled and all capabilities dropped. The dedicated live
   stage runs as UID 10001 and, with only `NET_RAW`, captured one repeated loopback-only
@@ -71,6 +73,14 @@ Last updated: 2026-08-01.
   fallback; dashboard text is labelled AI-generated or deterministic and cannot affect
   detection or authorize action. Provider protocol, retry, rate, cache, failure,
   privacy, API, repository, and UI behavior are covered in the green full suites.
+- Incident correlation now requires ten-minute proximity plus at least one explainable
+  affinity: same source, shared destination, common signature, common reason, a specific
+  mapped attack stage, or repeated risk/severity escalation. Generic unknown/review
+  stages and time alone cannot merge incidents. Detail responses derive source and
+  destination sets, signatures, reasons, stages, escalation count, acknowledgement
+  summary, alerts, and chronological timeline from durable source records. The dashboard
+  exposes that evidence and status controls. Pure-rule tests cover every required rule,
+  and repository/API/UI tests cover the integrated timeline.
 
 ## Hard blockers and fallbacks
 

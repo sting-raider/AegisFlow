@@ -8,3 +8,9 @@ Cascadia Mono data.
 Views cover overview, live alerts/evidence/feedback, incidents, flow filtering, hosts,
 models/drift, and system health. Demo data is always disclosed. Loading, empty, error,
 keyboard focus, responsive layout, and reduced motion are explicit states.
+
+Incident cards open a detail drawer backed by the incident detail API. It shows alert
+count, acknowledgement count, maximum risk, escalation count, explainable grouping
+reasons, mapped attack stages, endpoint route, chronological risk timeline, analyst
+status controls, and the separately fetched advisory explanation. AI and deterministic
+fallback text are labelled distinctly.

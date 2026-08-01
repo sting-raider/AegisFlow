@@ -24,7 +24,14 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 from packages.contracts import AnalystFeedback, DetectionResult, FlowEvent, SignatureEvent, Verdict
-from packages.incidents import DriftEvent
+from packages.incidents import (
+    AlertGroupingContext,
+    DriftEvent,
+    IncidentGroupingContext,
+    attack_stage,
+    grouping_reasons,
+    should_group,
+)
 
 
 class Base(DeclarativeBase):
@@ -257,23 +264,54 @@ class Repository:
                     risk=detection.final_risk_score,
                 )
             )
-            self._group_incident(session, alert_id, flow, detection)
+            self._group_incident(session, alert_id, flow, detection, signature)
             return alert_id
 
-    @staticmethod
     def _group_incident(
-        session: Session, alert_id: str, flow: FlowEvent, detection: DetectionResult
+        self,
+        session: Session,
+        alert_id: str,
+        flow: FlowEvent,
+        detection: DetectionResult,
+        signature: SignatureEvent | None,
     ) -> None:
         cutoff = detection.timestamp - timedelta(minutes=10)
-        incident = session.scalar(
+        candidates = session.scalars(
             select(IncidentRow)
             .where(
-                IncidentRow.source_host == str(flow.src_ip),
                 IncidentRow.status.in_(["open", "investigating"]),
                 IncidentRow.updated_at >= cutoff,
             )
             .order_by(IncidentRow.updated_at.desc())
+        ).all()
+        new_signature_ids = frozenset({signature.signature_id}) if signature else frozenset()
+        new_stage = attack_stage(
+            frozenset(detection.reason_codes),
+            signature_name=signature.signature_name if signature else "",
+            signature_category=signature.category if signature else "",
+            verdict=detection.verdict.value,
         )
+        new_context = AlertGroupingContext(
+            source_host=str(flow.src_ip),
+            destination_host=str(flow.dst_ip),
+            signature_ids=new_signature_ids,
+            reason_codes=frozenset(detection.reason_codes),
+            attack_stage=new_stage,
+            severity=detection.severity.value,
+            risk=detection.final_risk_score,
+        )
+        incident: IncidentRow | None = None
+        selected_reasons: tuple[str, ...] = ()
+        selected_sources: frozenset[str] = frozenset()
+        for candidate in candidates:
+            existing = self._incident_grouping_context(session, candidate)
+            reasons = grouping_reasons(existing, new_context)
+            if not should_group(reasons):
+                continue
+            if incident is None or len(reasons) > len(selected_reasons):
+                incident = candidate
+                selected_reasons = reasons
+                selected_sources = existing.source_hosts
         if incident is None:
             session.add(
                 IncidentRow(
@@ -285,15 +323,76 @@ class Repository:
                     created_at=detection.timestamp,
                     updated_at=detection.timestamp,
                     alert_ids=[alert_id],
-                    grouping_reasons=["same source host", "ten-minute proximity"],
+                    grouping_reasons=["initial alert"],
                 )
             )
         else:
             incident.alert_ids = [*incident.alert_ids, alert_id]
             incident.updated_at = detection.timestamp
+            incident.grouping_reasons = list(
+                dict.fromkeys([*incident.grouping_reasons, *selected_reasons])
+            )
+            if str(flow.src_ip) not in selected_sources:
+                incident.title = "Correlated network activity"
             severities = ["informational", "low", "medium", "high", "critical"]
             if severities.index(detection.severity.value) > severities.index(incident.severity):
                 incident.severity = detection.severity.value
+
+    @staticmethod
+    def _incident_grouping_context(
+        session: Session, incident: IncidentRow
+    ) -> IncidentGroupingContext:
+        rows = session.execute(
+            select(AlertRow, DetectionRow, FlowRow)
+            .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
+            .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
+            .where(AlertRow.id.in_(incident.alert_ids))
+            .order_by(AlertRow.created_at.asc())
+        ).all()
+        community_ids = {flow.community_flow_id for _, _, flow in rows}
+        signature_rows = (
+            session.scalars(
+                select(SignatureRow).where(SignatureRow.community_flow_id.in_(community_ids))
+            ).all()
+            if community_ids
+            else []
+        )
+        signatures_by_community: dict[str, list[SignatureRow]] = {}
+        for signature in signature_rows:
+            signatures_by_community.setdefault(signature.community_flow_id, []).append(signature)
+        stages: set[str] = set()
+        for _, detection, flow in rows:
+            related = signatures_by_community.get(flow.community_flow_id, [])
+            stages.add(
+                attack_stage(
+                    frozenset(
+                        reason
+                        for reason in detection.payload.get("reason_codes", [])
+                        if isinstance(reason, str)
+                    ),
+                    signature_name=" ".join(
+                        str(item.payload.get("signature_name", "")) for item in related
+                    ),
+                    signature_category=" ".join(
+                        str(item.payload.get("category", "")) for item in related
+                    ),
+                    verdict=detection.verdict,
+                )
+            )
+        return IncidentGroupingContext(
+            source_hosts=frozenset(flow.src_ip for _, _, flow in rows),
+            destination_hosts=frozenset(flow.dst_ip for _, _, flow in rows),
+            signature_ids=frozenset(item.signature_id for item in signature_rows),
+            reason_codes=frozenset(
+                reason
+                for _, detection, _ in rows
+                for reason in detection.payload.get("reason_codes", [])
+                if isinstance(reason, str)
+            ),
+            attack_stages=frozenset(stages),
+            severities=tuple(alert.severity for alert, _, _ in rows),
+            risks=tuple(alert.risk for alert, _, _ in rows),
+        )
 
     def alerts(
         self,
@@ -370,23 +469,110 @@ class Repository:
     def incidents(self) -> list[dict[str, Any]]:
         with self.session() as session:
             rows = session.scalars(select(IncidentRow).order_by(IncidentRow.updated_at.desc()))
-            return [
-                {
-                    "id": row.id,
-                    "title": row.title,
-                    "status": row.status,
-                    "severity": row.severity,
-                    "source_host": row.source_host,
-                    "created_at": row.created_at,
-                    "updated_at": row.updated_at,
-                    "alert_ids": row.alert_ids,
-                    "grouping_reasons": row.grouping_reasons,
-                }
-                for row in rows
-            ]
+            return [self._incident_dict(session, row, include_alerts=False) for row in rows]
 
     def incident(self, incident_id: str) -> dict[str, Any] | None:
-        return next((item for item in self.incidents() if item["id"] == incident_id), None)
+        with self.session() as session:
+            row = session.get(IncidentRow, incident_id)
+            return self._incident_dict(session, row, include_alerts=True) if row else None
+
+    def _incident_dict(
+        self, session: Session, incident: IncidentRow, *, include_alerts: bool
+    ) -> dict[str, Any]:
+        rows = session.execute(
+            select(AlertRow, DetectionRow, FlowRow)
+            .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
+            .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
+            .where(AlertRow.id.in_(incident.alert_ids))
+            .order_by(AlertRow.created_at.asc())
+        ).all()
+        community_ids = {flow.community_flow_id for _, _, flow in rows}
+        signature_rows = (
+            session.scalars(
+                select(SignatureRow).where(SignatureRow.community_flow_id.in_(community_ids))
+            ).all()
+            if community_ids
+            else []
+        )
+        signatures_by_community: dict[str, list[SignatureRow]] = {}
+        for signature in signature_rows:
+            signatures_by_community.setdefault(signature.community_flow_id, []).append(signature)
+        timeline: list[dict[str, Any]] = []
+        stages: set[str] = set()
+        reason_codes: set[str] = set()
+        for alert, detection, flow in rows:
+            reasons = {
+                reason
+                for reason in detection.payload.get("reason_codes", [])
+                if isinstance(reason, str)
+            }
+            reason_codes.update(reasons)
+            related = signatures_by_community.get(flow.community_flow_id, [])
+            stage = attack_stage(
+                frozenset(reasons),
+                signature_name=" ".join(
+                    str(item.payload.get("signature_name", "")) for item in related
+                ),
+                signature_category=" ".join(
+                    str(item.payload.get("category", "")) for item in related
+                ),
+                verdict=detection.verdict,
+            )
+            stages.add(stage)
+            timeline.append(
+                {
+                    "alert_id": alert.id,
+                    "timestamp": alert.created_at,
+                    "verdict": alert.verdict,
+                    "severity": alert.severity,
+                    "risk": alert.risk,
+                    "attack_stage": stage,
+                    "source_host": flow.src_ip,
+                    "destination_host": flow.dst_ip,
+                    "acknowledged": alert.acknowledged,
+                }
+            )
+        risks = [alert.risk for alert, _, _ in rows]
+        severity_ranks = [
+            ["informational", "low", "medium", "high", "critical"].index(alert.severity)
+            for alert, _, _ in rows
+        ]
+        escalation_count = sum(
+            1
+            for index in range(2, len(rows))
+            if risks[index - 2] < risks[index - 1] < risks[index]
+            or severity_ranks[index - 2] < severity_ranks[index - 1] < severity_ranks[index]
+        )
+        result: dict[str, Any] = {
+            "id": incident.id,
+            "title": incident.title,
+            "status": incident.status,
+            "severity": incident.severity,
+            "source_host": incident.source_host,
+            "source_hosts": sorted({flow.src_ip for _, _, flow in rows}),
+            "destination_hosts": sorted({flow.dst_ip for _, _, flow in rows}),
+            "created_at": incident.created_at,
+            "updated_at": incident.updated_at,
+            "alert_ids": incident.alert_ids,
+            "alert_count": len(rows),
+            "acknowledged_alerts": sum(alert.acknowledged for alert, _, _ in rows),
+            "max_risk": max(risks, default=0.0),
+            "grouping_reasons": incident.grouping_reasons,
+            "reason_codes": sorted(reason_codes),
+            "signature_names": sorted(
+                {
+                    str(signature.payload["signature_name"])
+                    for signature in signature_rows
+                    if isinstance(signature.payload.get("signature_name"), str)
+                }
+            ),
+            "attack_stages": sorted(stages),
+            "escalation_count": escalation_count,
+            "timeline": timeline,
+        }
+        if include_alerts:
+            result["alerts"] = [self._alert_dict(*row) for row in rows]
+        return result
 
     def incident_explanation_context(self, incident_id: str) -> dict[str, Any] | None:
         """Build an endpoint-free, allow-list-ready incident evidence envelope."""

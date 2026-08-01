@@ -50,7 +50,30 @@ export interface Incident {
   created_at: string;
   updated_at: string;
   alert_ids: string[];
+  alert_count: number;
+  acknowledged_alerts: number;
+  max_risk: number;
   grouping_reasons: string[];
+  source_hosts: string[];
+  destination_hosts: string[];
+  reason_codes: string[];
+  signature_names: string[];
+  attack_stages: string[];
+  escalation_count: number;
+  timeline: IncidentTimelineEntry[];
+  alerts?: Alert[];
+}
+
+export interface IncidentTimelineEntry {
+  alert_id: string;
+  timestamp: string;
+  verdict: Verdict;
+  severity: Severity;
+  risk: number;
+  attack_stage: string;
+  source_host: string;
+  destination_host: string;
+  acknowledged: boolean;
 }
 
 export interface IncidentExplanation {

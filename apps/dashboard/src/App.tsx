@@ -268,12 +268,34 @@ function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
 
 function Incidents({ incidents }: { incidents: Incident[] }) {
   const [selected, setSelected] = useState<Incident | null>(null);
+  const [statusChoice, setStatusChoice] = useState("investigating");
+  const queryClient = useQueryClient();
+  const detail = useQuery({
+    queryKey: ["incident", selected?.id],
+    queryFn: () => api.incident(selected!.id),
+    enabled: selected !== null
+  });
   const explanation = useQuery({
     queryKey: ["incident-explanation", selected?.id],
     queryFn: () => api.incidentExplanation(selected!.id),
     enabled: selected !== null,
     retry: false
   });
+  const statusMutation = useMutation({
+    mutationFn: () => api.setIncidentStatus(selected!.id, statusChoice),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["incidents"] }),
+        queryClient.invalidateQueries({ queryKey: ["incident", selected?.id] }),
+        queryClient.invalidateQueries({ queryKey: ["incident-explanation", selected?.id] })
+      ]);
+    }
+  });
+  const current = detail.data ?? selected;
+  const open = (incident: Incident) => {
+    setSelected(incident);
+    setStatusChoice(incident.status === "open" ? "investigating" : incident.status);
+  };
   return <>
     <div className="card-grid">{incidents.map((incident) => (
       <article className="incident-card" key={incident.id}>
@@ -282,15 +304,46 @@ function Incidents({ incidents }: { incidents: Incident[] }) {
         <p>{incident.alert_ids.length} related alert{incident.alert_ids.length === 1 ? "" : "s"}</p>
         <ul>{incident.grouping_reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
         <small>Updated {new Date(incident.updated_at).toLocaleString()}</small>
-        <button className="primary incident-card__explain" onClick={() => setSelected(incident)}>
-          Explain incident
+        <button className="primary incident-card__explain" onClick={() => open(incident)}>
+          Open incident
         </button>
       </article>
     ))}</div>
-    {selected && <aside className="drawer" aria-label="Incident explanation">
-      <button className="drawer__close" onClick={() => setSelected(null)} aria-label="Close incident explanation">×</button>
-      <p className="eyebrow">Sanitized incident evidence</p>
-      <h2>{selected.title}</h2>
+    {selected && current && <aside className="drawer" aria-label="Incident detail">
+      <button className="drawer__close" onClick={() => setSelected(null)} aria-label="Close incident detail">×</button>
+      <p className="eyebrow">Correlated alert timeline</p>
+      <h2>{current.title}</h2>
+      <div className="signal-grid incident-summary">
+        <Metric label="Alerts" value={current.alert_count} note={`${current.acknowledged_alerts} acknowledged`} />
+        <Metric label="Max risk" value={current.max_risk.toFixed(0)} note={current.severity} />
+        <Metric label="Escalations" value={current.escalation_count} note="deterministic" />
+      </div>
+      <form className="incident-status" onSubmit={(event) => { event.preventDefault(); statusMutation.mutate(); }}>
+        <label>Incident status
+          <select value={statusChoice} onChange={(event) => setStatusChoice(event.target.value)}>
+            <option value="open">Open</option>
+            <option value="investigating">Investigating</option>
+            <option value="contained">Contained</option>
+            <option value="closed">Closed</option>
+          </select>
+        </label>
+        <button className="primary" disabled={statusMutation.isPending}>Update status</button>
+        {statusMutation.isSuccess && <span className="form-success">Incident status updated.</span>}
+        {statusMutation.isError && <span className="form-error">Status was not updated.</span>}
+      </form>
+      <h3>Correlation evidence</h3>
+      <div className="reason-list">
+        {current.grouping_reasons.map((reason) => <code key={reason}>{reason}</code>)}
+        {current.attack_stages.map((stage) => <code key={stage}>{stage.replaceAll("_", " ")}</code>)}
+      </div>
+      <h3>Timeline</h3>
+      <ol className="incident-timeline">{current.timeline.map((entry) => <li key={entry.alert_id}>
+        <span className={`incident-timeline__mark incident-timeline__mark--${entry.severity}`} />
+        <div><strong>{entry.attack_stage.replaceAll("_", " ")}</strong><small>{new Date(entry.timestamp).toLocaleString()}</small></div>
+        <div className="mono">{entry.source_host} → {entry.destination_host}</div>
+        <span className={`risk risk--${entry.severity}`}>{entry.risk.toFixed(0)}</span>
+      </li>)}</ol>
+      <h3>Advisory explanation</h3>
       {explanation.isLoading && <div className="state">Generating an advisory explanation…</div>}
       {explanation.isError && <div className="state state--error">The optional provider is unavailable.</div>}
       {explanation.data && <section className="explanation">

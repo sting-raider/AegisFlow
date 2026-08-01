@@ -34,10 +34,42 @@ vi.stubGlobal(
     disconnect() {}
   }
 );
+const incidentFixture = {
+  id: "11111111-1111-4111-8111-111111111111",
+  title: "Related authentication activity",
+  status: "open",
+  severity: "high",
+  source_host: "10.0.0.8",
+  source_hosts: ["10.0.0.8"],
+  destination_hosts: ["10.0.0.9"],
+  created_at: "2026-08-01T09:59:00Z",
+  updated_at: "2026-08-01T10:00:00Z",
+  alert_ids: ["alert-1"],
+  alert_count: 1,
+  acknowledged_alerts: 0,
+  max_risk: 82,
+  grouping_reasons: ["same source host", "time proximity"],
+  reason_codes: ["REPEATED_AUTH_FAILURE"],
+  signature_names: ["Repeated authentication pattern"],
+  attack_stages: ["credential_access"],
+  escalation_count: 0,
+  timeline: [{
+    alert_id: "alert-1",
+    timestamp: "2026-08-01T10:00:00Z",
+    verdict: "known_attack",
+    severity: "high",
+    risk: 82,
+    attack_stage: "credential_access",
+    source_host: "10.0.0.8",
+    destination_host: "10.0.0.9",
+    acknowledged: false
+  }]
+};
 vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   const isStatus = input.includes("/system/status");
   const isExplanation = input.includes("/explanation");
   const isIncidents = input.endsWith("/api/v1/incidents");
+  const isIncidentDetail = input.includes(`/api/v1/incidents/${incidentFixture.id}`);
   return {
     ok: true,
     json: async () => isStatus
@@ -64,19 +96,11 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
           }
         : isIncidents
           ? {
-              items: [{
-                id: "11111111-1111-4111-8111-111111111111",
-                title: "Related authentication activity",
-                status: "open",
-                severity: "high",
-                source_host: "10.0.0.8",
-                created_at: "2026-08-01T09:59:00Z",
-                updated_at: "2026-08-01T10:00:00Z",
-                alert_ids: ["alert-1"],
-                grouping_reasons: ["same source host"]
-              }],
+              items: [incidentFixture],
               count: 1
             }
+          : isIncidentDetail
+            ? incidentFixture
           : { items: [], count: 0 }
   };
 }));
@@ -92,7 +116,8 @@ test("renders the operations dashboard and demo disclosure", async () => {
 test("loads incident explanations on demand and labels AI-generated text", async () => {
   render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
   fireEvent.click(screen.getByRole("button", { name: /Incidents/ }));
-  fireEvent.click(await screen.findByRole("button", { name: "Explain incident" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Open incident" }));
+  expect(await screen.findAllByText("credential access")).toHaveLength(2);
   expect(await screen.findByText("ai generated")).toBeTruthy();
   expect(screen.getByText("AI advisory based on sanitized incident evidence.")).toBeTruthy();
   expect(screen.getByText("openai-compatible")).toBeTruthy();

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from ipaddress import ip_address
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -8,6 +9,7 @@ from uuid import uuid4
 from sqlalchemy import event
 
 from apps.api.database import Repository
+from packages.contracts import Severity, Verdict
 from packages.detection import DetectionEngine
 from packages.incidents import DriftEvent, RuntimeDriftMonitor
 from scripts.generate_demo_pcaps import generate
@@ -65,6 +67,72 @@ def test_parent_rows_flush_before_foreign_key_dependants(bundle, tmp_path: Path)
     assert inserts.index("sensors") < inserts.index("flows")
     assert inserts.index("flows") < inserts.index("detection_results")
     assert inserts.index("detection_results") < inserts.index("alerts")
+
+
+def test_incidents_group_on_explainable_rules_and_return_timeline(bundle, tmp_path: Path) -> None:
+    repository = Repository(f"sqlite:///{(tmp_path / 'incidents.db').as_posix()}")
+    repository.create_schema()
+    base_flow = next(iter(DemoAdapter().flows()))
+    base_detection = DetectionEngine(bundle).detect(base_flow)
+    started = datetime(2026, 8, 1, tzinfo=UTC)
+    scenarios = [
+        ("10.0.0.1", "10.0.0.100", "PORT_SWEEP", 20.0, Severity.LOW),
+        ("10.0.0.2", "10.0.0.100", "DESTINATION_FANOUT", 30.0, Severity.MEDIUM),
+        ("10.0.0.3", "10.0.0.101", "DESTINATION_FANOUT", 40.0, Severity.HIGH),
+        ("10.0.0.4", "10.0.0.102", "PORT_SWEEP", 50.0, Severity.HIGH),
+        ("10.0.0.5", "10.0.0.103", "UNRELATED_SIGNAL", 60.0, Severity.CRITICAL),
+    ]
+    for index, (source, destination, reason, risk, severity) in enumerate(scenarios):
+        flow = base_flow.model_copy(
+            update={
+                "event_id": uuid4(),
+                "timestamp_start": started + timedelta(seconds=index),
+                "timestamp_end": started + timedelta(seconds=index + 1),
+                "src_ip": ip_address(source),
+                "dst_ip": ip_address(destination),
+                "community_flow_id": f"incident-flow-{index}",
+            }
+        )
+        detection = base_detection.model_copy(
+            update={
+                "event_id": uuid4(),
+                "flow_event_id": flow.event_id,
+                "timestamp": flow.timestamp_end,
+                "verdict": Verdict.SUSPICIOUS_UNKNOWN,
+                "severity": severity,
+                "reason_codes": [reason],
+                "final_risk_score": risk,
+            }
+        )
+        repository.ingest(flow, detection)
+
+    incidents = repository.incidents()
+    assert len(incidents) == 1
+    summary = incidents[0]
+    assert summary["alert_count"] == 5
+    assert summary["title"] == "Correlated network activity"
+    assert {
+        "shared destination",
+        "common reason",
+        "similar attack stage (reconnaissance)",
+        "repeated escalation",
+        "time proximity",
+    } <= set(summary["grouping_reasons"])
+    assert summary["escalation_count"] >= 1
+    assert summary["attack_stages"] == ["reconnaissance", "unclassified_anomaly"]
+
+    detail = repository.incident(summary["id"])
+    assert detail is not None
+    assert len(detail["timeline"]) == 5
+    assert len(detail["alerts"]) == 5
+    assert detail["timeline"][0]["source_host"] == "10.0.0.1"
+    assert detail["timeline"][-1]["severity"] == "critical"
+    assert detail["destination_hosts"] == [
+        "10.0.0.100",
+        "10.0.0.101",
+        "10.0.0.102",
+        "10.0.0.103",
+    ]
 
 
 def test_record_model_refreshes_loaded_manifest(tmp_path: Path) -> None:

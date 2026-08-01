@@ -20,6 +20,12 @@ Clients reconnect with bounded delay. Safe CORS defaults allow only local dashbo
 origins. Production deployments must configure explicit origins and an API key or
 place the API behind organizational authentication.
 
+Incident list responses include derived alert counts, endpoint sets, reason/signature
+sets, attack stages, escalation count, maximum risk, acknowledgement summary, and a
+chronological timeline. `GET /api/v1/incidents/{incident_id}` additionally returns the
+full related alerts. `POST /api/v1/incidents/{incident_id}/status` accepts only `open`,
+`investigating`, `contained`, or `closed` and advances the incident version.
+
 Incident explanations are fetched on demand from
 `GET /api/v1/incidents/{incident_id}/explanation`. The response identifies the requested
 and actual provider, whether text is AI-generated, deterministic fallback, or cached,

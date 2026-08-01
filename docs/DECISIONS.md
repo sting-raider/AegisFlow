@@ -128,3 +128,17 @@ Provider output remains labelled advisory text and has no route into detection, 
 feedback eligibility, retraining, or promotion. Sending full alert/flow records, analyst
 comments, packet data, raw address history, or unencrypted/credential-bearing provider
 URLs was rejected.
+
+## D-014 — Derived, multi-signal deterministic incident correlation
+
+Keep incident membership storage compact (`alert_ids` plus accumulated grouping reasons)
+and derive rich summaries from durable alert, detection, flow, and signature rows. New
+alerts consider open/investigating incidents within ten minutes and must share at least
+one of: source, destination, signature, reason, a specific deterministic attack stage, or
+a repeated risk/severity escalation. Time alone and generic unknown/review stage labels
+are insufficient. When several incidents match, the one with the most explained matches
+wins; recency breaks ties through query ordering.
+
+This avoids a migration full of denormalized lists that could drift from the source
+records. A slightly higher read cost is accepted for honest, reconstructable incident
+detail and the small bounded operational/demo scope.
