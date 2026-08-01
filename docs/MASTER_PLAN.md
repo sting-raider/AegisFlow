@@ -15,3 +15,14 @@
 
 This phase table does not substitute for the authoritative requirement audit. The
 requirement-by-requirement evidence is recorded in `docs/COMPLETION_AUDIT.md`.
+
+## Production-readiness expansion
+
+| Phase | Deliverable | Status |
+|---|---|---|
+| P1 | Gap map and honest claim reset | Complete |
+| P2 | Direction semantics, Community ID, exact hybrid evaluation, calibration/fusion | In progress (direction and Community ID complete) |
+| P3 | Profiling, batching/scaling, resilience and deployment hardening | Not started |
+| P4 | Editorial intelligence design system and full dashboard transformation | Not started |
+| P5 | Authentication/RBAC, retraining governance and release readiness | Not started |
+| P6 | Real-data, performance, security, UI, deployment and public CI validation | Not started |

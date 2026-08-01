@@ -11,6 +11,7 @@ from packages.detection.suricata import (
     EveMetadataEvent,
     EveParseError,
     correlate_eve_event,
+    orient_flow_with_suricata,
     parse_eve_line,
 )
 from services.sensor import DemoAdapter
@@ -48,6 +49,12 @@ def test_suricata_alert_is_sanitized_normalized_and_deterministic() -> None:
     assert first.severity == Severity.HIGH
     assert "payload" not in first.metadata
     assert len(first.raw_event_hash) == 64
+    assert first.community_flow_id == "1:B4H0bMN0Rih3qr9C82AA7esBYLM="
+
+
+def test_invalid_explicit_community_id_fails_visibly() -> None:
+    with pytest.raises(EveParseError, match="incomplete"):
+        parse_eve_line(_alert(community_id="1:fixture"))
 
 
 def test_partial_eve_line_fails_visibly() -> None:
@@ -131,6 +138,58 @@ def test_correlation_prefers_flow_id_then_uses_tuple_and_time() -> None:
     )
     assert isinstance(fallback, SignatureEvent)
     assert correlate_eve_event(fallback, [flow]) == flow
+
+
+def test_suricata_toserver_metadata_corrects_reversed_sensor_direction() -> None:
+    original = next(iter(DemoAdapter().flows()))
+    reversed_flow = original.model_copy(
+        update={
+            "src_ip": original.dst_ip,
+            "src_port": original.dst_port,
+            "dst_ip": original.src_ip,
+            "dst_port": original.src_port,
+            "packets_forward": original.packets_reverse,
+            "packets_reverse": original.packets_forward,
+            "bytes_forward": original.bytes_reverse,
+            "bytes_reverse": original.bytes_forward,
+            "first_packet_directions": [
+                -direction for direction in original.first_packet_directions
+            ],
+        }
+    )
+    event = parse_eve_line(
+        json.dumps(
+            {
+                "timestamp": original.timestamp_end.isoformat(),
+                "event_type": "flow",
+                "community_id": original.community_flow_id,
+                "src_ip": str(original.src_ip),
+                "src_port": original.src_port,
+                "dest_ip": str(original.dst_ip),
+                "dest_port": original.dst_port,
+                "proto": original.protocol,
+                "flow": {
+                    "state": "closed",
+                    "pkts_toserver": original.packets_forward,
+                    "pkts_toclient": original.packets_reverse,
+                    "bytes_toserver": original.bytes_forward,
+                    "bytes_toclient": original.bytes_reverse,
+                },
+            }
+        )
+    )
+    assert isinstance(event, EveMetadataEvent)
+
+    corrected = orient_flow_with_suricata(reversed_flow, event)
+
+    assert corrected.src_ip == original.src_ip
+    assert corrected.src_port == original.src_port
+    assert corrected.dst_ip == original.dst_ip
+    assert corrected.dst_port == original.dst_port
+    assert corrected.packets_forward == original.packets_forward
+    assert corrected.bytes_reverse == original.bytes_reverse
+    assert corrected.first_packet_directions == original.first_packet_directions
+    assert corrected.protocol_metadata["direction_basis"] == "suricata_toserver_toclient"
 
 
 def test_unknown_eve_event_is_ignored() -> None:

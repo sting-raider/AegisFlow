@@ -9,6 +9,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, Literal, cast
 from uuid import NAMESPACE_URL, UUID, uuid5
 
+from packages.common import community_id_v1, is_community_id_v1
 from packages.contracts import FlowEvent, Severity, SignatureEvent
 
 MAX_EVE_LINE_BYTES = 1024 * 1024
@@ -95,19 +96,29 @@ def _common_metadata(event: dict[str, Any]) -> dict[str, str | int | float | boo
 
 
 def _flow_identifier(event: dict[str, Any]) -> str:
-    explicit = event.get("community_id") or event.get("flow_id")
-    if explicit is not None and str(explicit):
+    explicit = event.get("community_id")
+    if explicit is not None:
+        if not is_community_id_v1(explicit):
+            raise ValueError("event has an invalid Community ID v1 value")
         return str(explicit)
-    endpoints = (
-        event.get("src_ip"),
-        event.get("src_port"),
-        event.get("dest_ip"),
-        event.get("dest_port"),
-        event.get("proto"),
-    )
-    if any(value is None for value in endpoints):
-        raise ValueError("event has no flow identifier or complete endpoint tuple")
-    return "tuple:" + hashlib.sha256("|".join(map(str, endpoints)).encode()).hexdigest()[:32]
+    src_ip = event.get("src_ip")
+    src_port = event.get("src_port")
+    dst_ip = event.get("dest_ip")
+    dst_port = event.get("dest_port")
+    protocol = event.get("proto")
+    if all(value is not None for value in (src_ip, src_port, dst_ip, dst_port, protocol)):
+        return community_id_v1(
+            str(src_ip),
+            int(cast(Any, src_port)),
+            str(dst_ip),
+            int(cast(Any, dst_port)),
+            str(protocol),
+        )
+    native = event.get("flow_id")
+    if native is None or not str(native):
+        raise ValueError("event has no Community ID, native flow ID, or complete endpoint tuple")
+    native_hash = hashlib.sha256(str(native).encode()).hexdigest()[:32]
+    return f"suricata-flow:{native_hash}"
 
 
 def _event_metadata(event_type: str, event: dict[str, Any]) -> dict[str, str | int | float | bool]:
@@ -264,6 +275,63 @@ def correlate_eve_event(
             distance = abs((event.timestamp - flow.timestamp_start).total_seconds())
             matched.append((distance, flow))
     return min(matched, key=lambda item: item[0])[1] if matched else None
+
+
+def orient_flow_with_suricata(flow: FlowEvent, event: EveMetadataEvent) -> FlowEvent:
+    """Apply authoritative Suricata toserver/toclient direction to a correlated flow.
+
+    Community ID remains direction-independent. The semantic endpoints and directional
+    feature fields are changed only when a complete EVE flow record proves orientation.
+    """
+
+    if event.event_type != "flow":
+        return flow
+    counters = {
+        key: event.metadata.get(f"flow_{key}")
+        for key in (
+            "pkts_toserver",
+            "pkts_toclient",
+            "bytes_toserver",
+            "bytes_toclient",
+        )
+    }
+    if not all(
+        isinstance(value, int) and not isinstance(value, bool) for value in counters.values()
+    ):
+        return flow
+    if None in (event.src_ip, event.src_port, event.dst_ip, event.dst_port):
+        return flow
+    event_source = (str(event.src_ip), int(cast(int, event.src_port)))
+    event_destination = (str(event.dst_ip), int(cast(int, event.dst_port)))
+    flow_source = (str(flow.src_ip), flow.src_port)
+    flow_destination = (str(flow.dst_ip), flow.dst_port)
+    if {event_source, event_destination} != {flow_source, flow_destination}:
+        raise ValueError("correlated Suricata flow endpoints do not match the sensor flow")
+
+    metadata = {
+        **flow.protocol_metadata,
+        "direction_basis": "suricata_toserver_toclient",
+        "suricata_pkts_toserver": cast(int, counters["pkts_toserver"]),
+        "suricata_pkts_toclient": cast(int, counters["pkts_toclient"]),
+        "suricata_bytes_toserver": cast(int, counters["bytes_toserver"]),
+        "suricata_bytes_toclient": cast(int, counters["bytes_toclient"]),
+    }
+    if event_source == flow_source:
+        return flow.model_copy(update={"protocol_metadata": metadata})
+    return flow.model_copy(
+        update={
+            "src_ip": flow.dst_ip,
+            "src_port": flow.dst_port,
+            "dst_ip": flow.src_ip,
+            "dst_port": flow.src_port,
+            "packets_forward": flow.packets_reverse,
+            "packets_reverse": flow.packets_forward,
+            "bytes_forward": flow.bytes_reverse,
+            "bytes_reverse": flow.bytes_forward,
+            "first_packet_directions": [-direction for direction in flow.first_packet_directions],
+            "protocol_metadata": metadata,
+        }
+    )
 
 
 class EveDeduplicator:

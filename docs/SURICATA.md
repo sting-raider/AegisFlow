@@ -22,11 +22,22 @@ Correlation prefers the EVE/community flow ID, then a direction-independent endp
 tuple plus a three-second time tolerance. For multiple correlated alerts, the sensor
 attaches the strongest severity to the flow envelope.
 
+The replay profile explicitly enables EVE Community ID output. AegisFlow implements the
+standard v1 algorithm and validates explicit EVE IDs before accepting them. Complete
+correlated `flow` records reconcile sensor direction with Suricata's `toserver` and
+`toclient` semantics; incomplete metadata never silently changes feature direction.
+
 The bundled 252-byte PCAP and safe local rule were replayed through Suricata 8.0.6 with
 networking disabled and only `DAC_OVERRIDE`. Suricata read three packets and emitted one alert, one DNS event,
 and two flow events. AegisFlow parsed all four with zero errors and correlated the
 alert to one of two Scapy flows. The six-record EVE fixture covers every supported type
 when Docker or Suricata is unavailable.
+
+After enabling Community ID, the same isolated replay was repeated on 2026-08-01. Both
+Suricata IDs exactly matched the two Scapy IDs (`1:jE4vtNVWbRZ2HzNUKsNPnAv+6lA=` and
+`1:CFBBfkZix6msq+mVuEHEcTzVR/Q=`); the reader reported zero errors and reconciled both
+flows using `toserver`/`toclient` evidence. Published Corelight TCP, UDP, and IPv6 vectors
+are also locked into the unit suite.
 
 Rule snapshots must be reviewed and checksum-pinned. The updater accepts HTTPS only,
 limits downloads to 64 MiB, verifies a lowercase SHA-256 digest, confines writes to

@@ -32,5 +32,22 @@ marked complete only when implementation and proportionate verification both exi
 | Documentation | Required topic files, current desktop/mobile screenshots, README validation snapshot, measured limitations, demo and faculty sequence | Complete |
 | GitHub publication | Public `sting-raider/AegisFlow` repository and `main` default branch | Complete |
 
-All rows are complete as of 2026-08-01. Future changes must update this matrix and
-`docs/PROGRESS.md` together when they alter the verified scope.
+The matrix above records completion of the original offline-demonstration brief. A new
+production-readiness expansion was accepted on 2026-08-01 and supersedes the old stop
+condition. The repository must not be described as production-ready while any row below
+is incomplete.
+
+| Production-readiness expansion | Current evidence | Status / remaining work |
+|---|---|---|
+| Semantic flow direction | Unordered canonical identity is separate from initiator/responder semantics; Scapy uses SYN/service-port/first-packet evidence, NFStream preserves or safely corrects `src2dst`, and complete Suricata `toserver`/`toclient` evidence takes precedence; focused unit/integration tests cover reversed and mid-stream cases | **Complete** |
+| Community ID interoperability | Standard Community ID v1 implementation passes published Corelight TCP/UDP/IPv6 vectors; pinned Suricata 8.0.6 and Scapy emitted the exact same two IDs for the bundled PCAP; strict ID correlation precedes bounded tuple/time fallback | **Complete** |
+| Exact hybrid public-data evaluation | Dataset adapters/splits exist, but `evaluate_dataset` trains a simplified logistic substitute and no reviewed public-data report is committed | **Incomplete:** evaluate the deployed classifier, anomaly models, fusion, and four final verdicts on reviewed public data |
+| Open-set calibration | Runtime sets `anomaly_percentile` equal to a normalized score | **Incomplete:** persist calibration distributions and compute empirical percentiles |
+| Evidence-backed fusion | Interpretable fixed baseline and synthetic boundary tests exist | **Incomplete:** compare/configure baseline and calibrated alternatives using held-out evidence |
+| Performance and scaling | Bounded overload benchmark exposes drops and single-worker bottlenecks | **Incomplete:** profile components, batch safely, support multi-worker partitioning, and record larger replay evidence |
+| Enterprise access control | Optional shared mutation API key only; reads and WebSockets are unauthenticated | **Incomplete:** authenticated identities, admin/analyst/viewer RBAC, audit attribution, rate limits, and OIDC-ready boundary |
+| Production deployment | Hardened single-host Compose demo and operational notes exist | **Incomplete:** production topology/config, TLS proxy guidance, orchestration manifests, rollout/release evidence |
+| Editorial analyst experience | Functional seven-view dark operations UI exists | **Incomplete:** reusable editorial design system, cohesive view transformation, accessibility and rendered QA |
+| Retraining governance | Immutable feedback, reviewed candidate export, bundle promotion/rollback exist | **Incomplete:** champion/challenger review and explicitly authorized promotion workflow |
+
+This expansion audit and `docs/PROGRESS.md` must remain consistent as evidence lands.

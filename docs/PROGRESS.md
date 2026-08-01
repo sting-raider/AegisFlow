@@ -14,8 +14,8 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 93 tests pass, Ruff passes across the repository, strict MyPy passes across
-  51 source files, and the current measured backend coverage is 84%.
+- Python: 103 tests pass, Ruff passes across the repository, strict MyPy passes across
+  52 source files, and the last measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -121,14 +121,27 @@ Last updated: 2026-08-01.
 - Final hardening commit `fd25b15` is published on public `main`; GitHub Actions run
   `30703942894` passed Python/coverage/NFStream/training/migration, dashboard/audit,
   Compose/live-loopback, integration/Playwright, gitleaks, and Trivy jobs.
+- Flow identity is now independent from semantic direction. Scapy uses SYN, unambiguous
+  service-port, then first-packet evidence; NFStream preserves or safely corrects its
+  `src2dst` direction; complete correlated Suricata `toserver`/`toclient` flow records
+  take precedence. Destination port, packet/byte counters, and packet-direction samples
+  follow the resulting initiator/responder orientation.
+- AegisFlow now implements standard Community ID v1 and passes published Corelight TCP,
+  UDP, and IPv6 reference vectors. An isolated pinned Suricata 8.0.6 replay emitted the
+  same two IDs as the Scapy sensor for the bundled PCAP; direction reconciliation yielded
+  two oriented flows, one correlated signature, and zero EVE processing errors.
 
 ## Hard blockers and fallbacks
 
-- None. Windows cannot validate authorized live packet capture or native Suricata, so
-  isolated Linux-container and fixture/PCAP evidence is required for those paths.
+- Production-readiness is not yet proven. No reviewed public dataset is currently present,
+  and the existing public-data command evaluates a simplified logistic gate rather than
+  the exact deployed hybrid detector. Windows cannot validate authorized live capture, so
+  isolated Linux-container evidence remains required for that path.
 
 ## Highest-priority required backlog
 
-- None for the authoritative build brief. Operational use still requires reviewed
-  public datasets, environment-specific threshold validation, and an authorized Linux
-  deployment; those are documented limitations, not bundled demo requirements.
+- Replace the simplified public-data gate with exact deployed-hybrid evaluation and run it
+  on reviewed public data without committing large datasets.
+- Add empirical anomaly percentiles, evidence-backed configurable fusion, profiling,
+  batching/worker scaling, enterprise auth/RBAC, production deployment assets, governed
+  champion/challenger promotion, and the editorial dashboard transformation.

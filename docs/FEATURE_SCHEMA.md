@@ -13,3 +13,11 @@ remain explainable.
 All missing required values reject the event. Infinity and out-of-range values reject
 the vector. The scaler is fitted once on the training fold and serialized; the sensor
 never fits preprocessing.
+
+Flow identity and feature direction are intentionally separate. `community_flow_id` is
+the unordered standard Community ID v1 correlation key. `src`/`dst`, forward/reverse
+counters, first-packet directions, and `destination_port` follow the best available
+initiator/responder evidence: TCP SYN without ACK, an unambiguous ephemeral-client to
+well-known-service pair, NFStream first-packet semantics, or complete correlated
+Suricata `toserver`/`toclient` metadata. The selected basis is recorded in
+`protocol_metadata.direction_basis`.

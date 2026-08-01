@@ -145,6 +145,12 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
 ## Known limitations
 
 - The bundled model is synthetic smoke data, not a production model.
+- The current public-data command is an evaluation gate for a simplified logistic model,
+  not yet the exact deployed hybrid pipeline; no reviewed real-dataset result is bundled.
+- API access control currently uses an optional shared key for mutations and does not yet
+  provide authenticated user identities, RBAC, SSO/OIDC, or tenant isolation.
+- Runtime detection is single-message/single-worker by default; the measured overload
+  benchmark intentionally records drops and is not a production capacity claim.
 - The Scapy PCAP adapter is deterministic but deliberately compact. NFStream 6.6.0 is
   validated for PCAP and explicit Linux live interfaces; its Windows native engine is
   unavailable, so Windows falls back to Scapy replay.
@@ -156,6 +162,10 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
   acknowledgement, bounded retries, and idempotent event IDs. The Compose fault matrix is
   documented in `docs/PROGRESS.md`.
 - No active response or automatic blocking is implemented.
+
+The active production-readiness expansion and unresolved evidence requirements are
+tracked in [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md). The completed offline
+demo should not be described as enterprise production-ready until that matrix closes.
 
 ## Upstream and license
 

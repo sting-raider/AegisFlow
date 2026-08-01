@@ -172,3 +172,29 @@ into a dead-letter stream was rejected because attacker-controlled fields could 
 payloads or secrets into durable infrastructure. All service events use a fixed JSON
 shape and redact addresses, credential patterns, and control characters. Operational
 debug convenience does not outweigh the no-payload/no-secret invariants.
+
+## D-017 — Reopen completion for evidence-based production readiness
+
+Treat the green offline demonstration as a verified baseline, not as evidence of
+enterprise production readiness. The expansion audit explicitly reopens semantic flow
+direction, standard Community ID, exact-hybrid public-data evaluation, empirical anomaly
+calibration, evidence-backed fusion, throughput/scaling, identity/RBAC, production
+deployment, retraining governance, and the editorial UI. Preserving the old all-complete
+claim was rejected because it would conflate a reproducible demo with an evaluated
+organizational deployment.
+
+## D-018 — Separate unordered identity from semantic traffic direction
+
+Use standard [Community ID v1](https://github.com/corelight/community-id-spec) as the
+direction-independent correlation key, while retaining initiator/responder endpoints as
+separate flow semantics. Scapy chooses a TCP SYN without ACK first, then an unambiguous
+ephemeral-client/well-known-service pair, then the first observed packet. NFStream keeps
+its first-packet `src2dst` semantics unless the same unambiguous port evidence corrects a
+mid-stream capture. A correlated Suricata flow record is authoritative when complete
+`toserver`/`toclient` counters and matching endpoints are present.
+
+Sorting endpoints and then treating the result as forward direction was rejected because
+it silently changes destination-port and directional features. Treating Suricata's native
+numeric `flow_id` as Community ID was also rejected; when no complete tuple exists it is
+retained only as a namespaced, hashed Suricata-local identity. The standard SHA-1 digest
+is used solely for protocol interoperability, never for a security decision.

@@ -10,6 +10,8 @@ services:
       - /var/log/suricata
       - -S
       - /etc/suricata/rules/aegisflow-demo.rules
+      - --set
+      - outputs.1.eve-log.community-id=true
     volumes:
       - ${SURICATA_PCAP:?set SURICATA_PCAP explicitly}:/captures/input.pcap:ro
       - ./configs/suricata/rules/aegisflow-demo.rules:/etc/suricata/rules/aegisflow-demo.rules:ro

@@ -17,9 +17,7 @@ from scripts.generate_demo_pcaps import generate
 from services.sensor import DemoAdapter, PcapAdapter
 
 
-def test_demo_detection_persistence_and_idempotency(
-    bundle: ModelBundle, tmp_path: Path
-) -> None:
+def test_demo_detection_persistence_and_idempotency(bundle: ModelBundle, tmp_path: Path) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'pipeline.db').as_posix()}")
     repository.create_schema()
     engine = DetectionEngine(bundle)
@@ -164,9 +162,51 @@ def test_synthetic_pcap_replay_is_deterministic(tmp_path: Path) -> None:
     assert all(flow.capture_mode.value == "pcap" for flow in first)
 
 
-def test_retention_cleanup_removes_expired_flow(
-    bundle: ModelBundle, tmp_path: Path
-) -> None:
+def test_pcap_identity_does_not_reverse_initiator_features(tmp_path: Path) -> None:
+    from scapy.all import IP, TCP, Ether, wrpcap
+
+    path = tmp_path / "direction.pcap"
+    request = (
+        Ether() / IP(src="203.0.113.9", dst="10.0.0.5") / TCP(sport=55_000, dport=443, flags="S")
+    )
+    response = (
+        Ether() / IP(src="10.0.0.5", dst="203.0.113.9") / TCP(sport=443, dport=55_000, flags="SA")
+    )
+    request.time = 1_700_000_000.0
+    response.time = 1_700_000_000.01
+    wrpcap(str(path), [request, response])
+
+    flow = next(iter(PcapAdapter(path).flows()))
+    assert str(flow.src_ip) == "203.0.113.9"
+    assert flow.src_port == 55_000
+    assert str(flow.dst_ip) == "10.0.0.5"
+    assert flow.dst_port == 443
+    assert flow.packets_forward == flow.packets_reverse == 1
+    assert flow.first_packet_directions == [1, -1]
+    assert flow.protocol_metadata["direction_basis"] == "tcp_syn_without_ack"
+
+
+def test_pcap_midstream_service_response_uses_port_direction_evidence(tmp_path: Path) -> None:
+    from scapy.all import IP, UDP, Ether, wrpcap
+
+    path = tmp_path / "midstream-direction.pcap"
+    response = Ether() / IP(src="10.0.0.53", dst="203.0.113.9") / UDP(sport=53, dport=55_000)
+    request = Ether() / IP(src="203.0.113.9", dst="10.0.0.53") / UDP(sport=55_000, dport=53)
+    response.time = 1_700_000_000.0
+    request.time = 1_700_000_000.01
+    wrpcap(str(path), [response, request])
+
+    flow = next(iter(PcapAdapter(path).flows()))
+
+    assert str(flow.src_ip) == "203.0.113.9"
+    assert flow.src_port == 55_000
+    assert str(flow.dst_ip) == "10.0.0.53"
+    assert flow.dst_port == 53
+    assert flow.first_packet_directions == [-1, 1]
+    assert flow.protocol_metadata["direction_basis"] == ("well_known_service_ephemeral_client")
+
+
+def test_retention_cleanup_removes_expired_flow(bundle: ModelBundle, tmp_path: Path) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'retention.db').as_posix()}")
     repository.create_schema()
     flow, detection = next(
@@ -209,9 +249,7 @@ def test_runtime_drift_events_are_persisted_idempotently(
     events: list[DriftEvent] = []
     for index in range(16):
         shifted = index >= 8
-        flow = base_flow.model_copy(
-            update={"duration_ms": 80_000_000.0 if shifted else 100.0}
-        )
+        flow = base_flow.model_copy(update={"duration_ms": 80_000_000.0 if shifted else 100.0})
         detection = base_detection.model_copy(
             update={
                 "event_id": uuid4(),

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import platform
 from abc import ABC, abstractmethod
 from collections import defaultdict
@@ -13,17 +12,20 @@ from statistics import fmean, pstdev
 from typing import Any
 from uuid import NAMESPACE_URL, uuid5
 
+from packages.common import canonical_flow_key, community_id_v1
+from packages.common.community_id import FlowKey
 from packages.contracts import CaptureMode, FlowEvent
+
+Endpoint = tuple[str, int]
+PacketObservation = tuple[float, int, Endpoint, Endpoint, Any]
+WELL_KNOWN_PORT_MAX = 1_023
+EPHEMERAL_PORT_MIN = 49_152
 
 
 class SensorAdapter(ABC):
     @abstractmethod
     def flows(self) -> Iterable[FlowEvent]:
         """Yield completed, validated flows."""
-
-
-def _community_id(parts: tuple[object, ...]) -> str:
-    return "1:" + hashlib.sha256("|".join(map(str, parts)).encode()).hexdigest()[:32]
 
 
 def _demo_flow(
@@ -80,7 +82,13 @@ def _demo_flow(
         first_packet_sizes=[64, 72, min(int(mean_size), 1500)],
         first_packet_directions=[1, -1, 1],
         first_packet_interarrival_times=[0.0, 3.2, 8.7],
-        community_flow_id=_community_id((name, offset, dst_port)),
+        community_flow_id=community_id_v1(
+            "10.20.0.15",
+            50_000 + offset,
+            f"198.51.100.{10 + offset}",
+            dst_port,
+            "TCP",
+        ),
         source_adapter="synthetic-v1",
         protocol_metadata={"scenario": name, **(metadata or {})},
     )
@@ -172,7 +180,7 @@ class PcapAdapter(SensorAdapter):
     def flows(self) -> Iterable[FlowEvent]:
         from scapy.all import IP, TCP, UDP, IPv6, PcapReader
 
-        buckets: dict[tuple[Any, ...], list[tuple[float, int, int, Any]]] = defaultdict(list)
+        buckets: dict[FlowKey, list[PacketObservation]] = defaultdict(list)
         with PcapReader(str(self.path)) as reader:
             for index, packet in enumerate(reader):
                 if index >= 2_000_000:
@@ -183,22 +191,26 @@ class PcapAdapter(SensorAdapter):
                     continue
                 a = (str(network.src), int(transport.sport))
                 b = (str(network.dst), int(transport.dport))
-                endpoints = tuple(sorted((a, b)))
                 protocol = "TCP" if packet.haslayer(TCP) else "UDP"
-                key = (*endpoints[0], *endpoints[1], protocol)
-                direction = 1 if a == endpoints[0] else -1
-                buckets[key].append((float(packet.time), len(packet), direction, packet))
+                key = canonical_flow_key(*a, *b, protocol)
+                buckets[key].append((float(packet.time), len(packet), a, b, packet))
         for key, packets in buckets.items():
             yield self._convert(key, packets)
 
-    def _convert(
-        self, key: tuple[Any, ...], packets: list[tuple[float, int, int, Any]]
-    ) -> FlowEvent:
+    def _convert(self, key: FlowKey, packets: list[PacketObservation]) -> FlowEvent:
         packets.sort(key=lambda item: item[0])
-        src_ip, src_port, dst_ip, dst_port, protocol = key
+        canonical_source = (key[0], key[1])
+        canonical_destination = (key[2], key[3])
+        protocol_number_value = key[4]
+        protocol = {6: "TCP", 17: "UDP"}.get(protocol_number_value, str(protocol_number_value))
+        semantic_source, semantic_destination, direction_basis = _packet_direction(
+            protocol, packets, canonical_source, canonical_destination
+        )
+        src_ip, src_port = semantic_source
+        dst_ip, dst_port = semantic_destination
         times = [item[0] for item in packets]
         sizes = [item[1] for item in packets]
-        directions = [item[2] for item in packets]
+        directions = [1 if item[2] == semantic_source else -1 for item in packets]
         iats = [max((b - a) * 1000, 0.0) for a, b in pairwise(times)]
         forward = [
             size for size, direction in zip(sizes, directions, strict=True) if direction == 1
@@ -208,13 +220,17 @@ class PcapAdapter(SensorAdapter):
         ]
         tcp_flags = {"S": 0, "A": 0, "F": 0, "R": 0, "P": 0}
         if protocol == "TCP":
-            for _, _, _, packet in packets:
+            for _, _, _, _, packet in packets:
                 flags = str(packet["TCP"].flags)
                 for flag in tcp_flags:
                     tcp_flags[flag] += int(flag in flags)
         duration_ms = max((times[-1] - times[0]) * 1000, 0.001)
         endpoint_version = ip_address(src_ip).version
         return FlowEvent(
+            event_id=uuid5(
+                NAMESPACE_URL,
+                f"aegisflow-pcap:{times[0]:.9f}:{key}",
+            ),
             sensor_id=self.sensor_id,
             capture_mode=CaptureMode.PCAP,
             timestamp_start=datetime.fromtimestamp(times[0], UTC),
@@ -249,9 +265,45 @@ class PcapAdapter(SensorAdapter):
             first_packet_sizes=sizes[:20],
             first_packet_directions=directions[:20],
             first_packet_interarrival_times=[0.0, *iats[:19]],
-            community_flow_id=_community_id(key),
-            source_adapter="scapy-flow-v1",
+            community_flow_id=community_id_v1(
+                src_ip, src_port, dst_ip, dst_port, protocol_number_value
+            ),
+            source_adapter="scapy-flow-v2",
+            protocol_metadata={"direction_basis": direction_basis},
         )
+
+
+def _packet_direction(
+    protocol: str,
+    packets: list[PacketObservation],
+    canonical_source: Endpoint,
+    canonical_destination: Endpoint,
+) -> tuple[Endpoint, Endpoint, str]:
+    if protocol == "TCP":
+        for _timestamp, _size, source, destination, packet in packets:
+            flags = int(packet["TCP"].flags)
+            if flags & 0x02 and not flags & 0x10:
+                return source, destination, "tcp_syn_without_ack"
+    service_direction = _well_known_service_direction(canonical_source, canonical_destination)
+    if service_direction is not None:
+        return *service_direction, "well_known_service_ephemeral_client"
+    first_source = packets[0][2]
+    first_destination = packets[0][3]
+    if first_source in {canonical_source, canonical_destination}:
+        return first_source, first_destination, "first_packet"
+    raise ValueError("packet endpoints do not match their canonical flow identity")
+
+
+def _well_known_service_direction(
+    first: Endpoint, second: Endpoint
+) -> tuple[Endpoint, Endpoint] | None:
+    first_is_client = first[1] >= EPHEMERAL_PORT_MIN and second[1] <= WELL_KNOWN_PORT_MAX
+    second_is_client = second[1] >= EPHEMERAL_PORT_MIN and first[1] <= WELL_KNOWN_PORT_MAX
+    if first_is_client:
+        return first, second
+    if second_is_client:
+        return second, first
+    return None
 
 
 def _nf_value(flow: Any, name: str, default: Any = 0) -> Any:
@@ -262,62 +314,62 @@ def _nf_value(flow: Any, name: str, default: Any = 0) -> Any:
 def _convert_nfstream_flow(flow: Any, capture_mode: CaptureMode, sensor_id: str) -> FlowEvent:
     original_source = (str(flow.src_ip), int(flow.src_port))
     original_destination = (str(flow.dst_ip), int(flow.dst_port))
-    source, destination = sorted((original_source, original_destination))
-    source_is_src2dst = source == original_source
-    if source_is_src2dst:
-        packets_forward = int(_nf_value(flow, "src2dst_packets"))
-        packets_reverse = int(_nf_value(flow, "dst2src_packets"))
-        bytes_forward = int(_nf_value(flow, "src2dst_bytes"))
-        bytes_reverse = int(_nf_value(flow, "dst2src_bytes"))
-    else:
-        packets_forward = int(_nf_value(flow, "dst2src_packets"))
-        packets_reverse = int(_nf_value(flow, "src2dst_packets"))
-        bytes_forward = int(_nf_value(flow, "dst2src_bytes"))
-        bytes_reverse = int(_nf_value(flow, "src2dst_bytes"))
+    packets_forward = int(_nf_value(flow, "src2dst_packets"))
+    packets_reverse = int(_nf_value(flow, "dst2src_packets"))
+    bytes_forward = int(_nf_value(flow, "src2dst_bytes"))
+    bytes_reverse = int(_nf_value(flow, "dst2src_bytes"))
 
     duration_ms = max(float(_nf_value(flow, "bidirectional_duration_ms", 0.001)), 0.001)
     packets = max(int(_nf_value(flow, "bidirectional_packets")), 1)
     total_bytes = max(int(_nf_value(flow, "bidirectional_bytes")), 0)
     first_seen_ms = int(_nf_value(flow, "bidirectional_first_seen_ms"))
     last_seen_ms = max(int(_nf_value(flow, "bidirectional_last_seen_ms")), first_seen_ms)
-    protocol_number = int(_nf_value(flow, "protocol"))
+    protocol_number_value = int(_nf_value(flow, "protocol"))
     protocol = {6: "TCP", 17: "UDP", 1: "ICMP", 58: "ICMPV6"}.get(
-        protocol_number, str(protocol_number)
+        protocol_number_value, str(protocol_number_value)
     )
     splt_length = min(packets, 20)
     raw_sizes = list(_nf_value(flow, "splt_ps", []))[:splt_length]
     raw_directions = list(_nf_value(flow, "splt_direction", []))[:splt_length]
     raw_iats = list(_nf_value(flow, "splt_piat_ms", []))[:splt_length]
     sizes = [max(int(value), 0) for value in raw_sizes]
-    directions = [
-        (1 if int(value) == 0 else -1) * (1 if source_is_src2dst else -1)
-        for value in raw_directions
-    ]
+    directions = [1 if int(value) == 0 else -1 for value in raw_directions]
     iats = [max(float(value), 0.0) for value in raw_iats]
     application = str(_nf_value(flow, "application_name", "")).strip() or None
+    semantic_source = original_source
+    semantic_destination = original_destination
+    direction_basis = "nfstream_first_packet_src2dst"
+    service_direction = _well_known_service_direction(original_source, original_destination)
+    if service_direction is not None and service_direction[0] != original_source:
+        semantic_source, semantic_destination = service_direction
+        packets_forward, packets_reverse = packets_reverse, packets_forward
+        bytes_forward, bytes_reverse = bytes_reverse, bytes_forward
+        directions = [-direction for direction in directions]
+        direction_basis = "well_known_service_ephemeral_client"
     metadata: dict[str, str | int | float | bool] = {
         "nfstream_expiration_id": int(_nf_value(flow, "expiration_id")),
         "application_is_guessed": bool(_nf_value(flow, "application_is_guessed", False)),
         "application_confidence": float(_nf_value(flow, "application_confidence", 0.0)),
+        "direction_basis": direction_basis,
     }
     category = str(_nf_value(flow, "application_category_name", "")).strip()
     if category:
         metadata["application_category"] = category[:128]
-    key = (*source, *destination, protocol)
+    identity = canonical_flow_key(*original_source, *original_destination, protocol_number_value)
     return FlowEvent(
         event_id=uuid5(
             NAMESPACE_URL,
-            f"aegisflow-nfstream:{capture_mode.value}:{sensor_id}:{first_seen_ms}:{key}",
+            f"aegisflow-nfstream:{capture_mode.value}:{sensor_id}:{first_seen_ms}:{identity}",
         ),
         sensor_id=sensor_id,
         capture_mode=capture_mode,
         timestamp_start=datetime.fromtimestamp(first_seen_ms / 1000, UTC),
         timestamp_end=datetime.fromtimestamp(last_seen_ms / 1000, UTC),
         duration_ms=duration_ms,
-        src_ip=ip_address(source[0]),
-        dst_ip=ip_address(destination[0]),
-        src_port=source[1],
-        dst_port=destination[1],
+        src_ip=ip_address(semantic_source[0]),
+        dst_ip=ip_address(semantic_destination[0]),
+        src_port=semantic_source[1],
+        dst_port=semantic_destination[1],
         ip_version=int(_nf_value(flow, "ip_version")),
         protocol=protocol,
         application_protocol=application[:64] if application else None,
@@ -344,7 +396,11 @@ def _convert_nfstream_flow(flow: Any, capture_mode: CaptureMode, sensor_id: str)
         first_packet_sizes=sizes,
         first_packet_directions=directions,
         first_packet_interarrival_times=iats,
-        community_flow_id=_community_id(key),
+        community_flow_id=community_id_v1(
+            *original_source,
+            *original_destination,
+            protocol_number_value,
+        ),
         source_adapter="nfstream-6.6.0",
         protocol_metadata=metadata,
     )

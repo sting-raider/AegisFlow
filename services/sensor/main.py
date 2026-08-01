@@ -11,7 +11,13 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from packages.common import log_event, service_logger
 from packages.common.bus import RedisStreamBus
 from packages.contracts import FlowEvent, Severity, SignatureEvent
-from packages.detection.suricata import EveJsonReader, EveReadBatch, correlate_eve_event
+from packages.detection.suricata import (
+    EveJsonReader,
+    EveMetadataEvent,
+    EveReadBatch,
+    correlate_eve_event,
+    orient_flow_with_suricata,
+)
 from services.sensor.adapters import (
     DemoAdapter,
     LiveAdapter,
@@ -54,6 +60,22 @@ def correlate_signatures(flows: list[FlowEvent], batch: EveReadBatch) -> dict[UU
         if previous is None or severity_order[event.severity] > severity_order[previous.severity]:
             correlated[flow.event_id] = event
     return correlated
+
+
+def apply_suricata_direction(flows: list[FlowEvent], batch: EveReadBatch) -> list[FlowEvent]:
+    """Reconcile sensor semantics with complete correlated Suricata flow records."""
+
+    oriented = list(flows)
+    positions = {flow.event_id: index for index, flow in enumerate(oriented)}
+    for event in batch.events:
+        if not isinstance(event, EveMetadataEvent) or event.event_type != "flow":
+            continue
+        flow = correlate_eve_event(event, oriented)
+        if flow is None:
+            continue
+        index = positions[flow.event_id]
+        oriented[index] = orient_flow_with_suricata(flow, event)
+    return oriented
 
 
 def run() -> None:
@@ -100,6 +122,7 @@ def run() -> None:
                 level="error",
                 error_code=error.error,
             )
+        buffered_flows = apply_suricata_direction(buffered_flows, batch)
         correlated = correlate_signatures(buffered_flows, batch)
         log_event(LOGGER, "suricata_eve_summary")
         flow_source = buffered_flows
