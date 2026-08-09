@@ -117,6 +117,14 @@ Last updated: 2026-08-10.
   QA exercised desktop and mobile layouts with no page overflow or console errors, and
   four component tests cover core analyst interactions. Missing backend telemetry stays
   visibly `not reported` rather than being fabricated.
+- The seven dashboard views now share a light-first editorial intelligence system with
+  functional navigation labels, an asymmetric overview lead, serif/sans/mono type roles,
+  mineral paper and restrained evidence accents, a single live-signal ribbon, automatic
+  dark mode, and responsive desktop/mobile layouts. Chromium acceptance now has two
+  scenarios: the complete analyst path plus zero Axe violations across all seven views
+  and the evidence dialog. It also verifies the skip link, current-page state, modal
+  labelling/autofocus, and reliable Escape dismissal. Current 1440x900 and 390x844
+  screenshots were regenerated from the running Compose demo.
 - Ingress hardening now caps mutation bodies, WebSocket origins/connections/frames, Redis
   stream length, and serialized stream messages. Oversized WebSocket frames and malformed
   events become visible processing errors; dead letters retain only a hash and bounded
@@ -225,15 +233,11 @@ Last updated: 2026-08-10.
   and must not be generalized beyond the recorded host and synthetic workload.
 - The repository implements the identity, governance, and deployment control planes, but
   has not been connected to a real organizational IdP or deployed to an external cluster.
-  The remaining dashboard is functional but has not yet completed the requested premium
-  editorial/newsroom visual transformation.
 
 ## Highest-priority required backlog
 
 - Build a feature-compatible multi-source challenger with fresh fit/calibration evidence
   and governed review; keep all published public reports frozen as final tests.
-- Complete the reusable editorial design system, cohesive seven-view transformation,
-  accessibility audit, and current desktop/mobile screenshots.
 - Extend runtime evidence with sustained representative replay and multi-host scaling;
   exercise the templates with a real IdP, managed data services, restore drill, and
   representative target-cluster capacity tests.

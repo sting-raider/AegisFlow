@@ -232,6 +232,6 @@ test("selects a flow for sanitized export and opens associated evidence", async 
   const exportLink = screen.getByRole("link", { name: "Export selected (1)" });
   expect(exportLink.getAttribute("href")).toContain(flowFixture.event_id);
   fireEvent.click(screen.getByText("10.0.0.9:22"));
-  expect(await screen.findByRole("complementary", { name: "Flow detail" })).toBeTruthy();
+  expect(await screen.findByRole("dialog", { name: "Flow evidence" })).toBeTruthy();
   expect(await screen.findByText("Repeated authentication pattern · credential access")).toBeTruthy();
 });

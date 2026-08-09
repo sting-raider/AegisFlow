@@ -22,15 +22,28 @@ import type {
 
 type View = "overview" | "alerts" | "incidents" | "flows" | "hosts" | "models" | "system";
 
-const views: { id: View; label: string; key: string }[] = [
-  { id: "overview", label: "Overview", key: "01" },
-  { id: "alerts", label: "Live alerts", key: "02" },
-  { id: "incidents", label: "Incidents", key: "03" },
-  { id: "flows", label: "Flow explorer", key: "04" },
-  { id: "hosts", label: "Hosts", key: "05" },
-  { id: "models", label: "Models & drift", key: "06" },
-  { id: "system", label: "System health", key: "07" }
+const views: { id: View; label: string; mark: string; description: string }[] = [
+  { id: "overview", label: "Overview", mark: "Brief", description: "What changed across validated traffic, active cases, and detector health." },
+  { id: "alerts", label: "Live alerts", mark: "Triage", description: "Prioritize validated signals and record analyst judgment without rewriting evidence." },
+  { id: "incidents", label: "Incidents", mark: "Cases", description: "Follow correlated alert timelines, investigation state, and advisory context." },
+  { id: "flows", label: "Flow explorer", mark: "Traffic", description: "Inspect payload-free flow evidence and export only the records you select." },
+  { id: "hosts", label: "Hosts", mark: "Entities", description: "Read recent endpoint activity, protocol use, and alert history in context." },
+  { id: "models", label: "Models & drift", mark: "Detection", description: "Review the active model, validation evidence, drift, and loading health." },
+  { id: "system", label: "System health", mark: "Operations", description: "Verify service readiness, retention policy, identity, and queue state." }
 ];
+
+function useEscapeKey(active: boolean, close: () => void) {
+  const closeRef = useRef(close);
+  useEffect(() => { closeRef.current = close; }, [close]);
+  useEffect(() => {
+    if (!active) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeRef.current();
+    };
+    window.addEventListener("keydown", dismiss);
+    return () => window.removeEventListener("keydown", dismiss);
+  }, [active]);
+}
 
 function useOperationsData(paused: boolean) {
   const queryClient = useQueryClient();
@@ -116,9 +129,9 @@ function Flowline({ alerts }: { alerts: Alert[] }) {
   return (
     <section className="flowline" aria-label="Recent detection flowline">
       <div className="flowline__legend">
-        <span>Oldest</span>
-        <strong>Detection flowline</strong>
-        <span>Now</span>
+        <span>Validated sequence</span>
+        <strong>Signal edition</strong>
+        <span>{alerts.length} loaded</span>
       </div>
       <div className="flowline__track">
         {alerts
@@ -181,19 +194,19 @@ function Overview({
         <Metric label="Unknown-behaviour flags" value={unknown} note="statistical, not confirmed" />
         <Metric label="Sensors ready" value={status?.sensors ?? "—"} note={`${status?.mode ?? "unknown"} mode`} />
       </div>
-      <div className="overview-grid">
-        <section className="panel">
+      <div className="overview-grid overview-grid--feature">
+        <section className="panel panel--lead">
           <header><span>Alert pressure</span><small>by severity</small></header>
           <div className="chart">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={severityData}>
-                <CartesianGrid stroke="#294651" vertical={false} />
-                <XAxis dataKey="severity" stroke="#89a2ad" />
-                <YAxis allowDecimals={false} stroke="#89a2ad" />
-                <Tooltip cursor={{ fill: "#17313d" }} />
+                <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
+                <XAxis dataKey="severity" stroke="var(--chart-axis)" />
+                <YAxis allowDecimals={false} stroke="var(--chart-axis)" />
+                <Tooltip cursor={{ fill: "var(--chart-cursor)" }} />
                 <Bar
                   dataKey="alerts"
-                  fill="#ff735c"
+                  fill="var(--danger)"
                   isAnimationActive={false}
                   radius={[2, 2, 0, 0]}
                 />
@@ -201,7 +214,8 @@ function Overview({
             </ResponsiveContainer>
           </div>
         </section>
-        <section className="panel">
+        <div className="overview-stack">
+        <section className="panel panel--analysis">
           <header><span>Detection character</span><small>known vs unknown</small></header>
           <div className="duel">
             <div><span>Known</span><strong>{known}</strong><small>classifier or signature evidence</small></div>
@@ -211,11 +225,11 @@ function Overview({
           <div className="chart chart--compact">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={protocolData.slice(0, 6)} layout="vertical">
-                <CartesianGrid stroke="#294651" horizontal={false} />
-                <XAxis type="number" allowDecimals={false} stroke="#89a2ad" />
-                <YAxis type="category" dataKey="protocol" width={54} stroke="#89a2ad" />
-                <Tooltip cursor={{ fill: "#17313d" }} />
-                <Bar dataKey="count" fill="#53c7c2" isAnimationActive={false} />
+                <CartesianGrid stroke="var(--chart-grid)" horizontal={false} />
+                <XAxis type="number" allowDecimals={false} stroke="var(--chart-axis)" />
+                <YAxis type="category" dataKey="protocol" width={54} stroke="var(--chart-axis)" />
+                <Tooltip cursor={{ fill: "var(--chart-cursor)" }} />
+                <Bar dataKey="count" fill="var(--signal)" isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -233,6 +247,7 @@ function Overview({
             </>
           ) : <p>No production model loaded.</p>}
         </section>
+        </div>
       </div>
       <div className="overview-grid overview-grid--lower">
         <RankedPanel title="Top sources" note="flow origin" items={sourceHosts} />
@@ -322,6 +337,7 @@ function AlertTable({
 }
 
 function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
+  useEscapeKey(true, close);
   const [disposition, setDisposition] = useState("requires_investigation");
   const [comment, setComment] = useState("");
   const mutation = useMutation({
@@ -333,10 +349,10 @@ function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["alerts"] })
   });
   return (
-    <aside className="drawer" aria-label="Alert detail">
-      <button className="drawer__close" onClick={close} aria-label="Close alert detail">×</button>
+    <div className="drawer" role="dialog" aria-modal="true" aria-labelledby="alert-detail-title">
+      <button autoFocus className="drawer__close" onClick={close} aria-label="Close alert detail">×</button>
       <p className="eyebrow">Detection evidence</p>
-      <h2>{alert.verdict.replaceAll("_", " ")}</h2>
+      <h2 id="alert-detail-title">{alert.verdict.replaceAll("_", " ")}</h2>
       <div className="risk-orbit"><span>{alert.risk.toFixed(0)}</span><small>risk / 100</small></div>
       <p>{alert.detection.explanation}</p>
       <div className="drawer-actions">
@@ -369,12 +385,13 @@ function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
         {mutation.isSuccess && <span className="form-success">Feedback recorded without changing the detection.</span>}
         {mutation.isError && <span className="form-error">Feedback was not recorded. Check API access.</span>}
       </form>
-    </aside>
+    </div>
   );
 }
 
 function Incidents({ incidents }: { incidents: Incident[] }) {
   const [selected, setSelected] = useState<Incident | null>(null);
+  useEscapeKey(selected !== null, () => setSelected(null));
   const [statusChoice, setStatusChoice] = useState("investigating");
   const [analystNote, setAnalystNote] = useState("");
   const queryClient = useQueryClient();
@@ -415,7 +432,7 @@ function Incidents({ incidents }: { incidents: Incident[] }) {
     <div className="card-grid">{incidents.map((incident) => (
       <article className="incident-card" key={incident.id}>
         <div><Badge value={incident.severity} /><span className="incident-card__status">{incident.status}</span></div>
-        <h3>{incident.title}</h3>
+        <h2>{incident.title}</h2>
         <p>{incident.alert_ids.length} related alert{incident.alert_ids.length === 1 ? "" : "s"}</p>
         <ul>{incident.grouping_reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
         <small>Updated {new Date(incident.updated_at).toLocaleString()}</small>
@@ -424,10 +441,10 @@ function Incidents({ incidents }: { incidents: Incident[] }) {
         </button>
       </article>
     ))}</div>
-    {selected && current && <aside className="drawer" aria-label="Incident detail">
-      <button className="drawer__close" onClick={() => setSelected(null)} aria-label="Close incident detail">×</button>
+    {selected && current && <div className="drawer" role="dialog" aria-modal="true" aria-labelledby="incident-detail-title">
+      <button autoFocus className="drawer__close" onClick={() => setSelected(null)} aria-label="Close incident detail">×</button>
       <p className="eyebrow">Correlated alert timeline</p>
-      <h2>{current.title}</h2>
+      <h2 id="incident-detail-title">{current.title}</h2>
       <div className="signal-grid incident-summary">
         <Metric label="Alerts" value={current.alert_count} note={`${current.acknowledged_alerts} acknowledged`} />
         <Metric label="Max risk" value={current.max_risk.toFixed(0)} note={current.severity} />
@@ -480,7 +497,7 @@ function Incidents({ incidents }: { incidents: Incident[] }) {
         <ul>{explanation.data.limitations.map((item) => <li key={item}>{item}</li>)}</ul>
         <small>Generated {new Date(explanation.data.generated_at).toLocaleString()}</small>
       </section>}
-    </aside>}
+    </div>}
   </>;
 }
 
@@ -492,6 +509,7 @@ function Flows({ flows }: { flows: Flow[] }) {
   const [page, setPage] = useState(0);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
+  useEscapeKey(selected !== null, () => setSelected(null));
   const detail = useQuery({
     queryKey: ["flow", selected],
     queryFn: () => api.flow(selected!),
@@ -527,9 +545,9 @@ function Flows({ flows }: { flows: Flow[] }) {
       <tbody>{pageItems.map((flow) => <tr key={flow.event_id} onClick={() => setSelected(flow.event_id)} tabIndex={0} onKeyDown={(event) => event.key === "Enter" && setSelected(flow.event_id)}><td><input aria-label={`Select flow ${flow.event_id}`} type="checkbox" checked={selectedIds.includes(flow.event_id)} onClick={(event) => event.stopPropagation()} onChange={() => toggle(flow.event_id)} /></td><td>{new Date(flow.timestamp_start).toLocaleString()}</td><td className="mono">{flow.src_ip}:{flow.src_port}</td><td className="mono">{flow.dst_ip}:{flow.dst_port}</td><td>{flow.protocol}</td><td>{flow.packets_forward + flow.packets_reverse}</td><td>{flow.bytes_forward.toLocaleString()} / {flow.bytes_reverse.toLocaleString()}</td></tr>)}</tbody>
     </table></div>
     <div className="pagination"><button disabled={page === 0} onClick={() => setPage((value) => value - 1)}>Previous</button><span>Page {page + 1} of {pages} · {shown.length} flows</span><button disabled={page + 1 >= pages} onClick={() => setPage((value) => value + 1)}>Next</button></div>
-    {selected && <aside className="drawer" aria-label="Flow detail">
-      <button className="drawer__close" onClick={() => setSelected(null)} aria-label="Close flow detail">×</button>
-      <p className="eyebrow">Validated flow record</p><h2>Flow evidence</h2>
+    {selected && <div className="drawer" role="dialog" aria-modal="true" aria-labelledby="flow-detail-title">
+      <button autoFocus className="drawer__close" onClick={() => setSelected(null)} aria-label="Close flow detail">×</button>
+      <p className="eyebrow">Validated flow record</p><h2 id="flow-detail-title">Flow evidence</h2>
       {detail.isLoading && <div className="state">Reading associated detection…</div>}
       {detail.isError && <div className="state state--error">Flow detail could not be loaded.</div>}
       {detail.data && <>
@@ -549,28 +567,29 @@ function Flows({ flows }: { flows: Flow[] }) {
         <h3>Signatures</h3>
         {detail.data.signatures.length ? detail.data.signatures.map((signature) => <p className="limitation" key={signature.signature_id}>{signature.signature_name} · {signature.category}</p>) : <p>No correlated signature event.</p>}
       </>}
-    </aside>}
+    </div>}
   </>;
 }
 
 function Hosts({ hosts, flows, alerts }: { hosts: Host[]; flows: Flow[]; alerts: Alert[] }) {
   const [selected, setSelected] = useState<string | null>(null);
+  useEscapeKey(selected !== null, () => setSelected(null));
   const selectedFlows = flows.filter((flow) => flow.src_ip === selected || flow.dst_ip === selected);
   const selectedAlerts = alerts.filter((alert) => alert.flow.src_ip === selected || alert.flow.dst_ip === selected);
   const protocols = rankedHosts(selectedFlows.map((flow) => flow.protocol));
   const risk = Math.max(0, ...selectedAlerts.map((alert) => alert.risk));
   const latest = selectedFlows.map((flow) => new Date(flow.timestamp_start).getTime()).sort((a, b) => b - a)[0];
-  return <><div className="card-grid">{hosts.map((host) => <article className="host-card" key={host.host} tabIndex={0} onClick={() => setSelected(host.host)} onKeyDown={(event) => event.key === "Enter" && setSelected(host.host)}>
+  return <><div className="card-grid">{hosts.map((host) => <div className="host-card" role="button" aria-label={`Open activity for ${host.host}`} key={host.host} tabIndex={0} onClick={() => setSelected(host.host)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelected(host.host); } }}>
     <div className={`host-card__pulse ${host.alerting ? "is-alerting" : ""}`} />
-    <h3 className="mono">{host.host}</h3>
+    <h2 className="mono">{host.host}</h2>
     <dl><div><dt>Flows</dt><dd>{host.flows}</dd></div><div><dt>Destination fan-out</dt><dd>{host.destinations}</dd></div><div><dt>Peak risk</dt><dd>{Math.max(0, ...alerts.filter((alert) => alert.flow.src_ip === host.host || alert.flow.dst_ip === host.host).map((alert) => alert.risk)).toFixed(0)}</dd></div></dl>
     <Badge value={host.alerting ? "needs_review" : "benign"} />
-  </article>)}</div>
-  {selected && <aside className="drawer" aria-label="Host detail"><button className="drawer__close" onClick={() => setSelected(null)} aria-label="Close host detail">×</button><p className="eyebrow">Host activity ledger</p><h2 className="mono">{selected}</h2>
+  </div>)}</div>
+  {selected && <div className="drawer" role="dialog" aria-modal="true" aria-labelledby="host-detail-title"><button autoFocus className="drawer__close" onClick={() => setSelected(null)} aria-label="Close host detail">×</button><p className="eyebrow">Host activity ledger</p><h2 id="host-detail-title" className="mono">{selected}</h2>
     <div className="signal-grid"><Metric label="Peak risk" value={risk.toFixed(0)} note={`${selectedAlerts.length} alerts`} /><Metric label="Recent activity" value={latest ? new Date(latest).toLocaleTimeString() : "none"} note={`${selectedFlows.length} flows loaded`} /><Metric label="Protocols" value={protocols.length} note="observed usage" /></div>
     <h3>Protocol usage</h3><div className="reason-list">{protocols.map((item) => <code key={item.label}>{item.label} · {item.count}</code>)}</div>
     <h3>Alert history</h3>{selectedAlerts.length ? <ol className="event-ledger">{selectedAlerts.map((alert) => <li key={alert.id}><div><strong>{alert.verdict.replaceAll("_", " ")}</strong><small>{new Date(alert.created_at).toLocaleString()} · {alert.detection.reason_codes.join(", ")}</small></div><span className={`risk risk--${alert.severity}`}>{alert.risk.toFixed(0)}</span></li>)}</ol> : <div className="state">No alert history in the loaded window.</div>}
-  </aside>}</>;
+  </div>}</>;
 }
 
 function Models({ models, drift, alerts, status }: { models: ModelVersion[]; drift: DriftEvent[]; alerts: Alert[]; status?: SystemStatus }) {
@@ -582,7 +601,7 @@ function Models({ models, drift, alerts, status }: { models: ModelVersion[]; dri
   </section><section className="panel"><header><span>Validation metrics</span><small>{models[0]?.metadata.feature_schema_version ?? "no schema"}</small></header>
     {models[0] ? <dl className="feature-ledger">{Object.entries(models[0].metadata.validation_metrics).slice(0, 10).map(([key, value]) => <div key={key}><dt>{key.replaceAll("_", " ")}</dt><dd>{typeof value === "number" ? value.toFixed(3) : String(value)}</dd></div>)}</dl> : <div className="state">No production metrics loaded.</div>}
   </section></div>
-  <div className="overview-grid overview-grid--lower"><section className="panel"><header><span>Risk score distribution</span><small>loaded alerts</small></header><div className="chart chart--compact"><ResponsiveContainer width="100%" height="100%"><BarChart data={scoreData}><XAxis dataKey="range" stroke="#89a2ad" /><YAxis allowDecimals={false} stroke="#89a2ad" /><Tooltip cursor={{ fill: "#17313d" }} /><Bar dataKey="detections" fill="#e9b44c" isAnimationActive={false} /></BarChart></ResponsiveContainer></div></section>
+  <div className="overview-grid overview-grid--lower"><section className="panel"><header><span>Risk score distribution</span><small>loaded alerts</small></header><div className="chart chart--compact"><ResponsiveContainer width="100%" height="100%"><BarChart data={scoreData}><XAxis dataKey="range" stroke="var(--chart-axis)" /><YAxis allowDecimals={false} stroke="var(--chart-axis)" /><Tooltip cursor={{ fill: "var(--chart-cursor)" }} /><Bar dataKey="detections" fill="var(--warning)" isAnimationActive={false} /></BarChart></ResponsiveContainer></div></section>
     <section className="panel"><header><span>Drift events</span><small>never auto-retrains</small></header>{drift.length ? <ol className="event-ledger">{drift.map((event) => <li key={event.id}><div><strong>{event.signal.replaceAll("_", " ")}</strong><small>{new Date(event.detected_at).toLocaleString()}</small></div><span>{event.magnitude.toFixed(3)}</span></li>)}</ol> : <div className="state">No drift event has crossed a detector threshold.</div>}</section>
     <section className="panel"><header><span>Model loading errors</span><small>health ledger</small></header>{loadErrors.length ? loadErrors.map((event) => <p className="limitation" key={event.id}>{new Date(event.timestamp).toLocaleString()} · {event.status}</p>) : <div className="state">No model loading error is recorded.</div>}</section>
   </div></>;
@@ -615,6 +634,7 @@ export function App() {
   const drift = data.drift.data?.items ?? [];
   const loading = [data.alerts, data.incidents, data.flows, data.hosts, data.models].some((query) => query.isLoading);
   const error = [data.alerts, data.incidents, data.flows, data.hosts, data.models].find((query) => query.error)?.error ?? null;
+  const currentView = views.find((item) => item.id === view) ?? views[0];
 
   let content: React.ReactNode;
   if (view === "overview") content = <Overview alerts={alerts} incidents={incidents} flows={flows} models={models} status={data.status.data} drift={drift} />;
@@ -628,15 +648,18 @@ export function App() {
 
   return (
     <div className="shell">
+      <a className="skip-link" href="#main-content">Skip to intelligence brief</a>
       <aside className="sidebar">
-        <a className="brand" href="#overview" onClick={() => setView("overview")}><span>A</span><div><strong>AegisFlow</strong><small>Network operations</small></div></a>
-        <nav aria-label="Primary navigation">{views.map((item) => <button key={item.id} className={view === item.id ? "active" : ""} onClick={() => setView(item.id)}><span>{item.key}</span>{item.label}</button>)}</nav>
+        <a className="brand" href="#overview" onClick={() => setView("overview")}><span aria-hidden="true">A</span><div><strong>AegisFlow</strong><small>Network intelligence</small></div></a>
+        <nav aria-label="Primary navigation">{views.map((item) => <button type="button" key={item.id} className={view === item.id ? "active" : ""} aria-current={view === item.id ? "page" : undefined} onClick={() => setView(item.id)}><span>{item.mark}</span>{item.label}</button>)}</nav>
         <div className="sidebar__foot"><span className={`connection ${data.connected ? "is-live" : ""}`} />{data.connected ? "Live stream linked" : "Reconnecting stream"}</div>
       </aside>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         {data.status.data?.mode === "demo" && <div className="demo-banner"><strong>Demo traffic</strong><span>Generated records are isolated and carry no real packet payloads.</span></div>}
-        <header className="page-header"><div><p className="eyebrow">Operational surface / {views.find((item) => item.id === view)?.key}</p><h1>{views.find((item) => item.id === view)?.label}</h1></div><div className="clock"><span>UTC</span><strong>{new Date().toISOString().slice(11, 19)}</strong></div></header>
-        <State loading={loading} error={error as Error | null} empty={false}>{content}</State>
+        <div className="main-inner">
+          <header className="page-header"><div><p className="eyebrow">AegisFlow intelligence / {currentView.mark}</p><h1>{currentView.label}</h1><p className="page-deck">{currentView.description}</p></div><div className="edition-meta"><span className={`edition-meta__status ${data.connected ? "is-live" : ""}`}>{data.connected ? "Live evidence" : "Link pending"}</span><span>UTC edition</span><strong>{new Date().toISOString().slice(11, 19)}</strong></div></header>
+          <State loading={loading} error={error as Error | null} empty={false}>{content}</State>
+        </div>
       </main>
       {selected && <AlertDetail alert={selected} close={() => setSelected(null)} />}
     </div>

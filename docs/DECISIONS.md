@@ -398,3 +398,20 @@ Restarting the dashboard whenever the API changes was rejected because it hides 
 service-discovery defect and makes otherwise independent frontend availability depend on
 backend container identity. Kubernetes ingress routes `/api` and `/health` directly to
 the API Service, so its cluster DNS remains outside this Docker-specific proxy path.
+
+## D-032 — Treat the dashboard as a network-intelligence brief
+
+Use a light-first mineral editorial system for the seven analyst views: deep ink and
+paper surfaces, patina/danger/evidence accents, Georgia display hierarchy, Segoe UI/Aptos
+working copy, and Cascadia Mono measurements. Keep one distinctive dark live-signal
+ribbon and an asymmetric overview lead; use quiet shared cards everywhere else. Replace
+decorative navigation numbers with labels that describe each view's actual job. Preserve
+the same hierarchy in automatic dark mode and collapse it deliberately for tablet and
+mobile widths.
+
+Make accessibility an executable acceptance condition. Chromium scans the overview,
+every analyst view, and the evidence dialog with Axe and requires zero violations. The
+same path verifies the skip link, current-page state, dialog labelling/autofocus, and
+Escape dismissal. A generic dark SOC-console restyle and a warm lifestyle-editorial
+theme were rejected because neither expresses the requested newsroom intelligence
+character without obscuring operational evidence.

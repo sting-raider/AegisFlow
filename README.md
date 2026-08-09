@@ -5,7 +5,7 @@
 
 AegisFlow is an adaptive hybrid network intrusion detection system for deterministic
 PCAP replay, explicit Linux live capture, explainable risk fusion, incident grouping,
-and a real-time analyst dashboard.
+and a real-time editorial network-intelligence dashboard.
 
 > AegisFlow detects known threats and flags statistically unusual behaviour that may
 > represent previously unseen threats.
@@ -34,7 +34,7 @@ The demo profile runs `sensor`, `detector`, `api`, and `dashboard` as separate
 processes with Redis and PostgreSQL. Tests can use the same domain logic with an
 in-process adapter and SQLite.
 
-![AegisFlow operations dashboard](docs/images/dashboard.png)
+![AegisFlow editorial network-intelligence dashboard](docs/images/dashboard.png)
 
 ## Quick start
 
@@ -89,7 +89,8 @@ The latest local validation on 2026-08-10 passed:
 
 - Ruff and strict MyPy across 64 Python source files, including migrations;
 - 145 Python tests with 84% backend coverage;
-- dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
+- dashboard ESLint, production build, 4 component interaction tests, and 2 Chromium E2E
+  scenarios including zero Axe violations across all seven views and the evidence dialog;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
 - clean Compose image builds, database migration through a mounted secret, offline replay,
   REST/auth checks, and independent Redis/PostgreSQL restart recovery;
@@ -103,7 +104,8 @@ The latest local validation on 2026-08-10 passed:
 
 See [`docs/PROGRESS.md`](docs/PROGRESS.md),
 [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md), and
-[`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) for the measured evidence and its limitations.
+[`docs/FINAL_COMPLETION_SUMMARY.md`](docs/FINAL_COMPLETION_SUMMARY.md) for the measured
+evidence, completion boundary, limitations, and deployment next steps.
 
 `make live` is Linux-only, requires an explicit interface, and prints an authorization
 warning. It builds a dedicated non-root NFStream sensor target with only `NET_RAW`;

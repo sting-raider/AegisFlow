@@ -1,13 +1,25 @@
 # Dashboard
 
-The React dashboard uses a navigation-chart visual language: deep channel/slate
-surfaces, sonar teal, signal coral, and warning amber. The live flowline is the one
-signature element. Bahnschrift carries operational headings, Segoe UI body copy, and
-Cascadia Mono data.
+The React dashboard is a network-intelligence brief for an analyst deciding what changed
+and what needs attention. Its light-first editorial system uses mineral paper, deep ink,
+patina teal, signal vermilion, and evidence ochre. Georgia carries the editorial display
+hierarchy, Segoe UI/Aptos carries working copy, and Cascadia Mono carries measurements.
+The dark live-signal edition ribbon is the one signature element; the surrounding cards
+stay quiet, softly rounded, and deliberately asymmetric. Automatic dark mode retains the
+same hierarchy instead of becoming a separate product skin.
 
 Views cover overview, live alerts/evidence/feedback, incidents, flow filtering, hosts,
-models/drift, and system health. Demo data is always disclosed. Loading, empty, error,
-keyboard focus, responsive layout, and reduced motion are explicit states.
+models/drift, and system health. Navigation markers describe each view's real job
+(`Brief`, `Triage`, `Cases`, `Traffic`, `Entities`, `Detection`, and `Operations`) rather
+than presenting decorative numbering. Demo data is always disclosed. Loading, empty,
+error, keyboard focus, responsive layout, automatic dark mode, and reduced motion are
+explicit states.
+
+Accessibility is part of the browser acceptance gate. The overview, every analyst view,
+and the evidence dialog pass Axe without violations in Chromium. The same test exercises
+the skip link, current-page semantics, modal labelling and focus, keyboard dismissal, and
+the analyst feedback path. Current 1440-pixel and 390-pixel rendered screenshots live in
+`docs/images/`; visual QA also covers the automatic dark palette.
 
 The API client can receive a short-lived access token through `setAccessToken`; it keeps
 that token in memory only and sends it as a bearer credential for REST and as the bounded
