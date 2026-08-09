@@ -1,12 +1,35 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
-from apps.api.main import app
+from apps.api.auth import AuthConfigurationError
+from apps.api.main import _cors_origins_from_env, app
+from services.sensor import DemoAdapter
+
+
+def test_cors_origins_reject_wildcards_and_non_tls_remote_origins(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AEGISFLOW_CORS_ORIGINS", "*")
+    with pytest.raises(AuthConfigurationError, match="exact HTTPS"):
+        _cors_origins_from_env()
+    monkeypatch.setenv("AEGISFLOW_CORS_ORIGINS", "http://dashboard.example.test")
+    with pytest.raises(AuthConfigurationError, match="exact HTTPS"):
+        _cors_origins_from_env()
+    monkeypatch.setenv(
+        "AEGISFLOW_CORS_ORIGINS",
+        "https://dashboard.example.test,http://127.0.0.1:5173",
+    )
+    assert _cors_origins_from_env() == (
+        "https://dashboard.example.test",
+        "http://127.0.0.1:5173",
+    )
 
 
 def test_api_vertical_slice(
@@ -18,9 +41,11 @@ def test_api_vertical_slice(
     monkeypatch.setenv("AEGISFLOW_DEMO_SEED", "1")
     monkeypatch.setenv("AEGISFLOW_EXPLANATION_PROVIDER", "disabled")
     monkeypatch.setenv("AEGISFLOW_RETENTION_ENABLED", "0")
-    monkeypatch.delenv("AEGISFLOW_API_KEY", raising=False)
+    monkeypatch.setenv("AEGISFLOW_AUTH_MODE", "demo")
     with TestClient(app, raise_server_exceptions=False) as client:
         assert client.get("/health/ready").json() == {"status": "ready"}
+        security_schemes = client.get("/openapi.json").json()["components"]["securitySchemes"]
+        assert set(security_schemes) >= {"BearerAuth", "ApiKeyAuth"}
         initial_queue = client.get("/api/v1/system/status").json()["queue"]
         assert {key: initial_queue[key] for key in ("pending", "lag", "consumers")} == {
             "pending": 0,
@@ -47,6 +72,9 @@ def test_api_vertical_slice(
             "drift_events_total",
             "database_errors_total",
             "queue_backpressure_events_total",
+            "authentication_failures_total",
+            "authorization_denials_total",
+            "rate_limit_rejections_total",
         ):
             assert metric_name in metrics
         assert client.get("/api/v1/drift-events").status_code == 200
@@ -90,14 +118,12 @@ def test_api_vertical_slice(
         assert detail.status_code == 200
         acknowledged = client.post(
             f"/api/v1/alerts/{alerts[0]['id']}/acknowledge",
-            json={"actor": "test-analyst"},
         )
         assert acknowledged.status_code == 200
         assert client.get(f"/api/v1/alerts/{alerts[0]['id']}").json()["acknowledged"] is True
         feedback = client.post(
             f"/api/v1/alerts/{alerts[0]['id']}/feedback",
             json={
-                "actor": "test-analyst",
                 "disposition": "requires_investigation",
                 "comment": "check adjacent flows",
             },
@@ -106,7 +132,6 @@ def test_api_vertical_slice(
         retraining_feedback = client.post(
             f"/api/v1/alerts/{alerts[0]['id']}/feedback",
             json={
-                "actor": "test-analyst",
                 "disposition": "benign_new_behaviour",
                 "comment": "approved pattern from private host",
                 "eligible_for_retraining": True,
@@ -134,18 +159,10 @@ def test_api_vertical_slice(
         assert "attachment" in exported_flows.headers["content-disposition"]
         assert first_alert["flow"]["src_ip"] not in exported_flows.text
         assert "ip_" in exported_flows.text
-        with monkeypatch.context() as protected_export:
-            protected_export.setenv("AEGISFLOW_API_KEY", "export-test-key")
-            denied_raw_export = client.get(
-                "/api/v1/exports/flows.csv",
-                params={"event_id": flow_id, "anonymize_ips": "false"},
-            )
-            allowed_raw_export = client.get(
-                "/api/v1/exports/flows.csv",
-                params={"event_id": flow_id, "anonymize_ips": "false"},
-                headers={"X-API-Key": "export-test-key"},
-            )
-        assert denied_raw_export.status_code == 401
+        allowed_raw_export = client.get(
+            "/api/v1/exports/flows.csv",
+            params={"event_id": flow_id, "anonymize_ips": "false"},
+        )
         assert first_alert["flow"]["src_ip"] in allowed_raw_export.text
         exported_alerts = client.get(
             "/api/v1/exports/alerts.csv",
@@ -176,14 +193,14 @@ def test_api_vertical_slice(
         assert incident_detail["alert_count"] == len(incident_detail["alert_ids"])
         note = client.post(
             f"/api/v1/incidents/{incidents[0]['id']}/notes",
-            json={"actor": "test-analyst", "note": "Review authentication sequence"},
+            json={"note": "Review authentication sequence"},
         )
         assert note.status_code == 200
         noted_incident = client.get(f"/api/v1/incidents/{incidents[0]['id']}").json()
         assert noted_incident["analyst_notes"] == [
             {
                 "id": note.json()["id"],
-                "actor": "test-analyst",
+                "actor": "demo-analyst",
                 "note": "Review authentication sequence",
                 "timestamp": note.json()["timestamp"],
             }
@@ -192,7 +209,7 @@ def test_api_vertical_slice(
             body_limit.setenv("AEGISFLOW_HTTP_MAX_BODY_BYTES", "1024")
             oversized = client.post(
                 f"/api/v1/incidents/{incidents[0]['id']}/notes",
-                json={"actor": "test-analyst", "note": "x" * 1500},
+                json={"note": "x" * 1500},
                 headers={"X-Correlation-ID": "body-limit-test"},
             )
         assert oversized.status_code == 413
@@ -269,3 +286,127 @@ def test_api_vertical_slice(
             "type": "processing_error",
             "error": {"code": "websocket_payload_too_large"},
         }
+
+
+def test_static_identity_rbac_and_server_side_audit_attribution(
+    monkeypatch: pytest.MonkeyPatch, registry: Path, tmp_path: Path
+) -> None:
+    keys = {"viewer": "v" * 32, "analyst": "a" * 32, "admin": "z" * 32}
+    keys_file = tmp_path / "api-keys.json"
+    keys_file.write_text(
+        json.dumps(
+            {
+                "schema_version": "1.0.0",
+                "keys": [
+                    {
+                        "id": role,
+                        "subject": f"{role}-user",
+                        "display_name": f"{role.title()} user",
+                        "sha256": hashlib.sha256(secret.encode()).hexdigest(),
+                        "roles": [role],
+                    }
+                    for role, secret in keys.items()
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("AEGISFLOW_DATABASE_URL", f"sqlite:///{(tmp_path / 'rbac.db').as_posix()}")
+    monkeypatch.setenv("AEGISFLOW_MODEL_REGISTRY", str(registry))
+    monkeypatch.setenv("AEGISFLOW_DEMO", "0")
+    monkeypatch.setenv("AEGISFLOW_DEMO_SEED", "0")
+    monkeypatch.setenv("AEGISFLOW_CONSUME_REDIS", "0")
+    monkeypatch.setenv("AEGISFLOW_AUTH_MODE", "api_key")
+    monkeypatch.setenv("AEGISFLOW_API_KEYS_FILE", str(keys_file))
+    monkeypatch.setenv("AEGISFLOW_RETENTION_ENABLED", "0")
+    monkeypatch.setenv("AEGISFLOW_EVALUATION_REPORT_DIR", str(Path("docs/evaluation").resolve()))
+    monkeypatch.setenv("AEGISFLOW_MODEL_GOVERNANCE_ENABLED", "0")
+
+    with TestClient(app, raise_server_exceptions=False) as client:
+        assert client.get("/health/ready").status_code == 200
+        assert client.get("/api/v1/alerts").status_code == 401
+        viewer_headers = {"X-API-Key": keys["viewer"]}
+        analyst_headers = {"X-API-Key": keys["analyst"]}
+        admin_headers = {"X-API-Key": keys["admin"]}
+        assert client.get("/api/v1/auth/me", headers=viewer_headers).json() == {
+            "subject": "viewer-user",
+            "display_name": "Viewer user",
+            "roles": ["viewer"],
+            "auth_method": "api_key",
+        }
+        assert client.get("/api/v1/alerts", headers=viewer_headers).status_code == 200
+        forbidden_mutation = client.post(
+            "/api/v1/alerts/00000000-0000-0000-0000-000000000000/acknowledge",
+            headers=viewer_headers,
+        )
+        assert forbidden_mutation.status_code == 403
+        assert forbidden_mutation.json()["error"]["code"] == "insufficient_role"
+        assert (
+            client.get(
+                "/api/v1/exports/flows.csv",
+                params={"anonymize_ips": "false"},
+                headers=analyst_headers,
+            ).status_code
+            == 403
+        )
+        assert client.get("/api/v1/audit-events", headers=analyst_headers).status_code == 403
+        candidate_request = {
+            "version": "0.3.0",
+            "evaluation_reports": [
+                "unsw-nb15-official-split.json",
+                "unsw-nb15-held-exploits.json",
+                "cse-cic-ids2018-thursday-time.json",
+                "unsw-to-cse-cic-ids2018-thursday.json",
+            ],
+        }
+        assert (
+            client.post(
+                "/api/v1/model-candidates/aegisflow-smoke",
+                json=candidate_request,
+                headers=analyst_headers,
+            ).status_code
+            == 403
+        )
+        rejected_candidate = client.post(
+            "/api/v1/model-candidates/aegisflow-smoke",
+            json=candidate_request,
+            headers=admin_headers,
+        )
+        assert rejected_candidate.status_code == 200
+        assert rejected_candidate.json()["status"] == "rejected"
+        assert "synthetic_training_bundle" in rejected_candidate.json()["blockers"]
+        assert (
+            client.post(
+                "/api/v1/model-candidates/aegisflow-smoke:0.3.0/reviews",
+                json={"decision": "approve", "comment": "must not bypass failed gates"},
+                headers=analyst_headers,
+            ).status_code
+            == 409
+        )
+        disabled_promotion = client.post(
+            "/api/v1/model-candidates/aegisflow-smoke:0.3.0/promote",
+            headers=admin_headers,
+        )
+        assert disabled_promotion.status_code == 503
+        assert disabled_promotion.json()["error"]["code"] == "model_governance_disabled"
+
+        app.state.repository.record_health_event("test", "rbac")
+        flow = list(DemoAdapter().flows())[2]
+        seeded = app.state.engine.detect(flow)
+        app.state.repository.ingest(flow, seeded)
+        alerts = client.get("/api/v1/alerts", headers=analyst_headers).json()["items"]
+        if alerts:
+            acknowledged = client.post(
+                f"/api/v1/alerts/{alerts[0]['id']}/acknowledge",
+                headers=analyst_headers,
+            )
+            assert acknowledged.status_code == 200
+            assert acknowledged.json()["actor"] == "analyst-user"
+        audit = client.get("/api/v1/audit-events", headers=admin_headers)
+        assert audit.status_code == 200
+        if alerts:
+            assert audit.json()["items"][0]["actor"] == "analyst-user"
+        with client.websocket_connect(
+            "/api/v1/stream/system", headers=viewer_headers
+        ) as websocket:
+            assert websocket.receive_json()["type"] == "system"

@@ -179,7 +179,9 @@ export interface SystemStatus {
   };
   retention: {
     enabled: boolean;
+    mode?: "in_process" | "external";
     days?: number;
+    audit_days?: number;
     interval_seconds?: number;
   };
   recent_health_events: HealthEvent[];
@@ -187,6 +189,9 @@ export interface SystemStatus {
   dropped_records?: number;
   suricata_status?: string;
   worker_latency_ms?: number | null;
+  auth_mode?: "demo" | "api_key" | "oidc";
+  model_governance_enabled?: boolean;
+  loaded_runtime_version?: string;
 }
 
 export interface HealthEvent {

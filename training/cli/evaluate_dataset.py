@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from packages.model_bundle import load_production_bundle
+from packages.model_bundle.bundle import sha256_file
 from training.data.adapters import DatasetKind, load_dataset
 from training.data.hybrid_evaluate import evaluate_hybrid_gate
 from training.data.quality import feature_drift, quality_report, train_test_overlap
@@ -114,6 +115,7 @@ def main() -> None:
             "model_name": args.model_name,
             "version": deployed_bundle.version,
             "bundle_schema_version": deployed_bundle.manifest.get("bundle_schema_version"),
+            "bundle_digest": sha256_file(deployed_bundle.root / "checksums.sha256"),
         }
         payload["evaluation"] = evaluate_hybrid_gate(
             dataset, comparison, train, test, deployed_bundle
@@ -131,6 +133,7 @@ def main() -> None:
             "model_name": args.model_name,
             "version": deployed_bundle.version,
             "bundle_schema_version": deployed_bundle.manifest.get("bundle_schema_version"),
+            "bundle_digest": sha256_file(deployed_bundle.root / "checksums.sha256"),
         }
         payload["evaluation"] = evaluate_hybrid_gate(
             dataset,

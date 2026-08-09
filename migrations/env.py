@@ -1,19 +1,21 @@
 from __future__ import annotations
 
-import os
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from apps.api.database import Base
+from apps.api.database import Base, database_url_from_env
 
 config = context.config
 if config.config_file_name:
     fileConfig(config.config_file_name)
-config.set_main_option(
-    "sqlalchemy.url", os.getenv("AEGISFLOW_DATABASE_URL", config.get_main_option("sqlalchemy.url"))
-)
+configured_url = config.get_main_option("sqlalchemy.url")
+if configured_url is None:
+    raise RuntimeError("sqlalchemy.url must be configured")
+database_url = database_url_from_env(configured_url)
+# Alembic stores the URL in ConfigParser, where literal percent signs must be escaped.
+config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 target_metadata = Base.metadata
 
 

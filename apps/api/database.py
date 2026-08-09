@@ -5,6 +5,7 @@ from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -18,6 +19,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     create_engine,
     delete,
     func,
@@ -41,6 +43,22 @@ def _as_utc(value: datetime) -> datetime:
     """Restore the UTC marker that SQLite drops from timezone-aware columns."""
 
     return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+
+
+def database_url_from_env(default: str = "sqlite:///aegisflow-demo.db") -> str:
+    secret_path = os.getenv("AEGISFLOW_DATABASE_URL_FILE", "").strip()
+    if not secret_path:
+        return os.getenv("AEGISFLOW_DATABASE_URL", default)
+    try:
+        path = Path(secret_path)
+        if path.stat().st_size > 4096:
+            raise ValueError
+        value = path.read_text(encoding="utf-8").strip()
+        if not value or any(character in value for character in "\r\n\x00"):
+            raise ValueError
+        return value
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise ValueError("database URL secret file is invalid") from exc
 
 
 class Base(DeclarativeBase):
@@ -151,6 +169,33 @@ class ModelVersionRow(Base):
     metadata_json: Mapped[dict[str, Any]] = mapped_column(JSON)
 
 
+class ModelCandidateRow(Base):
+    __tablename__ = "model_candidates"
+    id: Mapped[str] = mapped_column(String(200), primary_key=True)
+    model_name: Mapped[str] = mapped_column(String(128), index=True)
+    version: Mapped[str] = mapped_column(String(64), index=True)
+    bundle_digest: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_by: Mapped[str] = mapped_column(String(128))
+    required_modes: Mapped[list[str]] = mapped_column(JSON)
+    evidence: Mapped[list[dict[str, Any]]] = mapped_column(JSON)
+    blockers: Mapped[list[str]] = mapped_column(JSON)
+
+
+class ModelReviewRow(Base):
+    __tablename__ = "model_reviews"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    candidate_id: Mapped[str] = mapped_column(ForeignKey("model_candidates.id"), index=True)
+    actor: Mapped[str] = mapped_column(String(128))
+    decision: Mapped[str] = mapped_column(String(32))
+    comment: Mapped[str] = mapped_column(Text)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+
+    __table_args__ = (UniqueConstraint("candidate_id", "actor", name="uq_model_review_actor"),)
+
+
 class SystemHealthRow(Base):
     __tablename__ = "system_health_events"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
@@ -178,11 +223,7 @@ class IngestOutcome:
 
 class Repository:
     def __init__(self, url: str | None = None) -> None:
-        database_url = (
-            url
-            if url is not None
-            else os.getenv("AEGISFLOW_DATABASE_URL", "sqlite:///aegisflow-demo.db")
-        )
+        database_url = url if url is not None else database_url_from_env()
         connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
         self.engine = create_engine(database_url, pool_pre_ping=True, connect_args=connect_args)
         self.sessions = sessionmaker(self.engine, expire_on_commit=False)
@@ -869,13 +910,26 @@ class Repository:
             "iat_mean": mean("iat_mean"),
         }
 
-    def set_incident_status(self, incident_id: str, status: str) -> bool:
+    def set_incident_status(self, incident_id: str, status: str, actor: str) -> bool:
         with self.session() as session:
             row = session.get(IncidentRow, incident_id)
             if row is None:
                 return False
-            row.status = status
-            row.updated_at = datetime.now(UTC)
+            if row.status != status:
+                previous_status = row.status
+                timestamp = datetime.now(UTC)
+                row.status = status
+                row.updated_at = timestamp
+                session.add(
+                    AuditLogRow(
+                        id=str(uuid4()),
+                        actor=actor,
+                        action="incident_status_changed",
+                        timestamp=timestamp,
+                        target_id=incident_id,
+                        details={"from": previous_status, "to": status},
+                    )
+                )
             return True
 
     def add_incident_note(self, incident_id: str, actor: str, note: str) -> dict[str, Any] | None:
@@ -1001,6 +1055,28 @@ class Repository:
             )
         return event_id
 
+    def record_audit_event(
+        self,
+        *,
+        actor: str,
+        action: str,
+        target_id: str,
+        details: dict[str, Any] | None = None,
+    ) -> str:
+        event_id = str(uuid4())
+        with self.session() as session:
+            session.add(
+                AuditLogRow(
+                    id=event_id,
+                    actor=actor[:128],
+                    action=action[:128],
+                    timestamp=datetime.now(UTC),
+                    target_id=target_id[:128],
+                    details=details or {},
+                )
+            )
+        return event_id
+
     def health_events(self, limit: int = 50) -> list[dict[str, Any]]:
         with self.session() as session:
             rows = session.scalars(
@@ -1014,6 +1090,37 @@ class Repository:
                     "service": row.service,
                     "status": row.status,
                     "timestamp": _as_utc(row.timestamp),
+                    "details": row.details,
+                }
+                for row in rows
+            ]
+
+    def audit_events(
+        self,
+        *,
+        offset: int = 0,
+        limit: int = 100,
+        actor: str | None = None,
+        action: str | None = None,
+    ) -> list[dict[str, Any]]:
+        with self.session() as session:
+            statement = select(AuditLogRow)
+            if actor is not None:
+                statement = statement.where(AuditLogRow.actor == actor)
+            if action is not None:
+                statement = statement.where(AuditLogRow.action == action)
+            rows = session.scalars(
+                statement.order_by(AuditLogRow.timestamp.desc())
+                .offset(max(0, offset))
+                .limit(min(max(1, limit), 200))
+            )
+            return [
+                {
+                    "id": row.id,
+                    "actor": row.actor,
+                    "action": row.action,
+                    "timestamp": _as_utc(row.timestamp),
+                    "target_id": row.target_id,
                     "details": row.details,
                 }
                 for row in rows
@@ -1115,10 +1222,294 @@ class Repository:
                 for row in rows
             ]
 
+    def model_candidates(self, *, limit: int = 100) -> list[dict[str, Any]]:
+        with self.session() as session:
+            rows = session.scalars(
+                select(ModelCandidateRow)
+                .order_by(ModelCandidateRow.updated_at.desc())
+                .limit(min(max(1, limit), 200))
+            )
+            return [self._model_candidate_dict(session, row) for row in rows]
+
+    def model_candidate(self, candidate_id: str) -> dict[str, Any] | None:
+        with self.session() as session:
+            row = session.get(ModelCandidateRow, candidate_id)
+            return self._model_candidate_dict(session, row) if row is not None else None
+
+    @staticmethod
+    def _model_candidate_dict(
+        session: Session, row: ModelCandidateRow
+    ) -> dict[str, Any]:
+        reviews = session.scalars(
+            select(ModelReviewRow)
+            .where(ModelReviewRow.candidate_id == row.id)
+            .order_by(ModelReviewRow.timestamp.asc())
+        )
+        return {
+            "id": row.id,
+            "model_name": row.model_name,
+            "version": row.version,
+            "bundle_digest": row.bundle_digest,
+            "status": row.status,
+            "created_at": _as_utc(row.created_at),
+            "updated_at": _as_utc(row.updated_at),
+            "created_by": row.created_by,
+            "required_modes": row.required_modes,
+            "evidence": row.evidence,
+            "blockers": row.blockers,
+            "reviews": [
+                {
+                    "id": review.id,
+                    "actor": review.actor,
+                    "decision": review.decision,
+                    "comment": review.comment,
+                    "timestamp": _as_utc(review.timestamp),
+                }
+                for review in reviews
+            ],
+        }
+
+    def register_model_candidate(
+        self, assessment: dict[str, Any], *, actor: str
+    ) -> dict[str, Any]:
+        candidate_id = f"{assessment['model_name']}:{assessment['version']}"
+        now = datetime.now(UTC)
+        with self.session() as session:
+            existing = session.get(ModelCandidateRow, candidate_id)
+            if existing is not None:
+                if (
+                    existing.bundle_digest != assessment["bundle_digest"]
+                    or existing.evidence != assessment["evidence"]
+                    or existing.required_modes != assessment["required_modes"]
+                ):
+                    raise ValueError("candidate evidence is immutable")
+                return self._model_candidate_dict(session, existing)
+            status = "review_pending" if assessment["eligible_for_review"] else "rejected"
+            row = ModelCandidateRow(
+                id=candidate_id,
+                model_name=str(assessment["model_name"]),
+                version=str(assessment["version"]),
+                bundle_digest=str(assessment["bundle_digest"]),
+                status=status,
+                created_at=now,
+                updated_at=now,
+                created_by=actor,
+                required_modes=list(assessment["required_modes"]),
+                evidence=list(assessment["evidence"]),
+                blockers=list(assessment["blockers"]),
+            )
+            session.add(row)
+            session.add(
+                AuditLogRow(
+                    id=str(uuid4()),
+                    actor=actor,
+                    action="model_candidate_registered",
+                    timestamp=now,
+                    target_id=candidate_id,
+                    details={"status": status, "blockers": list(assessment["blockers"])},
+                )
+            )
+            session.flush()
+            return self._model_candidate_dict(session, row)
+
+    def review_model_candidate(
+        self,
+        candidate_id: str,
+        *,
+        actor: str,
+        decision: str,
+        comment: str,
+    ) -> dict[str, Any]:
+        if decision not in {"approve", "reject"}:
+            raise ValueError("invalid review decision")
+        now = datetime.now(UTC)
+        with self.session() as session:
+            row = session.scalar(
+                select(ModelCandidateRow)
+                .where(ModelCandidateRow.id == candidate_id)
+                .with_for_update()
+            )
+            if row is None:
+                raise KeyError("candidate not found")
+            if row.status != "review_pending":
+                raise ValueError("candidate is not awaiting review")
+            if row.created_by == actor:
+                raise ValueError("candidate creator cannot review the same candidate")
+            previous = session.scalar(
+                select(ModelReviewRow).where(
+                    ModelReviewRow.candidate_id == candidate_id,
+                    ModelReviewRow.actor == actor,
+                )
+            )
+            if previous is not None:
+                raise ValueError("review is immutable")
+            session.add(
+                ModelReviewRow(
+                    id=str(uuid4()),
+                    candidate_id=candidate_id,
+                    actor=actor,
+                    decision=decision,
+                    comment=comment,
+                    timestamp=now,
+                )
+            )
+            row.status = "approved" if decision == "approve" else "rejected"
+            row.updated_at = now
+            session.add(
+                AuditLogRow(
+                    id=str(uuid4()),
+                    actor=actor,
+                    action="model_candidate_reviewed",
+                    timestamp=now,
+                    target_id=candidate_id,
+                    details={"decision": decision},
+                )
+            )
+            session.flush()
+            return self._model_candidate_dict(session, row)
+
+    def begin_model_promotion(self, candidate_id: str, *, actor: str) -> dict[str, Any]:
+        now = datetime.now(UTC)
+        with self.session() as session:
+            row = session.scalar(
+                select(ModelCandidateRow)
+                .where(ModelCandidateRow.id == candidate_id)
+                .with_for_update()
+            )
+            if row is None:
+                raise KeyError("candidate not found")
+            if row.status != "approved":
+                raise ValueError("candidate is not approved")
+            approval = session.scalar(
+                select(ModelReviewRow).where(
+                    ModelReviewRow.candidate_id == candidate_id,
+                    ModelReviewRow.decision == "approve",
+                    ModelReviewRow.actor != actor,
+                )
+            )
+            if approval is None:
+                raise ValueError("promotion requires approval from a different identity")
+            row.status = "promotion_pending"
+            row.updated_at = now
+            session.add(
+                AuditLogRow(
+                    id=str(uuid4()),
+                    actor=actor,
+                    action="model_promotion_started",
+                    timestamp=now,
+                    target_id=candidate_id,
+                    details={"bundle_digest": row.bundle_digest},
+                )
+            )
+            session.flush()
+            return self._model_candidate_dict(session, row)
+
+    def finish_model_promotion(
+        self,
+        candidate_id: str,
+        *,
+        actor: str,
+        manifest: dict[str, Any] | None,
+        error_code: str | None = None,
+    ) -> dict[str, Any]:
+        now = datetime.now(UTC)
+        with self.session() as session:
+            row = session.scalar(
+                select(ModelCandidateRow)
+                .where(ModelCandidateRow.id == candidate_id)
+                .with_for_update()
+            )
+            if row is None:
+                raise KeyError("candidate not found")
+            if row.status != "promotion_pending":
+                raise ValueError("candidate promotion is not pending")
+            success = manifest is not None and error_code is None
+            row.status = "promoted" if success else "approved"
+            row.updated_at = now
+            session.add(
+                AuditLogRow(
+                    id=str(uuid4()),
+                    actor=actor,
+                    action="model_promoted" if success else "model_promotion_failed",
+                    timestamp=now,
+                    target_id=candidate_id,
+                    details={} if success else {"error_code": error_code or "unknown"},
+                )
+            )
+            session.flush()
+            return self._model_candidate_dict(session, row)
+
+    def record_model_rollback(
+        self,
+        *,
+        model_name: str,
+        from_version: str,
+        to_version: str,
+        actor: str,
+    ) -> None:
+        now = datetime.now(UTC)
+        with self.session() as session:
+            candidate = session.get(ModelCandidateRow, f"{model_name}:{from_version}")
+            if candidate is not None and candidate.status == "promoted":
+                candidate.status = "rolled_back"
+                candidate.updated_at = now
+            session.add(
+                AuditLogRow(
+                    id=str(uuid4()),
+                    actor=actor,
+                    action="model_rollback_requested",
+                    timestamp=now,
+                    target_id=model_name,
+                    details={"from": from_version, "to": to_version},
+                )
+            )
+
+    def reconcile_pending_model_promotions(
+        self,
+        *,
+        active_model_name: str,
+        active_version: str,
+        active_bundle_digest: str,
+    ) -> int:
+        now = datetime.now(UTC)
+        reconciled = 0
+        with self.session() as session:
+            rows = session.scalars(
+                select(ModelCandidateRow)
+                .where(ModelCandidateRow.status == "promotion_pending")
+                .with_for_update()
+            )
+            for row in rows:
+                success = (
+                    row.model_name == active_model_name
+                    and row.version == active_version
+                    and row.bundle_digest == active_bundle_digest
+                )
+                row.status = "promoted" if success else "approved"
+                row.updated_at = now
+                session.add(
+                    AuditLogRow(
+                        id=str(uuid4()),
+                        actor="system:startup",
+                        action="model_promotion_reconciled",
+                        timestamp=now,
+                        target_id=row.id,
+                        details={"outcome": "completed" if success else "released_for_retry"},
+                    )
+                )
+                reconciled += 1
+        return reconciled
+
     def record_model(self, manifest: dict[str, Any]) -> None:
         key = f"{manifest['model_name']}:{manifest['version']}"
         with self.session() as session:
             loaded_at = datetime.now(UTC)
+            for candidate in session.scalars(
+                select(ModelVersionRow).where(
+                    ModelVersionRow.model_name == str(manifest["model_name"])
+                )
+            ):
+                candidate.production = candidate.id == key
             row = session.get(ModelVersionRow, key)
             if row is None:
                 session.add(
@@ -1136,9 +1527,12 @@ class Repository:
                 row.loaded_at = loaded_at
                 row.metadata_json = manifest
 
-    def cleanup_before(self, cutoff: datetime) -> dict[str, int]:
+    def cleanup_before(
+        self, cutoff: datetime, *, audit_cutoff: datetime | None = None
+    ) -> dict[str, int]:
         """Delete expired operational records in foreign-key-safe order."""
         counts: dict[str, int] = {}
+        effective_audit_cutoff = audit_cutoff or cutoff
         with self.session() as session:
             old_flows = list(
                 session.scalars(select(FlowRow.event_id).where(FlowRow.timestamp_end < cutoff))
@@ -1205,7 +1599,7 @@ class Repository:
             )
             counts["audit_events"] = (
                 session.execute(
-                    delete(AuditLogRow).where(AuditLogRow.timestamp < cutoff)
+                    delete(AuditLogRow).where(AuditLogRow.timestamp < effective_audit_cutoff)
                 ).rowcount
                 or 0
             )

@@ -6,8 +6,12 @@ Read endpoints cover alerts, incidents, flows, hosts, model versions, drift, and
 system status. Mutations record alert feedback and incident status. List endpoints
 bound `limit` to 200. Alerts accept UTC `start`/`end`, severity, verdict, protocol,
 and host filters; flows accept UTC `start`/`end`, protocol, and host filters. Naive
-timestamps and reversed ranges are rejected. `X-Correlation-ID` is echoed or generated. If
-`AEGISFLOW_API_KEY` is set, mutations require `X-API-Key`.
+timestamps and reversed ranges are rejected. `X-Correlation-ID` is echoed or generated.
+All `/api/v1` endpoints and `/metrics` require an authenticated viewer outside demo mode.
+OIDC bearer tokens and hashed role-bearing API keys are supported; role-specific mutation
+rules and configuration are documented in
+[`AUTHENTICATION.md`](AUTHENTICATION.md). `GET /api/v1/auth/me` returns the server-derived
+subject, display name, role set, and authentication method.
 
 Errors use a stable `error` envelope containing `code`, a safe `message`, and the
 correlation ID. Validation errors include field locations and error types without
@@ -26,8 +30,9 @@ HMAC salt; pass `anonymize_ips=false` only for an authorized local workflow. Exp
 columns are allow-listed and never include protocol metadata, packet contents, or raw
 payloads. Retraining candidates contain only analyst-approved `benign_new_behaviour`
 rows and the fixed feature registry—never addresses, comments, or analyst identities.
-CSV formula prefixes are escaped. When `AEGISFLOW_API_KEY` is configured, disabling
-address anonymization requires the matching `X-API-Key` header.
+CSV formula prefixes are escaped. Disabling address anonymization requires `admin`; the
+raw export creates a durable audit event containing only actor, action, target, and row
+count.
 
 `POST /api/v1/alerts/{alert_id}/acknowledge` records the first acknowledgement in the
 audit log. Repeated acknowledgements are idempotent.
@@ -45,10 +50,10 @@ WebSockets:
 - `/api/v1/stream/system`
 
 Clients reconnect with bounded delay. Safe CORS defaults allow only local dashboard
-origins. Production deployments must configure explicit origins and an API key or
-place the API behind organizational authentication.
-WebSockets enforce the same origin allow-list, default to 32 concurrent connections,
-and cap outbound frames at 256 KiB. An oversized frame becomes a visible
+origins. Production deployments must configure their exact HTTPS dashboard origin and
+OIDC identity boundary. WebSockets enforce the same origin allow-list and viewer role,
+default to 32 concurrent connections, and cap outbound frames at 256 KiB. Browser bearer
+tokens use a WebSocket subprotocol rather than a query parameter. An oversized frame becomes a visible
 `processing_error`; it is never silently presented as an empty benign result.
 
 Incident list responses include derived alert counts, endpoint sets, reason/signature
@@ -59,6 +64,8 @@ full related alerts. `POST /api/v1/incidents/{incident_id}/status` accepts only 
 `POST /api/v1/incidents/{incident_id}/notes` records a bounded analyst note as an audit
 event and advances the incident version; incident detail returns the chronological note
 ledger. Notes never enter detection, explanation prompts, or retraining candidates.
+Acknowledgements, feedback, notes, and status changes ignore client attribution because
+the authenticated subject is the sole audit actor.
 
 Incident explanations are fetched on demand from
 `GET /api/v1/incidents/{incident_id}/explanation`. The response identifies the requested
@@ -66,3 +73,17 @@ and actual provider, whether text is AI-generated, deterministic fallback, or ca
 the incident-version hash, generation time, and limitations. This endpoint uses only
 sanitized aggregate evidence and is not part of ingestion or detection. See
 [`AI_EXPLANATIONS.md`](AI_EXPLANATIONS.md).
+
+Model-governance endpoints are:
+
+- `GET /api/v1/model-candidates` and `GET /api/v1/model-candidates/{id}` (`viewer`)
+- `POST /api/v1/model-candidates/{model_name}` (`admin` registration)
+- `POST /api/v1/model-candidates/{id}/reviews` (`analyst` review)
+- `POST /api/v1/model-candidates/{id}/promote` (`admin`, explicitly enabled)
+- `POST /api/v1/models/{model_name}/rollback` (`admin`, explicitly enabled)
+
+Registration revalidates the exact bundle and sanitized report files. A failing report
+or missing required mode makes the candidate durably `rejected`; it cannot be reviewed
+or promoted. Promotion rechecks every checksum after review, atomically updates the
+pointer, and reports `restart_required=true`. It never hot-swaps an in-flight detector.
+`GET /api/v1/audit-events` is admin-only and supports bounded actor/action filters.

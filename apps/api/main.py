@@ -13,13 +13,13 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Any, Literal, cast
+from urllib.parse import urlsplit
 from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
 
 import uvicorn
 from fastapi import (
     Depends,
     FastAPI,
-    Header,
     HTTPException,
     Query,
     Request,
@@ -30,10 +30,19 @@ from fastapi import (
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from pydantic import BaseModel, ConfigDict, Field
 
+from apps.api.auth import (
+    AuthConfigurationError,
+    AuthenticationError,
+    Authenticator,
+    Principal,
+    PrincipalRateLimiter,
+    Role,
+)
 from apps.api.consumer import DetectionConsumer
 from apps.api.database import Repository
 from apps.api.retention import RetentionWorker, retention_status, retention_worker_from_env
@@ -61,7 +70,15 @@ from packages.incidents import (
     RuntimeDriftMonitor,
     explanation_service_from_env,
 )
-from packages.model_bundle import BundleError, load_production_bundle
+from packages.model_bundle import (
+    BundleError,
+    assess_candidate,
+    load_production_bundle,
+    promote_bundle,
+    revalidate_candidate,
+    rollback_production_bundle,
+)
+from packages.model_bundle.bundle import sha256_file
 from services.sensor import DemoAdapter
 from training.cli.train_smoke import train
 
@@ -99,6 +116,15 @@ HTTP_BODY_REJECTIONS = Counter(
 WEBSOCKET_REJECTIONS = Counter(
     "websocket_rejections_total", "WebSocket connections or payloads rejected", ["reason"]
 )
+AUTHENTICATION_FAILURES = Counter(
+    "authentication_failures_total", "Rejected API authentication attempts", ["reason"]
+)
+AUTHORIZATION_DENIALS = Counter(
+    "authorization_denials_total", "Authenticated requests denied by RBAC", ["required_role"]
+)
+RATE_LIMIT_REJECTIONS = Counter(
+    "rate_limit_rejections_total", "Per-principal requests rejected", ["scope"]
+)
 LOGGER = service_logger("api")
 _CORRELATION_ID = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
 _websocket_connections = 0
@@ -107,7 +133,6 @@ _explicit_dropped_records = 0
 
 class FeedbackRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    actor: str = Field(min_length=1, max_length=128)
     disposition: FeedbackDisposition
     comment: str = Field(default="", max_length=2000)
     eligible_for_retraining: bool = False
@@ -120,13 +145,19 @@ class IncidentStatusRequest(BaseModel):
 
 class IncidentNoteRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    actor: str = Field(min_length=1, max_length=128)
     note: str = Field(min_length=1, max_length=2000)
 
 
-class AcknowledgeRequest(BaseModel):
+class ModelCandidateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    actor: str = Field(min_length=1, max_length=128)
+    version: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9._-]+$")
+    evaluation_reports: list[str] = Field(min_length=1, max_length=20)
+
+
+class ModelReviewRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    decision: Literal["approve", "reject"]
+    comment: str = Field(default="", max_length=2000)
 
 
 def _record_drift_metric(event: DriftEvent) -> None:
@@ -188,6 +219,8 @@ def _seed_demo(
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     configure_json_logger("uvicorn.access", "api-access", replace_handlers=True)
     configure_json_logger("uvicorn.error", "api-runtime", replace_handlers=True)
+    authenticator = Authenticator.from_env()
+    rate_limiter = PrincipalRateLimiter.from_env()
     repository = Repository()
     repository.create_schema()
     registry = Path(os.getenv("AEGISFLOW_MODEL_REGISTRY", "models/registry"))
@@ -205,14 +238,29 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         window_size=int(os.getenv("AEGISFLOW_DRIFT_WINDOW", "64")),
     )
     repository.record_model(bundle.manifest)
+    repository.reconcile_pending_model_promotions(
+        active_model_name=str(bundle.manifest["model_name"]),
+        active_version=bundle.version,
+        active_bundle_digest=sha256_file(bundle.root / "checksums.sha256"),
+    )
     app.state.repository = repository
+    app.state.authenticator = authenticator
+    app.state.rate_limiter = rate_limiter
+    app.state.model_registry = registry
+    app.state.evaluation_root = Path(
+        os.getenv("AEGISFLOW_EVALUATION_REPORT_DIR", "docs/evaluation")
+    )
+    app.state.model_version = bundle.version
     app.state.engine = engine
     app.state.drift_monitor = drift_monitor
     app.state.explanation_service = explanation_service_from_env()
     repository.record_health_event(
         "api",
         "ready",
-        {"mode": "demo" if os.getenv("AEGISFLOW_DEMO", "1") == "1" else "production"},
+        {
+            "mode": "demo" if os.getenv("AEGISFLOW_DEMO", "1") == "1" else "production",
+            "auth_mode": authenticator.settings.mode,
+        },
     )
     log_event(
         LOGGER,
@@ -256,7 +304,77 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     log_event(LOGGER, "api_stopped", model_version=str(bundle.manifest["version"]))
 
 
-app = FastAPI(
+class AegisFlowAPI(FastAPI):
+    def openapi(self) -> dict[str, Any]:
+        if self.openapi_schema is not None:
+            return self.openapi_schema
+        schema = get_openapi(
+            title=self.title,
+            version=self.version,
+            description=self.description,
+            routes=self.routes,
+        )
+        components = schema.setdefault("components", {})
+        security_schemes = components.setdefault("securitySchemes", {})
+        security_schemes.update(
+            {
+                "BearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
+                "ApiKeyAuth": {"type": "apiKey", "in": "header", "name": "X-API-Key"},
+            }
+        )
+        for path, path_item in schema.get("paths", {}).items():
+            if not isinstance(path_item, dict) or not (
+                path.startswith("/api/v1/") or path == "/metrics"
+            ):
+                continue
+            for operation in path_item.values():
+                if isinstance(operation, dict) and "responses" in operation:
+                    operation["security"] = [{"BearerAuth": []}, {"ApiKeyAuth": []}]
+        self.openapi_schema = schema
+        return schema
+
+
+def _cors_origins_from_env() -> tuple[str, ...]:
+    origins = tuple(
+        dict.fromkeys(
+            value.strip()
+            for value in os.getenv(
+                "AEGISFLOW_CORS_ORIGINS",
+                "http://localhost:5173,http://127.0.0.1:5173",
+            ).split(",")
+            if value.strip()
+        )
+    )
+    if not origins or len(origins) > 32:
+        raise AuthConfigurationError("CORS origins must contain between 1 and 32 values")
+    for origin in origins:
+        parsed = urlsplit(origin)
+        host = (parsed.hostname or "").lower()
+        loopback = host in {"localhost", "127.0.0.1", "::1"}
+        try:
+            _ = parsed.port
+        except ValueError as exc:
+            raise AuthConfigurationError("CORS origin contains an invalid port") from exc
+        if (
+            origin == "*"
+            or not host
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.path
+            or parsed.query
+            or parsed.fragment
+            or (parsed.scheme != "https" and not (parsed.scheme == "http" and loopback))
+        ):
+            raise AuthConfigurationError(
+                "CORS origins must be exact HTTPS origins or loopback HTTP origins"
+            )
+    return origins
+
+
+_CORS_ORIGINS = _cors_origins_from_env()
+
+
+app = AegisFlowAPI(
     title="AegisFlow API",
     version="1.0.0",
     description=(
@@ -267,15 +385,10 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        value.strip()
-        for value in os.getenv(
-            "AEGISFLOW_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
-        ).split(",")
-    ],
+    allow_origins=list(_CORS_ORIGINS),
     allow_credentials=False,
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type", "X-API-Key", "X-Correlation-ID"],
+    allow_headers=["Authorization", "Content-Type", "X-API-Key", "X-Correlation-ID"],
 )
 
 
@@ -346,6 +459,35 @@ async def correlation_id(request: Request, call_next: Any) -> Response:
         else str(uuid4())
     )
     request.state.correlation_id = correlation
+    if request.url.path.startswith("/api/v1/") or request.url.path == "/metrics":
+        authenticator = cast(Authenticator, request.app.state.authenticator)
+        try:
+            principal = authenticator.authenticate_headers(request.headers)
+        except AuthenticationError as exc:
+            AUTHENTICATION_FAILURES.labels(exc.code).inc()
+            log_event(
+                LOGGER,
+                "authentication_rejected",
+                level="warning" if exc.status_code < 500 else "error",
+                correlation_id=correlation,
+                error_code=exc.code,
+            )
+            auth_response = _middleware_error(exc.status_code, exc.code, correlation)
+            auth_response.headers["WWW-Authenticate"] = exc.challenge
+            return auth_response
+        if not principal.allows(Role.VIEWER):
+            AUTHORIZATION_DENIALS.labels(Role.VIEWER.value).inc()
+            return _middleware_error(403, "insufficient_role", correlation)
+        scope: Literal["read", "mutation"] = (
+            "read" if request.method in {"GET", "HEAD", "OPTIONS"} else "mutation"
+        )
+        limiter = cast(PrincipalRateLimiter, request.app.state.rate_limiter)
+        if not limiter.allow(principal, scope):
+            RATE_LIMIT_REJECTIONS.labels(scope).inc()
+            limited_response = _middleware_error(429, "rate_limit_exceeded", correlation)
+            limited_response.headers["Retry-After"] = "60"
+            return limited_response
+        request.state.principal = principal
     if request.method in {"POST", "PUT", "PATCH"}:
         maximum = _bounded_environment_int(
             "AEGISFLOW_HTTP_MAX_BODY_BYTES", 65_536, 1_024, 1_048_576
@@ -401,10 +543,34 @@ def explanation_service(request: Request) -> ExplanationService:
     return cast(ExplanationService, request.app.state.explanation_service)
 
 
-def mutation_auth(x_api_key: Annotated[str | None, Header()] = None) -> None:
-    expected = os.getenv("AEGISFLOW_API_KEY")
-    if expected and x_api_key != expected:
-        raise HTTPException(status_code=401, detail={"code": "invalid_api_key"})
+def current_principal(request: Request) -> Principal:
+    principal = getattr(request.state, "principal", None)
+    if not isinstance(principal, Principal):
+        raise HTTPException(status_code=401, detail={"code": "credentials_required"})
+    return principal
+
+
+def _authorize(principal: Principal, required: Role) -> Principal:
+    if not principal.allows(required):
+        AUTHORIZATION_DENIALS.labels(required.value).inc()
+        raise HTTPException(status_code=403, detail={"code": "insufficient_role"})
+    return principal
+
+
+def analyst_principal(
+    principal: Annotated[Principal, Depends(current_principal)],
+) -> Principal:
+    return _authorize(principal, Role.ANALYST)
+
+
+def admin_principal(
+    principal: Annotated[Principal, Depends(current_principal)],
+) -> Principal:
+    return _authorize(principal, Role.ADMIN)
+
+
+def _governance_enabled() -> bool:
+    return os.getenv("AEGISFLOW_MODEL_GOVERNANCE_ENABLED", "0") == "1"
 
 
 def _utc_range(
@@ -481,6 +647,13 @@ def metrics(request: Request) -> Response:
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
+@app.get("/api/v1/auth/me")
+def auth_me(
+    principal: Annotated[Principal, Depends(current_principal)],
+) -> dict[str, Any]:
+    return principal.as_dict()
+
+
 @app.get("/api/v1/alerts")
 def list_alerts(
     repo: Annotated[Repository, Depends(repository)],
@@ -531,29 +704,30 @@ def get_alert(alert_id: UUID, repo: Annotated[Repository, Depends(repository)]) 
     return item
 
 
-@app.post("/api/v1/alerts/{alert_id}/acknowledge", dependencies=[Depends(mutation_auth)])
+@app.post("/api/v1/alerts/{alert_id}/acknowledge")
 def acknowledge_alert(
     alert_id: UUID,
-    body: AcknowledgeRequest,
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
 ) -> dict[str, Any]:
-    if not repo.acknowledge_alert(str(alert_id), body.actor):
+    if not repo.acknowledge_alert(str(alert_id), principal.subject):
         raise HTTPException(status_code=404, detail={"code": "alert_not_found"})
-    return {"id": str(alert_id), "acknowledged": True, "actor": body.actor}
+    return {"id": str(alert_id), "acknowledged": True, "actor": principal.subject}
 
 
-@app.post("/api/v1/alerts/{alert_id}/feedback", dependencies=[Depends(mutation_auth)])
+@app.post("/api/v1/alerts/{alert_id}/feedback")
 def submit_feedback(
     alert_id: UUID,
     body: FeedbackRequest,
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
 ) -> dict[str, Any]:
     alert = repo.alert(str(alert_id))
     if alert is None:
         raise HTTPException(status_code=404, detail={"code": "alert_not_found"})
     feedback = AnalystFeedback(
         alert_id=alert_id,
-        actor=body.actor,
+        actor=principal.subject,
         disposition=body.disposition,
         comment=body.comment,
         original_model_result=alert["detection"],
@@ -585,6 +759,7 @@ def get_incident_explanation(
     incident_id: UUID,
     repo: Annotated[Repository, Depends(repository)],
     service: Annotated[ExplanationService, Depends(explanation_service)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
 ) -> dict[str, Any]:
     context = repo.incident_explanation_context(str(incident_id))
     if context is None:
@@ -596,27 +771,35 @@ def get_incident_explanation(
     )
     outcome = "cached" if result.cached else "fallback" if result.fallback else "generated"
     EXPLANATIONS.labels(result.provider, outcome).inc()
+    repo.record_audit_event(
+        actor=principal.subject,
+        action="incident_explanation_requested",
+        target_id=str(incident_id),
+        details={"provider": result.provider, "outcome": outcome},
+    )
     return result.as_dict()
 
 
-@app.post("/api/v1/incidents/{incident_id}/status", dependencies=[Depends(mutation_auth)])
+@app.post("/api/v1/incidents/{incident_id}/status")
 def set_incident_status(
     incident_id: UUID,
     body: IncidentStatusRequest,
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
 ) -> dict[str, str]:
-    if not repo.set_incident_status(str(incident_id), body.status):
+    if not repo.set_incident_status(str(incident_id), body.status, principal.subject):
         raise HTTPException(status_code=404, detail={"code": "incident_not_found"})
     return {"id": str(incident_id), "status": body.status}
 
 
-@app.post("/api/v1/incidents/{incident_id}/notes", dependencies=[Depends(mutation_auth)])
+@app.post("/api/v1/incidents/{incident_id}/notes")
 def add_incident_note(
     incident_id: UUID,
     body: IncidentNoteRequest,
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
 ) -> dict[str, Any]:
-    note = repo.add_incident_note(str(incident_id), body.actor, body.note)
+    note = repo.add_incident_note(str(incident_id), principal.subject, body.note)
     if note is None:
         raise HTTPException(status_code=404, detail={"code": "incident_not_found"})
     return note
@@ -664,26 +847,33 @@ def get_flow(event_id: UUID, repo: Annotated[Repository, Depends(repository)]) -
 @app.get("/api/v1/retraining-candidates")
 def list_retraining_candidates(
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=500)] = 200,
 ) -> dict[str, Any]:
     items = repo.retraining_candidates(offset=offset, limit=limit)
+    repo.record_audit_event(
+        actor=principal.subject,
+        action="retraining_candidates_viewed",
+        target_id="retraining-candidates",
+        details={"count": len(items), "offset": offset, "limit": limit},
+    )
     return {"items": items, "offset": offset, "limit": limit, "count": len(items)}
 
 
 @app.get("/api/v1/exports/flows.csv")
 def export_flows(
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(current_principal)],
     event_id: Annotated[list[UUID] | None, Query(max_length=200)] = None,
     anonymize_ips: bool = True,
-    x_api_key: Annotated[str | None, Header()] = None,
     protocol: Annotated[str | None, Query(min_length=1, max_length=32)] = None,
     host: Annotated[str | None, Query(min_length=1, max_length=64)] = None,
     start: datetime | None = None,
     end: datetime | None = None,
 ) -> Response:
     if not anonymize_ips:
-        mutation_auth(x_api_key)
+        _authorize(principal, Role.ADMIN)
     start, end = _utc_range(start, end)
     payloads = repo.flows(
         limit=200,
@@ -698,15 +888,22 @@ def export_flows(
         sanitize_flow_export(payload, anonymize_ips=anonymize_ips, salt=salt)
         for payload in payloads
     ]
+    if not anonymize_ips:
+        repo.record_audit_event(
+            actor=principal.subject,
+            action="raw_flow_export_created",
+            target_id="flow-export",
+            details={"row_count": len(rows)},
+        )
     return _csv_response(rows, list(FLOW_EXPORT_FIELDS), "aegisflow-flows.csv")
 
 
 @app.get("/api/v1/exports/alerts.csv")
 def export_alerts(
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(current_principal)],
     alert_id: Annotated[list[UUID] | None, Query(max_length=200)] = None,
     anonymize_ips: bool = True,
-    x_api_key: Annotated[str | None, Header()] = None,
     severity: Severity | None = None,
     verdict: Verdict | None = None,
     protocol: Annotated[str | None, Query(min_length=1, max_length=32)] = None,
@@ -715,7 +912,7 @@ def export_alerts(
     end: datetime | None = None,
 ) -> Response:
     if not anonymize_ips:
-        mutation_auth(x_api_key)
+        _authorize(principal, Role.ADMIN)
     start, end = _utc_range(start, end)
     items = (
         [item for value in alert_id if (item := repo.alert(str(value))) is not None]
@@ -781,12 +978,20 @@ def export_alerts(
         "signature_score",
         "model_version",
     ]
+    if not anonymize_ips:
+        repo.record_audit_event(
+            actor=principal.subject,
+            action="raw_alert_export_created",
+            target_id="alert-export",
+            details={"row_count": len(rows)},
+        )
     return _csv_response(rows, fields, "aegisflow-alerts.csv")
 
 
 @app.get("/api/v1/exports/retraining-candidates.csv")
 def export_retraining_candidates(
     repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
 ) -> Response:
     candidates = repo.retraining_candidates(limit=500)
     feature_names = list(FEATURE_NAMES)
@@ -808,6 +1013,12 @@ def export_retraining_candidates(
         "original_risk",
         *feature_names,
     ]
+    repo.record_audit_event(
+        actor=principal.subject,
+        action="retraining_candidates_exported",
+        target_id="retraining-candidate-export",
+        details={"row_count": len(rows)},
+    )
     return _csv_response(rows, fields, "aegisflow-retraining-candidates.csv")
 
 
@@ -837,6 +1048,176 @@ def current_model(repo: Annotated[Repository, Depends(repository)]) -> dict[str,
     if not items:
         raise HTTPException(status_code=503, detail={"code": "model_unavailable"})
     return items[0]
+
+
+@app.get("/api/v1/model-candidates")
+def list_model_candidates(
+    repo: Annotated[Repository, Depends(repository)],
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> dict[str, Any]:
+    items = repo.model_candidates(limit=limit)
+    return {"items": items, "count": len(items)}
+
+
+@app.get("/api/v1/model-candidates/{candidate_id}")
+def get_model_candidate(
+    candidate_id: str,
+    repo: Annotated[Repository, Depends(repository)],
+) -> dict[str, Any]:
+    candidate = repo.model_candidate(candidate_id)
+    if candidate is None:
+        raise HTTPException(status_code=404, detail={"code": "model_candidate_not_found"})
+    return candidate
+
+
+@app.post("/api/v1/model-candidates/{model_name}")
+def register_model_candidate(
+    model_name: str,
+    body: ModelCandidateRequest,
+    request: Request,
+    repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(admin_principal)],
+) -> dict[str, Any]:
+    registry = cast(Path, request.app.state.model_registry)
+    evaluation_root = cast(Path, request.app.state.evaluation_root)
+    try:
+        assessment = assess_candidate(
+            registry,
+            evaluation_root,
+            model_name,
+            body.version,
+            body.evaluation_reports,
+        )
+        return repo.register_model_candidate(assessment.as_dict(), actor=principal.subject)
+    except BundleError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={"code": "invalid_model_candidate"},
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=409, detail={"code": "candidate_evidence_conflict"}
+        ) from exc
+
+
+@app.post("/api/v1/model-candidates/{candidate_id}/reviews")
+def review_model_candidate(
+    candidate_id: str,
+    body: ModelReviewRequest,
+    repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(analyst_principal)],
+) -> dict[str, Any]:
+    try:
+        return repo.review_model_candidate(
+            candidate_id,
+            actor=principal.subject,
+            decision=body.decision,
+            comment=body.comment,
+        )
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=404, detail={"code": "model_candidate_not_found"}
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=409, detail={"code": "model_candidate_review_conflict"}
+        ) from exc
+
+
+@app.post("/api/v1/model-candidates/{candidate_id}/promote")
+def promote_model_candidate(
+    candidate_id: str,
+    request: Request,
+    repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(admin_principal)],
+) -> dict[str, Any]:
+    if not _governance_enabled():
+        raise HTTPException(status_code=503, detail={"code": "model_governance_disabled"})
+    candidate = repo.model_candidate(candidate_id)
+    if candidate is None:
+        raise HTTPException(status_code=404, detail={"code": "model_candidate_not_found"})
+    registry = cast(Path, request.app.state.model_registry)
+    evaluation_root = cast(Path, request.app.state.evaluation_root)
+    try:
+        revalidate_candidate(registry, evaluation_root, candidate)
+        repo.begin_model_promotion(candidate_id, actor=principal.subject)
+        promote_bundle(
+            registry,
+            str(candidate["model_name"]),
+            str(candidate["version"]),
+        )
+        promoted = load_production_bundle(registry, str(candidate["model_name"]))
+        if promoted.version != candidate["version"]:
+            raise BundleError("promoted model could not be loaded exactly")
+    except (BundleError, KeyError, OSError, ValueError) as exc:
+        pending = repo.model_candidate(candidate_id)
+        if pending is not None and pending["status"] == "promotion_pending":
+            repo.finish_model_promotion(
+                candidate_id,
+                actor=principal.subject,
+                manifest=None,
+                error_code=type(exc).__name__,
+            )
+        raise HTTPException(status_code=409, detail={"code": "model_promotion_rejected"}) from exc
+    result = repo.finish_model_promotion(
+        candidate_id,
+        actor=principal.subject,
+        manifest=promoted.manifest,
+    )
+    return {
+        **result,
+        "restart_required": True,
+        "loaded_runtime_version": str(request.app.state.model_version),
+    }
+
+
+@app.post("/api/v1/models/{model_name}/rollback")
+def rollback_model(
+    model_name: str,
+    request: Request,
+    repo: Annotated[Repository, Depends(repository)],
+    principal: Annotated[Principal, Depends(admin_principal)],
+) -> dict[str, Any]:
+    if not _governance_enabled():
+        raise HTTPException(status_code=503, detail={"code": "model_governance_disabled"})
+    registry = cast(Path, request.app.state.model_registry)
+    try:
+        previous = load_production_bundle(registry, model_name)
+        rolled_back = rollback_production_bundle(registry, model_name)
+    except (BundleError, OSError) as exc:
+        repo.record_audit_event(
+            actor=principal.subject,
+            action="model_rollback_failed",
+            target_id=model_name,
+            details={"error_code": type(exc).__name__},
+        )
+        raise HTTPException(status_code=409, detail={"code": "model_rollback_rejected"}) from exc
+    repo.record_model_rollback(
+        model_name=model_name,
+        from_version=previous.version,
+        to_version=rolled_back.version,
+        actor=principal.subject,
+    )
+    return {
+        "model_name": model_name,
+        "version": rolled_back.version,
+        "previous_version": previous.version,
+        "restart_required": True,
+        "loaded_runtime_version": str(request.app.state.model_version),
+    }
+
+
+@app.get("/api/v1/audit-events")
+def list_audit_events(
+    repo: Annotated[Repository, Depends(repository)],
+    _principal: Annotated[Principal, Depends(admin_principal)],
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+    actor: Annotated[str | None, Query(min_length=1, max_length=128)] = None,
+    action: Annotated[str | None, Query(min_length=1, max_length=128)] = None,
+) -> dict[str, Any]:
+    items = repo.audit_events(offset=offset, limit=limit, actor=actor, action=action)
+    return {"items": items, "offset": offset, "limit": limit, "count": len(items)}
 
 
 @app.get("/api/v1/drift-events")
@@ -891,6 +1272,9 @@ def _system_status(app: FastAPI, repo: Repository) -> dict[str, Any]:
             if status["signature_events"]
             else "not_configured"
         ),
+        "auth_mode": cast(Authenticator, app.state.authenticator).settings.mode,
+        "model_governance_enabled": _governance_enabled(),
+        "loaded_runtime_version": str(app.state.model_version),
         "retention": retention_status(worker),
         "recent_health_events": repo.health_events(limit=10),
     }
@@ -906,18 +1290,37 @@ def _record_queue_metrics(queue: Mapping[str, int | float | bool]) -> None:
 
 async def _stream(websocket: WebSocket, kind: Literal["alerts", "system"]) -> None:
     global _websocket_connections
-    allowed_origins = {
-        value.strip()
-        for value in os.getenv(
-            "AEGISFLOW_CORS_ORIGINS",
-            "http://localhost:5173,http://127.0.0.1:5173",
-        ).split(",")
-        if value.strip()
-    }
+    allowed_origins = set(_CORS_ORIGINS)
     origin = websocket.headers.get("origin")
     if origin is not None and origin not in allowed_origins:
         WEBSOCKET_REJECTIONS.labels("origin").inc()
         await websocket.close(code=1008, reason="origin not allowed")
+        return
+    authenticator = cast(Authenticator, websocket.app.state.authenticator)
+    try:
+        principal, subprotocol = authenticator.authenticate_websocket(websocket.headers)
+    except AuthenticationError as exc:
+        AUTHENTICATION_FAILURES.labels(exc.code).inc()
+        WEBSOCKET_REJECTIONS.labels("authentication").inc()
+        await websocket.close(
+            code=1013 if exc.status_code >= 500 else 1008,
+            reason=(
+                "authentication unavailable"
+                if exc.status_code >= 500
+                else "authentication required"
+            ),
+        )
+        return
+    if not principal.allows(Role.VIEWER):
+        AUTHORIZATION_DENIALS.labels(Role.VIEWER.value).inc()
+        WEBSOCKET_REJECTIONS.labels("authorization").inc()
+        await websocket.close(code=1008, reason="insufficient role")
+        return
+    limiter = cast(PrincipalRateLimiter, websocket.app.state.rate_limiter)
+    if not limiter.allow(principal, "websocket"):
+        RATE_LIMIT_REJECTIONS.labels("websocket").inc()
+        WEBSOCKET_REJECTIONS.labels("rate_limit").inc()
+        await websocket.close(code=1013, reason="connection rate limit reached")
         return
     maximum_connections = _bounded_environment_int(
         "AEGISFLOW_WEBSOCKET_MAX_CONNECTIONS", 32, 1, 1024
@@ -929,7 +1332,7 @@ async def _stream(websocket: WebSocket, kind: Literal["alerts", "system"]) -> No
     _websocket_connections += 1
     accepted = False
     try:
-        await websocket.accept()
+        await websocket.accept(subprotocol=subprotocol)
         accepted = True
         WEBSOCKETS.inc()
         last_payload: str | None = None

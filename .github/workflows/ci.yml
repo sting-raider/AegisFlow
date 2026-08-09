@@ -21,11 +21,11 @@ jobs:
           python-version: "3.11"
       - run: uv sync --locked --extra dev
       - run: uv run ruff check .
-      - run: uv run mypy packages services apps/api training scripts
+      - run: uv run mypy packages services apps/api training scripts migrations
       - run: uv run pytest --cov=packages --cov=services --cov=apps.api
       - run: uv run python scripts/evaluate_nfstream.py --pcap tests/fixtures/demo.pcap
       - run: uv run python -m training.cli.train_smoke
-      - run: AEGISFLOW_DATABASE_URL=sqlite:///ci-migration.db uv run alembic upgrade head
+      - run: AEGISFLOW_DATABASE_URL=sqlite:///ci-migration.db uv run python -m scripts.migrate
 
   dashboard:
     runs-on: ubuntu-24.04
@@ -52,6 +52,15 @@ jobs:
       - run: docker compose -f compose.yml -f compose.demo.yml config --quiet
       - run: INTERFACE=eth0 docker compose -f compose.yml -f compose.live.yml --profile live config --quiet
       - run: SURICATA_PCAP="$PWD/tests/fixtures/demo.pcap" docker compose -f compose.suricata.yml --profile suricata config --quiet
+      - run: >-
+          AEGISFLOW_OIDC_ISSUER=https://identity.example.invalid/
+          AEGISFLOW_OIDC_AUDIENCE=aegisflow-api
+          AEGISFLOW_OIDC_JWKS_URL=https://identity.example.invalid/.well-known/jwks.json
+          AEGISFLOW_CORS_ORIGINS=https://aegisflow.example.invalid
+          AEGISFLOW_DB_PASSWORD_SECRET_FILE=/tmp/aegisflow-db-password
+          AEGISFLOW_DATABASE_URL_SECRET_FILE=/tmp/aegisflow-database-url
+          docker compose -f compose.yml -f compose.production.yml config --quiet
+      - run: kubectl kustomize infra/kubernetes >/dev/null
       - run: docker compose -f compose.yml -f compose.demo.yml build
       - run: docker build -f infra/docker/backend.Dockerfile --target sensor-live -t aegisflow-sensor-live:ci .
       - run: >-
@@ -80,11 +89,21 @@ jobs:
       - run: docker compose -f compose.yml -f compose.demo.yml up --build -d
       - run: docker compose -f compose.yml -f compose.demo.yml run --rm sensor
       - run: |
+          ready=0
           for attempt in {1..30}; do
-            curl --fail http://127.0.0.1:8000/health/ready && break
+            if curl --fail http://127.0.0.1:8000/health/ready; then ready=1; break; fi
             sleep 2
           done
+          test "$ready" -eq 1
           curl --fail http://127.0.0.1:8000/api/v1/alerts
+      - run: |
+          docker compose -f compose.yml -f compose.demo.yml up -d --force-recreate api
+          ready=0
+          for attempt in {1..30}; do
+            if curl --fail http://127.0.0.1:5173/health/ready; then ready=1; break; fi
+            sleep 2
+          done
+          test "$ready" -eq 1
       - run: npm ci
         working-directory: apps/dashboard
       - run: npx playwright install --with-deps chromium

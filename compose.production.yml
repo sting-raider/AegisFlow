@@ -1,0 +1,91 @@
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: null
+      POSTGRES_PASSWORD_FILE: /run/secrets/aegisflow_db_password
+    secrets:
+      - aegisflow_db_password
+    logging:
+      driver: json-file
+      options: {max-size: "20m", max-file: "5"}
+    deploy:
+      resources:
+        limits: {cpus: "2.0", memory: 2g}
+
+  redis:
+    logging:
+      driver: json-file
+      options: {max-size: "20m", max-file: "5"}
+    deploy:
+      resources:
+        limits: {cpus: "1.0", memory: 512m}
+
+  api:
+    environment:
+      AEGISFLOW_DATABASE_URL_FILE: /run/secrets/aegisflow_database_url
+      AEGISFLOW_DEMO: "0"
+      AEGISFLOW_DEMO_SEED: "0"
+      AEGISFLOW_AUTH_MODE: oidc
+      AEGISFLOW_OIDC_ISSUER: ${AEGISFLOW_OIDC_ISSUER:?set the OIDC issuer}
+      AEGISFLOW_OIDC_AUDIENCE: ${AEGISFLOW_OIDC_AUDIENCE:?set the API audience}
+      AEGISFLOW_OIDC_JWKS_URL: ${AEGISFLOW_OIDC_JWKS_URL:?set the JWKS URL}
+      AEGISFLOW_CORS_ORIGINS: ${AEGISFLOW_CORS_ORIGINS:?set the dashboard HTTPS origin}
+      AEGISFLOW_MODEL_GOVERNANCE_ENABLED: ${AEGISFLOW_MODEL_GOVERNANCE_ENABLED:-0}
+    secrets:
+      - aegisflow_database_url
+    volumes:
+      - model-registry:/app/models/registry
+      - ${AEGISFLOW_EVALUATION_REPORT_HOST_DIR:-./docs/evaluation}:/app/docs/evaluation:ro
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=2).read()
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+    logging:
+      driver: json-file
+      options: {max-size: "20m", max-file: "5"}
+    deploy:
+      resources:
+        limits: {cpus: "2.0", memory: 2g}
+
+  detector:
+    environment:
+      AEGISFLOW_DEMO: "0"
+    volumes:
+      - model-registry:/app/models/registry:ro
+    logging:
+      driver: json-file
+      options: {max-size: "20m", max-file: "5"}
+    deploy:
+      replicas: ${AEGISFLOW_DETECTOR_REPLICAS:-2}
+      resources:
+        limits: {cpus: "2.0", memory: 2g}
+
+  dashboard:
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:8080/"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+    logging:
+      driver: json-file
+      options: {max-size: "20m", max-file: "5"}
+    deploy:
+      resources:
+        limits: {cpus: "0.5", memory: 256m}
+
+volumes:
+  model-registry:
+
+secrets:
+  aegisflow_db_password:
+    file: ${AEGISFLOW_DB_PASSWORD_SECRET_FILE:?set the PostgreSQL password secret file}
+  aegisflow_database_url:
+    file: ${AEGISFLOW_DATABASE_URL_SECRET_FILE:?set the SQLAlchemy URL secret file}

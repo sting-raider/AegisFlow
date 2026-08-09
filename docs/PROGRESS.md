@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-08-09.
+Last updated: 2026-08-10.
 
 ## Verified
 
@@ -14,8 +14,8 @@ Last updated: 2026-08-09.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 128 tests pass, Ruff passes across the repository, strict MyPy passes across
-  the Python source tree, and the last measured backend coverage is 84%.
+- Python: 145 tests pass, Ruff passes across the repository, strict MyPy passes across
+  64 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -146,8 +146,8 @@ Last updated: 2026-08-09.
   evaluator retrains the calibrated classifier, benign-only Isolation Forest and CPU
   denoising autoencoder, builds a benign empirical CDF, and applies the bundle-loaded
   fusion rule in batches. Focused parity coverage proves a runtime single-flow result
-  matches batch scoring; the full local gate passes 128 Python tests, Ruff, strict MyPy
-  across 58 source files, dashboard lint/build, and four dashboard tests.
+  matches batch scoring; the current full local gate passes 145 Python tests, Ruff,
+  strict MyPy across 64 source files, dashboard lint/build, and four dashboard tests.
 - The reviewed official UNSW-NB15 training/testing partitions were downloaded through
   UNSW's public SharePoint path and retained only under ignored `data/`. SHA-256 and
   provenance sidecars identify 175,341 training and 82,332 testing rows. The sanitized
@@ -177,6 +177,36 @@ Last updated: 2026-08-09.
   macro F1, benign FPR, unknown detection/review, calibration, replay-hour false alerts,
   and overlap. Every published report fails. The gate can reject but never promote a
   model automatically.
+- Non-demo access now has explicit OIDC and hashed service-key modes. Asymmetric token
+  verification, issuer/audience/time checks, server-derived viewer/analyst/admin roles,
+  authenticated WebSockets, bounded per-principal limits, safe errors, and durable
+  attribution cover all versioned API and metrics routes. Unknown key IDs cannot amplify
+  JWKS refreshes, and CORS rejects wildcards and non-loopback cleartext origins. Demo
+  identity is available only while demo mode is enabled. A real organizational IdP,
+  shared gateway limiter, session UX, and multi-tenancy remain target-deployment work.
+- Challenger governance now binds a checksum-valid v3 bundle to immutable schema-1.1
+  exact-hybrid reports covering grouped/source-file, chronological, held-family, and
+  cross-dataset modes. Passing reports additionally bind the checksum-file digest and
+  valid train/test fingerprints. Failed evidence creates a durable rejection; passing evidence only
+  permits independent review. Creator self-review is prohibited, promotion requires a
+  different approver, every byte is revalidated, pointer changes are atomic, restart is
+  explicit, crash-pending state is reconciled, and rollback is audited. The four published
+  reports remain rejection evidence and cannot be overridden.
+- A production Compose override forces non-demo OIDC, mounted database secrets, health,
+  resource and log bounds, and read-only detector model access. A Kustomize baseline adds
+  non-root/read-only workloads, probes, disruption budgets, TLS ingress, and default-deny
+  ingress policy while assuming managed PostgreSQL/Redis and out-of-band secrets.
+  PostgreSQL advisory locking serializes concurrent migration init, and a single
+  `Forbid`-concurrency CronJob owns retention for replicated APIs. All five
+  Compose configurations render and `kubectl kustomize` passes locally. These are deployment
+  templates, not evidence of a real IdP, managed service, restore drill, or cluster rollout.
+- The 2026-08-10 validation rebuilt the real demo images, upgraded PostgreSQL through
+  Alembic 0002, verified the governance/audit tables and demo identity, replayed the six
+  safe deterministic flows, and passed Chromium E2E. Frontend lint/build, four Vitest
+  interactions, `npm audit` with zero vulnerabilities, 145 Python tests, and 84% coverage
+  also pass. An API-only container replacement initially exposed a stale Nginx upstream;
+  Docker DNS re-resolution now restores dashboard-proxied readiness without restarting
+  the dashboard, and Chromium passes after that forced replacement.
 
 ## Hard blockers and fallbacks
 
@@ -189,11 +219,17 @@ Last updated: 2026-08-09.
   Redis/PostgreSQL server tracing, multi-host orchestration, and deployment-specific
   capacity validation remain open. The 78.78 flows/s Compose result is database-bound
   and must not be generalized beyond the recorded host and synthetic workload.
+- The repository implements the identity, governance, and deployment control planes, but
+  has not been connected to a real organizational IdP or deployed to an external cluster.
+  The remaining dashboard is functional but has not yet completed the requested premium
+  editorial/newsroom visual transformation.
 
 ## Highest-priority required backlog
 
 - Build a feature-compatible multi-source challenger with fresh fit/calibration evidence
   and governed review; keep all published public reports frozen as final tests.
+- Complete the reusable editorial design system, cohesive seven-view transformation,
+  accessibility audit, and current desktop/mobile screenshots.
 - Extend runtime evidence with sustained representative replay and multi-host scaling;
-  add enterprise auth/RBAC, production deployment assets, governed champion/challenger
-  promotion, and the editorial dashboard transformation.
+  exercise the templates with a real IdP, managed data services, restore drill, and
+  representative target-cluster capacity tests.

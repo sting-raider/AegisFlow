@@ -24,6 +24,7 @@ COPY services ./services
 COPY training ./training
 COPY scripts ./scripts
 COPY migrations ./migrations
+COPY docs/evaluation ./docs/evaluation
 RUN python -m pip install --no-deps --no-build-isolation .
 COPY models/registry ./models/registry
 

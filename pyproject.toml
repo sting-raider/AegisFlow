@@ -28,6 +28,7 @@ dependencies = [
   "structlog==25.4.0",
   "torch==2.13.0",
   "uvicorn[standard]==0.35.0",
+  "pyjwt[crypto]==2.13.0",
 ]
 
 [project.optional-dependencies]

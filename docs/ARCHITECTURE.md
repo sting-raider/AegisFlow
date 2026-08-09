@@ -10,6 +10,10 @@ flowchart LR
     Q2 --> A["API / incident core"]
     A --> DB["PostgreSQL\nSQLite demo fallback"]
     A -->|REST + WebSocket| UI["React dashboard"]
+    ID["OIDC / hashed service identity\nviewer · analyst · admin"] --> A
+    G["Evaluation evidence + independent review"] --> A
+    A -->|atomic approved pointer| M["Versioned model registry"]
+    M --> D
     D --> H["Drift + model health"]
     A --> X["Deterministic explanation\noptional sanitized provider"]
 ```
@@ -29,6 +33,13 @@ Data contracts reject invalid input at boundaries. Events are idempotent by UUID
 Feature order and transformations are versioned; model bundles carry checksums,
 thresholds, labels, metrics, and provenance. Payload storage and active response are
 out of scope.
+
+The API is also the model control plane. Outside demo mode, every versioned route and
+WebSocket receives a server-derived principal. RBAC gates analyst actions, raw exports,
+the audit ledger, and model governance. Candidate evidence is checksum-bound to the exact
+bundle; failing gates can reject, but independent human review plus an admin promotion is
+required before atomic pointer replacement. Runtime workers never hot-reload mid-batch;
+promotion and rollback report that a controlled restart is required.
 
 Both Redis hops use consumer groups with at-least-once delivery. A consumer acknowledges
 only after publishing the next-stage event or committing the database transaction. Stale

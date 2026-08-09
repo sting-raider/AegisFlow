@@ -24,6 +24,7 @@ flowchart LR
   R1 --> D["Detector\ncalibrated classifier + Isolation Forest + autoencoder + fusion"]
   D --> R2["Detection stream"]
   R2 --> A["FastAPI / incidents"]
+  I["OIDC or hashed service identity\nviewer / analyst / admin"] --> A
   A --> P["PostgreSQL"]
   A --> W["REST + WebSocket"]
   W --> UI["React operations dashboard"]
@@ -84,14 +85,16 @@ make reset
 
 ## Verified status
 
-The latest local validation on 2026-08-09 passed:
+The latest local validation on 2026-08-10 passed:
 
-- Ruff and strict MyPy across 56 Python source files;
-- 128 Python tests with 84% last-measured backend coverage;
+- Ruff and strict MyPy across 64 Python source files, including migrations;
+- 145 Python tests with 84% backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
-- clean Compose image builds, database migration, offline replay, REST/metrics checks,
-  and independent Redis/PostgreSQL restart recovery;
+- clean Compose image builds, database migration through a mounted secret, offline replay,
+  REST/auth checks, and independent Redis/PostgreSQL restart recovery;
+- base, demo, live, Suricata, and production Compose validation plus a rendered Kustomize
+  baseline;
 - exact runtime batching and a local Redis-to-PostgreSQL Compose benchmark. The recorded
   2,000-flow detector comparison improved from 153.50 to 3,496.81 flows/s, while the
   full durable pipeline completed at 78.78 flows/s with zero final queue lag.
@@ -115,8 +118,9 @@ training-fold CV, and trains both Isolation Forest and a compact denoising autoe
 benign rows only. Bundle v3
 includes the feature schema, preprocessing, classifier, both anomaly models, labels,
 calibration-derived thresholds, a benign empirical anomaly CDF, fusion comparison metrics,
-training provenance, artifact hashes, and SHA-256 checksums. Production promotion is
-atomic and records rollback history. The detector requires a calibrated v3 bundle; older
+training provenance, artifact hashes, and SHA-256 checksums. Governed promotion binds
+the exact bundle to exact-hybrid reports, requires independent human review and an admin
+promoter, is atomic, and records rollback history. The detector requires a calibrated v3 bundle; older
 v1/v2 history remains available for migration inspection but cannot perform inference.
 
 Smoke metrics are only installation evidence. They are not claims about operational
@@ -145,6 +149,10 @@ gate, so no evaluated model is eligible for operational promotion. See
 - Analyst feedback never mutates an original detection.
 - Drift cannot retrain or promote a model.
 - Optional explanation providers receive only sanitized structured fields.
+- Non-demo APIs and WebSockets require OIDC bearer tokens or hashed role-bearing service
+  keys; server-derived viewer/analyst/admin roles control every sensitive operation.
+- Model reports can reject automatically but cannot promote automatically; creator,
+  reviewer, and promoter constraints plus rollback are durably audited.
 - Mutation bodies, stream messages, stream length, and WebSocket connections/frames are
   bounded; rejected queue records retain only a structural summary and SHA-256 hash.
 - Sensor, detector, API, access, and runtime application events use redacted one-line
@@ -154,7 +162,9 @@ gate, so no evaluated model is eligible for operational promotion. See
 Optional incident explanations are disabled by default and run only when requested from
 an incident. The deterministic explanation always remains available; configured remote
 or loopback-local providers have timeout, retry, rate, privacy, and cache bounds. See
-[`docs/AI_EXPLANATIONS.md`](docs/AI_EXPLANATIONS.md). Read the full
+[`docs/AI_EXPLANATIONS.md`](docs/AI_EXPLANATIONS.md),
+[`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md), and the production Compose/Kubernetes
+guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Read the full
 [`threat model`](docs/THREAT_MODEL.md) before live deployment.
 
 ## Known limitations
@@ -164,8 +174,10 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
   approve it. UNSW official-split FPR is 64.4%; held-family direct unknown detection is
   2.1%; UNSW-to-CSE benign FPR is 100%; and the CSE chronological test misses essentially
   all later infiltration flows. These are negative evidence, not performance claims.
-- API access control currently uses an optional shared key for mutations and does not yet
-  provide authenticated user identities, RBAC, SSO/OIDC, or tenant isolation.
+- OIDC/JWKS validation, hashed service identities, RBAC, WebSocket authentication,
+  per-principal limits, and durable actor attribution are implemented and tested with
+  controlled keys. A real organizational IdP, gateway-wide limits, session UX, and
+  multi-tenancy have not been exercised by this repository.
 - Runtime inference, Redis publication, acknowledgement, and PostgreSQL persistence are
   bounded and batched. Compose can partition detection across multiple replicas; a
   two-worker smoke exercised both workers. The recorded local numbers remain synthetic
@@ -181,6 +193,9 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
   acknowledgement, bounded retries, and idempotent event IDs. The Compose fault matrix is
   documented in `docs/PROGRESS.md`.
 - No active response or automatic blocking is implemented.
+- The production Compose override and Kustomize base render locally, but no external
+  cluster rollout, managed-service integration, restore drill, or representative capacity
+  validation is claimed.
 
 The active production-readiness expansion and unresolved evidence requirements are
 tracked in [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md). The completed offline

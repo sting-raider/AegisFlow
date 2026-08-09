@@ -12,9 +12,21 @@ import type {
 } from "./types";
 
 const API = import.meta.env.VITE_API_URL ?? "";
+let accessToken: string | undefined;
+
+export function setAccessToken(token: string | undefined): void {
+  accessToken = token;
+}
+
+function headers(contentType = false): HeadersInit {
+  return {
+    ...(contentType ? { "Content-Type": "application/json" } : {}),
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+  };
+}
 
 async function get<T>(path: string): Promise<T> {
-  const response = await fetch(`${API}${path}`);
+  const response = await fetch(`${API}${path}`, { headers: headers() });
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
   return response.json() as Promise<T>;
 }
@@ -29,26 +41,25 @@ export const api = {
   setIncidentStatus: async (id: string, status: string) => {
     const response = await fetch(`${API}/api/v1/incidents/${id}/status`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: headers(true),
       body: JSON.stringify({ status })
     });
     if (!response.ok) throw new Error("Incident status could not be updated");
     return response.json() as Promise<{ id: string; status: string }>;
   },
-  addIncidentNote: async (id: string, note: string, actor = "demo-analyst") => {
+  addIncidentNote: async (id: string, note: string) => {
     const response = await fetch(`${API}/api/v1/incidents/${id}/notes`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ actor, note })
+      headers: headers(true),
+      body: JSON.stringify({ note })
     });
     if (!response.ok) throw new Error("Incident note could not be recorded");
     return response.json() as Promise<{ id: string; actor: string; note: string; timestamp: string }>;
   },
-  acknowledge: async (id: string, actor = "demo-analyst") => {
+  acknowledge: async (id: string) => {
     const response = await fetch(`${API}/api/v1/alerts/${id}/acknowledge`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ actor })
+      headers: headers()
     });
     if (!response.ok) throw new Error("Alert could not be acknowledged");
     return response.json() as Promise<{ id: string; acknowledged: boolean; actor: string }>;
@@ -61,11 +72,11 @@ export const api = {
   status: () => get<SystemStatus>("/api/v1/system/status"),
   feedback: async (
     id: string,
-    body: { actor: string; disposition: string; comment: string }
+    body: { disposition: string; comment: string }
   ) => {
     const response = await fetch(`${API}/api/v1/alerts/${id}/feedback`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: headers(true),
       body: JSON.stringify(body)
     });
     if (!response.ok) throw new Error("Feedback could not be recorded");
@@ -86,4 +97,8 @@ export function alertSocketUrl(): string {
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const host = window.location.port === "5173" ? "127.0.0.1:8000" : window.location.host;
   return `${protocol}//${host}/api/v1/stream/alerts`;
+}
+
+export function alertSocketProtocols(): string[] | undefined {
+  return accessToken ? ["aegisflow", `aegisflow.bearer.${accessToken}`] : undefined;
 }

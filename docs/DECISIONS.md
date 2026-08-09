@@ -307,3 +307,94 @@ wheel with `--no-deps --no-build-isolation`. The first cache-establishing build 
 the network download cost, but the measured follow-up source rebuild completed in 6.3
 seconds instead of redownloading the full ML runtime. Baking dependencies after all source
 copies was rejected because every code edit invalidated the most expensive image layer.
+
+## D-026 — Explicit identity modes and server-derived hierarchical RBAC
+
+Use three explicit API modes: local `demo` only while demo mode is enabled, OIDC bearer
+validation for human/organizational identity, and a mounted file of hashed role-bearing
+API keys for service accounts. OIDC requires asymmetric signatures, issuer/audience,
+`sub`/`iat`/`exp`, bounded lifetime, allow-listed role mapping, and bounded HTTPS JWKS
+retrieval. Apply viewer authentication to every versioned API and metrics route, then
+require analyst or admin for sensitive operations. WebSockets use the same identity and
+origin boundary; browser tokens travel as a subprotocol, never a query parameter.
+
+Derive every audit actor from the authenticated subject and remove actor fields from
+mutation bodies. The earlier optional shared mutation key was rejected because reads and
+WebSockets stayed anonymous, every privileged client had equivalent power, and callers
+could spoof audit attribution. Per-process principal limits provide a bounded local guard;
+the production gateway remains responsible for a shared multi-replica limit.
+
+## D-027 — Public evaluation rejects; independent humans authorize promotion
+
+Register a challenger only after reloading its checksum-valid v3 bundle and hashing
+sanitized schema-1.1 evaluation reports bound to that exact model/version and checksum
+file digest. Require valid train/test fingerprints plus the
+shared deployed hybrid scorer and grouped/source-file, chronological, held-family, and
+cross-dataset coverage. A failed report, missing mode, or synthetic training fingerprint
+creates a durable rejected candidate. A pass only permits review and keeps
+`automatic_promotion_allowed=false`.
+
+Store candidate/review state in PostgreSQL. Reviews are immutable, creators cannot review
+their candidate, and promotion needs approval from a different authenticated identity.
+Revalidate every byte immediately before atomic pointer replacement and require a
+controlled worker restart; never hot-swap a model mid-batch. Emergency admin rollback
+uses validated pointer history and marks the displaced candidate rolled back. Allowing an
+administrator to override a failed scientific gate or letting one identity create,
+approve, and promote was rejected.
+
+## D-028 — Separate production deployment templates from verified demo evidence
+
+Keep the base Compose profile as the reproducible loopback demo. Add a production Compose
+override that forces non-demo OIDC, mounted database secrets, health/resource/log bounds,
+a shared writable control-plane model volume, read-only detector mounts, and explicit
+governance enablement. Add a Kustomize baseline that assumes managed PostgreSQL/Redis and
+out-of-band secrets, with non-root/read-only pods, probes, disruption budgets, TLS ingress,
+and ingress NetworkPolicies.
+
+Do not describe rendered templates as a deployed platform. Target organizations must
+replace invalid placeholders, use immutable signed images, validate RWX or an external
+model registry, perform restore/rollout tests, and measure their own capacity. Committing
+credentials, bundling a default production password, or claiming cluster readiness from
+client-side rendering was rejected.
+
+## D-029 — Resolve the database secret once for runtime and migrations
+
+Use one bounded `database_url_from_env` loader for both SQLAlchemy runtime construction
+and Alembic. A mounted `AEGISFLOW_DATABASE_URL_FILE` takes precedence over the environment
+URL, must contain one nonempty UTF-8 line, and is never logged. Alembic escapes literal
+percent signs only when writing the value into its ConfigParser and otherwise preserves
+the URL. A fresh-database integration test upgrades through the governance migration using
+only the mounted secret file.
+
+Duplicating URL resolution in `migrations/env.py` was rejected because production Compose
+could start the application with one credential source while migrations silently used the
+demo environment fallback. Keeping a nullable ConfigParser default was also rejected
+because it weakened strict typing at the deployment boundary.
+
+## D-030 — Serialize migrations and schedule retention once per cluster
+
+Run schema upgrades through `scripts.migrate`, which uses a stable PostgreSQL session
+advisory lock around Alembic while retaining a direct path for SQLite development. This
+makes simultaneous API init containers wait rather than race DDL. The database URL still
+comes from the shared secret loader and is never printed. Both Compose and CI exercise the
+same entry point, and focused tests prove a fresh secret-file upgrade plus lock/upgrade/
+unlock ordering.
+
+Disable the in-process retention thread in the replicated Kustomize API and assign cleanup
+to one daily CronJob with `concurrencyPolicy: Forbid`; expose that external mode and its
+operational/audit windows in system status. Running Alembic or retention independently in
+every replica was rejected because rendering two valid pods does not make concurrent DDL
+or duplicate schedulers reliable.
+
+## D-031 — Re-resolve the API upstream after container replacement
+
+Configure the unprivileged dashboard Nginx with Docker's embedded DNS resolver and a
+shared-memory upstream using `resolve`. This lets the loopback Compose dashboard survive
+an API container replacement instead of retaining the removed container's IP and serving
+502 responses. CI force-recreates only the API, waits on the dashboard-proxied readiness
+route, and then runs Playwright.
+
+Restarting the dashboard whenever the API changes was rejected because it hides a stale
+service-discovery defect and makes otherwise independent frontend availability depend on
+backend container identity. Kubernetes ingress routes `/api` and `/health` directly to
+the API Service, so its cluster DNS remains outside this Docker-specific proxy path.

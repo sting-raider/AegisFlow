@@ -386,5 +386,6 @@ def test_dataset_evaluation_cli_writes_a_complete_report(
     assert "train_indices" not in report["split"]
     assert report["evaluation"]["harness"] == "exact deployed hybrid pipeline"
     assert report["evaluation_bundle"]["bundle_schema_version"] == 3
+    assert len(report["evaluation_bundle"]["bundle_digest"]) == 64
     assert report["evaluation"]["feature_order"] == list(FEATURE_NAMES)
     assert report["quality"]["rows"] == 60

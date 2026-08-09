@@ -21,8 +21,8 @@ requirement-by-requirement evidence is recorded in `docs/COMPLETION_AUDIT.md`.
 | Phase | Deliverable | Status |
 |---|---|---|
 | P1 | Gap map and honest claim reset | Complete |
-| P2 | Direction semantics, Community ID, exact hybrid evaluation, calibration/fusion | In progress (direction and Community ID complete) |
-| P3 | Profiling, batching/scaling, resilience and deployment hardening | Not started |
+| P2 | Direction semantics, Community ID, exact hybrid evaluation, calibration/fusion | Complete implementation/evidence; current model rejected |
+| P3 | Profiling, batching/scaling, resilience and deployment hardening | In progress (single-host performance and deployment templates complete) |
 | P4 | Editorial intelligence design system and full dashboard transformation | Not started |
-| P5 | Authentication/RBAC, retraining governance and release readiness | Not started |
+| P5 | Authentication/RBAC, retraining governance and release readiness | Complete as repository implementation; target IdP/cluster validation remains P6 |
 | P6 | Real-data, performance, security, UI, deployment and public CI validation | Not started |

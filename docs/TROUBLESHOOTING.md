@@ -10,6 +10,17 @@
   do not delete a consumer group to clear an outage.
 - **Dashboard reconnecting:** open `/health/ready`, verify the `/api` and WebSocket
   reverse proxy, then inspect browser network errors.
+- **API returns `401 credentials_required`:** check `AEGISFLOW_AUTH_MODE`. For OIDC,
+  validate issuer, audience, JWKS URL, asymmetric algorithm and token time claims. For
+  service keys, confirm the mounted file contains the SHA-256 digest and role, not the raw
+  key. Demo identity is intentionally refused when `AEGISFLOW_DEMO=0`.
+- **API returns `403 insufficient_role`:** inspect `/api/v1/auth/me` with the same
+  credential and correct the IdP role claim or explicit service-key role mapping. Never
+  add a caller-controlled actor or bypass the evaluation gate to work around RBAC.
+- **Alembic connects to the wrong database:** `AEGISFLOW_DATABASE_URL_FILE` takes
+  precedence over `AEGISFLOW_DATABASE_URL` for both migrations and runtime. Confirm the
+  mounted file is one nonempty UTF-8 line and that the migration and API containers mount
+  the same secret source.
 - **PostgreSQL migration failure:** confirm the database password/URL and run
   `alembic current` followed by `alembic upgrade head`.
 - **PostgreSQL interruption:** restore database health and leave the API running. Failed
