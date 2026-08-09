@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-08-01.
+Last updated: 2026-08-09.
 
 ## Verified
 
@@ -14,18 +14,21 @@ Last updated: 2026-08-01.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 108 tests pass, Ruff passes across the repository, strict MyPy passes across
-  53 source files, and the last measured backend coverage is 84%.
+- Python: 128 tests pass, Ruff passes across the repository, strict MyPy passes across
+  the Python source tree, and the last measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
   network; API/dashboard bind to loopback.
-- Bounded-queue burst benchmark on the recorded Windows host generated 2,000 flows,
-  processed 1,685 at 74.5 flows/s, explicitly dropped 315 after the 256-event queue
-  saturated, and drained to zero. Inference measured 14.55/21.02/26.65 ms p50/p95/p99;
-  queue-inclusive processing measured 4,124.57/4,357.90/4,382.78 ms. Average process CPU
-  was 97.13% with a 319.4 MB RSS peak. This is a local synthetic overload measurement,
-  not a production capacity claim.
+- Exact runtime profiling isolated single-row Isolation Forest traversal as 66.3% of
+  measured detector stage time. On the same 2,000-flow Windows burst with no drops,
+  64-row hybrid batching raised throughput from 153.50 to 3,496.81 flows/s (22.78x).
+  The local Compose Redis-to-PostgreSQL gate initially timed out at 150 seconds with
+  1,828/2,000 rows durable; bounded persistence transactions and transaction-local
+  incident-context caching then completed 2,000/2,000 in 25.39 seconds (78.78 flows/s)
+  with zero final pending or lag. A two-detector smoke exercised eight batches on each
+  replica and drained both queues. These are synthetic single-host measurements, not
+  production capacity claims; exact artifacts live under `docs/benchmarks/`.
 - Redis/PostgreSQL recovery matrix passes against Compose: abandoned detector work is
   claimed, a three-event backlog drains, Redis restarts without replacing consumers,
   PostgreSQL downtime leaves its event pending and records retry errors, and recovery
@@ -143,8 +146,8 @@ Last updated: 2026-08-01.
   evaluator retrains the calibrated classifier, benign-only Isolation Forest and CPU
   denoising autoencoder, builds a benign empirical CDF, and applies the bundle-loaded
   fusion rule in batches. Focused parity coverage proves a runtime single-flow result
-  matches batch scoring; the full local gate passes 113 Python tests, Ruff, strict MyPy
-  across 56 source files, dashboard lint/build, and four dashboard tests.
+  matches batch scoring; the full local gate passes 128 Python tests, Ruff, strict MyPy
+  across 58 source files, dashboard lint/build, and four dashboard tests.
 - The reviewed official UNSW-NB15 training/testing partitions were downloaded through
   UNSW's public SharePoint path and retained only under ignored `data/`. SHA-256 and
   provenance sidecars identify 175,341 training and 82,332 testing rows. The sanitized
@@ -182,11 +185,15 @@ Last updated: 2026-08-01.
   tuning against those final reports would be test leakage. Windows cannot validate
   authorized live capture, so isolated Linux-container evidence remains required for
   that path.
+- Runtime mechanics are materially stronger, but representative sustained traffic,
+  Redis/PostgreSQL server tracing, multi-host orchestration, and deployment-specific
+  capacity validation remain open. The 78.78 flows/s Compose result is database-bound
+  and must not be generalized beyond the recorded host and synthetic workload.
 
 ## Highest-priority required backlog
 
 - Build a feature-compatible multi-source challenger with fresh fit/calibration evidence
   and governed review; keep all published public reports frozen as final tests.
-- Add runtime profiling, batching/worker scaling, enterprise
-  auth/RBAC, production deployment assets, governed champion/challenger promotion, and
-  the editorial dashboard transformation.
+- Extend runtime evidence with sustained representative replay and multi-host scaling;
+  add enterprise auth/RBAC, production deployment assets, governed champion/challenger
+  promotion, and the editorial dashboard transformation.

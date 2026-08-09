@@ -36,6 +36,14 @@ pending entries are reclaimed after 30 seconds by default. Malformed events are 
 written to the dead-letter stream; database/Redis outages remain visible as pending or
 lagging queue work and retry metrics rather than being mislabeled benign.
 
+The detector reads bounded groups, converts all valid rows through one exact hybrid batch,
+publishes detection envelopes through one atomic Redis pipeline, then acknowledges their
+source IDs together. Multiple detector replicas share the same consumer group for disjoint
+work partitioning. The API persists bounded groups in one transaction and caches derived
+incident context only for that transaction. One invalid row is quarantined without
+poisoning valid rows; model-wide, Redis, or database failures leave work pending. See
+[`PERFORMANCE.md`](PERFORMANCE.md) for measured stage and full-pipeline evidence.
+
 The API-side durable consumer also feeds a bounded runtime drift monitor after a new
 detection is persisted. It watches anomaly score, known-class confidence, normalized
 flow rate, duration, byte volume, packet length, and alert rate. A threshold crossing

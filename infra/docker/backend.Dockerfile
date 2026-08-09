@@ -13,6 +13,10 @@ RUN groupadd --system --gid 10001 aegisflow \
 
 WORKDIR /app
 COPY pyproject.toml README.md LICENSE alembic.ini ./
+RUN python -m pip install --upgrade pip==25.1.1 \
+    && python -m pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu \
+    && python -m pip install hatchling==1.27.0 \
+    && python -c "import subprocess,sys,tomllib; dependencies=tomllib.load(open('pyproject.toml','rb'))['project']['dependencies']; subprocess.check_call([sys.executable,'-m','pip','install',*dependencies])"
 COPY apps/__init__.py ./apps/__init__.py
 COPY apps/api ./apps/api
 COPY packages ./packages
@@ -20,9 +24,7 @@ COPY services ./services
 COPY training ./training
 COPY scripts ./scripts
 COPY migrations ./migrations
-RUN python -m pip install --upgrade pip==25.1.1 \
-    && python -m pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu \
-    && python -m pip install .
+RUN python -m pip install --no-deps --no-build-isolation .
 COPY models/registry ./models/registry
 
 FROM runtime AS sensor-live

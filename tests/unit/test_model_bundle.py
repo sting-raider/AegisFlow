@@ -80,6 +80,44 @@ def test_runtime_single_flow_and_shared_batch_hybrid_paths_are_identical(
     ]
 
 
+def test_detection_engine_batch_preserves_single_flow_results(bundle: ModelBundle) -> None:
+    flows = list(DemoAdapter().flows())
+    engine = DetectionEngine(bundle)
+
+    batched = engine.detect_batch(flows)
+    singles = [engine.detect(flow) for flow in flows]
+
+    assert len(batched) == len(singles)
+    numeric = {
+        "known_attack_probability",
+        "classifier_confidence",
+        "anomaly_score",
+        "anomaly_percentile",
+        "open_set_score",
+        "reconstruction_error",
+        "reconstruction_score",
+        "signature_score",
+        "contextual_score",
+        "final_risk_score",
+    }
+    excluded = {"timestamp", "inference_latency_ms", "processing_latency_ms", *numeric}
+    assert [result.model_dump(exclude=excluded) for result in batched] == [
+        result.model_dump(exclude=excluded) for result in singles
+    ]
+    for field in numeric:
+        np.testing.assert_allclose(
+            [getattr(result, field) for result in batched],
+            [getattr(result, field) for result in singles],
+            atol=1e-6,
+        )
+    for batch_result, single_result in zip(batched, singles, strict=True):
+        assert batch_result.class_probabilities == pytest.approx(
+            single_result.class_probabilities, abs=1e-7
+        )
+    assert all(result.inference_latency_ms >= 0 for result in batched)
+    assert all(result.processing_latency_ms >= result.inference_latency_ms for result in batched)
+
+
 def test_corrupted_artifact_fails_before_deserialization(
     bundle: ModelBundle, tmp_path: Path
 ) -> None:

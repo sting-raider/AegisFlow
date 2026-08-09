@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import re
 from datetime import UTC, datetime
 from typing import Any, Literal
@@ -35,6 +36,10 @@ class JsonLogFormatter(logging.Formatter):
             "flow_id": _optional(record, "flow_id"),
             "model_version": _optional(record, "model_version"),
             "error_code": _optional(record, "error_code"),
+            "batch_size": _optional_number(record, "batch_size"),
+            "published_count": _optional_number(record, "published_count"),
+            "rejected_count": _optional_number(record, "rejected_count"),
+            "duration_ms": _optional_number(record, "duration_ms"),
         }
         return json.dumps(payload, separators=(",", ":"), sort_keys=True)
 
@@ -46,6 +51,13 @@ class _JsonStreamHandler(logging.StreamHandler[Any]):
 def _optional(record: logging.LogRecord, name: str) -> str | None:
     value = getattr(record, name, None)
     return redact_log_text(value, limit=128) if value is not None else None
+
+
+def _optional_number(record: logging.LogRecord, name: str) -> int | float | None:
+    value = getattr(record, name, None)
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        return None
+    return value if math.isfinite(value) else None
 
 
 def service_logger(service: str) -> logging.Logger:
@@ -76,6 +88,10 @@ def log_event(
     flow_id: str | None = None,
     model_version: str | None = None,
     error_code: str | None = None,
+    batch_size: int | None = None,
+    published_count: int | None = None,
+    rejected_count: int | None = None,
+    duration_ms: float | None = None,
 ) -> None:
     logger.log(
         {"info": logging.INFO, "warning": logging.WARNING, "error": logging.ERROR}[level],
@@ -86,5 +102,9 @@ def log_event(
             "flow_id": flow_id,
             "model_version": model_version,
             "error_code": error_code,
+            "batch_size": batch_size,
+            "published_count": published_count,
+            "rejected_count": rejected_count,
+            "duration_ms": duration_ms,
         },
     )

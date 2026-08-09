@@ -275,3 +275,35 @@ results as final evidence. Using their severe failures to tune the same candidat
 rejected as test leakage. A future multi-source challenger needs new fit/calibration
 partitions and must be compared against these reports only once its configuration is
 locked.
+
+## D-024 — Bounded hybrid and persistence batches with failure isolation
+
+Use one exact `HybridPredictor` call for up to 64 flows, publish all resulting detection
+envelopes in one atomic Redis pipeline, and acknowledge their source IDs with one command
+only after publication succeeds. Malformed raw Redis JSON, a schema-invalid row, or a
+feature-invalid row is hash-only quarantined and removed without poisoning valid rows. A
+model-wide error is not recast as
+bad input; the batch stays pending for recovery. Multiple detector processes share the
+same Redis consumer group, so horizontal replicas receive disjoint work while deterministic
+detection IDs preserve replay idempotency.
+
+Persist up to 64 detections in one PostgreSQL transaction and cache derived incident
+grouping context only for the lifetime of that transaction. The cache is built from durable
+source rows and updated with each accepted alert; it never becomes a learned traffic
+baseline. Drift events still become durable before Redis acknowledgement. Per-row model
+calls, per-output `XLEN`/`XADD`, per-ID acknowledgement, per-row database commits, and
+reloading an entire growing incident for every alert were rejected after the measured
+2,000-flow Compose run timed out at 150 seconds with only 1,828 rows durable.
+
+The post-change run completed all 2,000 rows in 25.39 seconds with zero queue lag. This is
+mechanical single-host evidence, not a capacity guarantee; representative sustained replay
+and multi-host evidence remain required.
+
+## D-025 — Cache immutable container dependencies before application source
+
+Install pinned CPU PyTorch, build tooling, and project dependencies before copying changing
+application source into the backend image. Copy the source afterward and build the local
+wheel with `--no-deps --no-build-isolation`. The first cache-establishing build still pays
+the network download cost, but the measured follow-up source rebuild completed in 6.3
+seconds instead of redownloading the full ML runtime. Baking dependencies after all source
+copies was rejected because every code edit invalidated the most expensive image layer.

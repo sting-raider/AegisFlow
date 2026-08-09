@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-09T16:31:28.320142+00:00",
+  "scope": "local Compose Redis-to-PostgreSQL exact pipeline benchmark",
+  "generated_flows": 2000,
+  "persisted_flows": 2000,
+  "persisted_detections": 2000,
+  "end_to_end_seconds": 25.38852960700001,
+  "end_to_end_flows_per_second": 78.77573183476404,
+  "ingress_publish": {
+    "batch_size": 64,
+    "elapsed_seconds": 0.09407156800011762,
+    "flows_per_second": 21260.40888355873,
+    "batch_latency_ms": {
+      "p50": 2.6584999999386127,
+      "p95": 4.543963099990833,
+      "p99": 6.841586220018598
+    }
+  },
+  "detector_inference_latency_ms": {
+    "p50": 10.177404000160095,
+    "p95": 13.216597000109687,
+    "p99": 17.932067999936407
+  },
+  "detector_processing_latency_ms": {
+    "p50": 12.56229099999473,
+    "p95": 15.862275450149355,
+    "p99": 20.636828219978725
+  },
+  "queue_after_completion": {
+    "flows": {
+      "pending": 0,
+      "lag": 0,
+      "consumers": 2
+    },
+    "detections": {
+      "pending": 0,
+      "lag": 0,
+      "consumers": 3
+    }
+  },
+  "machine": {
+    "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.36",
+    "python": "3.11.9",
+    "processor": ""
+  },
+  "limitations": [
+    "Synthetic metadata-only fixtures measure mechanics, not detection accuracy.",
+    "The result describes one local Compose host and is not a capacity guarantee.",
+    "Database and Redis time are measured end to end, not isolated with server tracing."
+  ]
+}

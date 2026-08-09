@@ -44,6 +44,10 @@ def test_json_log_has_required_shape_without_addresses_or_secrets() -> None:
         "flow_id",
         "model_version",
         "error_code",
+        "batch_size",
+        "published_count",
+        "rejected_count",
+        "duration_ms",
     }
     assert payload["level"] == "error"
     assert payload["service"] == "test-service"

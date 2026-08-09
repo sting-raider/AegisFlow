@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
@@ -169,6 +170,12 @@ class AuditLogRow(Base):
     details: Mapped[dict[str, Any]] = mapped_column(JSON)
 
 
+@dataclass(frozen=True)
+class IngestOutcome:
+    alert_id: str | None
+    is_new_detection: bool
+
+
 class Repository:
     def __init__(self, url: str | None = None) -> None:
         database_url = (
@@ -199,81 +206,118 @@ class Repository:
         detection: DetectionResult,
         signature: SignatureEvent | None = None,
     ) -> str | None:
+        with self.session() as session:
+            return self._ingest(session, flow, detection, signature, {}).alert_id
+
+    def ingest_batch(
+        self,
+        items: Sequence[tuple[FlowEvent, DetectionResult, SignatureEvent | None]],
+    ) -> list[IngestOutcome]:
+        """Persist a bounded group in one transaction while retaining row outcomes."""
+        if not items:
+            return []
+        incident_context_cache: dict[str, IncidentGroupingContext] = {}
+        with self.session() as session:
+            return [
+                self._ingest(
+                    session,
+                    flow,
+                    detection,
+                    signature,
+                    incident_context_cache,
+                )
+                for flow, detection, signature in items
+            ]
+
+    def _ingest(
+        self,
+        session: Session,
+        flow: FlowEvent,
+        detection: DetectionResult,
+        signature: SignatureEvent | None,
+        incident_context_cache: dict[str, IncidentGroupingContext],
+    ) -> IngestOutcome:
         flow_id = str(flow.event_id)
         detection_id = str(detection.event_id)
-        with self.session() as session:
-            if session.get(DetectionRow, detection_id) is not None:
-                existing = session.scalar(
-                    select(AlertRow).where(AlertRow.detection_id == detection_id)
-                )
-                return existing.id if existing else None
-            sensor = session.get(SensorRow, flow.sensor_id)
-            if sensor is None:
-                session.add(
-                    SensorRow(
-                        id=flow.sensor_id,
-                        last_seen=flow.timestamp_end,
-                        mode=flow.capture_mode.value,
-                    )
-                )
-                session.flush()
-            else:
-                sensor.last_seen = flow.timestamp_end
-            if session.get(FlowRow, flow_id) is None:
-                session.add(
-                    FlowRow(
-                        event_id=flow_id,
-                        sensor_id=flow.sensor_id,
-                        timestamp_start=flow.timestamp_start,
-                        timestamp_end=flow.timestamp_end,
-                        src_ip=str(flow.src_ip),
-                        dst_ip=str(flow.dst_ip),
-                        src_port=flow.src_port,
-                        dst_port=flow.dst_port,
-                        protocol=flow.protocol,
-                        community_flow_id=flow.community_flow_id,
-                        payload=flow.model_dump(mode="json"),
-                    )
-                )
-                session.flush()
-            if signature and session.get(SignatureRow, str(signature.event_id)) is None:
-                session.add(
-                    SignatureRow(
-                        event_id=str(signature.event_id),
-                        timestamp=signature.timestamp,
-                        community_flow_id=signature.community_flow_id,
-                        signature_id=signature.signature_id,
-                        payload=signature.model_dump(mode="json"),
-                    )
-                )
+        if session.get(DetectionRow, detection_id) is not None:
+            existing = session.scalar(
+                select(AlertRow).where(AlertRow.detection_id == detection_id)
+            )
+            return IngestOutcome(existing.id if existing else None, False)
+        sensor = session.get(SensorRow, flow.sensor_id)
+        if sensor is None:
             session.add(
-                DetectionRow(
-                    event_id=detection_id,
-                    flow_event_id=flow_id,
-                    timestamp=detection.timestamp,
-                    verdict=detection.verdict.value,
-                    severity=detection.severity.value,
-                    risk=detection.final_risk_score,
-                    payload=detection.model_dump(mode="json"),
+                SensorRow(
+                    id=flow.sensor_id,
+                    last_seen=flow.timestamp_end,
+                    mode=flow.capture_mode.value,
                 )
             )
             session.flush()
-            if detection.verdict == Verdict.BENIGN:
-                return None
-            alert_id = str(uuid4())
+        else:
+            sensor.last_seen = flow.timestamp_end
+        if session.get(FlowRow, flow_id) is None:
             session.add(
-                AlertRow(
-                    id=alert_id,
-                    detection_id=detection_id,
-                    flow_event_id=flow_id,
-                    created_at=detection.timestamp,
-                    verdict=detection.verdict.value,
-                    severity=detection.severity.value,
-                    risk=detection.final_risk_score,
+                FlowRow(
+                    event_id=flow_id,
+                    sensor_id=flow.sensor_id,
+                    timestamp_start=flow.timestamp_start,
+                    timestamp_end=flow.timestamp_end,
+                    src_ip=str(flow.src_ip),
+                    dst_ip=str(flow.dst_ip),
+                    src_port=flow.src_port,
+                    dst_port=flow.dst_port,
+                    protocol=flow.protocol,
+                    community_flow_id=flow.community_flow_id,
+                    payload=flow.model_dump(mode="json"),
                 )
             )
-            self._group_incident(session, alert_id, flow, detection, signature)
-            return alert_id
+            session.flush()
+        if signature and session.get(SignatureRow, str(signature.event_id)) is None:
+            session.add(
+                SignatureRow(
+                    event_id=str(signature.event_id),
+                    timestamp=signature.timestamp,
+                    community_flow_id=signature.community_flow_id,
+                    signature_id=signature.signature_id,
+                    payload=signature.model_dump(mode="json"),
+                )
+            )
+        session.add(
+            DetectionRow(
+                event_id=detection_id,
+                flow_event_id=flow_id,
+                timestamp=detection.timestamp,
+                verdict=detection.verdict.value,
+                severity=detection.severity.value,
+                risk=detection.final_risk_score,
+                payload=detection.model_dump(mode="json"),
+            )
+        )
+        session.flush()
+        if detection.verdict == Verdict.BENIGN:
+            return IngestOutcome(None, True)
+        alert_id = str(uuid4())
+        session.add(
+            AlertRow(
+                id=alert_id,
+                detection_id=detection_id,
+                flow_event_id=flow_id,
+                created_at=detection.timestamp,
+                verdict=detection.verdict.value,
+                severity=detection.severity.value,
+                risk=detection.final_risk_score,
+            )
+        )
+        self._group_incident(
+            session,
+            alert_id,
+            flow,
+            detection,
+            signature,
+            incident_context_cache,
+        )
+        return IngestOutcome(alert_id, True)
 
     def _group_incident(
         self,
@@ -282,6 +326,7 @@ class Repository:
         flow: FlowEvent,
         detection: DetectionResult,
         signature: SignatureEvent | None,
+        incident_context_cache: dict[str, IncidentGroupingContext],
     ) -> None:
         cutoff = detection.timestamp - timedelta(minutes=10)
         candidates = session.scalars(
@@ -312,7 +357,10 @@ class Repository:
         selected_reasons: tuple[str, ...] = ()
         selected_sources: frozenset[str] = frozenset()
         for candidate in candidates:
-            existing = self._incident_grouping_context(session, candidate)
+            existing = incident_context_cache.get(candidate.id)
+            if existing is None:
+                existing = self._incident_grouping_context(session, candidate)
+                incident_context_cache[candidate.id] = existing
             reasons = grouping_reasons(existing, new_context)
             if not should_group(reasons):
                 continue
@@ -321,9 +369,10 @@ class Repository:
                 selected_reasons = reasons
                 selected_sources = existing.source_hosts
         if incident is None:
+            incident_id = str(uuid4())
             session.add(
                 IncidentRow(
-                    id=str(uuid4()),
+                    id=incident_id,
                     title=f"Activity from {flow.src_ip}",
                     status="open",
                     severity=detection.severity.value,
@@ -333,6 +382,15 @@ class Repository:
                     alert_ids=[alert_id],
                     grouping_reasons=["initial alert"],
                 )
+            )
+            incident_context_cache[incident_id] = IncidentGroupingContext(
+                source_hosts=frozenset({str(flow.src_ip)}),
+                destination_hosts=frozenset({str(flow.dst_ip)}),
+                signature_ids=new_signature_ids,
+                reason_codes=frozenset(detection.reason_codes),
+                attack_stages=frozenset({new_stage}),
+                severities=(detection.severity.value,),
+                risks=(detection.final_risk_score,),
             )
         else:
             incident.alert_ids = [*incident.alert_ids, alert_id]
@@ -345,6 +403,16 @@ class Repository:
             severities = ["informational", "low", "medium", "high", "critical"]
             if severities.index(detection.severity.value) > severities.index(incident.severity):
                 incident.severity = detection.severity.value
+            existing = incident_context_cache[incident.id]
+            incident_context_cache[incident.id] = IncidentGroupingContext(
+                source_hosts=existing.source_hosts | {str(flow.src_ip)},
+                destination_hosts=existing.destination_hosts | {str(flow.dst_ip)},
+                signature_ids=existing.signature_ids | new_signature_ids,
+                reason_codes=existing.reason_codes | frozenset(detection.reason_codes),
+                attack_stages=existing.attack_stages | {new_stage},
+                severities=(*existing.severities, detection.severity.value),
+                risks=(*existing.risks, detection.final_risk_score),
+            )
 
     @staticmethod
     def _incident_grouping_context(

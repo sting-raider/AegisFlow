@@ -5,6 +5,7 @@ import os
 import socket
 from collections import deque
 from collections.abc import Callable
+from dataclasses import dataclass
 from threading import Event, Lock, Thread
 from time import perf_counter
 
@@ -12,11 +13,25 @@ from pydantic import ValidationError
 from redis.exceptions import RedisError
 from sqlalchemy.exc import SQLAlchemyError
 
-from apps.api.database import Repository
+from apps.api.database import IngestOutcome, Repository
 from packages.common import log_event, service_logger
-from packages.common.bus import MessageTooLargeError, RedisStreamBus, safe_dead_letter
+from packages.common.bus import (
+    MessageTooLargeError,
+    RedisStreamBus,
+    safe_dead_letter,
+    stream_error_code,
+)
 from packages.contracts import DetectionResult, FlowEvent, SignatureEvent
 from packages.incidents import DriftEvent, RuntimeDriftMonitor
+
+
+@dataclass(frozen=True)
+class _PersistenceItem:
+    message_id: str
+    envelope: dict[str, object]
+    flow: FlowEvent
+    detection: DetectionResult
+    signature: SignatureEvent | None
 
 
 class DetectionConsumer:
@@ -97,13 +112,22 @@ class DetectionConsumer:
 
     def _run(self) -> None:
         consumer = f"api-{socket.gethostname()}-{os.getpid()}"
+        batch_size = max(
+            1,
+            min(int(os.getenv("AEGISFLOW_PERSISTENCE_BATCH_SIZE", "64")), 256),
+        )
         redis_retry_seconds = 0.25
         while not self.stop_event.is_set():
             try:
-                for message_id, envelope in self.bus.consume(
-                    "aegisflow:detections", "api-core", consumer, block_ms=1000
-                ):
-                    self.process_message(message_id, envelope)
+                messages = self.bus.consume_batch(
+                    "aegisflow:detections",
+                    "api-core",
+                    consumer,
+                    count=batch_size,
+                    block_ms=1_000,
+                )
+                if messages:
+                    self.process_batch(messages)
                 self._update_queue_status()
                 redis_retry_seconds = 0.25
             except RedisError as exc:
@@ -119,22 +143,49 @@ class DetectionConsumer:
 
     def process_message(self, message_id: str, envelope: dict[str, object]) -> bool:
         """Persist one detection and acknowledge only durable or quarantined outcomes."""
+        return self.process_batch([(message_id, envelope)])
+
+    def process_batch(self, messages: list[tuple[str, dict[str, object]]]) -> bool:
+        """Validate and durably persist a bounded Redis batch in one transaction."""
+        if not messages:
+            return True
         started = perf_counter()
         with self._telemetry_lock:
-            self.received_total += 1
-            self._received_times.append(started)
+            self.received_total += len(messages)
+            self._received_times.extend([started] * len(messages))
         if self.on_flow_received is not None:
-            self.on_flow_received()
+            for _ in messages:
+                self.on_flow_received()
+        success = True
         try:
-            return self._process_message(message_id, envelope)
+            work: list[_PersistenceItem] = []
+            for message_id, envelope in messages:
+                item, error_code = self._validate_message(message_id, envelope)
+                if item is None:
+                    success = (
+                        self._quarantine(
+                            message_id,
+                            envelope,
+                            error_code or "ValidationError",
+                        )
+                        and success
+                    )
+                else:
+                    work.append(item)
+            return self._persist_batch(work) and success
         finally:
             elapsed = perf_counter() - started
             with self._telemetry_lock:
                 self.last_processing_latency_ms = elapsed * 1000
             if self.on_processing_latency is not None:
-                self.on_processing_latency(elapsed)
+                for _ in messages:
+                    self.on_processing_latency(elapsed)
 
-    def _process_message(self, message_id: str, envelope: dict[str, object]) -> bool:
+    def _validate_message(
+        self,
+        message_id: str,
+        envelope: dict[str, object],
+    ) -> tuple[_PersistenceItem | None, str | None]:
         try:
             flow = FlowEvent.model_validate(envelope["flow"])
             detection = DetectionResult.model_validate(envelope["detection"])
@@ -144,30 +195,7 @@ class DetectionConsumer:
                 else None
             )
         except (KeyError, TypeError, ValueError, ValidationError) as exc:
-            error_code = type(exc).__name__
-            with self._telemetry_lock:
-                self.rejected_total += 1
-            if self.on_flow_rejected is not None:
-                self.on_flow_rejected(error_code)
-            try:
-                self.bus.publish(
-                    "aegisflow:dead-letter",
-                    safe_dead_letter("aegisflow:detections", envelope, error_code),
-                )
-            except MessageTooLargeError:
-                with self._telemetry_lock:
-                    self.dropped_total += 1
-                if self.on_flow_dropped is not None:
-                    self.on_flow_dropped("dead_letter_too_large")
-                return False
-            self.bus.acknowledge("aegisflow:detections", "api-core", message_id)
-            log_event(
-                self.logger,
-                "detection_event_rejected",
-                level="error",
-                error_code=error_code,
-            )
-            return True
+            return None, stream_error_code(envelope, type(exc).__name__)
 
         with self._telemetry_lock:
             self.validated_total += 1
@@ -177,32 +205,80 @@ class DetectionConsumer:
             self.on_flow_validated()
         if signature is not None and self.on_signature_event is not None:
             self.on_signature_event()
+        return _PersistenceItem(message_id, envelope, flow, detection, signature), None
 
+    def _quarantine(
+        self,
+        message_id: str,
+        envelope: dict[str, object],
+        error_code: str,
+    ) -> bool:
+        with self._telemetry_lock:
+            self.rejected_total += 1
+        if self.on_flow_rejected is not None:
+            self.on_flow_rejected(error_code)
+        try:
+            self.bus.publish(
+                "aegisflow:dead-letter",
+                safe_dead_letter("aegisflow:detections", envelope, error_code),
+            )
+        except MessageTooLargeError:
+            with self._telemetry_lock:
+                self.dropped_total += 1
+            if self.on_flow_dropped is not None:
+                self.on_flow_dropped("dead_letter_too_large")
+            return False
+        self.bus.acknowledge("aegisflow:detections", "api-core", message_id)
+        log_event(
+            self.logger,
+            "detection_event_rejected",
+            level="error",
+            error_code=error_code,
+        )
+        return True
+
+    def _persist_batch(self, work: list[_PersistenceItem]) -> bool:
+        if not work:
+            return True
         monitor = self.drift_monitor
-        novelty_required = monitor is not None or self.on_detection_result is not None
-        is_new_detection: bool | None = None if novelty_required else False
-        pending_drift_events: tuple[DriftEvent, ...] | None = None
+        outcomes: list[IngestOutcome] | None = None
+        pending_drift_events: list[tuple[DriftEvent, ...]] | None = None
         for attempt in range(self.database_attempts):
             try:
-                if is_new_detection is None:
-                    is_new_detection = not self.repository.detection_exists(
-                        str(detection.event_id)
-                    )
-                alert_id = self.repository.ingest(flow, detection, signature)
-                if is_new_detection and monitor is not None:
-                    if pending_drift_events is None:
-                        pending_drift_events = monitor.observe(flow, detection)
-                    for event in pending_drift_events:
+                current_outcomes = self.repository.ingest_batch(
+                    [(item.flow, item.detection, item.signature) for item in work]
+                )
+                if outcomes is None:
+                    outcomes = current_outcomes
+                if pending_drift_events is None:
+                    pending_drift_events = [
+                        monitor.observe(item.flow, item.detection)
+                        if monitor is not None and outcome.is_new_detection
+                        else ()
+                        for item, outcome in zip(work, outcomes, strict=True)
+                    ]
+                for events in pending_drift_events:
+                    for event in events:
                         if self.repository.record_drift_event(event) and self.on_drift_event:
                             self.on_drift_event(event)
-                self.bus.acknowledge("aegisflow:detections", "api-core", message_id)
-                if is_new_detection and self.on_detection_result is not None:
-                    self.on_detection_result(detection, alert_id is not None)
+                self.bus.acknowledge_many(
+                    "aegisflow:detections",
+                    "api-core",
+                    [item.message_id for item in work],
+                )
+                if self.on_detection_result is not None:
+                    for item, outcome in zip(work, outcomes, strict=True):
+                        if outcome.is_new_detection:
+                            self.on_detection_result(
+                                item.detection, outcome.alert_id is not None
+                            )
                 log_event(
                     self.logger,
-                    "detection_persisted",
-                    flow_id=str(flow.event_id),
-                    model_version=detection.classifier_model_version,
+                    "detection_batch_persisted",
+                    model_version=work[0].detection.classifier_model_version,
+                    batch_size=len(work),
+                    published_count=len(work),
+                    rejected_count=0,
                 )
                 return True
             except SQLAlchemyError as exc:
@@ -213,9 +289,9 @@ class DetectionConsumer:
                         self.logger,
                         "database_retry_exhausted",
                         level="error",
-                        flow_id=str(flow.event_id),
-                        model_version=detection.classifier_model_version,
+                        model_version=work[0].detection.classifier_model_version,
                         error_code=type(exc).__name__,
+                        batch_size=len(work),
                     )
                     return False
                 delay = self.retry_base_seconds * (2**attempt)

@@ -41,6 +41,26 @@ def test_demo_detection_persistence_and_idempotency(bundle: ModelBundle, tmp_pat
     assert context["payload"]["aggregated_features"]["flow_count"] >= 1
 
 
+def test_repository_ingest_batch_commits_rows_and_reports_novelty(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
+    repository = Repository(f"sqlite:///{(tmp_path / 'batch-ingest.db').as_posix()}")
+    repository.create_schema()
+    engine = DetectionEngine(bundle)
+    flows = list(DemoAdapter().flows())[:3]
+    detections = [engine.detect(flow) for flow in flows]
+
+    outcomes = repository.ingest_batch(
+        [(flow, detection, None) for flow, detection in zip(flows, detections, strict=True)]
+    )
+    duplicate = repository.ingest_batch([(flows[0], detections[0], None)])
+
+    assert len(outcomes) == 3
+    assert all(outcome.is_new_detection for outcome in outcomes)
+    assert duplicate[0].is_new_detection is False
+    assert repository.status()["flows"] == 3
+
+
 def test_parent_rows_flush_before_foreign_key_dependants(
     bundle: ModelBundle, tmp_path: Path
 ) -> None:

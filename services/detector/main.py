@@ -5,20 +5,16 @@ import signal
 import socket
 from pathlib import Path
 from threading import Event
+from time import perf_counter
 
-from pydantic import ValidationError
 from redis.exceptions import RedisError
 
 from packages.common import log_event, service_logger
-from packages.common.bus import MessageTooLargeError, RedisStreamBus, safe_dead_letter
-from packages.contracts import FlowEvent, SignatureEvent
+from packages.common.bus import RedisStreamBus
 from packages.detection import DetectionEngine
 from packages.model_bundle import load_production_bundle
+from services.detector.worker import FLOW_STREAM, GROUP, DetectorWorker
 
-FLOW_STREAM = "aegisflow:flows"
-DETECTION_STREAM = "aegisflow:detections"
-DEAD_STREAM = "aegisflow:dead-letter"
-GROUP = "detectors"
 LOGGER = service_logger("detector")
 
 
@@ -41,53 +37,36 @@ def run() -> None:
     )
     bundle = load_production_bundle(Path(os.getenv("AEGISFLOW_MODEL_REGISTRY", "models/registry")))
     engine = DetectionEngine(bundle)
-    consumer = os.getenv("AEGISFLOW_CONSUMER_NAME", socket.gethostname())
+    worker = DetectorWorker(bus=bus, engine=engine)
+    consumer = os.getenv(
+        "AEGISFLOW_CONSUMER_NAME", f"{socket.gethostname()}-{os.getpid()}"
+    )
+    batch_size = max(1, min(int(os.getenv("AEGISFLOW_DETECTOR_BATCH_SIZE", "64")), 512))
+    batch_wait_ms = max(
+        1, min(int(os.getenv("AEGISFLOW_DETECTOR_BATCH_WAIT_MS", "250")), 5_000)
+    )
     redis_retry_seconds = 0.25
     while not stop_event.is_set():
         try:
-            for message_id, envelope in bus.consume(FLOW_STREAM, GROUP, consumer):
-                try:
-                    flow = FlowEvent.model_validate(envelope["flow"])
-                    signature = (
-                        SignatureEvent.model_validate(envelope["signature"])
-                        if envelope.get("signature")
-                        else None
-                    )
-                    detection = engine.detect(flow, signature)
-                    bus.publish(
-                        DETECTION_STREAM,
-                        {
-                            "flow": flow.model_dump(mode="json"),
-                            "signature": signature.model_dump(mode="json") if signature else None,
-                            "detection": detection.model_dump(mode="json"),
-                        },
-                    )
-                    bus.acknowledge(FLOW_STREAM, GROUP, message_id)
-                    log_event(
-                        LOGGER,
-                        "detection_published",
-                        flow_id=str(flow.event_id),
-                        model_version=str(bundle.manifest["version"]),
-                    )
-                except (
-                    KeyError,
-                    MessageTooLargeError,
-                    TypeError,
-                    ValueError,
-                    ValidationError,
-                ) as exc:
-                    bus.publish(
-                        DEAD_STREAM,
-                        safe_dead_letter(FLOW_STREAM, envelope, type(exc).__name__),
-                    )
-                    bus.acknowledge(FLOW_STREAM, GROUP, message_id)
-                    log_event(
-                        LOGGER,
-                        "flow_processing_rejected",
-                        level="error",
-                        model_version=str(bundle.manifest["version"]),
-                        error_code=type(exc).__name__,
-                    )
+            messages = bus.consume_batch(
+                FLOW_STREAM,
+                GROUP,
+                consumer,
+                count=batch_size,
+                block_ms=batch_wait_ms,
+            )
+            if messages:
+                started = perf_counter()
+                result = worker.process_batch(messages)
+                log_event(
+                    LOGGER,
+                    "detection_batch_published",
+                    model_version=bundle.version,
+                    batch_size=result.received,
+                    published_count=result.published,
+                    rejected_count=result.rejected,
+                    duration_ms=(perf_counter() - started) * 1000,
+                )
             redis_retry_seconds = 0.25
         except RedisError as exc:
             log_event(

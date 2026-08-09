@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from time import perf_counter
 
 import numpy as np
 
@@ -51,6 +52,7 @@ class HybridPredictor:
         *,
         signature_scores: np.ndarray | Sequence[float] | None = None,
         contextual_scores: np.ndarray | Sequence[float] | None = None,
+        stage_observer: Callable[[str, float, int], None] | None = None,
     ) -> HybridBatchResult:
         raw = np.asarray(raw_features, dtype=np.float64)
         if raw.ndim == 1:
@@ -63,7 +65,11 @@ class HybridPredictor:
         signatures = _optional_signal(signature_scores, rows, "signature")
         contexts = _optional_signal(contextual_scores, rows, "contextual")
 
+        started = perf_counter() if stage_observer is not None else 0.0
         transformed = self.bundle.preprocessor.transform(raw)
+        _observe(stage_observer, "scaling", started, rows)
+
+        started = perf_counter() if stage_observer is not None else 0.0
         probabilities = np.asarray(
             self.bundle.classifier.predict_proba(transformed), dtype=np.float64
         )
@@ -81,11 +87,19 @@ class HybridPredictor:
             else None
             for row in range(rows)
         )
+        _observe(stage_observer, "classifier", started, rows)
 
+        started = perf_counter() if stage_observer is not None else 0.0
         decisions = np.asarray(self.bundle.anomaly.decision_function(transformed), dtype=np.float64)
         isolation_scores = self._isolation_scores(decisions)
+        _observe(stage_observer, "isolation_forest", started, rows)
+
+        started = perf_counter() if stage_observer is not None else 0.0
         raw_reconstruction_errors = reconstruction_errors(self.autoencoder, transformed)
         reconstruction_scores = self._reconstruction_scores(raw_reconstruction_errors)
+        _observe(stage_observer, "autoencoder", started, rows)
+
+        started = perf_counter() if stage_observer is not None else 0.0
         validation_scale = float(self.bundle.thresholds.get("open_set_validation_scale", 1.0))
         isolation_scores = np.clip(isolation_scores * validation_scale, 0.0, 1.0)
         reconstruction_scores = np.clip(reconstruction_scores * validation_scale, 0.0, 1.0)
@@ -99,6 +113,9 @@ class HybridPredictor:
                 for score, probability in zip(anomaly_scores, probabilities, strict=True)
             ]
         )
+        _observe(stage_observer, "calibration_open_set", started, rows)
+
+        started = perf_counter() if stage_observer is not None else 0.0
         outcomes = tuple(
             fuse_risk(
                 FusionInput(
@@ -131,6 +148,7 @@ class HybridPredictor:
                 strict=True,
             )
         )
+        _observe(stage_observer, "fusion", started, rows)
         return HybridBatchResult(
             classes,
             probabilities,
@@ -191,6 +209,16 @@ def _optional_signal(
     if np.any(result < 0) or np.any(result > 1):
         raise ValueError(f"{name} scores must be in [0, 1]")
     return result
+
+
+def _observe(
+    observer: Callable[[str, float, int], None] | None,
+    stage: str,
+    started: float,
+    rows: int,
+) -> None:
+    if observer is not None:
+        observer(stage, (perf_counter() - started) * 1000, rows)
 
 
 def _classifier_uncertainty(probabilities: np.ndarray) -> float:

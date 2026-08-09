@@ -84,21 +84,21 @@ make reset
 
 ## Verified status
 
-The latest local validation on 2026-08-01 passed:
+The latest local validation on 2026-08-09 passed:
 
 - Ruff and strict MyPy across 56 Python source files;
-- 113 Python tests with 84% last-measured backend coverage;
+- 128 Python tests with 84% last-measured backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and Chromium E2E;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
 - clean Compose image builds, database migration, offline replay, REST/metrics checks,
   and independent Redis/PostgreSQL restart recovery;
-- a bounded-queue overload benchmark with explicit drops, queue drain, latency, CPU,
-  and memory reporting.
+- exact runtime batching and a local Redis-to-PostgreSQL Compose benchmark. The recorded
+  2,000-flow detector comparison improved from 153.50 to 3,496.81 flows/s, while the
+  full durable pipeline completed at 78.78 flows/s with zero final queue lag.
 
 See [`docs/PROGRESS.md`](docs/PROGRESS.md),
 [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md), and
-[`docs/BENCHMARK_LATEST.json`](docs/BENCHMARK_LATEST.json) for the measured evidence and
-its limitations.
+[`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) for the measured evidence and its limitations.
 
 `make live` is Linux-only, requires an explicit interface, and prints an authorization
 warning. It builds a dedicated non-root NFStream sensor target with only `NET_RAW`;
@@ -166,8 +166,10 @@ or loopback-local providers have timeout, retry, rate, privacy, and cache bounds
   all later infiltration flows. These are negative evidence, not performance claims.
 - API access control currently uses an optional shared key for mutations and does not yet
   provide authenticated user identities, RBAC, SSO/OIDC, or tenant isolation.
-- Runtime detection is single-message/single-worker by default; the measured overload
-  benchmark intentionally records drops and is not a production capacity claim.
+- Runtime inference, Redis publication, acknowledgement, and PostgreSQL persistence are
+  bounded and batched. Compose can partition detection across multiple replicas; a
+  two-worker smoke exercised both workers. The recorded local numbers remain synthetic
+  single-host evidence, not a production capacity claim.
 - The Scapy PCAP adapter is deterministic but deliberately compact. NFStream 6.6.0 is
   validated for PCAP and explicit Linux live interfaces; its Windows native engine is
   unavailable, so Windows falls back to Scapy replay.

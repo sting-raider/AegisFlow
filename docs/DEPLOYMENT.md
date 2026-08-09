@@ -11,14 +11,17 @@ by default). Keep this timeout above normal processing latency in production.
 Ingress and queue limits are configurable with `AEGISFLOW_HTTP_MAX_BODY_BYTES`,
 `AEGISFLOW_WEBSOCKET_MAX_CONNECTIONS`, `AEGISFLOW_WEBSOCKET_MAX_PAYLOAD_BYTES`,
 `AEGISFLOW_STREAM_MAXLEN`, `AEGISFLOW_STREAM_MAX_PAYLOAD_BYTES`, and
-`AEGISFLOW_BACKPRESSURE_THRESHOLD`. Defaults are intentionally conservative for the
+`AEGISFLOW_BACKPRESSURE_THRESHOLD`. Detector and database batch bounds are configured by
+`AEGISFLOW_DETECTOR_BATCH_SIZE` (64), `AEGISFLOW_DETECTOR_BATCH_WAIT_MS` (250 ms), and
+`AEGISFLOW_PERSISTENCE_BATCH_SIZE` (64). Defaults are intentionally conservative for the
 single-host demo. Size them from measured traffic and memory, keep reverse-proxy limits
 at least as strict, and alert on `queue_capacity_utilization`,
 `queue_backpressure_events_total`, and `flows_dropped_total`.
 
 Application, sensor, detector, API access, and API runtime events are emitted as one-line
 JSON with timestamp, level, service, event type, correlation/flow/model identifiers, and
-error code. Missing fields are explicit nulls. Credential patterns, control characters,
+error code plus bounded batch counts and duration where applicable. Missing fields are
+explicit nulls. Credential patterns, control characters,
 and addresses are redacted; malformed queue records are represented only by a SHA-256
 and bounded structural summary.
 
@@ -66,3 +69,16 @@ Validate configuration:
 ```bash
 docker compose -f compose.yml -f compose.demo.yml config
 ```
+
+Detector replicas share one Redis consumer group and receive disjoint pending entries.
+Container hostnames make the default consumer names unique; deterministic detection IDs
+and database constraints make recovery idempotent. Scale only after measuring the
+database boundary and keeping `AEGISFLOW_PENDING_IDLE_MS` above worst-case batch latency:
+
+```bash
+docker compose -f compose.yml -f compose.demo.yml up -d --scale detector=2 detector
+```
+
+The recorded two-replica smoke exercised both workers and drained both queues, but did
+not establish linear scaling because PostgreSQL persistence remained dominant. See
+[`PERFORMANCE.md`](PERFORMANCE.md).

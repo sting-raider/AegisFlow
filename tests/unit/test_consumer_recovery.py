@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from sqlalchemy.exc import SQLAlchemyError
 
 from apps.api.consumer import DetectionConsumer
-from apps.api.database import Repository
+from apps.api.database import IngestOutcome, Repository
 from packages.common.bus import RedisStreamBus
 from packages.detection import DetectionEngine
 from packages.incidents import DriftEvent, RuntimeDriftMonitor
@@ -24,8 +24,10 @@ def detection_envelope(bundle: ModelBundle) -> dict[str, object]:
 
 def test_database_failure_is_retried_before_acknowledgement(bundle: ModelBundle) -> None:
     repository = Mock(spec=Repository)
-    repository.ingest.side_effect = [SQLAlchemyError("offline"), None]
-    repository.detection_exists.return_value = False
+    repository.ingest_batch.side_effect = [
+        SQLAlchemyError("offline"),
+        [IngestOutcome(None, True)],
+    ]
     bus = Mock(spec=RedisStreamBus)
     database_error = Mock()
     received = Mock()
@@ -45,7 +47,7 @@ def test_database_failure_is_retried_before_acknowledgement(bundle: ModelBundle)
     )
 
     assert consumer.process_message("1-0", detection_envelope(bundle))
-    assert repository.ingest.call_count == 2
+    assert repository.ingest_batch.call_count == 2
     database_error.assert_called_once_with()
     received.assert_called_once_with()
     validated.assert_called_once_with()
@@ -56,12 +58,32 @@ def test_database_failure_is_retried_before_acknowledgement(bundle: ModelBundle)
     assert telemetry["validated_total"] == 1
     assert telemetry["rejected_total"] == 0
     assert telemetry["processing_latency_ms"] is not None
-    bus.acknowledge.assert_called_once_with("aegisflow:detections", "api-core", "1-0")
+    bus.acknowledge_many.assert_called_once_with(
+        "aegisflow:detections", "api-core", ["1-0"]
+    )
+
+
+def test_consumer_persists_and_acknowledges_a_bounded_batch(bundle: ModelBundle) -> None:
+    repository = Mock(spec=Repository)
+    repository.ingest_batch.return_value = [
+        IngestOutcome(None, True),
+        IngestOutcome(None, True),
+    ]
+    bus = Mock(spec=RedisStreamBus)
+    consumer = DetectionConsumer(repository, "redis://unused", bus=bus)
+    envelope = detection_envelope(bundle)
+
+    assert consumer.process_batch([("1-0", envelope), ("2-0", envelope)])
+
+    repository.ingest_batch.assert_called_once()
+    bus.acknowledge_many.assert_called_once_with(
+        "aegisflow:detections", "api-core", ["1-0", "2-0"]
+    )
 
 
 def test_exhausted_database_retry_remains_pending(bundle: ModelBundle) -> None:
     repository = Mock(spec=Repository)
-    repository.ingest.side_effect = SQLAlchemyError("offline")
+    repository.ingest_batch.side_effect = SQLAlchemyError("offline")
     bus = Mock(spec=RedisStreamBus)
     consumer = DetectionConsumer(
         repository,
@@ -72,8 +94,8 @@ def test_exhausted_database_retry_remains_pending(bundle: ModelBundle) -> None:
     )
 
     assert not consumer.process_message("2-0", detection_envelope(bundle))
-    assert repository.ingest.call_count == 2
-    bus.acknowledge.assert_not_called()
+    assert repository.ingest_batch.call_count == 2
+    bus.acknowledge_many.assert_not_called()
 
 
 def test_schema_error_is_quarantined_and_acknowledged() -> None:
@@ -86,7 +108,7 @@ def test_schema_error_is_quarantined_and_acknowledged() -> None:
     envelope = {"flow": {"schema_version": "unsupported"}}
 
     assert consumer.process_message("3-0", envelope)
-    repository.ingest.assert_not_called()
+    repository.ingest_batch.assert_not_called()
     bus.publish.assert_called_once()
     assert bus.publish.call_args.args[0] == "aegisflow:dead-letter"
     dead_letter = bus.publish.call_args.args[1]
@@ -99,7 +121,7 @@ def test_schema_error_is_quarantined_and_acknowledged() -> None:
 
 def test_new_detection_persists_drift_before_acknowledgement(bundle: ModelBundle) -> None:
     repository = Mock(spec=Repository)
-    repository.detection_exists.return_value = False
+    repository.ingest_batch.return_value = [IngestOutcome(None, True)]
     repository.record_drift_event.return_value = True
     bus = Mock(spec=RedisStreamBus)
     monitor = Mock(spec=RuntimeDriftMonitor)
@@ -126,7 +148,9 @@ def test_new_detection_persists_drift_before_acknowledgement(bundle: ModelBundle
     assert consumer.process_message("4-0", detection_envelope(bundle))
     repository.record_drift_event.assert_called_once_with(event)
     callback.assert_called_once_with(event)
-    bus.acknowledge.assert_called_once_with("aegisflow:detections", "api-core", "4-0")
+    bus.acknowledge_many.assert_called_once_with(
+        "aegisflow:detections", "api-core", ["4-0"]
+    )
 
 
 def test_queue_pressure_is_counted_once_per_threshold_crossing(monkeypatch) -> None:
