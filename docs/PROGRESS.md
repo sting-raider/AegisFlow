@@ -207,6 +207,10 @@ Last updated: 2026-08-10.
   also pass. An API-only container replacement initially exposed a stale Nginx upstream;
   Docker DNS re-resolution now restores dashboard-proxied readiness without restarting
   the dashboard, and Chromium passes after that forced replacement.
+- Enterprise milestone commit `70e188e` is published on public `main`. GitHub Actions run
+  `31340692583` passed all Python/coverage/migration/NFStream/training, dashboard/audit,
+  Compose/Kustomize/live-loopback, forced API-replacement/Playwright, Gitleaks, and Trivy
+  jobs.
 
 ## Hard blockers and fallbacks
 

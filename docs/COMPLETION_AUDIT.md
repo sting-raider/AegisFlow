@@ -28,7 +28,7 @@ marked complete only when implementation and proportionate verification both exi
 | Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix, previous-valid model fallback | Complete |
 | Automated tests | 145 Python tests at 84% backend coverage plus four Vitest interactions and Playwright E2E; randomized feature parity/bounds; auth/RBAC/governance/migration coverage; malformed Redis quarantine; Redis/PostgreSQL recovery; model fallback/Compose fault injection; bounded-queue performance conservation/resource test | Complete |
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
-| CI/CD | Python/frontend/Compose/integration/migration/audit/Trivy/gitleaks jobs; public run `30703942894` passed every job for hardening commit `fd25b15` | Complete |
+| CI/CD | Python/frontend/Compose/Kustomize/integration/migration/API-replacement E2E/audit/Trivy/Gitleaks jobs; public run `31340692583` passed every job for enterprise commit `70e188e` | Complete |
 | Documentation | Required topic files, current desktop/mobile screenshots, README validation snapshot, measured limitations, demo and faculty sequence | Complete |
 | GitHub publication | Public `sting-raider/AegisFlow` repository and `main` default branch | Complete |
 

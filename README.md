@@ -95,6 +95,8 @@ The latest local validation on 2026-08-10 passed:
   REST/auth checks, and independent Redis/PostgreSQL restart recovery;
 - base, demo, live, Suricata, and production Compose validation plus a rendered Kustomize
   baseline;
+- public GitHub Actions run `31340692583` passed Python, dashboard, deployment-render,
+  live-loopback, API-replacement E2E, Gitleaks, and Trivy jobs;
 - exact runtime batching and a local Redis-to-PostgreSQL Compose benchmark. The recorded
   2,000-flow detector comparison improved from 153.50 to 3,496.81 flows/s, while the
   full durable pipeline completed at 78.78 flows/s with zero final queue lag.
