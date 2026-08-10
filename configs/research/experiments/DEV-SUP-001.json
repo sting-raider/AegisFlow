@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV-SUP-001",
+  "status": "complete_no_candidate_selected",
+  "permitted_use": "development_only",
+  "code_commit": "a1e5f933fb29ec55bd2857fe1e7c809eaf059ed3",
+  "feature_schema": "2.0.0-research-a",
+  "feature_view": "portable_numerical_core_after_origin_ablation",
+  "feature_order": [
+    "duration_log1p_ms",
+    "packets_total_log1p",
+    "packets_forward_fraction",
+    "bytes_total_log1p",
+    "bytes_forward_fraction",
+    "packet_rate_log1p_derived",
+    "byte_rate_log1p_derived",
+    "packet_length_mean_log1p_derived",
+    "forward_reverse_byte_log_ratio"
+  ],
+  "dataset_fingerprints": {
+    "hikari": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+    "cse_2018_02_28": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+    "iot23": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c"
+  },
+  "split_ids": [
+    "train:cse_2018_02_28+iot23/test:hikari",
+    "train:hikari+iot23/test:cse_2018_02_28",
+    "train:hikari+cse_2018_02_28/test:iot23"
+  ],
+  "seed": 431,
+  "preprocessing": "training quantile clipping plus robust scaling",
+  "sampling": "deterministic 10000-row cap per source and binary class, exact-vector deduplication, conflicting-label removal",
+  "models": [
+    "logistic_regression",
+    "calibrated_random_forest",
+    "hist_gradient_boosting",
+    "compact_mlp"
+  ],
+  "calibration": {
+    "random_forest": "sigmoid, three-fold stratified development rows",
+    "other_models": "native probability output; calibration metrics measured only"
+  },
+  "fusion": "not_applicable_supervised_baseline",
+  "decision_threshold": 0.5,
+  "artifacts": [
+    {
+      "path": "docs/research/experiments/dev-supervised-baselines-v1.json",
+      "sha256": "533346ccfaa841e3795fca6a9a386621b732e6db18c73719b247479ea140816a"
+    },
+    {
+      "path": "docs/research/supervised-baselines.md",
+      "sha256": "7b86c0175e80c7abfe8b99a8b53272c2e15d90280d76a2a704e563feee697f75"
+    }
+  ],
+  "disposition": "No baseline meets development operating objectives; no candidate selected or locked."
+}

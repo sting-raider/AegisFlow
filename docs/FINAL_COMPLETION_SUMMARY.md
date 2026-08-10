@@ -27,8 +27,9 @@ integrity guard, implemented shared portable/temporal research schemas, and admi
 checksum-reviewed fresh development environments. Six IoT-23 captures provide 43,009
 full Schema B rows. The origin diagnostic blocks the full portable schema at 0.95416
 balanced accuracy while its numerical-core ablation clears the 0.90 shortcut threshold at
-0.68428. Challenger experiments, final frozen evaluation, and operational acceptance
-remain open.
+0.68428. The first four supervised cross-environment baselines all fail development
+objectives, so no candidate is selected. Anomaly/held-family experiments, final frozen
+evaluation, and operational acceptance remain open.
 
 ## What was implemented
 
@@ -62,7 +63,7 @@ remain open.
 
 | Evidence | Result |
 |---|---|
-| Python quality gate | Ruff and strict MyPy across 74 sources; 166 tests; 84% measured backend coverage |
+| Python quality gate | Ruff and strict MyPy across 75 sources; 168 tests; 84% measured backend coverage |
 | Dashboard quality gate | ESLint, TypeScript/Vite production build, 4 component tests, 2 Chromium scenarios, zero Axe violations across all seven views and the evidence dialog |
 | Dependency/security gate | Dashboard audit reports zero vulnerabilities; Gitleaks and Trivy passed the published enterprise milestone |
 | Runtime evidence | 2,000-flow exact detector batching improved from 153.50 to 3,496.81 flows/s on the recorded host; the durable Compose path completed at 78.78 flows/s with zero final queue lag |

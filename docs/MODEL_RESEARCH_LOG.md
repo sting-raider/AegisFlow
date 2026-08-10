@@ -125,3 +125,34 @@ all protocol, port, service, and port-missing categorical fields reduces origin 
 accuracy to `0.68428`, below the `0.90` block threshold. That nine-feature numerical core
 may proceed to grouped development experiments; it has not yet been selected. See
 `docs/development/dataset-origin-diagnostic.json`.
+
+## MR-004 — Cross-environment supervised baselines
+
+Date: 2026-08-10
+
+Experiment: `DEV-SUP-001`
+
+Code commit: `a1e5f933fb29ec55bd2857fe1e7c809eaf059ed3`
+
+Status: complete; no candidate selected
+
+The numerical-core view was evaluated as benign-versus-malicious classification in all
+three leave-one-environment-out rotations. Each source contributed at most 10,000 rows per
+binary class before exact-vector deduplication and conflicting-label removal. Training
+used fold-only quantile clipping and robust scaling. Logistic regression, sigmoid-
+calibrated random forest, HistGradientBoosting, and the compact MLP all used an untuned
+0.5 threshold.
+
+No model meets the development operating objectives. The compact MLP is strongest on
+mean macro F1 (`0.61474`) and mean malicious recall (`0.43945`), but its worst-environment
+macro F1 is `0.36329`, malicious recall is `0.03644`, benign FPR is `0.18202`, and mean ECE
+is `0.26168`. Its apparently strong IoT-23 result does not transfer to CSE. The other
+models have worst malicious recall from zero to `0.00664`; their worst benign FPR ranges
+from `0.31460` to `0.55160` except for the MLP. No threshold was tuned, no model was locked,
+and no frozen report was run.
+
+Disposition: supervised maliciousness alone is insufficient on this feature view.
+Proceed to benign-only anomaly/open-set baselines and repeated held-family evaluation.
+Machine-readable evidence is in
+`docs/research/experiments/dev-supervised-baselines-v1.json`; its SHA-256 is
+`533346ccfaa841e3795fca6a9a386621b732e6db18c73719b247479ea140816a`.

@@ -15,7 +15,7 @@ production NIDS. Detection never authorizes automatic blocking.
 | Temporal representation | Bounded shared training/runtime semantics and parity | Implementation passes; 43,009 IoT-23 rows replay Schema B; candidate selection open |
 | Fresh development corpus | Reviewed provenance/licensing/hashes and non-frozen boundary | Pass for initial experiments: 3 official environments and 6 temporal IoT capture groups |
 | Dataset-origin diagnostic | Balanced deduplicated source classification and ablation | Full Schema A blocked at 0.95416; categorical ablation clears at 0.68428 |
-| Challenger evidence | Registered baselines, costs, ablations, repeated held-family and cross-environment results | Numerical-core experiments not started |
+| Challenger evidence | Registered baselines, costs, ablations, repeated held-family and cross-environment results | Supervised cross-environment baseline complete; all 4 models fail objectives; anomaly/held-family work open |
 | Final scientific gate | Candidate locked before exactly one frozen run; governed GO/NO-GO | Open |
 | Sustained capacity | 10/30-minute plus burst/failure tests with loss, lag, latency and resource budgets | Open |
 | Multi-worker correctness | Partitioning, recovery, idempotency and shared state under sustained load | Open |

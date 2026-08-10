@@ -38,8 +38,13 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   random forest, HistGradientBoosting, and the compact MLP across all three leave-one-
   environment-out rotations. It applies train-only preprocessing, deterministic binary-
   class caps, exact-vector deduplication, conflicting-label removal, fixed untuned 0.5
-  thresholds, and aggregate-only resource/calibration/error reporting. No result has been
-  run or used for selection yet.
+  thresholds, and aggregate-only resource/calibration/error reporting. `DEV-SUP-001`
+  completed all three rotations. No model qualifies: the compact MLP is strongest on mean
+  macro F1 (0.61474), but worst-environment malicious recall is 3.64% and worst benign FPR
+  is 18.20%. No result was used to select or lock a candidate. A CI verifier binds the
+  clean code commit, source fingerprints, schema/order, seed, aggregate report hashes,
+  and development-only/frozen-source policy and rejects report tampering or per-row
+  predictions.
 - Remaining work begins with challenger and held-family experiments, then sustained
   performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
@@ -67,8 +72,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 166 tests pass, Ruff passes across the repository, strict MyPy passes across
-  74 source files including migrations, and measured backend coverage is 84%.
+- Python: 168 tests pass, Ruff passes across the repository, strict MyPy passes across
+  75 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
