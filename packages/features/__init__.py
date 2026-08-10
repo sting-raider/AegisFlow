@@ -13,6 +13,7 @@ from packages.features.research import (
     FlowObservation,
     TemporalFeatureState,
     portable_feature_mapping,
+    portable_feature_matrix,
     portable_feature_vector,
     research_feature_schema,
 )
@@ -30,6 +31,7 @@ __all__ = [
     "flow_to_mapping",
     "flow_to_vector",
     "portable_feature_mapping",
+    "portable_feature_matrix",
     "portable_feature_vector",
     "research_feature_schema",
 ]

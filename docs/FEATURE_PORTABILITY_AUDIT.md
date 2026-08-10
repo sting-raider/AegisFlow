@@ -47,3 +47,13 @@ zero in the current vector.
   accuracy blocks model selection until ablation identifies and removes shortcut features.
 - Per-feature missingness, clipping rate, drift, and ablation results on fresh development
   data. Frozen reports remain excluded from every one of these checks.
+
+## First empirical result
+
+The 2026-08-10 two-source diagnostic sampled 50,000 unique Schema A rows each from fresh
+HIKARI-2021 and CSE-CIC-IDS2018 development captures. Full Schema A origin balanced
+accuracy was 1.000; the three strongest coefficients were protocol categories because
+HIKARI's aggregate CSV has no protocol field. Full Schema A is blocked. Removing protocol,
+port, service, and port-missing categories reduced balanced accuracy to 0.69772. This
+identifies a concrete shortcut surface, but it does not close the audit: the evidence has
+only two environments and lacks capture-disjoint groups.

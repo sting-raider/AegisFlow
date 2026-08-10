@@ -22,6 +22,14 @@
       "license_and_citation": "Redistribution requires citation and a link to the official UNB page.",
       "expected_layout": "One or more CICFlowMeter-V3 CSV files with Label and Timestamp columns."
     },
+    "hikari2021": {
+      "adapter": "hikari2021",
+      "official_page": "https://zenodo.org/records/6463389",
+      "retrieval": "Download only ALLFLOWMETER_HIKARI2021.csv.zip from the official Zenodo record; verify the published MD5 and record a locally reviewed SHA-256 before extraction.",
+      "capture_boundaries": "HIKARI-2021 encrypted synthetic attack and real benign/background flow collection; preserve source archive and traffic_category labels.",
+      "license_and_citation": "CC BY 4.0. Cite Ferriyan, Thamrin, Takeda, and Murai and DOI 10.5281/zenodo.6463389.",
+      "expected_layout": "ALLFLOWMETER_HIKARI2021.csv with traffic_category, Label, origin/responder endpoints, duration, directional packet/payload/header totals, flag counts, and IAT statistics."
+    },
     "unsw_nb15": {
       "adapter": "unsw_nb15",
       "official_page": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",

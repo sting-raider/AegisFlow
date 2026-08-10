@@ -12,6 +12,7 @@ from packages.features.research import (
     FlowObservation,
     TemporalFeatureState,
     portable_feature_mapping,
+    portable_feature_matrix,
     portable_feature_vector,
     research_feature_schema,
 )
@@ -86,6 +87,16 @@ def test_flow_event_and_training_observation_have_exact_portable_parity() -> Non
     np.testing.assert_array_equal(
         portable_feature_vector(runtime), portable_feature_vector(training)
     )
+    batch = portable_feature_matrix(
+        duration_ms=np.asarray([runtime.duration_ms]),
+        packets_forward=np.asarray([runtime.packets_forward]),
+        packets_reverse=np.asarray([runtime.packets_reverse]),
+        bytes_forward=np.asarray([runtime.bytes_forward]),
+        bytes_reverse=np.asarray([runtime.bytes_reverse]),
+        destination_ports=[runtime.destination_port],
+        protocols=[runtime.protocol],
+    )
+    np.testing.assert_array_equal(batch[0], portable_feature_vector(runtime))
 
 
 def test_temporal_replay_is_deterministic_and_duplicate_idempotent() -> None:

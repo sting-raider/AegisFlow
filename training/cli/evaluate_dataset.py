@@ -36,7 +36,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run reproducible quality, leakage, split, and dataset evaluation gates"
     )
-    choices = ["cic_ids2017", "cse_cic_ids2018", "unsw_nb15", "nfstream_csv"]
+    choices = [
+        "cic_ids2017",
+        "cse_cic_ids2018",
+        "hikari2021",
+        "unsw_nb15",
+        "nfstream_csv",
+    ]
     parser.add_argument("--dataset", choices=choices, required=True)
     parser.add_argument("--input", type=Path, action="append", required=True)
     parser.add_argument("--label-column")

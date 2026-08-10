@@ -1,0 +1,121 @@
+{
+  "adapter_notes": [],
+  "dataset": "cse_cic_ids2018",
+  "dataset_fingerprint": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+  "generated_at": "2026-08-10T07:24:00.118938+00:00",
+  "permitted_use": "development_fit_calibration_and_model_selection_only",
+  "provenance": [
+    {
+      "declared_manifest": null,
+      "filename": "Wednesday-28-02-2018_TrafficForML_CICFlowMeter.csv",
+      "sha256": "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771",
+      "size_bytes": 209249758
+    }
+  ],
+  "quality": {
+    "adapter_notes": [],
+    "blocking_issues": [],
+    "class_distribution": {
+      "benign": 538666,
+      "infiltration": 68236
+    },
+    "constant_columns": [],
+    "dataset": "cse_cic_ids2018",
+    "duplicate_rows": 105799,
+    "excluded_rows": [
+      {
+        "count": 33,
+        "reason": "repeated_csv_header"
+      },
+      {
+        "count": 6169,
+        "reason": "nonfinite_or_out_of_registry_canonical_features"
+      }
+    ],
+    "fingerprint": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+    "identifier_columns": [],
+    "infinite_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "missing_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "out_of_range_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "raw_to_normalized_labels": {
+      "Benign": {
+        "benign": 538666
+      },
+      "Infilteration": {
+        "infiltration": 68236
+      }
+    },
+    "rows": 606902,
+    "suspiciously_predictive_columns": [],
+    "warnings": [
+      "105799 duplicate canonical rows"
+    ]
+  },
+  "research_features": {
+    "notes": [
+      "research schema B unavailable: every row requires valid endpoints and timestamp"
+    ],
+    "schema_a_rows": 606902,
+    "schema_a_version": "2.0.0-research-a",
+    "schema_b_rows": 0,
+    "schema_b_version": "2.0.0-research-b"
+  },
+  "schema_version": "1.0.0"
+}

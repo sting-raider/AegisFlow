@@ -449,3 +449,20 @@ the skew allowance for state mutation. Train-only quantile clipping and robust s
 serialized separately so evaluation rows cannot change preprocessing. Replacing the
 production bundle before development evidence, silently fabricating temporal context, and
 using a vendor CSV's similarly named field without semantic review were rejected.
+
+## D-035 — Admit only reviewed fresh sources and block origin shortcuts
+
+Build the first development pool from the official HIKARI-2021 v1.4.0 Zenodo artifact and
+the official CSE-CIC-IDS2018 February 28 processed object. Bind reviewed local SHA-256,
+publisher metadata, license/citation notes, capture limits, exclusions, class counts, and
+sanitized quality fingerprints in a versioned manifest. Refuse preparation or diagnostics
+when any input hash matches the frozen-final manifest. Raw files remain ignored.
+
+Treat absent temporal prerequisites as unavailable, not as fabricated context. HIKARI's
+aggregate file lacks a trustworthy row timestamp and protocol; the processed CSE file
+lacks endpoints. Neither may claim Schema B evidence. The first origin classifier obtains
+1.000 balanced accuracy on full Schema A, driven by protocol availability, so that feature
+view is blocked. Its categorical ablation reaches 0.69772 and may be researched further,
+but cannot be selected until broader grouped evidence exists. Using mirrors, bypassing an
+official access form, zero-filling temporal history, or treating an S3 multipart ETag as a
+file MD5 were rejected.

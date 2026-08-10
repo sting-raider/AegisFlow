@@ -21,9 +21,18 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   encoding, and zero substitution for unavailable UNSW fields. These are plausible
   dataset-origin shortcuts and make the current schema unsuitable as the final challenger
   representation without further evidence.
-- Fresh development corpus acquisition, dataset-origin diagnostics, challenger experiments,
-  sustained performance, real local OIDC/Kubernetes, restore, rollback/failure, security,
-  and final GO/NO-GO evidence remain open.
+- A fresh development pool now contains two official, non-frozen, checksum-reviewed
+  sources: HIKARI-2021 v1.4.0 (555,278 retained rows) and the distinct CSE-CIC-IDS2018
+  2018-02-28 capture (606,902 retained rows). Both pass blocking quality checks, and a
+  development guard rejects source hashes registered as frozen-final evidence. Raw files
+  remain ignored. A third independent, temporal-capable environment is still required.
+- The first balanced, deduplicated dataset-origin diagnostic blocks full Schema A:
+  origin balanced accuracy is 1.000, dominated by protocol availability. Removing all
+  protocol/port/service categories lowers it to 0.69772. Full Schema A cannot enter
+  challenger selection; the reduced numerical core needs broader grouped evidence.
+- Remaining work includes third-source acquisition, challenger experiments, sustained
+  performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
+  GO/NO-GO evidence.
 - Research Schema A now emits 24 portable features from exporter-independent counts,
   fractions, derived rates, log transforms, protocol categories, port ranges, service
   families, and explicit port missingness; it never exposes raw endpoint identity or a
@@ -48,8 +57,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 160 tests pass, Ruff passes across the repository, strict MyPy passes across
-  70 source files including migrations, and measured backend coverage is 84%.
+- Python: 164 tests pass, Ruff passes across the repository, strict MyPy passes across
+  71 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose

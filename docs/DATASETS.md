@@ -2,8 +2,8 @@
 
 Full datasets are never committed. The authoritative source catalog is
 `configs/datasets/catalog.json`; it identifies the official landing pages and expected
-layouts for CIC-IDS2017, CSE-CIC-IDS2018, UNSW-NB15, user-provided NFStream CSV, and
-the bundled synthetic smoke generator. Do not replace an official file with a mirror
+layouts for CIC-IDS2017, CSE-CIC-IDS2018, UNSW-NB15, HIKARI-2021, user-provided NFStream
+CSV, and the bundled synthetic smoke generator. Do not replace an official file with a mirror
 without recording that decision and a new fingerprint.
 
 Official pages:
@@ -11,6 +11,35 @@ Official pages:
 - CIC-IDS2017: <https://www.unb.ca/cic/datasets/ids-2017.html>
 - CSE-CIC-IDS2018: <https://www.unb.ca/cic/datasets/ids-2018.html>
 - UNSW-NB15: <https://research.unsw.edu.au/projects/unsw-nb15-dataset>
+- HIKARI-2021 v1.4.0: <https://zenodo.org/records/6463389>
+
+The reviewed development-only sources and their exact checksums, row counts, license
+notes, limitations, and quality-report fingerprints are in
+`configs/datasets/development-pool-v1.json`. They are deliberately distinct from every
+source hash in `configs/evaluation/frozen-evidence-v1.json`. Generate a sanitized quality
+report and enforce that boundary with:
+
+```bash
+uv run python scripts/prepare_development_dataset.py \
+  --dataset hikari2021 \
+  --input data/hikari2021/ALLFLOWMETER_HIKARI2021.csv \
+  --output docs/development/hikari2021-quality.json
+```
+
+HIKARI wire-byte totals are reconstructed from its directional payload and header totals.
+Its aggregate CSV does not publish trustworthy row timestamps or protocol, so Schema B is
+unavailable and the protocol categories make full Schema A a dataset-origin shortcut.
+The February 28 CSE file has timestamps but omits endpoints, so Schema B is also
+unavailable. These limitations are visible rather than zero-filled.
+
+Run the development origin diagnostic with explicit source IDs and paths:
+
+```bash
+uv run python scripts/evaluate_dataset_origin.py \
+  --source hikari hikari2021 data/hikari2021/ALLFLOWMETER_HIKARI2021.csv \
+  --source cse_2018_02_28 cse_cic_ids2018 data/cse_cic_ids2018/Wednesday-28-02-2018_TrafficForML_CICFlowMeter.csv \
+  --output docs/development/dataset-origin-diagnostic.json
+```
 
 The generic downloader requires HTTPS and a reviewed lowercase SHA-256, supports
 resumption, enforces expected and maximum sizes, and writes provenance with retrieval

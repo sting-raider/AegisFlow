@@ -16,7 +16,7 @@ from packages.features.registry import FEATURE_NAMES, FEATURE_REGISTRY
 from packages.features.research import (
     FlowObservation,
     TemporalFeatureState,
-    portable_feature_vector,
+    portable_feature_matrix,
 )
 from training.data.models import (
     CanonicalDataset,
@@ -25,7 +25,13 @@ from training.data.models import (
     SourceColumnProfile,
 )
 
-DatasetKind = Literal["cic_ids2017", "cse_cic_ids2018", "unsw_nb15", "nfstream_csv"]
+DatasetKind = Literal[
+    "cic_ids2017",
+    "cse_cic_ids2018",
+    "hikari2021",
+    "unsw_nb15",
+    "nfstream_csv",
+]
 MAX_INPUT_BYTES = 8 * 1024 * 1024 * 1024
 DEFAULT_MAX_ROWS = 5_000_000
 
@@ -96,16 +102,36 @@ NFSTREAM_RULES: dict[str, ColumnRule] = {
     "destination_port": _rule("destination_port", "dst_port"),
 }
 
+HIKARI_RULES: dict[str, ColumnRule] = {
+    "duration_ms": _rule("flow_duration", scale=1000.0),
+    "packets_forward": _rule("fwd_pkts_tot"),
+    "packets_reverse": _rule("bwd_pkts_tot"),
+    "bytes_forward_payload": _rule("fwd_pkts_payload.tot"),
+    "bytes_reverse_payload": _rule("bwd_pkts_payload.tot"),
+    "bytes_forward_header": _rule("fwd_header_size_tot"),
+    "bytes_reverse_header": _rule("bwd_header_size_tot"),
+    "packet_rate": _rule("flow_pkts_per_sec"),
+    "byte_rate": _rule("payload_bytes_per_second"),
+    "packet_length_std": _rule("flow_pkts_payload.std"),
+    "iat_mean": _rule("flow_iat.avg", scale=0.001),
+    "iat_std": _rule("flow_iat.std", scale=0.001),
+    "tcp_syn_count": _rule("flow_SYN_flag_count"),
+    "tcp_ack_count": _rule("flow_ACK_flag_count"),
+    "tcp_rst_count": _rule("flow_RST_flag_count"),
+    "destination_port": _rule("responp"),
+}
+
 BENIGN_LABELS = {"benign", "normal", "normaltraffic", "0", "background"}
 LABEL_FAMILIES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("brute_force", ("patator", "bruteforce", "brute force")),
     ("web_attack", ("xss", "sql injection", "web attack")),
-    ("port_scan", ("portscan", "port scan", "reconnaissance")),
+    ("port_scan", ("portscan", "port scan", "reconnaissance", "probing")),
     ("ddos", ("ddos", "distributed denial")),
     ("dos", ("dos", "denial of service", "hulk", "slowloris", "goldeneye")),
     ("infiltration", ("infiltration", "infilteration")),
     ("botnet", ("botnet", " bot", "bot ")),
     ("heartbleed", ("heartbleed",)),
+    ("cryptomining", ("cryptominer", "xmrig")),
 )
 
 
@@ -162,7 +188,7 @@ def _numeric(
 
 def _identifier_like(name: str) -> bool:
     normalized = _key(name)
-    return normalized in {"id", "recordid"} or any(
+    return normalized in {"id", "recordid", "uid", "originh", "responh"} or any(
         token in normalized
         for token in ("srcip", "sourceip", "dstip", "destinationip", "flowid", "sessionid")
     )
@@ -201,7 +227,13 @@ def _label_column(kind: DatasetKind, lookup: dict[str, str], requested: str | No
         if resolved is None:
             raise ValueError(f"label column is missing: {requested}")
         return resolved
-    candidates = ("attackcat", "label") if kind == "unsw_nb15" else ("label", "attackcat")
+    candidates = (
+        ("attackcat", "label")
+        if kind == "unsw_nb15"
+        else ("trafficcategory", "label")
+        if kind == "hikari2021"
+        else ("label", "attackcat")
+    )
     resolved = _resolve_column(lookup, candidates)
     if resolved is None:
         raise ValueError("no label column found; provide --label-column")
@@ -237,6 +269,20 @@ def _canonical_features(
             "destination_port=0 because the official UNSW training/testing partitions "
             "do not publish transport ports"
         )
+
+    if {
+        "bytes_forward_payload",
+        "bytes_forward_header",
+        "bytes_reverse_payload",
+        "bytes_reverse_header",
+    }.issubset(values):
+        values["bytes_forward"] = (
+            values["bytes_forward_payload"] + values["bytes_forward_header"]
+        )
+        values["bytes_reverse"] = (
+            values["bytes_reverse_payload"] + values["bytes_reverse_header"]
+        )
+        notes.append("wire bytes reconstruct HIKARI payload plus header totals")
 
     required = (
         "duration_ms",
@@ -316,11 +362,39 @@ def _research_feature_matrices(
     )
     port_source = _numeric(raw, lookup, rules["destination_port"])
     placeholder_time = datetime.fromtimestamp(0, UTC)
-    portable_rows: list[np.ndarray] = []
     temporal_observations: list[FlowObservation] = []
     temporal_available = source_column is not None and destination_column is not None
     notes: list[str] = []
     canonical_values = canonical.to_numpy(dtype=np.float64)
+    port_values = (
+        port_source.to_numpy(dtype=np.float64)
+        if port_source is not None
+        else np.full(len(raw), np.nan)
+    )
+    ports: list[int | None] = [
+        int(value) if np.isfinite(value) and 0 <= value <= 65_535 else None
+        for value in port_values
+    ]
+    protocols: list[str | int | None]
+    if protocol_column is not None:
+        protocols = [str(value) for value in raw[protocol_column].tolist()]
+    else:
+        protocols = [None for _ in range(len(raw))]
+    portable_matrix = portable_feature_matrix(
+        duration_ms=canonical_values[:, FEATURE_NAMES.index("duration_ms")],
+        packets_forward=canonical_values[:, FEATURE_NAMES.index("packets_forward")],
+        packets_reverse=canonical_values[:, FEATURE_NAMES.index("packets_reverse")],
+        bytes_forward=canonical_values[:, FEATURE_NAMES.index("bytes_forward")],
+        bytes_reverse=canonical_values[:, FEATURE_NAMES.index("bytes_reverse")],
+        destination_ports=ports,
+        protocols=protocols,
+    )
+    if not temporal_available or np.isnat(timestamps).any():
+        notes.append(
+            "research schema B unavailable: every row requires valid endpoints and timestamp"
+        )
+        return portable_matrix, None, tuple(notes)
+
     for position, (_, row) in enumerate(raw.iterrows()):
         timestamp_value = timestamps[position]
         timestamp = (
@@ -328,11 +402,8 @@ def _research_feature_matrices(
             if not np.isnat(timestamp_value)
             else placeholder_time
         )
-        port_value = port_source.iloc[position] if port_source is not None else np.nan
-        port = int(port_value) if np.isfinite(port_value) and 0 <= port_value <= 65_535 else None
-        protocol: str | int | None = (
-            str(row[protocol_column]) if protocol_column is not None else None
-        )
+        port = ports[position]
+        protocol = protocols[position]
         values = canonical_values[position]
         event_id = f"{row['__aegisflow_source_file']}:{position}"
         sensor_id = str(row["__aegisflow_source_file"])
@@ -341,21 +412,6 @@ def _research_feature_matrices(
         packets_reverse = int(values[FEATURE_NAMES.index("packets_reverse")])
         bytes_forward = int(values[FEATURE_NAMES.index("bytes_forward")])
         bytes_reverse = int(values[FEATURE_NAMES.index("bytes_reverse")])
-        portable = FlowObservation(
-            event_id=event_id,
-            sensor_id=sensor_id,
-            timestamp=timestamp,
-            source_ip="0.0.0.0",
-            destination_ip="0.0.0.0",
-            destination_port=port,
-            protocol=protocol,
-            duration_ms=duration_ms,
-            packets_forward=packets_forward,
-            packets_reverse=packets_reverse,
-            bytes_forward=bytes_forward,
-            bytes_reverse=bytes_reverse,
-        )
-        portable_rows.append(portable_feature_vector(portable))
         if temporal_available and timestamp != placeholder_time:
             assert source_column is not None and destination_column is not None
             try:
@@ -385,7 +441,6 @@ def _research_feature_matrices(
         else:
             temporal_available = False
 
-    portable_matrix = np.vstack(portable_rows)
     if not temporal_available or len(temporal_observations) != len(raw):
         notes.append(
             "research schema B unavailable: every row requires valid endpoints and timestamp"
@@ -417,6 +472,8 @@ def load_dataset(
     rules = (
         UNSW_RULES
         if kind == "unsw_nb15"
+        else HIKARI_RULES
+        if kind == "hikari2021"
         else NFSTREAM_RULES
         if kind == "nfstream_csv"
         else CIC_RULES

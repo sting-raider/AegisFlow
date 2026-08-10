@@ -1,0 +1,430 @@
+{
+  "categorical_ablation": {
+    "accuracy": 0.69772,
+    "balanced_accuracy": 0.69772,
+    "confusion_labels": [
+      "cse_2018_02_28",
+      "hikari"
+    ],
+    "confusion_matrix": [
+      [
+        8500,
+        4000
+      ],
+      [
+        3557,
+        8943
+      ]
+    ],
+    "feature_count": 9,
+    "feature_order": [
+      "duration_log1p_ms",
+      "packets_total_log1p",
+      "packets_forward_fraction",
+      "bytes_total_log1p",
+      "bytes_forward_fraction",
+      "packet_rate_log1p_derived",
+      "byte_rate_log1p_derived",
+      "packet_length_mean_log1p_derived",
+      "forward_reverse_byte_log_ratio"
+    ],
+    "macro_f1": 0.6976250547509917,
+    "preprocessing": {
+      "binary_passthrough": [],
+      "feature_order": [
+        "duration_log1p_ms",
+        "packets_total_log1p",
+        "packets_forward_fraction",
+        "bytes_total_log1p",
+        "bytes_forward_fraction",
+        "packet_rate_log1p_derived",
+        "byte_rate_log1p_derived",
+        "packet_length_mean_log1p_derived",
+        "forward_reverse_byte_log_ratio"
+      ],
+      "lower_bounds": [
+        0.08065328834246145,
+        1.0986122886681098,
+        0.2,
+        0.0,
+        0.0,
+        0.02627796572651079,
+        0.0,
+        0.0,
+        -4.363444486962358
+      ],
+      "lower_quantile": 0.005,
+      "medians": [
+        5.571069794385284,
+        2.0794415416798357,
+        0.5,
+        6.1903154058531475,
+        0.2571428571428571,
+        4.216697775052967,
+        8.699956172831442,
+        4.695924549256556,
+        -0.8965099560912027
+      ],
+      "scales": [
+        4.9321410697861054,
+        1.7917594692280552,
+        0.03448275862068961,
+        3.6693298435868025,
+        0.25745077384328663,
+        3.2188131499632,
+        4.187232483871389,
+        1.5452841503176504,
+        1.21715980860789
+      ],
+      "type": "training_quantile_clip_and_robust_scale",
+      "upper_bounds": [
+        12.388362510780224,
+        7.155407997808511,
+        1.0,
+        14.452671240351787,
+        1.0,
+        10.299035995891082,
+        13.892901021497796,
+        7.443666624141807,
+        7.0909098220799835
+      ],
+      "upper_quantile": 0.995
+    },
+    "removed_features": [
+      "protocol_tcp",
+      "protocol_udp",
+      "protocol_icmp",
+      "protocol_other",
+      "destination_port_missing",
+      "port_well_known",
+      "port_registered",
+      "port_dynamic",
+      "service_dns",
+      "service_web",
+      "service_mail",
+      "service_remote_access",
+      "service_file_transfer",
+      "service_database",
+      "service_other"
+    ],
+    "test_rows": 25000,
+    "top_absolute_coefficients": [
+      {
+        "feature": "bytes_total_log1p",
+        "magnitude": 10.222703437846826
+      },
+      {
+        "feature": "duration_log1p_ms",
+        "magnitude": 4.648384282420525
+      },
+      {
+        "feature": "packets_total_log1p",
+        "magnitude": 3.636777927324384
+      },
+      {
+        "feature": "packet_length_mean_log1p_derived",
+        "magnitude": 2.6342847821807562
+      },
+      {
+        "feature": "packet_rate_log1p_derived",
+        "magnitude": 1.9810170017099935
+      },
+      {
+        "feature": "byte_rate_log1p_derived",
+        "magnitude": 1.1155447610218856
+      },
+      {
+        "feature": "bytes_forward_fraction",
+        "magnitude": 0.6370994873614773
+      },
+      {
+        "feature": "forward_reverse_byte_log_ratio",
+        "magnitude": 0.41739613976132645
+      },
+      {
+        "feature": "packets_forward_fraction",
+        "magnitude": 0.11772484044671096
+      }
+    ],
+    "train_rows": 75000
+  },
+  "challenger_selection_blocked": true,
+  "diagnostic": "dataset_origin_classifier",
+  "disposition": "blocked_shortcut_investigation_required",
+  "feature_schema": "2.0.0-research-a",
+  "full_schema_a": {
+    "accuracy": 1.0,
+    "balanced_accuracy": 1.0,
+    "confusion_labels": [
+      "cse_2018_02_28",
+      "hikari"
+    ],
+    "confusion_matrix": [
+      [
+        12500,
+        0
+      ],
+      [
+        0,
+        12500
+      ]
+    ],
+    "feature_count": 24,
+    "feature_order": [
+      "duration_log1p_ms",
+      "packets_total_log1p",
+      "packets_forward_fraction",
+      "bytes_total_log1p",
+      "bytes_forward_fraction",
+      "packet_rate_log1p_derived",
+      "byte_rate_log1p_derived",
+      "packet_length_mean_log1p_derived",
+      "forward_reverse_byte_log_ratio",
+      "protocol_tcp",
+      "protocol_udp",
+      "protocol_icmp",
+      "protocol_other",
+      "destination_port_missing",
+      "port_well_known",
+      "port_registered",
+      "port_dynamic",
+      "service_dns",
+      "service_web",
+      "service_mail",
+      "service_remote_access",
+      "service_file_transfer",
+      "service_database",
+      "service_other"
+    ],
+    "macro_f1": 1.0,
+    "preprocessing": {
+      "binary_passthrough": [
+        "protocol_tcp",
+        "protocol_udp",
+        "protocol_icmp",
+        "protocol_other",
+        "destination_port_missing",
+        "port_well_known",
+        "port_registered",
+        "port_dynamic",
+        "service_dns",
+        "service_web",
+        "service_mail",
+        "service_remote_access",
+        "service_file_transfer",
+        "service_database",
+        "service_other"
+      ],
+      "feature_order": [
+        "duration_log1p_ms",
+        "packets_total_log1p",
+        "packets_forward_fraction",
+        "bytes_total_log1p",
+        "bytes_forward_fraction",
+        "packet_rate_log1p_derived",
+        "byte_rate_log1p_derived",
+        "packet_length_mean_log1p_derived",
+        "forward_reverse_byte_log_ratio",
+        "protocol_tcp",
+        "protocol_udp",
+        "protocol_icmp",
+        "protocol_other",
+        "destination_port_missing",
+        "port_well_known",
+        "port_registered",
+        "port_dynamic",
+        "service_dns",
+        "service_web",
+        "service_mail",
+        "service_remote_access",
+        "service_file_transfer",
+        "service_database",
+        "service_other"
+      ],
+      "lower_bounds": [
+        0.08065328834246145,
+        1.0986122886681098,
+        0.2,
+        0.0,
+        0.0,
+        0.02627796572651079,
+        0.0,
+        0.0,
+        -4.363444486962358,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lower_quantile": 0.005,
+      "medians": [
+        5.571069794385284,
+        2.0794415416798357,
+        0.5,
+        6.1903154058531475,
+        0.2571428571428571,
+        4.216697775052967,
+        8.699956172831442,
+        4.695924549256556,
+        -0.8965099560912027,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scales": [
+        4.9321410697861054,
+        1.7917594692280552,
+        0.03448275862068961,
+        3.6693298435868025,
+        0.25745077384328663,
+        3.2188131499632,
+        4.187232483871389,
+        1.5452841503176504,
+        1.21715980860789,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": "training_quantile_clip_and_robust_scale",
+      "upper_bounds": [
+        12.388362510780224,
+        7.155407997808511,
+        1.0,
+        14.452671240351787,
+        1.0,
+        10.299035995891082,
+        13.892901021497796,
+        7.443666624141807,
+        7.0909098220799835,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "upper_quantile": 0.995
+    },
+    "test_rows": 25000,
+    "top_absolute_coefficients": [
+      {
+        "feature": "protocol_other",
+        "magnitude": 10.282630062221173
+      },
+      {
+        "feature": "protocol_tcp",
+        "magnitude": 6.611200485608033
+      },
+      {
+        "feature": "protocol_udp",
+        "magnitude": 5.3458330415583495
+      },
+      {
+        "feature": "packet_length_mean_log1p_derived",
+        "magnitude": 2.123335331230989
+      },
+      {
+        "feature": "bytes_forward_fraction",
+        "magnitude": 1.460523100840957
+      },
+      {
+        "feature": "service_remote_access",
+        "magnitude": 1.0527829262410757
+      },
+      {
+        "feature": "port_well_known",
+        "magnitude": 0.9746807086604267
+      },
+      {
+        "feature": "bytes_total_log1p",
+        "magnitude": 0.8990511037841896
+      },
+      {
+        "feature": "packets_total_log1p",
+        "magnitude": 0.7860096192357104
+      },
+      {
+        "feature": "service_other",
+        "magnitude": 0.7691357147895556
+      }
+    ],
+    "train_rows": 75000
+  },
+  "generated_at": "2026-08-10T07:34:27.949371+00:00",
+  "high_origin_accuracy_threshold": 0.9,
+  "limitations": [
+    "Aggregate sources do not expose shared capture groups, so this diagnostic cannot use a capture-disjoint split.",
+    "High accuracy identifies corpus separability; it does not by itself identify a causal shortcut."
+  ],
+  "schema_version": "1.0.0",
+  "seed": 431,
+  "sources": [
+    {
+      "dataset": "hikari2021",
+      "dataset_fingerprint": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+      "input_rows": 555278,
+      "provenance_sha256": [
+        "fddcf2a9fe496ed5a2306df4586f7029e2d4150b0fe7ad70337d5d63e61c645f"
+      ],
+      "sampled_rows": 50000,
+      "source_id": "hikari",
+      "unique_schema_a_rows": 285708
+    },
+    {
+      "dataset": "cse_cic_ids2018",
+      "dataset_fingerprint": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+      "input_rows": 606902,
+      "provenance_sha256": [
+        "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771"
+      ],
+      "sampled_rows": 50000,
+      "source_id": "cse_2018_02_28",
+      "unique_schema_a_rows": 238113
+    }
+  ],
+  "split": "stratified row split after exact per-source Schema A deduplication"
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter, OrderedDict
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from ipaddress import ip_address
@@ -162,50 +163,101 @@ def _service_group(port: int | None) -> str:
 
 
 def portable_feature_mapping(observation: FlowObservation) -> dict[str, float]:
-    observation.validate()
-    packets_total = observation.packets_forward + observation.packets_reverse
-    bytes_total = observation.bytes_forward + observation.bytes_reverse
-    duration_seconds = max(observation.duration_ms / 1000.0, 1e-6)
-    protocol = _protocol_group(observation.protocol)
-    port = observation.destination_port
-    service = _service_group(port)
-    values = {
-        "duration_log1p_ms": math.log1p(observation.duration_ms),
-        "packets_total_log1p": math.log1p(packets_total),
-        "packets_forward_fraction": observation.packets_forward / max(packets_total, 1),
-        "bytes_total_log1p": math.log1p(bytes_total),
-        "bytes_forward_fraction": observation.bytes_forward / max(bytes_total, 1),
-        "packet_rate_log1p_derived": math.log1p(packets_total / duration_seconds),
-        "byte_rate_log1p_derived": math.log1p(bytes_total / duration_seconds),
-        "packet_length_mean_log1p_derived": math.log1p(bytes_total / max(packets_total, 1)),
-        "forward_reverse_byte_log_ratio": math.log1p(observation.bytes_forward)
-        - math.log1p(observation.bytes_reverse),
-        "protocol_tcp": float(protocol == "tcp"),
-        "protocol_udp": float(protocol == "udp"),
-        "protocol_icmp": float(protocol == "icmp"),
-        "protocol_other": float(protocol == "other"),
-        "destination_port_missing": float(port is None),
-        "port_well_known": float(port is not None and port < 1024),
-        "port_registered": float(port is not None and 1024 <= port < 49_152),
-        "port_dynamic": float(port is not None and port >= 49_152),
-        "service_dns": float(service == "dns"),
-        "service_web": float(service == "web"),
-        "service_mail": float(service == "mail"),
-        "service_remote_access": float(service == "remote_access"),
-        "service_file_transfer": float(service == "file_transfer"),
-        "service_database": float(service == "database"),
-        "service_other": float(service == "other"),
-    }
-    if set(values) != set(PORTABLE_FEATURE_NAMES):
-        raise RuntimeError("portable feature implementation does not match its registry")
-    if not all(math.isfinite(value) for value in values.values()):
-        raise ValueError("portable features must be finite")
-    return values
+    vector = portable_feature_vector(observation)
+    return dict(zip(PORTABLE_FEATURE_NAMES, vector.tolist(), strict=True))
 
 
 def portable_feature_vector(observation: FlowObservation) -> np.ndarray:
-    values = portable_feature_mapping(observation)
-    return np.asarray([values[name] for name in PORTABLE_FEATURE_NAMES], dtype=np.float64)
+    observation.validate()
+    vector = portable_feature_matrix(
+        duration_ms=np.asarray([observation.duration_ms]),
+        packets_forward=np.asarray([observation.packets_forward]),
+        packets_reverse=np.asarray([observation.packets_reverse]),
+        bytes_forward=np.asarray([observation.bytes_forward]),
+        bytes_reverse=np.asarray([observation.bytes_reverse]),
+        destination_ports=[observation.destination_port],
+        protocols=[observation.protocol],
+    )[0]
+    return np.asarray(vector, dtype=np.float64)
+
+
+def portable_feature_matrix(
+    *,
+    duration_ms: np.ndarray,
+    packets_forward: np.ndarray,
+    packets_reverse: np.ndarray,
+    bytes_forward: np.ndarray,
+    bytes_reverse: np.ndarray,
+    destination_ports: Sequence[int | None],
+    protocols: Sequence[str | int | None],
+) -> np.ndarray:
+    """Canonical vectorized Schema A implementation; scalar runtime delegates here."""
+
+    numeric = [
+        np.asarray(values, dtype=np.float64)
+        for values in (
+            duration_ms,
+            packets_forward,
+            packets_reverse,
+            bytes_forward,
+            bytes_reverse,
+        )
+    ]
+    rows = len(numeric[0])
+    if any(values.ndim != 1 or len(values) != rows for values in numeric):
+        raise ValueError("portable feature inputs must be aligned one-dimensional arrays")
+    if len(destination_ports) != rows or len(protocols) != rows:
+        raise ValueError("portable categorical inputs must align with numeric rows")
+    if any(not np.isfinite(values).all() or np.any(values < 0) for values in numeric):
+        raise ValueError("portable numeric inputs must be finite and non-negative")
+    duration, packets_fwd, packets_rev, bytes_fwd, bytes_rev = numeric
+    packets_total = packets_fwd + packets_rev
+    bytes_total = bytes_fwd + bytes_rev
+    duration_seconds = np.maximum(duration / 1000.0, 1e-6)
+    ports = np.asarray(
+        [np.nan if value is None else float(value) for value in destination_ports]
+    )
+    if np.any(np.isfinite(ports) & ((ports < 0) | (ports > 65_535))):
+        raise ValueError("destination ports must be missing or in [0, 65535]")
+    protocol_groups = np.asarray([_protocol_group(value) for value in protocols])
+    missing_port = ~np.isfinite(ports)
+    service_groups = np.asarray(
+        [
+            _service_group(None if missing else int(port))
+            for port, missing in zip(ports, missing_port, strict=True)
+        ]
+    )
+    matrix = np.column_stack(
+        (
+            np.log1p(duration),
+            np.log1p(packets_total),
+            packets_fwd / np.maximum(packets_total, 1.0),
+            np.log1p(bytes_total),
+            bytes_fwd / np.maximum(bytes_total, 1.0),
+            np.log1p(packets_total / duration_seconds),
+            np.log1p(bytes_total / duration_seconds),
+            np.log1p(bytes_total / np.maximum(packets_total, 1.0)),
+            np.log1p(bytes_fwd) - np.log1p(bytes_rev),
+            protocol_groups == "tcp",
+            protocol_groups == "udp",
+            protocol_groups == "icmp",
+            protocol_groups == "other",
+            missing_port,
+            (~missing_port) & (ports < 1024),
+            (~missing_port) & (ports >= 1024) & (ports < 49_152),
+            (~missing_port) & (ports >= 49_152),
+            service_groups == "dns",
+            service_groups == "web",
+            service_groups == "mail",
+            service_groups == "remote_access",
+            service_groups == "file_transfer",
+            service_groups == "database",
+            service_groups == "other",
+        )
+    ).astype(np.float64)
+    if matrix.shape != (rows, len(PORTABLE_FEATURE_NAMES)) or not np.isfinite(matrix).all():
+        raise ValueError("portable feature matrix violates schema A")
+    return matrix
 
 
 @dataclass(frozen=True)

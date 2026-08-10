@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0.0",
+  "policy": {
+    "purpose": "development_fit_calibration_and_model_selection_only",
+    "frozen_final_sources_allowed": false,
+    "raw_files_committed": false,
+    "checksum_required": true
+  },
+  "sources": [
+    {
+      "id": "hikari2021-v1.4.0-flowmeter",
+      "status": "acquired_and_verified",
+      "dataset": "HIKARI-2021",
+      "version": "1.4.0",
+      "official_source": "https://zenodo.org/records/6463389",
+      "doi": "10.5281/zenodo.6463389",
+      "publisher": "Zenodo / Keio University authors",
+      "license": "CC-BY-4.0",
+      "citation": "Ferriyan, Thamrin, Takeda, and Murai, HIKARI-2021",
+      "collection_environment": "Real benign/background traffic plus encrypted synthetic attack traffic; aggregate FlowMeter CSV published by the authors.",
+      "capture_dates": "2021 collection; individual published PCAP names span April-May 2021; aggregate CSV does not expose a trustworthy per-row timestamp.",
+      "attack_families": [
+        "Bruteforce",
+        "Bruteforce-XML",
+        "Probing",
+        "XMRIGCC CryptoMiner"
+      ],
+      "rows": 555278,
+      "retained_rows": 555278,
+      "quality_report": {
+        "path": "docs/development/hikari2021-quality.json",
+        "fingerprint": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+        "blocking_issues": 0,
+        "duplicate_canonical_rows": 157631
+      },
+      "label_distribution": {
+        "Background": 170151,
+        "Benign": 347431,
+        "Bruteforce": 5884,
+        "Bruteforce-XML": 5145,
+        "Probing": 23388,
+        "XMRIGCC CryptoMiner": 3279
+      },
+      "archive": {
+        "filename": "ALLFLOWMETER_HIKARI2021.csv.zip",
+        "download_url": "https://zenodo.org/records/6463389/files/ALLFLOWMETER_HIKARI2021.csv.zip?download=1",
+        "size_bytes": 68403081,
+        "published_md5": "d7d9e277fe4a66cb00764d7f91a810dd",
+        "reviewed_sha256": "ba09d35269566fd2f269871043b24e7d8e372bc4a47e9c2027729e5ff2e660e0"
+      },
+      "extracted_file": {
+        "filename": "ALLFLOWMETER_HIKARI2021.csv",
+        "size_bytes": 302425555,
+        "sha256": "fddcf2a9fe496ed5a2306df4586f7029e2d4150b0fe7ad70337d5d63e61c645f"
+      },
+      "feature_availability": {
+        "available": [
+          "directional packet totals",
+          "directional payload and header byte totals",
+          "flow duration",
+          "flow packet rate",
+          "payload length statistics",
+          "IAT statistics",
+          "TCP flag counts",
+          "origin/responder endpoints and ports"
+        ],
+        "missing": [
+          "trustworthy per-row timestamp",
+          "protocol column in aggregate CSV"
+        ]
+      },
+      "timestamp_quality": "Unavailable in the aggregate CSV; Schema B is prohibited for this source.",
+      "known_limitations": [
+        "Attack traffic is synthetic while benign/background traffic is real.",
+        "Protocol missingness may identify this dataset and must be measured by the origin diagnostic.",
+        "Published FlowMeter semantics differ from CICFlowMeter and AegisFlow runtime fields.",
+        "The binary Label column is an auxiliary label and must never enter features.",
+        "No row-random split is permitted; source/capture grouping must be reconstructed or this source may only serve cross-environment testing."
+      ]
+    },
+    {
+      "id": "cse-cic-ids2018-2018-02-28",
+      "status": "acquired_and_verified",
+      "dataset": "CSE-CIC-IDS2018",
+      "version": "official processed-traffic capture",
+      "official_source": "https://www.unb.ca/cic/datasets/ids-2018.html",
+      "publisher": "Canadian Institute for Cybersecurity, University of New Brunswick",
+      "license": "Redistribution requires citation and a link to the official UNB page.",
+      "citation": "Sharafaldin, Lashkari, and Ghorbani; CSE-CIC-IDS2018 official dataset page",
+      "collection_environment": "AWS-based victim network with CICFlowMeter-V3 processed flows; separate daily capture from the frozen final file.",
+      "capture_dates": "2018-02-28",
+      "attack_families": [
+        "Infilteration"
+      ],
+      "rows_before_adapter_exclusions": 613104,
+      "retained_rows": 606902,
+      "adapter_exclusions": {
+        "repeated_csv_header": 33,
+        "nonfinite_or_out_of_registry_canonical_features": 6169
+      },
+      "quality_report": {
+        "path": "docs/development/cse-cic-ids2018-2018-02-28-quality.json",
+        "fingerprint": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+        "blocking_issues": 0,
+        "duplicate_canonical_rows": 105799
+      },
+      "raw_label_distribution": {
+        "Benign": 544200,
+        "Infilteration": 68871,
+        "repeated_header": 33
+      },
+      "source_file": {
+        "filename": "Wednesday-28-02-2018_TrafficForML_CICFlowMeter.csv",
+        "download_url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Wednesday-28-02-2018_TrafficForML_CICFlowMeter.csv",
+        "size_bytes": 209249758,
+        "s3_etag": "af10d2362a17be6331cfc6d1ce2474f2-13",
+        "s3_etag_is_multipart_not_file_md5": true,
+        "s3_last_modified": "2018-10-11T16:10:33Z",
+        "reviewed_sha256": "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771"
+      },
+      "feature_availability": {
+        "available": [
+          "duration",
+          "directional packets and bytes",
+          "packet length statistics",
+          "IAT statistics",
+          "TCP flag counts",
+          "destination port",
+          "protocol",
+          "timestamp"
+        ],
+        "missing": [
+          "source endpoint",
+          "destination endpoint"
+        ]
+      },
+      "timestamp_quality": "31,855 distinct non-missing timestamp strings; adapter parsing and chronology quality require the full quality report.",
+      "known_limitations": [
+        "Same broad testbed family as the frozen 2018-03-01 CSE report, but a distinct source object and capture day.",
+        "Published processed CSV omits endpoints, so Schema B is prohibited.",
+        "The attack label is misspelled Infilteration at source and maps to infiltration.",
+        "Development use is permitted, but the frozen 2018-03-01 report remains final-only and cannot guide choices."
+      ]
+    }
+  ]
+}

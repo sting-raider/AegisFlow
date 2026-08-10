@@ -14,6 +14,7 @@ from packages.features.research import PORTABLE_FEATURE_NAMES, RUNTIME_ENRICHED_
 from packages.model_bundle import ModelBundle
 from training.cli.evaluate_dataset import main as evaluate_dataset_main
 from training.data.adapters import load_dataset
+from training.data.development import assert_development_only
 from training.data.evaluate import evaluate_logistic_gate
 from training.data.hybrid_evaluate import evaluate_hybrid_gate
 from training.data.models import CanonicalDataset, InputProvenance
@@ -146,10 +147,52 @@ def test_official_dataset_catalog_has_all_supported_adapters() -> None:
     assert set(catalog["datasets"]) == {
         "cic_ids2017",
         "cse_cic_ids2018",
+        "hikari2021",
         "unsw_nb15",
         "nfstream_csv",
         "synthetic_smoke",
     }
+
+
+def test_hikari_adapter_reconstructs_wire_bytes_and_maps_research_labels(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "hikari.csv"
+    pd.DataFrame(
+        {
+            "originh": ["10.0.0.1", "10.0.0.2", "10.0.0.3"],
+            "responh": ["192.0.2.1", "192.0.2.2", "192.0.2.3"],
+            "responp": [443, 22, 3333],
+            "flow_duration": [1.0, 2.0, 3.0],
+            "fwd_pkts_tot": [2, 4, 6],
+            "bwd_pkts_tot": [1, 2, 3],
+            "fwd_pkts_payload.tot": [100, 200, 300],
+            "bwd_pkts_payload.tot": [50, 100, 150],
+            "fwd_header_size_tot": [40, 80, 120],
+            "bwd_header_size_tot": [20, 40, 60],
+            "flow_pkts_per_sec": [3, 3, 3],
+            "flow_pkts_payload.std": [10, 20, 30],
+            "flow_iat.avg": [1000, 2000, 3000],
+            "flow_iat.std": [100, 200, 300],
+            "flow_SYN_flag_count": [1, 2, 3],
+            "flow_ACK_flag_count": [1, 2, 3],
+            "flow_RST_flag_count": [0, 1, 0],
+            "traffic_category": ["Benign", "Probing", "XMRIGCC CryptoMiner"],
+            "Label": [0, 1, 1],
+        }
+    ).to_csv(path, index=False)
+
+    dataset = load_dataset("hikari2021", [path])
+
+    assert dataset.labels.tolist() == ["benign", "port_scan", "cryptomining"]
+    assert dataset.features[:, FEATURE_NAMES.index("bytes_forward")].tolist() == [
+        140.0,
+        280.0,
+        420.0,
+    ]
+    assert dataset.portable_features is not None
+    assert dataset.runtime_enriched_features is None
+    assert any("wire bytes" in note for note in dataset.adapter_notes)
 
 
 def test_quality_flags_predictive_source_columns_and_nonfinite_values(tmp_path: Path) -> None:
@@ -239,6 +282,28 @@ def test_manifest_checksum_is_enforced(tmp_path: Path) -> None:
     )
     with pytest.raises(ValueError, match="checksum"):
         load_dataset("cic_ids2017", [path])
+
+
+def test_development_preparation_rejects_frozen_source_hash(tmp_path: Path) -> None:
+    manifest = tmp_path / "frozen.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "reports": [
+                    {
+                        "source_files": [
+                            {"filename": "final.csv", "sha256": "a" * 64}
+                        ]
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    provenance = (InputProvenance("candidate.csv", 10, "a" * 64, None),)
+
+    with pytest.raises(ValueError, match="frozen-final"):
+        assert_development_only(provenance, manifest)
 
 
 def _canonical(seed: int = 7, name: str = "fixture") -> CanonicalDataset:

@@ -92,3 +92,33 @@ continuous fields while passing declared binary categories unchanged. Transformi
 outlier cannot alter learned bounds. This is implementation/parity evidence only: neither
 schema is preferred until fresh development experiments and the dataset-origin diagnostic
 are complete.
+
+## MR-003 — Fresh development pool and first origin diagnostic
+
+Date: 2026-08-10
+
+Status: corpus incomplete; full Schema A blocked
+
+Two non-frozen official sources were acquired and reviewed. HIKARI-2021 v1.4.0 contributes
+555,278 retained rows (SHA-256
+`fddcf2a9fe496ed5a2306df4586f7029e2d4150b0fe7ad70337d5d63e61c645f`); the distinct
+CSE-CIC-IDS2018 2018-02-28 object contributes 606,902 retained rows after 33 repeated
+headers and 6,169 invalid canonical rows are excluded (SHA-256
+`f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771`). Both pass the
+blocking quality gate. Exact provenance and aggregate quality evidence are in
+`configs/datasets/development-pool-v1.json` and `docs/development/`. A preparation guard
+refuses every source hash registered as frozen-final evidence.
+
+Neither aggregate file can support Schema B: HIKARI lacks trustworthy per-row timestamps
+and the processed CSE CSV lacks endpoints. The pool therefore does not yet satisfy the
+environment or temporal-evidence requirement.
+
+After exact per-source Schema A deduplication, a deterministic balanced 50,000-row sample
+from each source was split 75/25. A train-fit robust-preprocessed logistic classifier
+identified corpus origin with 1.000 balanced accuracy. `protocol_other`, `protocol_tcp`,
+and `protocol_udp` dominated because HIKARI publishes no protocol column. Full Schema A is
+therefore blocked from challenger selection. Removing all protocol, port, service, and
+port-missing categorical fields reduced origin balanced accuracy to `0.69772`, below the
+`0.90` block threshold. That numerical core is only a research candidate; the two-source,
+row-stratified diagnostic cannot substitute for a capture-disjoint, three-environment
+result. See `docs/development/dataset-origin-diagnostic.json`.
