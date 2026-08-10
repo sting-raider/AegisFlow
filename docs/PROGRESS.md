@@ -45,6 +45,13 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   clean code commit, source fingerprints, schema/order, seed, aggregate report hashes,
   and development-only/frozen-source policy and rejects report tampering or per-row
   predictions.
+- A three-way benign-only anomaly harness now compares Isolation Forest, robust
+  covariance, Local Outlier Factor novelty, one-class SVM, and a CPU denoising
+  autoencoder. Fit, threshold-calibration, and test environments are mutually disjoint;
+  both fit/calibration orientations are repeated for every held environment. Direct and
+  review thresholds come only from calibration benign FPR budgets, every test attack
+  family is absent from fit/calibration, and model failures remain visible. The real
+  experiment has not run yet.
 - Remaining work begins with challenger and held-family experiments, then sustained
   performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
@@ -72,8 +79,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 168 tests pass, Ruff passes across the repository, strict MyPy passes across
-  75 source files including migrations, and measured backend coverage is 84%.
+- Python: 169 tests pass, Ruff passes across the repository, strict MyPy passes across
+  78 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose

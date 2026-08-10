@@ -48,6 +48,7 @@ class PreparedResearchSource:
     binary_labels: np.ndarray
     family_labels: np.ndarray
     groups: np.ndarray
+    timestamps: np.ndarray
     manifest: dict[str, Any]
 
 
@@ -135,8 +136,28 @@ def _prepare_source(
         binary_labels=retained_binary,
         family_labels=dataset.labels[retained_indices],
         groups=dataset.groups[retained_indices],
+        timestamps=dataset.timestamps[retained_indices],
         manifest=manifest,
     )
+
+
+def prepare_research_sources(
+    datasets: dict[str, CanonicalDataset],
+    *,
+    max_rows_per_class: int,
+    seed: int = RESEARCH_SEED,
+) -> list[PreparedResearchSource]:
+    if max_rows_per_class < 20:
+        raise ValueError("max_rows_per_class must be at least 20")
+    return [
+        _prepare_source(
+            source_id,
+            dataset,
+            max_rows_per_class=max_rows_per_class,
+            seed=seed,
+        )
+        for source_id, dataset in datasets.items()
+    ]
 
 
 def _model(name: str, seed: int) -> tuple[Any, dict[str, Any]]:
@@ -310,15 +331,9 @@ def run_cross_environment_supervised(
         raise ValueError("max_rows_per_class must be at least 20")
     if not models or len(set(models)) != len(models):
         raise ValueError("models must be nonempty and unique")
-    prepared = [
-        _prepare_source(
-            source_id,
-            dataset,
-            max_rows_per_class=max_rows_per_class,
-            seed=seed,
-        )
-        for source_id, dataset in datasets.items()
-    ]
+    prepared = prepare_research_sources(
+        datasets, max_rows_per_class=max_rows_per_class, seed=seed
+    )
     rotations: list[dict[str, Any]] = []
     for held_out in prepared:
         training_sources = [source for source in prepared if source is not held_out]

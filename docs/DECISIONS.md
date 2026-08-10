@@ -504,3 +504,22 @@ or LightGBM is deferred until the dependency provides measurable benefit over ma
 scikit-learn baselines; advanced open-set models and threshold selection remain separate
 experiments. Running the frozen reports, optimizing a threshold during this baseline, or
 calling binary maliciousness an unknown-behaviour result were rejected.
+
+## D-038 — Separate anomaly fit, threshold calibration, and held environment
+
+Evaluate benign-only Isolation Forest, robust covariance, Local Outlier Factor novelty,
+one-class SVM, and a compact CPU denoising autoencoder with a strict three-way environment
+rotation. One fresh environment supplies benign fit rows, a second supplies only benign
+threshold calibration, and the third remains wholly held out. Repeat both fit/calibration
+orientations for every held environment, yielding six runs per model. No attack label or
+attack row enters anomaly fit or calibration, so every tested attack family is genuinely
+unseen by the anomaly model.
+
+Set direct-suspicious thresholds at a 1% calibration benign-FPR budget and review
+thresholds at 5%; report the observed calibration rate, transferred test FPR, direct
+unknown recall, detection-or-review, per-family results, PR/ROC AUC, score percentiles,
+resource cost, and a four-point operating curve. Keep the numerical-core feature view and
+train-fit preprocessing from the origin-cleared baseline. Do not report false alerts/hour
+from class-sampled/deduplicated data. Combining fit and calibration environments, fitting
+on attacks, interpreting anomaly scores as calibrated probabilities, or hiding a model
+fit failure were rejected.

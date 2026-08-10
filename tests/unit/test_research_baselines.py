@@ -8,6 +8,7 @@ from packages.features.research import (
     PORTABLE_NUMERICAL_CORE_FEATURE_NAMES,
 )
 from training.data.models import CanonicalDataset, InputProvenance
+from training.research.anomaly import run_cross_environment_anomaly_baselines
 from training.research.baselines import run_cross_environment_supervised
 
 
@@ -67,3 +68,26 @@ def test_cross_environment_supervised_baseline_is_deterministic_and_aggregate_on
         item["sampled_indices_sha256"] for item in repeated["sources"]
     ]
     assert "predictions" not in str(report)
+
+
+def test_three_way_anomaly_baseline_keeps_fit_calibration_and_test_distinct() -> None:
+    datasets = {
+        "first": _source("first", 0.0),
+        "second": _source("second", 0.5),
+        "third": _source("third", 1.0),
+    }
+
+    report = run_cross_environment_anomaly_baselines(
+        datasets,
+        models=("isolation_forest",),
+        max_rows_per_class=50,
+    )
+
+    assert len(report["runs"]) == 6
+    assert report["summary"]["isolation_forest"]["completed_runs"] == 6
+    for run in report["runs"]:
+        assert len(
+            {run["fit_source"], run["calibration_source"], run["testing_source"]}
+        ) == 3
+        assert run["status"] == "complete"
+        assert run["per_family"]["attack"]["rows"] > 0

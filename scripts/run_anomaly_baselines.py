@@ -8,62 +8,64 @@ from typing import Any, cast
 
 from training.data.adapters import DatasetKind, load_dataset
 from training.data.development import assert_development_only
-from training.research.baselines import (
-    DEFAULT_SUPERVISED_MODELS,
-    run_cross_environment_supervised,
+from training.research.anomaly import (
+    DEFAULT_ANOMALY_MODELS,
+    run_cross_environment_anomaly_baselines,
 )
 from training.research.evidence import atomic_text, git_commit_from_clean_tree
 
 
 def _markdown(report: dict[str, Any]) -> str:
     lines = [
-        "# Development supervised baseline results",
+        "# Development anomaly/open-set baseline results",
         "",
-        f"Experiment: `{report['experiment_id']}`  ",
-        f"Code commit: `{report['code_commit']}`  ",
+        f"Experiment: `{report['experiment_id']}`",
+        "",
+        f"Code commit: `{report['code_commit']}`",
+        "",
         f"Generated: `{report['generated_at']}`",
         "",
-        "This is development-only evidence. It does not select, lock, or promote a model,",
-        "and it does not use the frozen final reports.",
+        "This is development-only evidence. One environment supplies benign fit data, a",
+        "second supplies benign calibration, and the third is completely held out. No",
+        "attack family enters anomaly fit or calibration.",
         "",
-        "| Model | Mean macro F1 | Worst macro F1 | Mean benign FPR | Worst benign FPR "
-        "| Mean malicious recall | Worst malicious recall |",
-        "|---|---:|---:|---:|---:|---:|---:|",
+        "| Model | Complete | Failed | Mean direct unknown recall | Worst direct recall | "
+        "Mean detection-or-review | Worst detection-or-review | Mean benign FPR | "
+        "Worst benign FPR |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for model, values in report["summary"].items():
-        lines.append(
-            f"| {model} | {values['macro_f1_mean']:.5f} | "
-            f"{values['macro_f1_min']:.5f} | {values['benign_fpr_mean']:.5f} | "
-            f"{values['benign_fpr_max']:.5f} | "
-            f"{values['malicious_recall_mean']:.5f} | "
-            f"{values['malicious_recall_min']:.5f} |"
-        )
-    lines.extend(
-        [
-            "",
-            "## Cross-environment rotations",
-            "",
-        ]
-    )
-    for rotation in report["rotations"]:
-        lines.extend(
-            [
-                f"### Test: {rotation['testing_source']}",
-                "",
-                f"Train sources: {', '.join(rotation['training_sources'])}. "
-                f"Exact feature-row overlap: {rotation['exact_feature_row_overlap']}.",
-                "",
-                "| Model | Macro F1 | Benign FPR | Malicious recall | PR-AUC | ECE | Rows/s |",
-                "|---|---:|---:|---:|---:|---:|---:|",
-            ]
-        )
-        for values in rotation["models"]:
+        if not values["completed_runs"]:
             lines.append(
-                f"| {values['model']} | {values['macro_f1']:.5f} | "
-                f"{values['benign_false_positive_rate']:.5f} | "
-                f"{values['malicious_recall']:.5f} | "
-                f"{values['pr_auc_malicious']:.5f} | {values['ece']:.5f} | "
-                f"{values['throughput_rows_per_second']:.1f} |"
+                f"| {model} | 0 | {values['failed_runs']} | n/a | n/a | n/a | n/a | n/a | n/a |"
+            )
+            continue
+        lines.append(
+            f"| {model} | {values['completed_runs']} | {values['failed_runs']} | "
+            f"{values['direct_unknown_recall_mean']:.5f} | "
+            f"{values['direct_unknown_recall_min']:.5f} | "
+            f"{values['detection_or_review_mean']:.5f} | "
+            f"{values['detection_or_review_min']:.5f} | "
+            f"{values['benign_fpr_mean']:.5f} | {values['benign_fpr_max']:.5f} |"
+        )
+    lines.extend(["", "## Runs", ""])
+    for values in report["runs"]:
+        title = (
+            f"{values['model']}: fit {values['fit_source']}, calibrate "
+            f"{values['calibration_source']}, test {values['testing_source']}"
+        )
+        lines.append(f"### {title}")
+        lines.append("")
+        if values["status"] != "complete":
+            lines.append(
+                f"Failed visibly: `{values['error_type']}` — {values['error']}"
+            )
+        else:
+            lines.append(
+                f"Direct recall `{values['direct_suspicious_unknown_recall']:.5f}`; "
+                f"detection-or-review `{values['detection_or_review_recall']:.5f}`; "
+                f"benign FPR `{values['test_benign_false_positive_rate']:.5f}`; "
+                f"PR-AUC `{values['pr_auc_malicious']:.5f}`."
             )
         lines.append("")
     lines.extend(
@@ -79,7 +81,7 @@ def _markdown(report: dict[str, Any]) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run development-only cross-environment supervised baselines"
+        description="Run three-way development-only anomaly/open-set baselines"
     )
     parser.add_argument(
         "--source",
@@ -91,11 +93,11 @@ def main() -> None:
     parser.add_argument(
         "--model",
         action="append",
-        choices=DEFAULT_SUPERVISED_MODELS,
+        choices=DEFAULT_ANOMALY_MODELS,
         dest="models",
     )
     parser.add_argument("--max-rows-per-class", type=int, default=10_000)
-    parser.add_argument("--experiment-id", default="DEV-SUP-001")
+    parser.add_argument("--experiment-id", default="DEV-ANO-001")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--markdown-output", type=Path, required=True)
     parser.add_argument(
@@ -120,9 +122,9 @@ def main() -> None:
         dataset = load_dataset(dataset_kind, paths)
         assert_development_only(dataset.provenance, args.frozen_manifest)
         datasets[source_id] = dataset
-    report = run_cross_environment_supervised(
+    report = run_cross_environment_anomaly_baselines(
         datasets,
-        models=tuple(args.models or DEFAULT_SUPERVISED_MODELS),
+        models=tuple(args.models or DEFAULT_ANOMALY_MODELS),
         max_rows_per_class=args.max_rows_per_class,
     )
     report["experiment_id"] = args.experiment_id
