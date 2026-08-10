@@ -485,3 +485,22 @@ machine and excluded from model vectors and committed evidence. Dropping 14,260 
 DDoS zero-packet flows, flattening all captures into one group, or downloading the full
 21+ GiB corpus were rejected because each would weaken validity without helping the next
 experiment.
+
+## D-037 — Start challenger research with an untuned numerical-core baseline matrix
+
+Begin A3 with binary benign-versus-malicious cross-environment baselines over the
+nine-feature numerical core that cleared the dataset-origin threshold. Compare class-
+weighted logistic regression, sigmoid-calibrated random forest, class-weighted
+HistGradientBoosting, and the existing-size compact MLP in all three leave-one-environment-
+out rotations. Use train-fit quantile clipping/robust scaling, a fixed 0.5 decision
+threshold, and report F1, PR-AUC, benign FPR/workload, recall, ECE/Brier, latency,
+throughput, memory, and exact cross-source feature overlap.
+
+Require a clean committed tree before an experiment so its code hash is meaningful.
+Deterministically cap each binary class per source, remove exact duplicates, and remove
+feature vectors carrying conflicting binary labels while recording every index hash and
+count. Commit only aggregate evidence, never predictions or endpoint identities. XGBoost
+or LightGBM is deferred until the dependency provides measurable benefit over maintained
+scikit-learn baselines; advanced open-set models and threshold selection remain separate
+experiments. Running the frozen reports, optimizing a threshold during this baseline, or
+calling binary maliciousness an unknown-behaviour result were rejected.

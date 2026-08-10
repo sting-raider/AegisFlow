@@ -44,6 +44,18 @@ PORTABLE_FEATURE_NAMES = (
     "service_other",
 )
 
+PORTABLE_DATASET_SENSITIVE_FEATURE_NAMES = tuple(
+    name
+    for name in PORTABLE_FEATURE_NAMES
+    if name.startswith(("protocol_", "port_", "service_"))
+    or name == "destination_port_missing"
+)
+PORTABLE_NUMERICAL_CORE_FEATURE_NAMES = tuple(
+    name
+    for name in PORTABLE_FEATURE_NAMES
+    if name not in PORTABLE_DATASET_SENSITIVE_FEATURE_NAMES
+)
+
 TEMPORAL_FEATURE_NAMES = (
     "source_flows_10s_log1p",
     "source_flows_60s_log1p",

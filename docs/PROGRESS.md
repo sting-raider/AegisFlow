@@ -34,6 +34,12 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - The three-environment, deduplicated dataset-origin diagnostic still blocks full Schema
   A at 0.95416 balanced accuracy. Removing protocol/port/service categories lowers it to
   0.68428, so only the reduced numerical core clears the 0.90 shortcut threshold.
+- A clean-commit development harness now compares logistic regression, sigmoid-calibrated
+  random forest, HistGradientBoosting, and the compact MLP across all three leave-one-
+  environment-out rotations. It applies train-only preprocessing, deterministic binary-
+  class caps, exact-vector deduplication, conflicting-label removal, fixed untuned 0.5
+  thresholds, and aggregate-only resource/calibration/error reporting. No result has been
+  run or used for selection yet.
 - Remaining work begins with challenger and held-family experiments, then sustained
   performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
@@ -61,8 +67,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 165 tests pass, Ruff passes across the repository, strict MyPy passes across
-  71 source files including migrations, and measured backend coverage is 84%.
+- Python: 166 tests pass, Ruff passes across the repository, strict MyPy passes across
+  74 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose

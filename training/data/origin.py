@@ -13,7 +13,11 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 
-from packages.features.research import PORTABLE_FEATURE_NAMES, PORTABLE_SCHEMA_VERSION
+from packages.features.research import (
+    PORTABLE_DATASET_SENSITIVE_FEATURE_NAMES,
+    PORTABLE_FEATURE_NAMES,
+    PORTABLE_SCHEMA_VERSION,
+)
 from training.data.models import CanonicalDataset
 from training.features import RobustResearchPreprocessor
 
@@ -137,12 +141,8 @@ def evaluate_dataset_origin(
     matrix = np.vstack(sampled)
     origins = np.concatenate(origin_labels).astype(str)
     full_mask = np.ones(len(PORTABLE_FEATURE_NAMES), dtype=bool)
-    categorical_mask = np.asarray(
-        [
-            name.startswith(("protocol_", "port_", "service_"))
-            or name == "destination_port_missing"
-            for name in PORTABLE_FEATURE_NAMES
-        ]
+    categorical_mask = np.isin(
+        PORTABLE_FEATURE_NAMES, PORTABLE_DATASET_SENSITIVE_FEATURE_NAMES
     )
     full = _evaluate_view(
         matrix,
