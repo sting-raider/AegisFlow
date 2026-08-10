@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 from packages.features.registry import FEATURE_NAMES
+from packages.features.research import PORTABLE_FEATURE_NAMES, RUNTIME_ENRICHED_FEATURE_NAMES
 from packages.model_bundle import ModelBundle
 from training.cli.evaluate_dataset import main as evaluate_dataset_main
 from training.data.adapters import load_dataset
@@ -58,6 +59,27 @@ def test_cic_adapter_maps_units_labels_and_drops_identifiers(tmp_path: Path) -> 
     report = quality_report(dataset)
     assert "Source IP" in report.identifier_columns
     assert "Source IP" not in FEATURE_NAMES
+    assert dataset.portable_features is not None
+    assert dataset.portable_features.shape == (3, len(PORTABLE_FEATURE_NAMES))
+    assert dataset.runtime_enriched_features is None
+
+
+def test_cic_adapter_replays_shared_temporal_features_when_endpoints_and_time_exist(
+    tmp_path: Path,
+) -> None:
+    frame = _cic_frame().copy()
+    frame["Destination IP"] = ["192.0.2.1", "192.0.2.2", "192.0.2.3"]
+    path = tmp_path / "temporal.csv"
+    frame.to_csv(path, index=False)
+
+    dataset = load_dataset("cic_ids2017", [path])
+
+    assert dataset.runtime_enriched_features is not None
+    assert dataset.runtime_enriched_features.shape == (
+        3,
+        len(RUNTIME_ENRICHED_FEATURE_NAMES),
+    )
+    assert any("source-row order" in note for note in dataset.research_feature_notes)
 
 
 def test_cse_and_generic_nfstream_adapters_are_registered(tmp_path: Path) -> None:

@@ -21,9 +21,20 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   encoding, and zero substitution for unavailable UNSW fields. These are plausible
   dataset-origin shortcuts and make the current schema unsuitable as the final challenger
   representation without further evidence.
-- Fresh development corpus acquisition, portable and temporal schema implementation,
-  challenger experiments, sustained performance, real local OIDC/Kubernetes, restore,
-  rollback/failure, security, and final GO/NO-GO evidence remain open.
+- Fresh development corpus acquisition, dataset-origin diagnostics, challenger experiments,
+  sustained performance, real local OIDC/Kubernetes, restore, rollback/failure, security,
+  and final GO/NO-GO evidence remain open.
+- Research Schema A now emits 24 portable features from exporter-independent counts,
+  fractions, derived rates, log transforms, protocol categories, port ranges, service
+  families, and explicit port missingness; it never exposes raw endpoint identity or a
+  continuous port magnitude. Research Schema B adds 16 AegisFlow-owned temporal signals
+  over bounded 10/60-second sensor+source windows. The shared implementation handles
+  cold starts, expiry, duplicates, bounded source/event state, sensor isolation, IPv4/IPv6,
+  and late events. Dataset adapters call the same vectorizer/state machine and decline
+  Schema B when any row lacks a valid timestamp or endpoint.
+- Train-fit preprocessing clips only at training-derived quantiles, robust-scales
+  continuous features, and preserves declared categorical/binary geometry. No candidate
+  has been trained or selected yet; origin-classifier and fresh-data evidence remain open.
 
 ## Verified
 
@@ -37,8 +48,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 149 tests pass, Ruff passes across the repository, strict MyPy passes across
-  67 source files including migrations, and measured backend coverage is 84%.
+- Python: 160 tests pass, Ruff passes across the repository, strict MyPy passes across
+  70 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -177,8 +188,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   evaluator retrains the calibrated classifier, benign-only Isolation Forest and CPU
   denoising autoencoder, builds a benign empirical CDF, and applies the bundle-loaded
   fusion rule in batches. Focused parity coverage proves a runtime single-flow result
-  matches batch scoring; the current full local gate passes 149 Python tests, Ruff,
-  strict MyPy across 67 source files, dashboard lint/build, and four dashboard tests.
+  matches batch scoring; the current full local gate passes 160 Python tests, Ruff,
+  strict MyPy across 70 source files, dashboard lint/build, and four dashboard tests.
 - The reviewed official UNSW-NB15 training/testing partitions were downloaded through
   UNSW's public SharePoint path and retained only under ignored `data/`. SHA-256 and
   provenance sidecars identify 175,341 training and 82,332 testing rows. The sanitized
@@ -234,7 +245,7 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - The 2026-08-10 validation rebuilt the real demo images, upgraded PostgreSQL through
   Alembic 0002, verified the governance/audit tables and demo identity, replayed the six
   safe deterministic flows, and passed Chromium E2E. Frontend lint/build, four Vitest
-  interactions, `npm audit` with zero vulnerabilities, 149 Python tests, and 84% coverage
+  interactions, `npm audit` with zero vulnerabilities, 160 Python tests, and 84% coverage
   also pass. An API-only container replacement initially exposed a stale Nginx upstream;
   Docker DNS re-resolution now restores dashboard-proxied readiness without restarting
   the dashboard, and Chromium passes after that forced replacement.

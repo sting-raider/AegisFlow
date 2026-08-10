@@ -432,3 +432,20 @@ and gate thresholds. This separates configuration integrity from result bytes wh
 full report hash protects both. Re-running, editing, or mining the frozen reports during
 challenger development was rejected because it would convert final evidence into a tuning
 set and invalidate the acceptance claim.
+
+## D-034 — Add research schemas without breaking the frozen bundle contract
+
+Keep the deployed 18-feature registry unchanged for legacy bundle reproducibility. Add
+Schema A as an exporter-independent flow representation and Schema B as Schema A plus
+bounded AegisFlow-owned temporal behavior. Use the same pure vectorizer and state machine
+from runtime `FlowEvent` conversion and training dataset replay. Treat missing temporal
+prerequisites as schema unavailability, not as a zero-filled behavioral history.
+
+Schema A replaces raw magnitudes with log/fraction fields and replaces continuous port
+distance with explicit missingness, port-range, protocol, and service-family categories.
+Schema B keys state by sensor+source, expires it, caps sources/events/duplicate history,
+returns cached vectors for duplicates, and flags late traffic while ignoring events beyond
+the skew allowance for state mutation. Train-only quantile clipping and robust scaling are
+serialized separately so evaluation rows cannot change preprocessing. Replacing the
+production bundle before development evidence, silently fabricating temporal context, and
+using a vendor CSV's similarly named field without semantic review were rejected.

@@ -11,8 +11,8 @@ production NIDS. Detection never authorizes automatic blocking.
 | Acceptance area | Required evidence | Current status |
 |---|---|---|
 | Frozen-evidence integrity | Exact report/config/source hashes; final-only policy; CI guard | Pass |
-| Portable representation | Universal schema, explicit missingness, robust transforms, parity | Open |
-| Temporal representation | Bounded shared training/runtime semantics and parity | Open |
+| Portable representation | Universal schema, explicit missingness, robust transforms, parity | Implementation passes; development evidence open |
+| Temporal representation | Bounded shared training/runtime semantics and parity | Implementation passes; selection/integration evidence open |
 | Fresh development corpus | Reviewed provenance/licensing/hashes and non-frozen boundary | Open |
 | Challenger evidence | Registered baselines, costs, ablations, repeated held-family and cross-environment results | Open |
 | Final scientific gate | Candidate locked before exactly one frozen run; governed GO/NO-GO | Open |

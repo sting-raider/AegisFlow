@@ -54,7 +54,7 @@ live final status is in `docs/PROGRESS.md`; this file will be replaced by
 
 | Evidence | Result |
 |---|---|
-| Python quality gate | Ruff and strict MyPy across 67 sources; 149 tests; 84% measured backend coverage |
+| Python quality gate | Ruff and strict MyPy across 70 sources; 160 tests; 84% measured backend coverage |
 | Dashboard quality gate | ESLint, TypeScript/Vite production build, 4 component tests, 2 Chromium scenarios, zero Axe violations across all seven views and the evidence dialog |
 | Dependency/security gate | Dashboard audit reports zero vulnerabilities; Gitleaks and Trivy passed the published enterprise milestone |
 | Runtime evidence | 2,000-flow exact detector batching improved from 153.50 to 3,496.81 flows/s on the recorded host; the durable Compose path completed at 78.78 flows/s with zero final queue lag |

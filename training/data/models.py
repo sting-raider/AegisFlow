@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from packages.features.registry import FEATURE_NAMES
+from packages.features.research import PORTABLE_FEATURE_NAMES, RUNTIME_ENRICHED_FEATURE_NAMES
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,9 @@ class CanonicalDataset:
     provenance: tuple[InputProvenance, ...]
     adapter_notes: tuple[str, ...] = ()
     row_exclusions: tuple[RowExclusion, ...] = ()
+    portable_features: np.ndarray | None = None
+    runtime_enriched_features: np.ndarray | None = None
+    research_feature_notes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         rows = len(self.labels)
@@ -53,6 +57,16 @@ class CanonicalDataset:
         for values in (self.raw_labels, self.groups, self.timestamps, self.source_files):
             if len(values) != rows:
                 raise ValueError("dataset metadata length does not match feature rows")
+        if self.portable_features is not None and self.portable_features.shape != (
+            rows,
+            len(PORTABLE_FEATURE_NAMES),
+        ):
+            raise ValueError("portable feature matrix does not match research schema A")
+        if self.runtime_enriched_features is not None and self.runtime_enriched_features.shape != (
+            rows,
+            len(RUNTIME_ENRICHED_FEATURE_NAMES),
+        ):
+            raise ValueError("runtime-enriched feature matrix does not match research schema B")
 
     @property
     def row_count(self) -> int:

@@ -65,3 +65,30 @@ schema with identical training/runtime state semantics. Both require parity test
 origin-classifier diagnostic before model comparisons begin.
 
 Detailed availability and risk mapping is in `docs/FEATURE_PORTABILITY_AUDIT.md`.
+
+## MR-002 — Research schemas A/B and train-fit numeric representation
+
+Date: 2026-08-10
+
+Status: implementation complete; empirical selection not started
+
+Schema A (`2.0.0-research-a`) contains 24 current-flow features. Counts, duration, derived
+rates, packet-size mean, and byte asymmetry use stable log/fraction representations.
+Protocol is one-hot grouped; destination port becomes range and service-family categories
+with an explicit missing indicator. Raw IPs, continuous port magnitude, exporter-provided
+rates, optional IAT dispersion, and optional TCP flag counts are excluded.
+
+Schema B (`2.0.0-research-b`) adds 16 bounded temporal features computed by AegisFlow over
+10/60-second windows keyed by sensor and source. It records flow/unique-peer/unique-port
+counts, novelty, protocol/port rarity, fan-out entropy, interval moments/burstiness,
+short-flow ratio, cold start, and late-event state. Duplicate IDs return a cached vector
+without mutation; state expires and has explicit source/event/cache caps; events beyond
+the skew allowance are visible as late and do not corrupt state. Training adapters replay
+the same state machine in source-row order only when every row has a valid timestamp and
+endpoint. Otherwise Schema B is unavailable rather than imputed.
+
+A separate train-fit preprocessor performs quantile clipping and robust scaling for
+continuous fields while passing declared binary categories unchanged. Transforming a test
+outlier cannot alter learned bounds. This is implementation/parity evidence only: neither
+schema is preferred until fresh development experiments and the dataset-origin diagnostic
+are complete.

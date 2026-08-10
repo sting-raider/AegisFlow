@@ -94,8 +94,8 @@ make reset
 
 The latest local validation on 2026-08-10 passed:
 
-- Ruff and strict MyPy across 67 Python source files, including migrations;
-- 149 Python tests with 84% backend coverage;
+- Ruff and strict MyPy across 70 Python source files, including migrations;
+- 160 Python tests with 84% backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and 2 Chromium E2E
   scenarios including zero Axe violations across all seven views and the evidence dialog;
 - `npm audit --audit-level=high` with no reported vulnerabilities;

@@ -4,6 +4,8 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from ipaddress import ip_address
 from pathlib import Path
 from typing import Any, Literal
 
@@ -11,6 +13,11 @@ import numpy as np
 import pandas as pd
 
 from packages.features.registry import FEATURE_NAMES, FEATURE_REGISTRY
+from packages.features.research import (
+    FlowObservation,
+    TemporalFeatureState,
+    portable_feature_vector,
+)
 from training.data.models import (
     CanonicalDataset,
     InputProvenance,
@@ -289,6 +296,111 @@ def _canonical_features(
     return canonical, tuple(notes)
 
 
+def _research_feature_matrices(
+    raw: pd.DataFrame,
+    canonical: pd.DataFrame,
+    lookup: dict[str, str],
+    rules: dict[str, ColumnRule],
+    timestamps: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray | None, tuple[str, ...]]:
+    protocol_column = _resolve_column(
+        lookup, tuple(_key(name) for name in ("Protocol", "proto", "protocol_name"))
+    )
+    source_column = _resolve_column(
+        lookup,
+        tuple(_key(name) for name in ("Source IP", "Src IP", "src_ip", "srcip")),
+    )
+    destination_column = _resolve_column(
+        lookup,
+        tuple(_key(name) for name in ("Destination IP", "Dst IP", "dst_ip", "dstip")),
+    )
+    port_source = _numeric(raw, lookup, rules["destination_port"])
+    placeholder_time = datetime.fromtimestamp(0, UTC)
+    portable_rows: list[np.ndarray] = []
+    temporal_observations: list[FlowObservation] = []
+    temporal_available = source_column is not None and destination_column is not None
+    notes: list[str] = []
+    canonical_values = canonical.to_numpy(dtype=np.float64)
+    for position, (_, row) in enumerate(raw.iterrows()):
+        timestamp_value = timestamps[position]
+        timestamp = (
+            pd.Timestamp(timestamp_value).to_pydatetime().replace(tzinfo=UTC)
+            if not np.isnat(timestamp_value)
+            else placeholder_time
+        )
+        port_value = port_source.iloc[position] if port_source is not None else np.nan
+        port = int(port_value) if np.isfinite(port_value) and 0 <= port_value <= 65_535 else None
+        protocol: str | int | None = (
+            str(row[protocol_column]) if protocol_column is not None else None
+        )
+        values = canonical_values[position]
+        event_id = f"{row['__aegisflow_source_file']}:{position}"
+        sensor_id = str(row["__aegisflow_source_file"])
+        duration_ms = float(values[FEATURE_NAMES.index("duration_ms")])
+        packets_forward = int(values[FEATURE_NAMES.index("packets_forward")])
+        packets_reverse = int(values[FEATURE_NAMES.index("packets_reverse")])
+        bytes_forward = int(values[FEATURE_NAMES.index("bytes_forward")])
+        bytes_reverse = int(values[FEATURE_NAMES.index("bytes_reverse")])
+        portable = FlowObservation(
+            event_id=event_id,
+            sensor_id=sensor_id,
+            timestamp=timestamp,
+            source_ip="0.0.0.0",
+            destination_ip="0.0.0.0",
+            destination_port=port,
+            protocol=protocol,
+            duration_ms=duration_ms,
+            packets_forward=packets_forward,
+            packets_reverse=packets_reverse,
+            bytes_forward=bytes_forward,
+            bytes_reverse=bytes_reverse,
+        )
+        portable_rows.append(portable_feature_vector(portable))
+        if temporal_available and timestamp != placeholder_time:
+            assert source_column is not None and destination_column is not None
+            try:
+                source = str(ip_address(str(row[source_column]).strip()))
+                destination = str(ip_address(str(row[destination_column]).strip()))
+                if ip_address(source).version != ip_address(destination).version:
+                    temporal_available = False
+                else:
+                    temporal_observations.append(
+                        FlowObservation(
+                            event_id=event_id,
+                            sensor_id=sensor_id,
+                            timestamp=timestamp,
+                            source_ip=source,
+                            destination_ip=destination,
+                            destination_port=port,
+                            protocol=protocol,
+                            duration_ms=duration_ms,
+                            packets_forward=packets_forward,
+                            packets_reverse=packets_reverse,
+                            bytes_forward=bytes_forward,
+                            bytes_reverse=bytes_reverse,
+                        )
+                    )
+            except ValueError:
+                temporal_available = False
+        else:
+            temporal_available = False
+
+    portable_matrix = np.vstack(portable_rows)
+    if not temporal_available or len(temporal_observations) != len(raw):
+        notes.append(
+            "research schema B unavailable: every row requires valid endpoints and timestamp"
+        )
+        return portable_matrix, None, tuple(notes)
+    state = TemporalFeatureState()
+    enriched = np.vstack(
+        [state.observe_runtime_enriched_vector(item) for item in temporal_observations]
+    )
+    notes.append(
+        "research schema B replayed in source-row order with sensor scope equal to source file"
+    )
+    return portable_matrix, enriched, tuple(notes)
+
+
 def load_dataset(
     kind: DatasetKind,
     paths: list[Path],
@@ -380,13 +492,17 @@ def load_dataset(
     profiles = _source_profiles(
         raw.drop(columns=["__aegisflow_source_file"]), labels, resolved_label
     )
+    parsed_timestamps = _timestamps(raw, lookup, timestamp_column)
+    portable_features, runtime_enriched_features, research_notes = _research_feature_matrices(
+        raw, canonical, lookup, rules, parsed_timestamps
+    )
     return CanonicalDataset(
         name=kind,
         features=canonical.to_numpy(dtype=np.float64),
         labels=labels.to_numpy(dtype=str),
         raw_labels=raw_labels.to_numpy(dtype=str),
         groups=groups,
-        timestamps=_timestamps(raw, lookup, timestamp_column),
+        timestamps=parsed_timestamps,
         source_files=source_files,
         raw_column_names=tuple(
             str(column) for column in raw.columns if column != "__aegisflow_source_file"
@@ -395,4 +511,7 @@ def load_dataset(
         provenance=tuple(provenances),
         adapter_notes=notes,
         row_exclusions=tuple(exclusions),
+        portable_features=portable_features,
+        runtime_enriched_features=runtime_enriched_features,
+        research_feature_notes=research_notes,
     )
