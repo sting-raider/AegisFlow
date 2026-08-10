@@ -141,6 +141,128 @@
         "The attack label is misspelled Infilteration at source and maps to infiltration.",
         "Development use is permitted, but the frozen 2018-03-01 report remains final-only and cannot guide choices."
       ]
+    },
+    {
+      "id": "iot23-reviewed-six-captures",
+      "status": "acquired_and_verified",
+      "dataset": "IoT-23",
+      "version": "official IndividualScenarios Zeek labeled flow logs",
+      "official_source": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/",
+      "official_landing_page": "https://www.stratosphereips.org/datasets-iot23",
+      "publisher": "Stratosphere Laboratory, Czech Technical University in Prague",
+      "license": "CC-BY-2.0",
+      "citation": "Parmisano, Garcia, and Erquiaga; A labeled dataset with malicious and benign IoT network traffic",
+      "collection_environment": "Controlled CTU IoT network with real malware executed on Raspberry Pi devices and real Philips HUE/Amazon Echo benign-device traffic.",
+      "capture_dates": "2018-07-31 through 2019-01-10 across six separately grouped scenarios",
+      "attack_families": [
+        "C&C",
+        "C&C-Torii",
+        "DDoS",
+        "FileDownload",
+        "PartOfAHorizontalPortScan"
+      ],
+      "retained_rows": 43009,
+      "normalized_label_distribution": {
+        "benign": 13543,
+        "command_and_control": 14947,
+        "ddos": 14394,
+        "file_download": 3,
+        "port_scan": 122
+      },
+      "quality_report": {
+        "path": "docs/development/iot23-quality.json",
+        "fingerprint": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c",
+        "blocking_issues": 0,
+        "duplicate_canonical_rows": 31811,
+        "schema_a_rows": 43009,
+        "schema_b_rows": 43009
+      },
+      "source_files": [
+        {
+          "scenario": "CTU-IoT-Malware-Capture-34-1",
+          "filename": "CTU-IoT-Malware-Capture-34-1.conn.log.labeled",
+          "download_url": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/IndividualScenarios/CTU-IoT-Malware-Capture-34-1/bro/conn.log.labeled",
+          "malware_or_device": "Mirai",
+          "capture_range_utc": "2018-12-21T14:50:16Z/2018-12-22T14:50:13Z",
+          "rows": 23145,
+          "size_bytes": 2926718,
+          "sha256": "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e"
+        },
+        {
+          "scenario": "CTU-IoT-Malware-Capture-20-1",
+          "filename": "CTU-IoT-Malware-Capture-20-1.conn.log.labeled",
+          "download_url": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/IndividualScenarios/CTU-IoT-Malware-Capture-20-1/bro/conn.log.labeled",
+          "malware_or_device": "Torii",
+          "capture_range_utc": "2018-10-02T11:12:49Z/2018-10-03T11:11:49Z",
+          "rows": 3209,
+          "size_bytes": 419604,
+          "sha256": "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711"
+        },
+        {
+          "scenario": "CTU-IoT-Malware-Capture-42-1",
+          "filename": "CTU-IoT-Malware-Capture-42-1.conn.log.labeled",
+          "download_url": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/IndividualScenarios/CTU-IoT-Malware-Capture-42-1/bro/conn.log.labeled",
+          "malware_or_device": "Trojan",
+          "capture_range_utc": "2019-01-10T13:34:42Z/2019-01-10T21:55:30Z",
+          "rows": 4426,
+          "size_bytes": 585829,
+          "sha256": "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa"
+        },
+        {
+          "scenario": "CTU-IoT-Malware-Capture-8-1",
+          "filename": "CTU-IoT-Malware-Capture-8-1.conn.log.labeled",
+          "download_url": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/IndividualScenarios/CTU-IoT-Malware-Capture-8-1/bro/conn.log.labeled",
+          "malware_or_device": "Hakai",
+          "capture_range_utc": "2018-07-31T13:15:11Z/2018-08-01T13:15:06Z",
+          "rows": 10403,
+          "size_bytes": 1431000,
+          "sha256": "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a"
+        },
+        {
+          "scenario": "CTU-Honeypot-Capture-4-1",
+          "filename": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+          "download_url": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/IndividualScenarios/CTU-Honeypot-Capture-4-1/bro/conn.log.labeled",
+          "malware_or_device": "Philips HUE",
+          "capture_range_utc": "2018-10-25T12:06:37Z/2018-10-26T09:58:24Z",
+          "rows": 452,
+          "size_bytes": 61653,
+          "sha256": "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e"
+        },
+        {
+          "scenario": "CTU-Honeypot-Capture-5-1",
+          "filename": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+          "download_url": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/IndividualScenarios/CTU-Honeypot-Capture-5-1/bro/conn.log.labeled",
+          "malware_or_device": "Amazon Echo",
+          "capture_range_utc": "2018-09-21T09:40:22Z/2018-09-21T15:09:33Z",
+          "rows": 1374,
+          "size_bytes": 182147,
+          "sha256": "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262"
+        }
+      ],
+      "feature_availability": {
+        "available": [
+          "timestamp",
+          "origin/responder endpoints and ports",
+          "protocol and service",
+          "duration",
+          "directional packet totals",
+          "directional IP-layer byte totals",
+          "connection state and history"
+        ],
+        "missing": [
+          "portable packet-length dispersion",
+          "portable IAT dispersion",
+          "portable TCP flag counts"
+        ]
+      },
+      "timestamp_quality": "Every retained row has a Unix-seconds timestamp. Source order includes legitimate reordering; the shared temporal state exposes late events and ignores mutations beyond its skew allowance.",
+      "known_limitations": [
+        "All captures come from one CTU controlled environment and cannot alone prove broad deployment transfer.",
+        "26,185 flows have no Zeek duration; the adapter records zero observed duration and derives rates with a one-microsecond floor.",
+        "31,811 rows duplicate the legacy canonical vector, but temporal context and source order remain distinct and are not deduplicated for Schema B replay.",
+        "Only three FileDownload rows are present, so that family cannot support independent quantitative claims.",
+        "Raw endpoint identities are required transiently to compute bounded temporal state but never enter feature vectors or committed reports."
+      ]
     }
   ]
 }

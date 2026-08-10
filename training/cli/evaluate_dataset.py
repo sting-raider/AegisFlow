@@ -39,7 +39,8 @@ def main() -> None:
     choices = [
         "cic_ids2017",
         "cse_cic_ids2018",
-        "hikari2021",
+            "hikari2021",
+            "iot23_zeek",
         "unsw_nb15",
         "nfstream_csv",
     ]

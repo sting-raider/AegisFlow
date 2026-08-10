@@ -30,6 +30,15 @@
       "license_and_citation": "CC BY 4.0. Cite Ferriyan, Thamrin, Takeda, and Murai and DOI 10.5281/zenodo.6463389.",
       "expected_layout": "ALLFLOWMETER_HIKARI2021.csv with traffic_category, Label, origin/responder endpoints, duration, directional packet/payload/header totals, flag counts, and IAT statistics."
     },
+    "iot23_zeek": {
+      "adapter": "iot23_zeek",
+      "official_page": "https://www.stratosphereips.org/datasets-iot23",
+      "official_repository": "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/",
+      "retrieval": "Select reviewed IndividualScenarios conn.log.labeled files from the official CTU repository; record a SHA-256 for each exact object and preserve capture-file groups.",
+      "capture_boundaries": "Twenty malicious and three real-IoT benign scenarios collected by Stratosphere Laboratory; every selected scenario remains a distinct source group.",
+      "license_and_citation": "CC BY 2.0. Cite Parmisano, Garcia, and Erquiaga and the official IoT-23 dataset page.",
+      "expected_layout": "Zeek conn.log.labeled with #fields metadata, timestamps, endpoints, protocol, ports, directional packet/IP-byte totals, label, and detailed-label."
+    },
     "unsw_nb15": {
       "adapter": "unsw_nb15",
       "official_page": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",

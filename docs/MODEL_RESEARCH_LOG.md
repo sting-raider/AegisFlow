@@ -97,9 +97,9 @@ are complete.
 
 Date: 2026-08-10
 
-Status: corpus incomplete; full Schema A blocked
+Status: initial corpus complete; full Schema A blocked; numerical core eligible
 
-Two non-frozen official sources were acquired and reviewed. HIKARI-2021 v1.4.0 contributes
+Three non-frozen official environments were acquired and reviewed. HIKARI-2021 v1.4.0 contributes
 555,278 retained rows (SHA-256
 `fddcf2a9fe496ed5a2306df4586f7029e2d4150b0fe7ad70337d5d63e61c645f`); the distinct
 CSE-CIC-IDS2018 2018-02-28 object contributes 606,902 retained rows after 33 repeated
@@ -109,16 +109,19 @@ blocking quality gate. Exact provenance and aggregate quality evidence are in
 `configs/datasets/development-pool-v1.json` and `docs/development/`. A preparation guard
 refuses every source hash registered as frozen-final evidence.
 
-Neither aggregate file can support Schema B: HIKARI lacks trustworthy per-row timestamps
-and the processed CSE CSV lacks endpoints. The pool therefore does not yet satisfy the
-environment or temporal-evidence requirement.
+The third source is 43,009 IoT-23 rows across four malicious and two real-device benign
+capture groups (six reviewed SHA-256 objects). Its labels include command-and-control,
+DDoS, file download, and horizontal port scan behavior. Every retained row has timestamps,
+endpoints, protocol, port, and directional counts and replays through shared Schema B.
+HIKARI still lacks trustworthy per-row timestamps and the processed CSE CSV lacks
+endpoints, so those aggregate sources remain Schema A-only.
 
-After exact per-source Schema A deduplication, a deterministic balanced 50,000-row sample
-from each source was split 75/25. A train-fit robust-preprocessed logistic classifier
-identified corpus origin with 1.000 balanced accuracy. `protocol_other`, `protocol_tcp`,
-and `protocol_udp` dominated because HIKARI publishes no protocol column. Full Schema A is
-therefore blocked from challenger selection. Removing all protocol, port, service, and
-port-missing categorical fields reduced origin balanced accuracy to `0.69772`, below the
-`0.90` block threshold. That numerical core is only a research candidate; the two-source,
-row-stratified diagnostic cannot substitute for a capture-disjoint, three-environment
-result. See `docs/development/dataset-origin-diagnostic.json`.
+After exact per-source Schema A deduplication, HIKARI and CSE contribute deterministic
+50,000-row samples and IoT-23 contributes all 11,078 unique portable rows. A 75/25
+train-fit robust-preprocessed logistic diagnostic identifies corpus origin with 0.95416
+balanced accuracy. Protocol categories remain strongest because HIKARI publishes no
+protocol column. Full Schema A is therefore blocked from challenger selection. Removing
+all protocol, port, service, and port-missing categorical fields reduces origin balanced
+accuracy to `0.68428`, below the `0.90` block threshold. That nine-feature numerical core
+may proceed to grouped development experiments; it has not yet been selected. See
+`docs/development/dataset-origin-diagnostic.json`.

@@ -1,19 +1,27 @@
 {
   "categorical_ablation": {
-    "accuracy": 0.69772,
-    "balanced_accuracy": 0.69772,
+    "accuracy": 0.6399351818509182,
+    "balanced_accuracy": 0.6842767749699158,
     "confusion_labels": [
       "cse_2018_02_28",
-      "hikari"
+      "hikari",
+      "iot23"
     ],
     "confusion_matrix": [
       [
-        8500,
-        4000
+        7105,
+        3794,
+        1601
       ],
       [
-        3557,
-        8943
+        2561,
+        8420,
+        1519
+      ],
+      [
+        420,
+        104,
+        2246
       ]
     ],
     "feature_count": 9,
@@ -28,7 +36,7 @@
       "packet_length_mean_log1p_derived",
       "forward_reverse_byte_log_ratio"
     ],
-    "macro_f1": 0.6976250547509917,
+    "macro_f1": 0.6199348772890421,
     "preprocessing": {
       "binary_passthrough": [],
       "feature_order": [
@@ -43,50 +51,50 @@
         "forward_reverse_byte_log_ratio"
       ],
       "lower_bounds": [
-        0.08065328834246145,
+        0.07973496801885356,
         1.0986122886681098,
         0.2,
         0.0,
         0.0,
-        0.02627796572651079,
+        0.026284600464078378,
         0.0,
         0.0,
-        -4.363444486962358
+        -4.293618506703076
       ],
       "lower_quantile": 0.005,
       "medians": [
-        5.571069794385284,
-        2.0794415416798357,
+        5.6274628277245435,
+        1.791759469228055,
         0.5,
-        6.1903154058531475,
-        0.2571428571428571,
-        4.216697775052967,
-        8.699956172831442,
-        4.695924549256556,
-        -0.8965099560912027
+        6.09807428216624,
+        0.2808219178082192,
+        3.8741250033881096,
+        8.484952353043417,
+        4.5591262474866845,
+        -0.8167611365271217
       ],
       "scales": [
-        4.9321410697861054,
-        1.7917594692280552,
-        0.03448275862068961,
-        3.6693298435868025,
-        0.25745077384328663,
-        3.2188131499632,
-        4.187232483871389,
-        1.5452841503176504,
-        1.21715980860789
+        4.766622042848945,
+        1.7047480922384255,
+        0.05555555555555558,
+        3.536469682269039,
+        0.27213718886695315,
+        3.6918609797622075,
+        4.787309606110893,
+        1.5265520125240064,
+        1.2588815484393185
       ],
       "type": "training_quantile_clip_and_robust_scale",
       "upper_bounds": [
-        12.388362510780224,
-        7.155407997808511,
+        12.391970383653584,
+        7.1204443723924875,
         1.0,
-        14.452671240351787,
+        14.333592480149349,
         1.0,
-        10.299035995891082,
-        13.892901021497796,
-        7.443666624141807,
-        7.0909098220799835
+        10.301343615437757,
+        13.894122988864185,
+        7.397598947469841,
+        7.854248521806128
       ],
       "upper_quantile": 0.995
     },
@@ -107,66 +115,75 @@
       "service_database",
       "service_other"
     ],
-    "test_rows": 25000,
+    "test_rows": 27770,
     "top_absolute_coefficients": [
       {
         "feature": "bytes_total_log1p",
-        "magnitude": 10.222703437846826
+        "magnitude": 6.23953535898896
       },
       {
         "feature": "duration_log1p_ms",
-        "magnitude": 4.648384282420525
+        "magnitude": 3.881334183310296
       },
       {
         "feature": "packets_total_log1p",
-        "magnitude": 3.636777927324384
-      },
-      {
-        "feature": "packet_length_mean_log1p_derived",
-        "magnitude": 2.6342847821807562
+        "magnitude": 2.8297668853702858
       },
       {
         "feature": "packet_rate_log1p_derived",
-        "magnitude": 1.9810170017099935
-      },
-      {
-        "feature": "byte_rate_log1p_derived",
-        "magnitude": 1.1155447610218856
+        "magnitude": 2.8209433716281023
       },
       {
         "feature": "bytes_forward_fraction",
-        "magnitude": 0.6370994873614773
+        "magnitude": 1.7830617123944408
+      },
+      {
+        "feature": "packet_length_mean_log1p_derived",
+        "magnitude": 1.7637632387141349
+      },
+      {
+        "feature": "byte_rate_log1p_derived",
+        "magnitude": 1.256709256708782
       },
       {
         "feature": "forward_reverse_byte_log_ratio",
-        "magnitude": 0.41739613976132645
+        "magnitude": 0.4090604121116543
       },
       {
         "feature": "packets_forward_fraction",
-        "magnitude": 0.11772484044671096
+        "magnitude": 0.12687671919428092
       }
     ],
-    "train_rows": 75000
+    "train_rows": 83308
   },
+  "categorical_ablation_selection_blocked": false,
   "challenger_selection_blocked": true,
   "diagnostic": "dataset_origin_classifier",
-  "disposition": "blocked_shortcut_investigation_required",
+  "disposition": "full_schema_blocked_categorical_ablation_clears_threshold",
   "feature_schema": "2.0.0-research-a",
   "full_schema_a": {
-    "accuracy": 1.0,
-    "balanced_accuracy": 1.0,
+    "accuracy": 0.9741447605329492,
+    "balanced_accuracy": 0.9541573044524668,
     "confusion_labels": [
       "cse_2018_02_28",
-      "hikari"
+      "hikari",
+      "iot23"
     ],
     "confusion_matrix": [
       [
+        12067,
+        0,
+        433
+      ],
+      [
+        0,
         12500,
         0
       ],
       [
+        285,
         0,
-        12500
+        2485
       ]
     ],
     "feature_count": 24,
@@ -196,7 +213,7 @@
       "service_database",
       "service_other"
     ],
-    "macro_f1": 1.0,
+    "macro_f1": 0.9482927680108153,
     "preprocessing": {
       "binary_passthrough": [
         "protocol_tcp",
@@ -242,15 +259,15 @@
         "service_other"
       ],
       "lower_bounds": [
-        0.08065328834246145,
+        0.07973496801885356,
         1.0986122886681098,
         0.2,
         0.0,
         0.0,
-        0.02627796572651079,
+        0.026284600464078378,
         0.0,
         0.0,
-        -4.363444486962358,
+        -4.293618506703076,
         0.0,
         0.0,
         0.0,
@@ -269,19 +286,19 @@
       ],
       "lower_quantile": 0.005,
       "medians": [
-        5.571069794385284,
-        2.0794415416798357,
+        5.6274628277245435,
+        1.791759469228055,
         0.5,
-        6.1903154058531475,
-        0.2571428571428571,
-        4.216697775052967,
-        8.699956172831442,
-        4.695924549256556,
-        -0.8965099560912027,
+        6.09807428216624,
+        0.2808219178082192,
+        3.8741250033881096,
+        8.484952353043417,
+        4.5591262474866845,
+        -0.8167611365271217,
         0.0,
         0.0,
         0.0,
-        1.0,
+        0.0,
         0.0,
         1.0,
         0.0,
@@ -295,15 +312,15 @@
         0.0
       ],
       "scales": [
-        4.9321410697861054,
-        1.7917594692280552,
-        0.03448275862068961,
-        3.6693298435868025,
-        0.25745077384328663,
-        3.2188131499632,
-        4.187232483871389,
-        1.5452841503176504,
-        1.21715980860789,
+        4.766622042848945,
+        1.7047480922384255,
+        0.05555555555555558,
+        3.536469682269039,
+        0.27213718886695315,
+        3.6918609797622075,
+        4.787309606110893,
+        1.5265520125240064,
+        1.2588815484393185,
         1.0,
         1.0,
         1.0,
@@ -322,15 +339,15 @@
       ],
       "type": "training_quantile_clip_and_robust_scale",
       "upper_bounds": [
-        12.388362510780224,
-        7.155407997808511,
+        12.391970383653584,
+        7.1204443723924875,
         1.0,
-        14.452671240351787,
+        14.333592480149349,
         1.0,
-        10.299035995891082,
-        13.892901021497796,
-        7.443666624141807,
-        7.0909098220799835,
+        10.301343615437757,
+        13.894122988864185,
+        7.397598947469841,
+        7.854248521806128,
         1.0,
         1.0,
         0.0,
@@ -349,52 +366,53 @@
       ],
       "upper_quantile": 0.995
     },
-    "test_rows": 25000,
+    "test_rows": 27770,
     "top_absolute_coefficients": [
       {
         "feature": "protocol_other",
-        "magnitude": 10.282630062221173
+        "magnitude": 7.998697084201638
       },
       {
         "feature": "protocol_tcp",
-        "magnitude": 6.611200485608033
+        "magnitude": 4.681992029006064
+      },
+      {
+        "feature": "duration_log1p_ms",
+        "magnitude": 4.534022892766195
       },
       {
         "feature": "protocol_udp",
-        "magnitude": 5.3458330415583495
-      },
-      {
-        "feature": "packet_length_mean_log1p_derived",
-        "magnitude": 2.123335331230989
-      },
-      {
-        "feature": "bytes_forward_fraction",
-        "magnitude": 1.460523100840957
+        "magnitude": 3.668867524773645
       },
       {
         "feature": "service_remote_access",
-        "magnitude": 1.0527829262410757
+        "magnitude": 3.3794188430685783
       },
       {
-        "feature": "port_well_known",
-        "magnitude": 0.9746807086604267
+        "feature": "byte_rate_log1p_derived",
+        "magnitude": 2.976379530250397
       },
       {
-        "feature": "bytes_total_log1p",
-        "magnitude": 0.8990511037841896
+        "feature": "port_dynamic",
+        "magnitude": 2.879696988760568
       },
       {
-        "feature": "packets_total_log1p",
-        "magnitude": 0.7860096192357104
+        "feature": "bytes_forward_fraction",
+        "magnitude": 2.78187044061899
       },
       {
         "feature": "service_other",
-        "magnitude": 0.7691357147895556
+        "magnitude": 2.37230124691451
+      },
+      {
+        "feature": "packet_length_mean_log1p_derived",
+        "magnitude": 2.2831348001598064
       }
     ],
-    "train_rows": 75000
+    "train_rows": 83308
   },
-  "generated_at": "2026-08-10T07:34:27.949371+00:00",
+  "full_schema_a_selection_blocked": true,
+  "generated_at": "2026-08-10T08:10:19.628845+00:00",
   "high_origin_accuracy_threshold": 0.9,
   "limitations": [
     "Aggregate sources do not expose shared capture groups, so this diagnostic cannot use a capture-disjoint split.",
@@ -424,6 +442,22 @@
       "sampled_rows": 50000,
       "source_id": "cse_2018_02_28",
       "unique_schema_a_rows": 238113
+    },
+    {
+      "dataset": "iot23_zeek",
+      "dataset_fingerprint": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c",
+      "input_rows": 43009,
+      "provenance_sha256": [
+        "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e",
+        "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711",
+        "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa",
+        "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a",
+        "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e",
+        "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262"
+      ],
+      "sampled_rows": 11078,
+      "source_id": "iot23",
+      "unique_schema_a_rows": 11078
     }
   ],
   "split": "stratified row split after exact per-source Schema A deduplication"

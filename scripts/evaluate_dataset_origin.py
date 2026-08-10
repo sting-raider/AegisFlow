@@ -48,10 +48,20 @@ def main() -> None:
         default=Path("configs/evaluation/frozen-evidence-v1.json"),
     )
     args = parser.parse_args()
+    grouped: dict[str, tuple[DatasetKind, list[Path]]] = {}
+    for source_id, dataset_kind, path in args.source:
+        kind = cast(DatasetKind, dataset_kind)
+        existing = grouped.get(source_id)
+        if existing is not None and existing[0] != kind:
+            raise ValueError(f"source {source_id} cannot mix dataset kinds")
+        if existing is None:
+            grouped[source_id] = (kind, [Path(path)])
+        else:
+            existing[1].append(Path(path))
     datasets = []
     source_ids = []
-    for source_id, dataset_kind, path in args.source:
-        dataset = load_dataset(cast(DatasetKind, dataset_kind), [Path(path)])
+    for source_id, (dataset_kind, paths) in grouped.items():
+        dataset = load_dataset(dataset_kind, paths)
         assert_development_only(dataset.provenance, args.frozen_manifest)
         datasets.append(dataset)
         source_ids.append(source_id)

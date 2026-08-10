@@ -12,6 +12,8 @@ Official pages:
 - CSE-CIC-IDS2018: <https://www.unb.ca/cic/datasets/ids-2018.html>
 - UNSW-NB15: <https://research.unsw.edu.au/projects/unsw-nb15-dataset>
 - HIKARI-2021 v1.4.0: <https://zenodo.org/records/6463389>
+- IoT-23: <https://www.stratosphereips.org/datasets-iot23> and the official
+  <https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/> repository
 
 The reviewed development-only sources and their exact checksums, row counts, license
 notes, limitations, and quality-report fingerprints are in
@@ -31,6 +33,15 @@ Its aggregate CSV does not publish trustworthy row timestamps or protocol, so Sc
 unavailable and the protocol categories make full Schema A a dataset-origin shortcut.
 The February 28 CSE file has timestamps but omits endpoints, so Schema B is also
 unavailable. These limitations are visible rather than zero-filled.
+
+The reviewed IoT-23 slice uses six exact `conn.log.labeled` objects: Mirai, Torii,
+Trojan, Hakai, Philips HUE, and Amazon Echo scenarios. The adapter supports both the
+newer tab-delimited and legacy three-space label suffixes, interprets Unix timestamps,
+uses Zeek directional IP-layer byte totals, and preserves every file as a capture group.
+All 43,009 retained rows have Schema B evidence. Zeek flows with no observed duration use
+zero milliseconds and a documented one-microsecond rate floor; zero-packet flows use a
+zero packet-length mean. Endpoint identities are profiled for leakage and used transiently
+for bounded temporal state but never enter committed features or reports.
 
 Run the development origin diagnostic with explicit source IDs and paths:
 

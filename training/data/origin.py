@@ -160,7 +160,14 @@ def evaluate_dataset_origin(
         seed=seed,
         test_size=test_size,
     )
-    blocked = full["balanced_accuracy"] >= high_accuracy_threshold
+    full_blocked = full["balanced_accuracy"] >= high_accuracy_threshold
+    ablation_blocked = ablated["balanced_accuracy"] >= high_accuracy_threshold
+    if full_blocked and not ablation_blocked:
+        disposition = "full_schema_blocked_categorical_ablation_clears_threshold"
+    elif full_blocked:
+        disposition = "blocked_shortcut_investigation_required"
+    else:
+        disposition = "full_schema_origin_accuracy_below_blocking_threshold"
     return {
         "schema_version": "1.0.0",
         "diagnostic": "dataset_origin_classifier",
@@ -174,12 +181,10 @@ def evaluate_dataset_origin(
             "a causal shortcut.",
         ],
         "high_origin_accuracy_threshold": high_accuracy_threshold,
-        "challenger_selection_blocked": blocked,
-        "disposition": (
-            "blocked_shortcut_investigation_required"
-            if blocked
-            else "origin_accuracy_below_blocking_threshold"
-        ),
+        "challenger_selection_blocked": full_blocked,
+        "full_schema_a_selection_blocked": full_blocked,
+        "categorical_ablation_selection_blocked": ablation_blocked,
+        "disposition": disposition,
         "sources": source_summary,
         "full_schema_a": full,
         "categorical_ablation": {

@@ -1,0 +1,205 @@
+{
+  "adapter_notes": [
+    "duration_ms=0 for 26185 Zeek flows with no observed interval",
+    "Zeek rates use a one-microsecond floor for zero observed duration",
+    "Zeek zero-packet flows use packet_length_mean=0",
+    "directional wire bytes use Zeek orig_ip_bytes and resp_ip_bytes",
+    "packet_length_std=0 because the source schema does not provide it",
+    "iat_mean=0 because the source schema does not provide it",
+    "iat_std=0 because the source schema does not provide it",
+    "tcp_syn_count=0 because the source schema does not provide it",
+    "tcp_rst_count=0 because the source schema does not provide it",
+    "tcp_ack_count=0 because the source schema does not provide it"
+  ],
+  "dataset": "iot23_zeek",
+  "dataset_fingerprint": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c",
+  "generated_at": "2026-08-10T08:03:38.702870+00:00",
+  "permitted_use": "development_fit_calibration_and_model_selection_only",
+  "provenance": [
+    {
+      "declared_manifest": null,
+      "filename": "CTU-IoT-Malware-Capture-34-1.conn.log.labeled",
+      "sha256": "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e",
+      "size_bytes": 2926718
+    },
+    {
+      "declared_manifest": null,
+      "filename": "CTU-IoT-Malware-Capture-20-1.conn.log.labeled",
+      "sha256": "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711",
+      "size_bytes": 419604
+    },
+    {
+      "declared_manifest": null,
+      "filename": "CTU-IoT-Malware-Capture-42-1.conn.log.labeled",
+      "sha256": "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa",
+      "size_bytes": 585829
+    },
+    {
+      "declared_manifest": null,
+      "filename": "CTU-IoT-Malware-Capture-8-1.conn.log.labeled",
+      "sha256": "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a",
+      "size_bytes": 1431000
+    },
+    {
+      "declared_manifest": null,
+      "filename": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "sha256": "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e",
+      "size_bytes": 61653
+    },
+    {
+      "declared_manifest": null,
+      "filename": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "sha256": "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262",
+      "size_bytes": 182147
+    }
+  ],
+  "quality": {
+    "adapter_notes": [
+      "duration_ms=0 for 26185 Zeek flows with no observed interval",
+      "Zeek rates use a one-microsecond floor for zero observed duration",
+      "Zeek zero-packet flows use packet_length_mean=0",
+      "directional wire bytes use Zeek orig_ip_bytes and resp_ip_bytes",
+      "packet_length_std=0 because the source schema does not provide it",
+      "iat_mean=0 because the source schema does not provide it",
+      "iat_std=0 because the source schema does not provide it",
+      "tcp_syn_count=0 because the source schema does not provide it",
+      "tcp_rst_count=0 because the source schema does not provide it",
+      "tcp_ack_count=0 because the source schema does not provide it"
+    ],
+    "blocking_issues": [],
+    "class_distribution": {
+      "benign": 13543,
+      "command_and_control": 14947,
+      "ddos": 14394,
+      "file_download": 3,
+      "port_scan": 122
+    },
+    "constant_columns": [
+      "packet_length_std",
+      "iat_mean",
+      "iat_std",
+      "tcp_syn_count",
+      "tcp_rst_count",
+      "syn_ack_ratio"
+    ],
+    "dataset": "iot23_zeek",
+    "duplicate_rows": 31811,
+    "excluded_rows": [],
+    "fingerprint": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c",
+    "identifier_columns": [
+      "id.orig_h",
+      "id.resp_h",
+      "uid"
+    ],
+    "infinite_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "missing_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "out_of_range_values": {
+      "byte_rate": 0,
+      "bytes_forward": 0,
+      "bytes_reverse": 0,
+      "bytes_total": 0,
+      "destination_port": 0,
+      "duration_ms": 0,
+      "forward_reverse_byte_ratio": 0,
+      "iat_mean": 0,
+      "iat_std": 0,
+      "packet_length_mean": 0,
+      "packet_length_std": 0,
+      "packet_rate": 0,
+      "packets_forward": 0,
+      "packets_reverse": 0,
+      "packets_total": 0,
+      "syn_ack_ratio": 0,
+      "tcp_rst_count": 0,
+      "tcp_syn_count": 0
+    },
+    "raw_to_normalized_labels": {
+      "Benign": {
+        "benign": 11717
+      },
+      "C&C": {
+        "command_and_control": 14928
+      },
+      "C&C-FileDownload": {
+        "command_and_control": 3
+      },
+      "C&C-Torii": {
+        "command_and_control": 16
+      },
+      "DDoS": {
+        "ddos": 14394
+      },
+      "FileDownload": {
+        "file_download": 3
+      },
+      "PartOfAHorizontalPortScan": {
+        "port_scan": 122
+      },
+      "benign": {
+        "benign": 1826
+      }
+    },
+    "rows": 43009,
+    "suspiciously_predictive_columns": [
+      {
+        "column": "id.resp_h",
+        "label_purity": 0.998396,
+        "reason": "near-perfect label association",
+        "unique_ratio": 0.005278
+      }
+    ],
+    "warnings": [
+      "31811 duplicate canonical rows",
+      "canonical features contain constant columns",
+      "source columns show suspiciously predictive label association"
+    ]
+  },
+  "research_features": {
+    "notes": [
+      "research schema B replayed in source-row order with sensor scope equal to source file"
+    ],
+    "schema_a_rows": 43009,
+    "schema_a_version": "2.0.0-research-a",
+    "schema_b_rows": 43009,
+    "schema_b_version": "2.0.0-research-b"
+  },
+  "schema_version": "1.0.0"
+}

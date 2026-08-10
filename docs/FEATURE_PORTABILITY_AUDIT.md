@@ -50,10 +50,12 @@ zero in the current vector.
 
 ## First empirical result
 
-The 2026-08-10 two-source diagnostic sampled 50,000 unique Schema A rows each from fresh
-HIKARI-2021 and CSE-CIC-IDS2018 development captures. Full Schema A origin balanced
-accuracy was 1.000; the three strongest coefficients were protocol categories because
-HIKARI's aggregate CSV has no protocol field. Full Schema A is blocked. Removing protocol,
-port, service, and port-missing categories reduced balanced accuracy to 0.69772. This
-identifies a concrete shortcut surface, but it does not close the audit: the evidence has
-only two environments and lacks capture-disjoint groups.
+The 2026-08-10 diagnostic uses fresh HIKARI-2021, CSE-CIC-IDS2018, and six grouped IoT-23
+captures after exact per-source Schema A deduplication. HIKARI and CSE contribute balanced
+50,000-row samples; IoT-23 contributes all 11,078 unique portable rows. Full Schema A
+origin balanced accuracy is 0.95416, above the 0.90 blocking threshold; protocol
+availability remains the strongest shortcut because HIKARI's aggregate CSV has no
+protocol field. Removing protocol, port, service, and port-missing categories reduces
+balanced accuracy to 0.68428. Full Schema A is blocked while this nine-feature numerical
+core may proceed to grouped development experiments. This diagnostic remains
+row-stratified because the two aggregate sources do not expose compatible capture groups.

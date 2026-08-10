@@ -10,8 +10,8 @@ scientific NO-GO with the engineering platform explicitly separated from detecto
 | Phase | Deliverable | Status |
 |---|---|---|
 | A0 | Freeze legacy final evidence and prevent development use | Complete; automated guard green |
-| A1 | Audit feature portability; implement portable and bounded temporal schemas with parity | In progress; schemas/parity implemented, origin diagnostic and development evidence open |
-| A2 | Acquire and provenance a fresh non-frozen development corpus | Not started |
+| A1 | Audit feature portability; implement portable and bounded temporal schemas with parity | Complete for research: full Schema A blocked by origin diagnostic; numerical-core ablation remains eligible |
+| A2 | Acquire and provenance a fresh non-frozen development corpus | Complete for initial experiments: three official environments, six temporal IoT captures, frozen boundary green |
 | A3 | Register baselines/challengers; run cost, ablation, held-family and cross-environment development experiments | Not started |
 | A4 | Lock one challenger; run frozen final evidence once; issue scientific GO/NO-GO | Not started |
 | A5 | Sustained/burst/failure performance and multi-worker correctness acceptance | Not started |

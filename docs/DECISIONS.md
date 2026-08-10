@@ -466,3 +466,22 @@ view is blocked. Its categorical ablation reaches 0.69772 and may be researched 
 but cannot be selected until broader grouped evidence exists. Using mirrors, bypassing an
 official access form, zero-filling temporal history, or treating an S3 multipart ETag as a
 file MD5 were rejected.
+
+## D-036 — Use a bounded official IoT-23 slice for temporal development evidence
+
+Add six checksum-reviewed IoT-23 IndividualScenarios Zeek flow logs from the official CTU
+repository: four small malicious captures (Mirai, Torii, Trojan, and Hakai) plus two real
+benign-device captures (Philips HUE and Amazon Echo). Keep each object as a source group
+and treat the combined CTU environment as one dataset origin. This provides 43,009 flows,
+five normalized behavior labels, and full timestamp/endpoint/protocol/port coverage
+without downloading multi-gigabyte scenarios.
+
+Use Zeek `orig_ip_bytes`/`resp_ip_bytes` as directional wire-byte semantics. Represent an
+unset duration as zero observed milliseconds and derive rates with a one-microsecond floor;
+represent zero-packet mean length as zero. The legacy bundle-compatible vector uses port
+zero only when Zeek has no transport port, while research Schema A retains explicit port
+missingness. Raw endpoint identity is used only transiently by the bounded Schema B state
+machine and excluded from model vectors and committed evidence. Dropping 14,260 mostly
+DDoS zero-packet flows, flattening all captures into one group, or downloading the full
+21+ GiB corpus were rejected because each would weaken validity without helping the next
+experiment.

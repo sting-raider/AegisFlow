@@ -38,6 +38,7 @@ def test_origin_diagnostic_blocks_an_obvious_dataset_shortcut() -> None:
     )
 
     assert report["challenger_selection_blocked"] is True
+    assert report["full_schema_a_selection_blocked"] is True
     assert report["full_schema_a"]["balanced_accuracy"] > 0.99
     assert report["sources"][0]["sampled_rows"] == 300
     assert "protocol_tcp" in report["categorical_ablation"]["removed_features"]

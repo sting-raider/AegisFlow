@@ -148,6 +148,7 @@ def test_official_dataset_catalog_has_all_supported_adapters() -> None:
         "cic_ids2017",
         "cse_cic_ids2018",
         "hikari2021",
+        "iot23_zeek",
         "unsw_nb15",
         "nfstream_csv",
         "synthetic_smoke",
@@ -193,6 +194,143 @@ def test_hikari_adapter_reconstructs_wire_bytes_and_maps_research_labels(
     assert dataset.portable_features is not None
     assert dataset.runtime_enriched_features is None
     assert any("wire bytes" in note for note in dataset.adapter_notes)
+
+
+def test_iot23_zeek_adapter_preserves_capture_groups_and_temporal_parity(
+    tmp_path: Path,
+) -> None:
+    fields = (
+        "ts",
+        "uid",
+        "id.orig_h",
+        "id.orig_p",
+        "id.resp_h",
+        "id.resp_p",
+        "proto",
+        "service",
+        "duration",
+        "orig_bytes",
+        "resp_bytes",
+        "conn_state",
+        "local_orig",
+        "local_resp",
+        "missed_bytes",
+        "history",
+        "orig_pkts",
+        "orig_ip_bytes",
+        "resp_pkts",
+        "resp_ip_bytes",
+    )
+
+    def zeek_row(
+        timestamp: str,
+        uid: str,
+        destination: str,
+        port: str,
+        duration: str,
+        packets: str,
+        wire_bytes: str,
+        label: str,
+        detail: str,
+    ) -> str:
+        values = (
+            timestamp,
+            uid,
+            "192.168.1.195",
+            "41040",
+            destination,
+            port,
+            "tcp",
+            "-",
+            duration,
+            "0",
+            "0",
+            "S0",
+            "-",
+            "-",
+            "0",
+            "S",
+            packets,
+            wire_bytes,
+            "0",
+            "0",
+        )
+        return "\t".join(values) + f"\t-   {label}   {detail}"
+
+    path = tmp_path / "CTU-IoT-Malware-Capture-34-1.conn.log.labeled"
+    path.write_text(
+        "\n".join(
+            (
+                "#separator \\x09",
+                "#fields\t"
+                + "\t".join(fields)
+                + "\ttunnel_parents   label   detailed-label",
+                zeek_row(
+                    "1545403816.962094",
+                    "one",
+                    "185.244.25.235",
+                    "80",
+                    "3.1",
+                    "3",
+                    "180",
+                    "Benign",
+                    "-",
+                ),
+                zeek_row(
+                    "1545403817.962094",
+                    "two",
+                    "185.244.25.236",
+                    "6667",
+                    "-",
+                    "1",
+                    "60",
+                    "Malicious",
+                    "C&C",
+                ),
+                zeek_row(
+                    "1545403818.962094",
+                    "three",
+                    "185.244.25.237",
+                    "-",
+                    "0.2",
+                    "2",
+                    "120",
+                    "Malicious",
+                    "PartOfAHorizontalPortScan",
+                ),
+                "#close\t2019-03-15-14-50-49",
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    dataset = load_dataset("iot23_zeek", [path])
+
+    assert dataset.labels.tolist() == ["benign", "command_and_control", "port_scan"]
+    assert dataset.groups.tolist() == [path.name] * 3
+    assert dataset.features[:, FEATURE_NAMES.index("bytes_forward")].tolist() == [
+        180.0,
+        60.0,
+        120.0,
+    ]
+    assert dataset.features[1, FEATURE_NAMES.index("duration_ms")] == 0.0
+    assert str(dataset.timestamps[0]).startswith("2018-12-21")
+    assert dataset.portable_features is not None
+    assert (
+        dataset.portable_features[
+            2, PORTABLE_FEATURE_NAMES.index("destination_port_missing")
+        ]
+        == 1.0
+    )
+    assert dataset.runtime_enriched_features is not None
+    assert dataset.runtime_enriched_features.shape == (
+        3,
+        len(RUNTIME_ENRICHED_FEATURE_NAMES),
+    )
+    assert any("no observed interval" in note for note in dataset.adapter_notes)
+    assert {"id.orig_h", "id.resp_h", "uid"}.issubset(
+        quality_report(dataset).identifier_columns
+    )
 
 
 def test_quality_flags_predictive_source_columns_and_nonfinite_values(tmp_path: Path) -> None:

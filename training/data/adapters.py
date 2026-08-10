@@ -29,6 +29,7 @@ DatasetKind = Literal[
     "cic_ids2017",
     "cse_cic_ids2018",
     "hikari2021",
+    "iot23_zeek",
     "unsw_nb15",
     "nfstream_csv",
 ]
@@ -121,8 +122,19 @@ HIKARI_RULES: dict[str, ColumnRule] = {
     "destination_port": _rule("responp"),
 }
 
+IOT23_RULES: dict[str, ColumnRule] = {
+    "duration_ms": _rule("duration", scale=1000.0),
+    "packets_forward": _rule("orig_pkts"),
+    "packets_reverse": _rule("resp_pkts"),
+    "bytes_forward": _rule("orig_ip_bytes"),
+    "bytes_reverse": _rule("resp_ip_bytes"),
+    "destination_port": _rule("id.resp_p"),
+}
+
 BENIGN_LABELS = {"benign", "normal", "normaltraffic", "0", "background"}
 LABEL_FAMILIES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("command_and_control", ("c&c", "command and control")),
+    ("file_download", ("filedownload", "file download")),
     ("brute_force", ("patator", "bruteforce", "brute force")),
     ("web_attack", ("xss", "sql injection", "web attack")),
     ("port_scan", ("portscan", "port scan", "reconnaissance", "probing")),
@@ -188,7 +200,15 @@ def _numeric(
 
 def _identifier_like(name: str) -> bool:
     normalized = _key(name)
-    return normalized in {"id", "recordid", "uid", "originh", "responh"} or any(
+    return normalized in {
+        "id",
+        "recordid",
+        "uid",
+        "originh",
+        "responh",
+        "idorigh",
+        "idresph",
+    } or any(
         token in normalized
         for token in ("srcip", "sourceip", "dstip", "destinationip", "flowid", "sessionid")
     )
@@ -232,7 +252,7 @@ def _label_column(kind: DatasetKind, lookup: dict[str, str], requested: str | No
         if kind == "unsw_nb15"
         else ("trafficcategory", "label")
         if kind == "hikari2021"
-        else ("label", "attackcat")
+        else ("label", "detailedlabel", "detlabel", "attackcat")
     )
     resolved = _resolve_column(lookup, candidates)
     if resolved is None:
@@ -240,12 +260,32 @@ def _label_column(kind: DatasetKind, lookup: dict[str, str], requested: str | No
     return resolved
 
 
-def _timestamps(frame: pd.DataFrame, lookup: dict[str, str], requested: str | None) -> np.ndarray:
-    candidates = (_key(requested),) if requested else ("timestamp", "stime", "starttime")
+def _timestamps(
+    frame: pd.DataFrame,
+    lookup: dict[str, str],
+    requested: str | None,
+    *,
+    unix_seconds: bool = False,
+) -> np.ndarray:
+    candidates = (
+        (_key(requested),)
+        if requested
+        else ("timestamp", "stime", "starttime", "ts")
+    )
     column = _resolve_column(lookup, candidates)
     if column is None:
         return np.full(len(frame), np.datetime64("NaT"), dtype="datetime64[ns]")
-    parsed = pd.to_datetime(frame[column], errors="coerce", utc=True, format="mixed", dayfirst=True)
+    if unix_seconds:
+        parsed = pd.to_datetime(
+            pd.to_numeric(frame[column], errors="coerce"),
+            errors="coerce",
+            utc=True,
+            unit="s",
+        )
+    else:
+        parsed = pd.to_datetime(
+            frame[column], errors="coerce", utc=True, format="mixed", dayfirst=True
+        )
     return parsed.to_numpy(dtype="datetime64[ns]")
 
 
@@ -255,6 +295,7 @@ def _canonical_features(
     rules: dict[str, ColumnRule],
     *,
     allow_missing_destination_port: bool = False,
+    zeek_ip_bytes: bool = False,
 ) -> tuple[pd.DataFrame, tuple[str, ...]]:
     notes: list[str] = []
     values: dict[str, pd.Series[float]] = {}
@@ -262,6 +303,32 @@ def _canonical_features(
         numeric = _numeric(frame, lookup, rule)
         if numeric is not None:
             values[feature] = numeric
+
+    if zeek_ip_bytes:
+        missing_duration = int(values["duration_ms"].isna().sum())
+        if missing_duration:
+            values["duration_ms"] = values["duration_ms"].fillna(0.0)
+            notes.append(
+                f"duration_ms=0 for {missing_duration} Zeek flows with no observed interval"
+            )
+        duration_seconds = (values["duration_ms"] / 1000.0).clip(lower=1e-6)
+        packets_total = values["packets_forward"] + values["packets_reverse"]
+        bytes_total = values["bytes_forward"] + values["bytes_reverse"]
+        values["packet_rate"] = packets_total / duration_seconds
+        values["byte_rate"] = bytes_total / duration_seconds
+        values["packet_length_mean"] = bytes_total / packets_total.clip(lower=1.0)
+        notes.append("Zeek rates use a one-microsecond floor for zero observed duration")
+        notes.append("Zeek zero-packet flows use packet_length_mean=0")
+        missing_port = int(values["destination_port"].isna().sum())
+        if missing_port:
+            values["destination_port"] = values["destination_port"].fillna(0.0)
+            notes.append(
+                f"legacy destination_port=0 for {missing_port} Zeek flows without a "
+                "transport port; research schema preserves explicit missingness"
+            )
+        notes.append(
+            "directional wire bytes use Zeek orig_ip_bytes and resp_ip_bytes"
+        )
 
     if allow_missing_destination_port and "destination_port" not in values:
         values["destination_port"] = pd.Series(np.zeros(len(frame)), index=frame.index, dtype=float)
@@ -354,11 +421,23 @@ def _research_feature_matrices(
     )
     source_column = _resolve_column(
         lookup,
-        tuple(_key(name) for name in ("Source IP", "Src IP", "src_ip", "srcip")),
+        tuple(
+            _key(name)
+            for name in ("Source IP", "Src IP", "src_ip", "srcip", "id.orig_h")
+        ),
     )
     destination_column = _resolve_column(
         lookup,
-        tuple(_key(name) for name in ("Destination IP", "Dst IP", "dst_ip", "dstip")),
+        tuple(
+            _key(name)
+            for name in (
+                "Destination IP",
+                "Dst IP",
+                "dst_ip",
+                "dstip",
+                "id.resp_h",
+            )
+        ),
     )
     port_source = _numeric(raw, lookup, rules["destination_port"])
     placeholder_time = datetime.fromtimestamp(0, UTC)
@@ -398,7 +477,7 @@ def _research_feature_matrices(
     for position, (_, row) in enumerate(raw.iterrows()):
         timestamp_value = timestamps[position]
         timestamp = (
-            pd.Timestamp(timestamp_value).to_pydatetime().replace(tzinfo=UTC)
+            pd.Timestamp(timestamp_value).floor("us").to_pydatetime().replace(tzinfo=UTC)
             if not np.isnat(timestamp_value)
             else placeholder_time
         )
@@ -456,6 +535,49 @@ def _research_feature_matrices(
     return portable_matrix, enriched, tuple(notes)
 
 
+def _read_iot23_zeek(path: Path, *, nrows: int) -> pd.DataFrame:
+    fields: list[str] | None = None
+    with path.open(encoding="utf-8") as stream:
+        for line in stream:
+            if line.startswith("#fields"):
+                fields = re.split(r"\t| {3,}", line.rstrip("\r\n"))[1:]
+                break
+    if not fields:
+        raise ValueError(f"IoT-23 Zeek log has no #fields declaration: {path}")
+    normalized_fields = [
+        "detailed-label" if field in {"det_label", "detailed-label"} else field
+        for field in fields
+    ]
+    required = {
+        "ts",
+        "uid",
+        "id.orig_h",
+        "id.resp_h",
+        "id.resp_p",
+        "proto",
+        "duration",
+        "orig_pkts",
+        "orig_ip_bytes",
+        "resp_pkts",
+        "resp_ip_bytes",
+        "label",
+        "detailed-label",
+    }
+    if not required.issubset(normalized_fields):
+        missing = sorted(required - set(normalized_fields))
+        raise ValueError(f"IoT-23 Zeek log is missing fields: {', '.join(missing)}")
+    return pd.read_csv(
+        path,
+        sep=r"\t| {3,}",
+        names=normalized_fields,
+        comment="#",
+        engine="python",
+        nrows=nrows,
+        na_values=["-", "(empty)"],
+        keep_default_na=True,
+    )
+
+
 def load_dataset(
     kind: DatasetKind,
     paths: list[Path],
@@ -474,6 +596,8 @@ def load_dataset(
         if kind == "unsw_nb15"
         else HIKARI_RULES
         if kind == "hikari2021"
+        else IOT23_RULES
+        if kind == "iot23_zeek"
         else NFSTREAM_RULES
         if kind == "nfstream_csv"
         else CIC_RULES
@@ -483,11 +607,21 @@ def load_dataset(
     remaining = max_rows + 1
     for requested_path in paths:
         path = requested_path.resolve()
-        if not path.is_file() or path.suffix.lower() != ".csv":
-            raise ValueError(f"dataset input must be an existing CSV: {path}")
+        valid_suffix = (
+            path.name.endswith(".conn.log.labeled")
+            if kind == "iot23_zeek"
+            else path.suffix.lower() == ".csv"
+        )
+        if not path.is_file() or not valid_suffix:
+            expected = "IoT-23 conn.log.labeled" if kind == "iot23_zeek" else "CSV"
+            raise ValueError(f"dataset input must be an existing {expected}: {path}")
         if path.stat().st_size > MAX_INPUT_BYTES:
             raise ValueError(f"dataset input exceeds 8 GiB: {path}")
-        frame = pd.read_csv(path, nrows=remaining, low_memory=False)
+        frame = (
+            _read_iot23_zeek(path, nrows=remaining)
+            if kind == "iot23_zeek"
+            else pd.read_csv(path, nrows=remaining, low_memory=False)
+        )
         frame["__aegisflow_source_file"] = path.name
         frames.append(frame)
         provenances.append(_provenance(path))
@@ -514,14 +648,22 @@ def load_dataset(
             raw_labels = raw_labels.where(
                 ~missing_attack_category, raw[fallback].fillna("unlabeled").astype(str)
             )
+    if kind == "iot23_zeek":
+        detailed = _resolve_column(lookup, ("detailedlabel", "detlabel"))
+        if detailed is None:
+            raise ValueError("IoT-23 Zeek log requires detailed-label")
+        malicious = raw_labels.str.strip().str.lower() == "malicious"
+        details = raw[detailed].fillna("").astype(str).str.strip()
+        raw_labels = raw_labels.where(~malicious | details.isin({"", "-"}), details)
     labels = raw_labels.map(normalize_label)
     canonical, notes = _canonical_features(
         raw,
         lookup,
         rules,
         allow_missing_destination_port=kind == "unsw_nb15",
+        zeek_ip_bytes=kind == "iot23_zeek",
     )
-    if kind in {"cic_ids2017", "cse_cic_ids2018"}:
+    if kind in {"cic_ids2017", "cse_cic_ids2018", "iot23_zeek"}:
         invalid = ~np.isfinite(canonical.to_numpy(dtype=np.float64)).all(axis=1)
         for index, spec in enumerate(FEATURE_REGISTRY):
             values = canonical.iloc[:, index].to_numpy(dtype=np.float64)
@@ -546,10 +688,18 @@ def load_dataset(
     else:
         groups = raw["__aegisflow_source_file"].astype(str).to_numpy(dtype=str)
     source_files = raw["__aegisflow_source_file"].astype(str).to_numpy(dtype=str)
-    profiles = _source_profiles(
-        raw.drop(columns=["__aegisflow_source_file"]), labels, resolved_label
+    profile_frame = raw.drop(columns=["__aegisflow_source_file"])
+    if kind == "iot23_zeek":
+        detailed_label = _resolve_column(lookup, ("detailedlabel", "detlabel"))
+        if detailed_label is not None:
+            profile_frame = profile_frame.drop(columns=[detailed_label])
+    profiles = _source_profiles(profile_frame, labels, resolved_label)
+    parsed_timestamps = _timestamps(
+        raw,
+        lookup,
+        timestamp_column,
+        unix_seconds=kind == "iot23_zeek",
     )
-    parsed_timestamps = _timestamps(raw, lookup, timestamp_column)
     portable_features, runtime_enriched_features, research_notes = _research_feature_matrices(
         raw, canonical, lookup, rules, parsed_timestamps
     )
