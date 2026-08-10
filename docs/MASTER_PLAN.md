@@ -1,5 +1,27 @@
 # Master plan
 
+## Final acceptance plan (authoritative from 2026-08-10)
+
+The earlier implementation phases remain useful engineering evidence, but their stop
+condition has been superseded. Completion now requires either a promoted production
+candidate that passes the locked scientific and operational gates, or an evidence-backed
+scientific NO-GO with the engineering platform explicitly separated from detector quality.
+
+| Phase | Deliverable | Status |
+|---|---|---|
+| A0 | Freeze legacy final evidence and prevent development use | Complete; automated guard green |
+| A1 | Audit feature portability; implement portable and bounded temporal schemas with parity | In progress; audit complete, schemas open |
+| A2 | Acquire and provenance a fresh non-frozen development corpus | Not started |
+| A3 | Register baselines/challengers; run cost, ablation, held-family and cross-environment development experiments | Not started |
+| A4 | Lock one challenger; run frozen final evidence once; issue scientific GO/NO-GO | Not started |
+| A5 | Sustained/burst/failure performance and multi-worker correctness acceptance | Not started |
+| A6 | Real local OIDC, Kubernetes, restore, rollout/failure and security drills | Not started |
+| A7 | Production validator, release provenance, operator package and final acceptance report | Not started |
+
+The four reports listed in `configs/evaluation/frozen-evidence-v1.json` are final-only.
+They cannot be used to choose A1-A4 features, models, hyperparameters, thresholds, or
+calibration.
+
 | Phase | Deliverable | Status |
 |---|---|---|
 | 0 | Upstream audit, attribution, decisions, execution guide | Complete |

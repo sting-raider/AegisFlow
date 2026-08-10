@@ -415,3 +415,20 @@ same path verifies the skip link, current-page state, dialog labelling/autofocus
 Escape dismissal. A generic dark SOC-console restyle and a warm lifestyle-editorial
 theme were rejected because neither expresses the requested newsroom intelligence
 character without obscuring operational evidence.
+
+## D-033 — Freeze legacy public evaluations before challenger research
+
+Treat the four committed UNSW/CSE reports as immutable, final-only rejection evidence.
+Record each report byte hash, a versioned canonical hash of evaluation inputs and gate
+policy, embedded source-file hashes and sizes, publication commit/time, and permitted use
+in `configs/evaluation/frozen-evidence-v1.json`. Verify the boundary in CI and fail closed
+if a report, its evaluation configuration, its source fingerprints, or the no-development-
+use policy changes. Preserve the original failing outcomes and automatic-promotion=false.
+
+The configuration projection intentionally excludes observed scores, predictions, and
+criterion pass/fail values while binding the dataset/split, bundle identity, feature order,
+fit manifest, seed, shared inference path, row counts, dataset fingerprints, class scope,
+and gate thresholds. This separates configuration integrity from result bytes while the
+full report hash protects both. Re-running, editing, or mining the frozen reports during
+challenger development was rejected because it would convert final evidence into a tuning
+set and invalidate the acceptance claim.

@@ -1,10 +1,13 @@
-# Final completion summary
+# Engineering baseline completion summary
 
 Date: 2026-08-10
 
-## Completion verdict
+## Superseded completion verdict
 
-AegisFlow satisfies the authoritative repository implementation brief: the major flow
+This document records completion of the earlier engineering-platform brief. A final
+model-research and production-acceptance brief accepted on 2026-08-10 supersedes that
+stop condition, so **the entire project is not complete**. AegisFlow satisfies the earlier
+repository implementation brief: the major flow
 correctness and interoperability defects are resolved, the exact hybrid detector has
 reviewed public-data evidence, the measured runtime and recovery story is materially
 stronger, enterprise access/governance/deployment controls exist, and the seven-view
@@ -15,7 +18,9 @@ This is not a claim that the current model or an arbitrary deployment is product
 All four published real-data evaluations reject the current model, and no external IdP,
 managed data service, multi-host cluster, restore drill, or representative target-capacity
 test has been supplied. The repository is a serious evaluation platform with guarded
-deployment templates; production acceptance remains environment- and model-specific.
+deployment templates; production acceptance remains environment- and model-specific. The
+live final status is in `docs/PROGRESS.md`; this file will be replaced by
+`docs/FINAL_ACCEPTANCE_REPORT.md` only after a governed GO/NO-GO decision.
 
 ## What was implemented
 
@@ -49,7 +54,7 @@ deployment templates; production acceptance remains environment- and model-speci
 
 | Evidence | Result |
 |---|---|
-| Python quality gate | Ruff and strict MyPy across 64 sources; 145 tests; 84% measured backend coverage |
+| Python quality gate | Ruff and strict MyPy across 67 sources; 149 tests; 84% measured backend coverage |
 | Dashboard quality gate | ESLint, TypeScript/Vite production build, 4 component tests, 2 Chromium scenarios, zero Axe violations across all seven views and the evidence dialog |
 | Dependency/security gate | Dashboard audit reports zero vulnerabilities; Gitleaks and Trivy passed the published enterprise milestone |
 | Runtime evidence | 2,000-flow exact detector batching improved from 153.50 to 3,496.81 flows/s on the recorded host; the durable Compose path completed at 78.78 flows/s with zero final queue lag |

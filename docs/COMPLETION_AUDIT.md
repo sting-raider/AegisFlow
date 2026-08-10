@@ -1,5 +1,10 @@
 # Completion audit
 
+> **Current verdict (2026-08-10): not complete under the final acceptance brief.**
+> The matrices below preserve evidence for the completed engineering baseline. They do
+> not establish production detector quality. Final scientific and operational acceptance
+> is tracked in `docs/MASTER_PLAN.md` and `docs/PRODUCTION_ACCEPTANCE.md`.
+
 This matrix maps the authoritative build brief to repository evidence. A requirement is
 marked complete only when implementation and proportionate verification both exist.
 
@@ -26,7 +31,7 @@ marked complete only when implementation and proportionate verification both exi
 | Security | Threat model; asymmetric OIDC and hashed service identities; hierarchical RBAC and durable attribution; HTTP/stream/WebSocket size, origin, identity and connection limits; bounded queues; hash-only dead letters; redacted JSON logs; local ports; non-root/read-only containers; CI scans | Complete as repository controls; target IdP, gateway and tenancy validation remain deployment-specific |
 | Observability | All brief-listed flow/signature/detection/alert/inference/processing/queue/model/WebSocket/drift/database Prometheus metrics; system telemetry; structured redacted JSON sensor/detector/API/access/runtime events | Complete |
 | Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix, previous-valid model fallback | Complete |
-| Automated tests | 145 Python tests at 84% backend coverage plus four Vitest interactions and Playwright E2E; randomized feature parity/bounds; auth/RBAC/governance/migration coverage; malformed Redis quarantine; Redis/PostgreSQL recovery; model fallback/Compose fault injection; bounded-queue performance conservation/resource test | Complete |
+| Automated tests | 149 Python tests at 84% backend coverage plus four Vitest interactions and Playwright E2E; frozen-evidence integrity; randomized feature parity/bounds; auth/RBAC/governance/migration coverage; malformed Redis quarantine; Redis/PostgreSQL recovery; model fallback/Compose fault injection; bounded-queue performance conservation/resource test | Complete for the engineering baseline |
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
 | CI/CD | Python/frontend/Compose/Kustomize/integration/migration/API-replacement E2E/audit/Trivy/Gitleaks jobs; public run `31340692583` passed every job for enterprise commit `70e188e` | Complete |
 | Documentation | Required topic files, current desktop/mobile screenshots, README validation snapshot, measured limitations, demo and faculty sequence | Complete |

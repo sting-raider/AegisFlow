@@ -14,6 +14,12 @@ It does not guarantee zero-day detection, inspect payloads by default, or block
 traffic. The detector and offline demo require no LLM, API key, GPU, or internet
 connection after dependencies and images are installed.
 
+> **Project status:** the engineering platform and local demo are complete and public,
+> but final model and production acceptance is still in progress. All four frozen
+> real-data evaluations reject the current smoke model, so this repository must not yet
+> be represented as a production-ready detector. See
+> [`docs/PRODUCTION_ACCEPTANCE.md`](docs/PRODUCTION_ACCEPTANCE.md).
+
 ## Architecture
 
 ```mermaid
@@ -75,6 +81,7 @@ uv run python -m training.cli.evaluate_dataset --help
 make lint
 make typecheck
 make test
+make frozen-evidence-check
 make train-smoke
 make replay PCAP=/absolute/path/capture.pcap
 make live INTERFACE=eth0
@@ -87,8 +94,8 @@ make reset
 
 The latest local validation on 2026-08-10 passed:
 
-- Ruff and strict MyPy across 64 Python source files, including migrations;
-- 145 Python tests with 84% backend coverage;
+- Ruff and strict MyPy across 67 Python source files, including migrations;
+- 149 Python tests with 84% backend coverage;
 - dashboard ESLint, production build, 4 component interaction tests, and 2 Chromium E2E
   scenarios including zero Axe violations across all seven views and the evidence dialog;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
@@ -104,8 +111,8 @@ The latest local validation on 2026-08-10 passed:
 
 See [`docs/PROGRESS.md`](docs/PROGRESS.md),
 [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md), and
-[`docs/FINAL_COMPLETION_SUMMARY.md`](docs/FINAL_COMPLETION_SUMMARY.md) for the measured
-evidence, completion boundary, limitations, and deployment next steps.
+[`docs/PRODUCTION_ACCEPTANCE.md`](docs/PRODUCTION_ACCEPTANCE.md) for the measured
+evidence, current completion boundary, limitations, and acceptance work.
 
 `make live` is Linux-only, requires an explicit interface, and prints an authorization
 warning. It builds a dedicated non-root NFStream sensor target with only `NET_RAW`;

@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "policy": {
+    "permitted_use": "final_acceptance_only",
+    "development_use_allowed": false,
+    "candidate_lock_required_before_final_run": true,
+    "maximum_final_runs_per_locked_candidate": 1,
+    "notes": "These reports are immutable rejection evidence. Their labels, metrics, predictions, errors, and distributions must not guide model or threshold development."
+  },
+  "reports": [
+    {
+      "id": "cse-cic-ids2018-thursday-time",
+      "path": "docs/evaluation/cse-cic-ids2018-thursday-time.json",
+      "report_sha256": "3c50a1f42d5aa09d2dfc21b30f62d6cf7affb435a175ef5aee8eeffee1766244",
+      "evaluation_config_sha256": "783fddead0e1236266b9ac28a801320ed12dcc165f022281b2837d6d822f8f39",
+      "published_commit": "d212f053fa6f9269d36f13ce6320c28ea35e3acd",
+      "published_at": "2026-08-01T22:37:13+05:30",
+      "permitted_use": "final_acceptance_only",
+      "source_files": [
+        {
+          "filename": "Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv",
+          "size_bytes": 107842858,
+          "sha256": "b0534c5d7d8b41e03df71c6966c995d116a8ed28e61f377c8b14cdf5d28f4edf"
+        }
+      ]
+    },
+    {
+      "id": "unsw-nb15-held-exploits",
+      "path": "docs/evaluation/unsw-nb15-held-exploits.json",
+      "report_sha256": "464b8d570fba19facbdcf3e5ce3f88ba4225f9f8ef90df6f234a4f4b008aa123",
+      "evaluation_config_sha256": "c64b7dfc35a2363fa7f418e38ebe5fed539b5366d2453abbe2cd3bac6de1028c",
+      "published_commit": "d212f053fa6f9269d36f13ce6320c28ea35e3acd",
+      "published_at": "2026-08-01T22:37:13+05:30",
+      "permitted_use": "final_acceptance_only",
+      "source_files": [
+        {
+          "filename": "UNSW_NB15_testing-set.csv",
+          "size_bytes": 15380800,
+          "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559"
+        },
+        {
+          "filename": "UNSW_NB15_training-set.csv",
+          "size_bytes": 32293018,
+          "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa"
+        }
+      ]
+    },
+    {
+      "id": "unsw-nb15-official-split",
+      "path": "docs/evaluation/unsw-nb15-official-split.json",
+      "report_sha256": "bad60308f5ed90a707075177d60d6cc0d617832121f17414e9a485d691aabffb",
+      "evaluation_config_sha256": "00366af4235a45bec4bb5bba96f0ecb5413dba5add264c0931342b3f9538b869",
+      "published_commit": "d212f053fa6f9269d36f13ce6320c28ea35e3acd",
+      "published_at": "2026-08-01T22:37:13+05:30",
+      "permitted_use": "final_acceptance_only",
+      "source_files": [
+        {
+          "filename": "UNSW_NB15_testing-set.csv",
+          "size_bytes": 15380800,
+          "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559"
+        },
+        {
+          "filename": "UNSW_NB15_training-set.csv",
+          "size_bytes": 32293018,
+          "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa"
+        }
+      ]
+    },
+    {
+      "id": "unsw-to-cse-cic-ids2018-thursday",
+      "path": "docs/evaluation/unsw-to-cse-cic-ids2018-thursday.json",
+      "report_sha256": "04e023e5df2eff8ac37cd80637181d0a3baa99a5b83fc1069a0feb3d317513dd",
+      "evaluation_config_sha256": "26a7d88c3be66bdf0ed252cd47aec89fd209c21bea213c0c0ff1bca7073c0311",
+      "published_commit": "d212f053fa6f9269d36f13ce6320c28ea35e3acd",
+      "published_at": "2026-08-01T22:37:13+05:30",
+      "permitted_use": "final_acceptance_only",
+      "source_files": [
+        {
+          "filename": "Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv",
+          "size_bytes": 107842858,
+          "sha256": "b0534c5d7d8b41e03df71c6966c995d116a8ed28e61f377c8b14cdf5d28f4edf"
+        },
+        {
+          "filename": "UNSW_NB15_testing-set.csv",
+          "size_bytes": 15380800,
+          "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559"
+        },
+        {
+          "filename": "UNSW_NB15_training-set.csv",
+          "size_bytes": 32293018,
+          "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa"
+        }
+      ]
+    }
+  ]
+}

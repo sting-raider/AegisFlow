@@ -1,0 +1,67 @@
+# Model research log
+
+This log is append-only research evidence for the final model-quality phase. Failed and
+inconclusive experiments remain visible. Frozen final evidence is never used to select a
+representation, model, hyperparameter, calibration method, or threshold.
+
+## Research protocol
+
+- Development evidence must come from newly acquired, provenance-checked datasets not
+  listed in `configs/evaluation/frozen-evidence-v1.json`.
+- Every experiment will record code commit, dataset fingerprints, split indices/groups,
+  schema version, preprocessing fit scope, estimator parameters, seed, calibration scope,
+  thresholds, operating costs, artifacts, metrics, and disposition.
+- Candidate selection uses repeated grouped/chronological, leave-family-out, and
+  cross-environment development evidence. The chosen candidate is locked before final
+  evaluation. Frozen final evidence may be run only once for that locked candidate.
+- No failed or suspicious sample automatically enters a benign baseline. AI explanations
+  remain outside detection and evaluation.
+
+## MR-000 — Freeze-boundary integrity
+
+Date: 2026-08-10
+
+Status: complete
+
+The four previously published reports all reject model `aegisflow-smoke` v0.3.0. They are
+now registered as final-only evidence with exact byte, configuration, source-data,
+publication commit, and publication date fingerprints. The verifier checks four reports
+and eight embedded source fingerprints; tests prove byte tampering, configuration changes,
+and development-use policy changes fail closed.
+
+No model decision was made from the contents of these reports. Their previously published
+failure values are retained only to explain why the current model cannot be promoted.
+
+## MR-001 — Current-schema portability audit
+
+Date: 2026-08-10
+
+Status: audit complete; replacement schemas not yet implemented
+
+The current 18-feature schema is runtime-consistent but not portable enough to be accepted
+as the final representation:
+
+- All features use a standard scaler over raw heavy-tailed counts, rates, durations, and
+  ratios. There is no log transform, robust/quantile transform, or training-derived clip.
+- `destination_port` is treated as a continuous number even though port ordering is not a
+  meaningful distance. The official UNSW partitions omit it and receive the numeric value
+  zero, creating a dataset-origin marker that is also a valid protocol value.
+- UNSW lacks packet-length standard deviation, IAT standard deviation, SYN count, RST
+  count, and sometimes destination port. The adapter substitutes zero without missingness
+  indicators, conflating unavailable with observed zero.
+- Protocol and bounded port/service categories are absent. Dataset-specific derived fields
+  therefore depend heavily on source exporter semantics.
+- `packet_rate`, `byte_rate`, packet-size mean, and IAT mean may be supplied directly or
+  reconstructed differently by adapter. The derivations are documented but no origin-
+  classification diagnostic currently quantifies shortcut leakage.
+- Runtime fan-out context is used only in explainable fusion metadata. Training CSV
+  evaluation states that it does not synthesize rolling context, so it cannot validate a
+  temporal representation end to end.
+
+Decision: retain the schema solely for legacy bundle compatibility. Challenger work must
+implement (A) a portable universal flow schema with explicit missingness and semantically
+bounded protocol/port encoding, and (B) an optional runtime-enriched bounded temporal
+schema with identical training/runtime state semantics. Both require parity tests and an
+origin-classifier diagnostic before model comparisons begin.
+
+Detailed availability and risk mapping is in `docs/FEATURE_PORTABILITY_AUDIT.md`.

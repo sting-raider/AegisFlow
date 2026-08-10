@@ -4,8 +4,8 @@ COMPOSE = docker compose -f compose.yml -f compose.demo.yml
 LIVE_COMPOSE = docker compose -f compose.yml -f compose.live.yml
 SURICATA_COMPOSE = docker compose -f compose.suricata.yml
 
-.PHONY: install lint typecheck test train-smoke demo demo-stop replay live live-stop \
-	suricata-replay benchmark retention-cleanup reset
+.PHONY: install lint typecheck test frozen-evidence-check train-smoke demo demo-stop replay \
+	live live-stop suricata-replay benchmark retention-cleanup reset
 
 install:
 	$(UV) sync --extra dev
@@ -22,6 +22,9 @@ typecheck:
 test:
 	$(UV) run pytest
 	npm --prefix apps/dashboard test
+
+frozen-evidence-check:
+	$(UV) run python -m scripts.verify_frozen_evidence
 
 train-smoke:
 	$(UV) run python -m training.cli.train_smoke

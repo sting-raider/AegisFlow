@@ -2,6 +2,29 @@
 
 Last updated: 2026-08-10.
 
+## Active final model and production-acceptance phase
+
+The engineering/evaluation platform is demoable, but the project is **not complete under
+the final acceptance brief**. The currently deployed smoke model is rejected by all four
+frozen public-data evaluations and must not be described as a production detector. Work
+now follows the model-research and production-acceptance phases in `docs/MASTER_PLAN.md`.
+
+- The four legacy public-data reports are frozen as final rejection evidence in
+  `configs/evaluation/frozen-evidence-v1.json`. The manifest records exact report,
+  evaluation-configuration, source-dataset, publication-commit, and publication-time
+  fingerprints. `make frozen-evidence-check` verifies the boundary and CI runs it.
+- Frozen labels, metrics, predictions, errors, and distributions are prohibited from
+  development or threshold selection. A challenger must be locked using fresh development
+  evidence before a single final acceptance run is authorized.
+- The initial portability audit found that the current 18-feature schema uses raw
+  heavy-tailed values, a numeric destination port, no missingness indicators, no protocol
+  encoding, and zero substitution for unavailable UNSW fields. These are plausible
+  dataset-origin shortcuts and make the current schema unsuitable as the final challenger
+  representation without further evidence.
+- Fresh development corpus acquisition, portable and temporal schema implementation,
+  challenger experiments, sustained performance, real local OIDC/Kubernetes, restore,
+  rollback/failure, security, and final GO/NO-GO evidence remain open.
+
 ## Verified
 
 - Empty workspace recovered onto `codex/aegisflow`.
@@ -14,8 +37,8 @@ Last updated: 2026-08-10.
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 145 tests pass, Ruff passes across the repository, strict MyPy passes across
-  64 source files including migrations, and measured backend coverage is 84%.
+- Python: 149 tests pass, Ruff passes across the repository, strict MyPy passes across
+  67 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -154,8 +177,8 @@ Last updated: 2026-08-10.
   evaluator retrains the calibrated classifier, benign-only Isolation Forest and CPU
   denoising autoencoder, builds a benign empirical CDF, and applies the bundle-loaded
   fusion rule in batches. Focused parity coverage proves a runtime single-flow result
-  matches batch scoring; the current full local gate passes 145 Python tests, Ruff,
-  strict MyPy across 64 source files, dashboard lint/build, and four dashboard tests.
+  matches batch scoring; the current full local gate passes 149 Python tests, Ruff,
+  strict MyPy across 67 source files, dashboard lint/build, and four dashboard tests.
 - The reviewed official UNSW-NB15 training/testing partitions were downloaded through
   UNSW's public SharePoint path and retained only under ignored `data/`. SHA-256 and
   provenance sidecars identify 175,341 training and 82,332 testing rows. The sanitized
@@ -211,7 +234,7 @@ Last updated: 2026-08-10.
 - The 2026-08-10 validation rebuilt the real demo images, upgraded PostgreSQL through
   Alembic 0002, verified the governance/audit tables and demo identity, replayed the six
   safe deterministic flows, and passed Chromium E2E. Frontend lint/build, four Vitest
-  interactions, `npm audit` with zero vulnerabilities, 145 Python tests, and 84% coverage
+  interactions, `npm audit` with zero vulnerabilities, 149 Python tests, and 84% coverage
   also pass. An API-only container replacement initially exposed a stale Nginx upstream;
   Docker DNS re-resolution now restores dashboard-proxied readiness without restarting
   the dashboard, and Chromium passes after that forced replacement.
