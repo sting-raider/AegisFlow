@@ -49,7 +49,7 @@
     },
     {
       "path": "docs/research/supervised-baselines.md",
-      "sha256": "7b86c0175e80c7abfe8b99a8b53272c2e15d90280d76a2a704e563feee697f75"
+      "sha256": "02328ec1332586b941a69216938670972426fe10cfb06ca318af4bd70aebad3b"
     }
   ],
   "disposition": "No baseline meets development operating objectives; no candidate selected or locked."

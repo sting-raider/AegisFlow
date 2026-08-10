@@ -1,7 +1,9 @@
 # Development supervised baseline results
 
-Experiment: `DEV-SUP-001`  
-Code commit: `a1e5f933fb29ec55bd2857fe1e7c809eaf059ed3`  
+Experiment: `DEV-SUP-001`
+
+Code commit: `a1e5f933fb29ec55bd2857fe1e7c809eaf059ed3`
+
 Generated: `2026-08-10T08:27:19.050325+00:00`
 
 This is development-only evidence. It does not select, lock, or promote a model,
