@@ -69,7 +69,7 @@ def _train_autoencoder(
     return model
 
 
-def _fit_anomaly_model(
+def fit_anomaly_model(
     name: str, matrix: np.ndarray, *, seed: int
 ) -> tuple[Any, dict[str, Any], int]:
     if name == "isolation_forest":
@@ -118,7 +118,7 @@ def _fit_anomaly_model(
     raise ValueError(f"unsupported anomaly baseline: {name}")
 
 
-def _anomaly_scores(name: str, estimator: Any, matrix: np.ndarray) -> np.ndarray:
+def anomaly_scores(name: str, estimator: Any, matrix: np.ndarray) -> np.ndarray:
     if name == "denoising_autoencoder":
         scores = reconstruction_errors(estimator, matrix)
     else:
@@ -129,7 +129,7 @@ def _anomaly_scores(name: str, estimator: Any, matrix: np.ndarray) -> np.ndarray
     return scores
 
 
-def _threshold(scores: np.ndarray, false_positive_budget: float) -> float:
+def calibration_threshold(scores: np.ndarray, false_positive_budget: float) -> float:
     return float(np.quantile(scores, 1.0 - false_positive_budget, method="higher"))
 
 
@@ -177,29 +177,29 @@ def _evaluate_anomaly_model(
     rss_before = process.memory_info().rss
     cpu_before = sum(process.cpu_times()[:2])
     fit_started = perf_counter()
-    estimator, config, model_fit_rows = _fit_anomaly_model(
+    estimator, config, model_fit_rows = fit_anomaly_model(
         name, transformed_fit, seed=seed
     )
     fit_seconds = perf_counter() - fit_started
     fit_cpu_seconds = sum(process.cpu_times()[:2]) - cpu_before
     rss_after_fit = process.memory_info().rss
-    calibration_scores = _anomaly_scores(name, estimator, transformed_calibration)
+    calibration_scores = anomaly_scores(name, estimator, transformed_calibration)
 
     inference_cpu_before = sum(process.cpu_times()[:2])
     inference_started = perf_counter()
-    test_scores = _anomaly_scores(name, estimator, transformed_test)
+    test_scores = anomaly_scores(name, estimator, transformed_test)
     inference_seconds = perf_counter() - inference_started
     inference_cpu_seconds = sum(process.cpu_times()[:2]) - inference_cpu_before
     y_test = testing_source.binary_labels
     benign = y_test == 0
     malicious = y_test == 1
-    direct_threshold = _threshold(calibration_scores, 0.01)
-    review_threshold = _threshold(calibration_scores, 0.05)
+    direct_threshold = calibration_threshold(calibration_scores, 0.01)
+    review_threshold = calibration_threshold(calibration_scores, 0.05)
     direct = test_scores > direct_threshold
     review = test_scores > review_threshold
     curve: list[dict[str, float]] = []
     for budget in _FPR_BUDGETS:
-        threshold = _threshold(calibration_scores, budget)
+        threshold = calibration_threshold(calibration_scores, budget)
         calibration_flags = calibration_scores > threshold
         test_flags = test_scores > threshold
         curve.append(
@@ -217,7 +217,7 @@ def _evaluate_anomaly_model(
     single_latencies: list[float] = []
     for row in transformed_test[: min(100, len(transformed_test))]:
         started = perf_counter()
-        _anomaly_scores(name, estimator, row.reshape(1, -1))
+        anomaly_scores(name, estimator, row.reshape(1, -1))
         single_latencies.append((perf_counter() - started) * 1000.0)
     latency = np.asarray(single_latencies or [0.0])
     return {

@@ -160,7 +160,7 @@ def prepare_research_sources(
     ]
 
 
-def _model(name: str, seed: int) -> tuple[Any, dict[str, Any]]:
+def supervised_model(name: str, seed: int) -> tuple[Any, dict[str, Any]]:
     if name == "logistic_regression":
         config = {
             "class_weight": "balanced",
@@ -249,7 +249,7 @@ def _evaluate_model(
     preprocessor = RobustResearchPreprocessor(PORTABLE_NUMERICAL_CORE_FEATURE_NAMES)
     transformed_train = preprocessor.fit_transform(x_train)
     transformed_test = preprocessor.transform(x_test)
-    estimator, config = _model(name, seed)
+    estimator, config = supervised_model(name, seed)
     process = psutil.Process()
     rss_before = process.memory_info().rss
     cpu_before = sum(process.cpu_times()[:2])
