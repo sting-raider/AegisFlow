@@ -105,6 +105,19 @@ def test_hybrid_temporal_holds_families_and_calibration_groups_out() -> None:
             {run["fit_benign_group"], run["calibration_benign_group"]}
         )
         assert run["signature_ablation"]["status"] == "not_evaluable"
+        analysis = run["full_hybrid_error_analysis"]
+        assert set(analysis["groups"]) == {
+            "direction",
+            "duration_range",
+            "host_behavior",
+            "missing_feature_pattern",
+            "packet_count_range",
+            "protocol",
+            "score_component",
+            "service",
+        }
+        assert "source_ip" not in str(analysis)
+        assert "destination_ip" not in str(analysis)
         full = next(
             item for item in run["ablations"] if item["ablation"] == "full_hybrid"
         )

@@ -328,6 +328,181 @@ def _operating_curve(
     return result
 
 
+def _named_categories(
+    matrix: np.ndarray, names: tuple[str, ...], choices: tuple[str, ...], fallback: str
+) -> np.ndarray:
+    indices = _indices(names)
+    values = matrix[:, indices]
+    selected = np.argmax(values, axis=1)
+    present = np.max(values, axis=1) > 0.5
+    return np.asarray(
+        [
+            choices[index] if active else fallback
+            for index, active in zip(selected, present, strict=True)
+        ]
+    )
+
+
+def _bucket_metrics(
+    categories: np.ndarray,
+    truth: np.ndarray,
+    direct: np.ndarray,
+    review: np.ndarray,
+    unknown: np.ndarray,
+    *,
+    minimum_rows: int = 5,
+) -> dict[str, Any]:
+    buckets: dict[str, Any] = {}
+    suppressed = 0
+    for category in sorted(set(map(str, categories))):
+        selected = categories == category
+        if int(selected.sum()) < minimum_rows:
+            suppressed += 1
+            continue
+        benign = selected & ~truth
+        malicious = selected & truth
+        buckets[category] = {
+            "rows": int(selected.sum()),
+            "benign_rows": int(benign.sum()),
+            "malicious_rows": int(malicious.sum()),
+            "direct_false_positives": int((direct & benign).sum()),
+            "direct_false_positive_rate": (
+                float(np.mean(direct[benign])) if benign.any() else None
+            ),
+            "malicious_missed_after_review": int((~review & malicious).sum()),
+            "malicious_missed_after_review_rate": (
+                float(np.mean(~review[malicious])) if malicious.any() else None
+            ),
+            "direct_suspicious_unknown": int((unknown & malicious).sum()),
+            "direct_suspicious_unknown_rate": (
+                float(np.mean(unknown[malicious])) if malicious.any() else None
+            ),
+        }
+    return {
+        "minimum_bucket_rows": minimum_rows,
+        "suppressed_small_categories": suppressed,
+        "buckets": buckets,
+    }
+
+
+def _aggregate_error_analysis(
+    matrix: np.ndarray,
+    labels: np.ndarray,
+    test_indices: np.ndarray,
+    supervised: _SignalScores,
+    anomaly: _SignalScores,
+) -> dict[str, Any]:
+    signals = (supervised, anomaly)
+    direct_thresholds = _thresholds(signals, _DIRECT_FPR_BUDGET)
+    review_thresholds = _thresholds(signals, _REVIEW_FPR_BUDGET)
+    direct = _flags(signals, direct_thresholds, test_indices)
+    review = _flags(signals, review_thresholds, test_indices) | direct
+    supervised_direct = (
+        supervised.testing[test_indices] > direct_thresholds[supervised.name]
+    )
+    anomaly_direct = anomaly.testing[test_indices] > direct_thresholds[anomaly.name]
+    truth = labels[test_indices] != "benign"
+    selected = matrix[test_indices]
+    duration_ms = np.expm1(
+        selected[:, RUNTIME_ENRICHED_FEATURE_NAMES.index("duration_log1p_ms")]
+    )
+    packet_count = np.expm1(
+        selected[:, RUNTIME_ENRICHED_FEATURE_NAMES.index("packets_total_log1p")]
+    )
+    forward_fraction = selected[
+        :, RUNTIME_ENRICHED_FEATURE_NAMES.index("packets_forward_fraction")
+    ]
+    fanout = np.expm1(
+        selected[
+            :, RUNTIME_ENRICHED_FEATURE_NAMES.index("unique_destinations_60s_log1p")
+        ]
+    )
+    cold = selected[:, RUNTIME_ENRICHED_FEATURE_NAMES.index("temporal_cold_start")] > 0.5
+    late = selected[:, RUNTIME_ENRICHED_FEATURE_NAMES.index("temporal_late_event")] > 0.5
+    port_missing = (
+        selected[
+            :, RUNTIME_ENRICHED_FEATURE_NAMES.index("destination_port_missing")
+        ]
+        > 0.5
+    )
+    descriptors = {
+        "protocol": _named_categories(
+            selected,
+            ("protocol_tcp", "protocol_udp", "protocol_icmp", "protocol_other"),
+            ("tcp", "udp", "icmp", "other"),
+            "unreported",
+        ),
+        "service": _named_categories(
+            selected,
+            (
+                "service_dns",
+                "service_web",
+                "service_mail",
+                "service_remote_access",
+                "service_file_transfer",
+                "service_database",
+                "service_other",
+            ),
+            (
+                "dns",
+                "web",
+                "mail",
+                "remote_access",
+                "file_transfer",
+                "database",
+                "other",
+            ),
+            "unreported",
+        ),
+        "duration_range": np.select(
+            [
+                duration_ms == 0,
+                duration_ms < 100,
+                duration_ms < 1_000,
+                duration_ms < 10_000,
+            ],
+            ["zero", "under_100ms", "100ms_to_1s", "1s_to_10s"],
+            default="10s_or_more",
+        ),
+        "packet_count_range": np.select(
+            [packet_count <= 1, packet_count <= 5, packet_count <= 20],
+            ["zero_or_one", "two_to_five", "six_to_twenty"],
+            default="more_than_twenty",
+        ),
+        "direction": np.select(
+            [forward_fraction < 0.25, forward_fraction > 0.75],
+            ["mostly_reverse", "mostly_forward"],
+            default="bidirectional",
+        ),
+        "host_behavior": np.select(
+            [cold, fanout <= 1, fanout <= 4],
+            ["cold_start", "fanout_one", "fanout_two_to_four"],
+            default="fanout_five_plus",
+        ),
+        "missing_feature_pattern": np.select(
+            [port_missing & cold, port_missing, cold, late],
+            ["port_missing_and_cold", "port_missing", "cold_start", "late_event"],
+            default="none",
+        ),
+        "score_component": np.select(
+            [supervised_direct & anomaly_direct, supervised_direct, anomaly_direct],
+            ["supervised_and_anomaly", "supervised_only", "anomaly_only"],
+            default="neither_direct",
+        ),
+    }
+    return {
+        "scope": "aggregate development-only full-hybrid errors",
+        "privacy": (
+            "fixed semantic buckets only; no endpoints, row identifiers, scores, or "
+            "per-row outputs are retained"
+        ),
+        "groups": {
+            name: _bucket_metrics(values, truth, direct, review, anomaly_direct)
+            for name, values in descriptors.items()
+        },
+    }
+
+
 def run_held_family_hybrid_temporal(
     supervised_datasets: dict[str, CanonicalDataset],
     temporal_source_id: str,
@@ -545,6 +720,13 @@ def run_held_family_hybrid_temporal(
                     "ablations": ablations,
                     "full_hybrid_operating_curve": _operating_curve(
                         full_signals, test_indices, labels
+                    ),
+                    "full_hybrid_error_analysis": _aggregate_error_analysis(
+                        matrix,
+                        labels,
+                        test_indices,
+                        supervised_signal,
+                        signals["anomaly_temporal"],
                     ),
                     "signature_ablation": {
                         "status": "not_evaluable",
