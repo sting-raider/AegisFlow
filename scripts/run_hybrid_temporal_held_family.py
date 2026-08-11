@@ -64,7 +64,8 @@ def _markdown(report: dict[str, Any]) -> str:
         )
         lines.extend(
             [
-                "| Error dimension | Highest direct-FP bucket | Highest missed-after-review bucket |",
+                "| Error dimension | Highest direct-FP bucket | "
+                "Highest missed-after-review bucket |",
                 "|---|---|---|",
             ]
         )
