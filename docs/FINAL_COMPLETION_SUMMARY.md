@@ -27,9 +27,10 @@ integrity guard, implemented shared portable/temporal research schemas, and admi
 checksum-reviewed fresh development environments. Six IoT-23 captures provide 43,009
 full Schema B rows. The origin diagnostic blocks the full portable schema at 0.95416
 balanced accuracy while its numerical-core ablation clears the 0.90 shortcut threshold at
-0.68428. The first four supervised cross-environment baselines all fail development
-objectives, so no candidate is selected. Anomaly/held-family experiments, final frozen
-evaluation, and operational acceptance remain open.
+0.68428. The first four supervised and five benign-only anomaly model families all fail
+cross-environment development objectives, so no candidate is selected. Hybrid/temporal
+and held-family experiments, final frozen evaluation, and operational acceptance remain
+open.
 
 ## What was implemented
 

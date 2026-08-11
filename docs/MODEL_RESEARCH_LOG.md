@@ -156,3 +156,36 @@ Proceed to benign-only anomaly/open-set baselines and repeated held-family evalu
 Machine-readable evidence is in
 `docs/research/experiments/dev-supervised-baselines-v1.json`; its SHA-256 is
 `533346ccfaa841e3795fca6a9a386621b732e6db18c73719b247479ea140816a`.
+
+## MR-005 â€” Three-way cross-environment anomaly baselines
+
+Date: 2026-08-10
+
+Experiment: `DEV-ANO-001`
+
+Code commit: `c91aadc678e179d000cc1f549bbff50b703cc99d`
+
+Status: complete; no candidate selected
+
+Isolation Forest, robust covariance, Local Outlier Factor novelty, one-class SVM, and a
+CPU denoising autoencoder were each evaluated in six strict three-way rotations. One
+environment supplied benign-only fit rows, a second supplied benign-only threshold
+calibration, and the third remained completely held out for testing. Both fit/calibration
+orientations were run for every held environment, so no malicious sample or test row
+entered fitting, preprocessing, or threshold selection.
+
+All five model families fail the development objectives. One-class SVM has the strongest
+mean direct unknown recall (`0.06281`) but zero worst-rotation recall and a worst benign
+FPR of `0.18817`. Robust covariance has the strongest mean detection-or-review recall
+(`0.15814`) but also reaches zero in a rotation and a worst benign FPR of `0.10854`.
+Isolation Forest is more restrained but reaches only `0.00479` mean direct recall and
+`0.08101` mean detection-or-review. The remaining models are similarly unstable across
+source orientation. All 30 runs completed; no threshold was changed after observing a
+test environment, no candidate was locked, and no frozen report was run.
+
+Disposition: a universal benign-only detector over the nine-feature numerical core does
+not transfer reliably. Proceed to controlled supervised/anomaly fusion, Schema B temporal
+contribution, and repeated held-family ablations using development evidence only.
+Machine-readable evidence is in
+`docs/research/experiments/dev-anomaly-baselines-v1.json`; its SHA-256 is
+`0b9bdb7a0235db714849e642a7bf68ca985dcbfe2ceb17a728ad2b8389fb2023`.

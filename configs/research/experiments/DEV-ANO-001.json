@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV-ANO-001",
+  "status": "complete_no_candidate_selected",
+  "permitted_use": "development_only",
+  "code_commit": "c91aadc678e179d000cc1f549bbff50b703cc99d",
+  "feature_schema": "2.0.0-research-a",
+  "feature_view": "portable_numerical_core_after_origin_ablation",
+  "feature_order": [
+    "duration_log1p_ms",
+    "packets_total_log1p",
+    "packets_forward_fraction",
+    "bytes_total_log1p",
+    "bytes_forward_fraction",
+    "packet_rate_log1p_derived",
+    "byte_rate_log1p_derived",
+    "packet_length_mean_log1p_derived",
+    "forward_reverse_byte_log_ratio"
+  ],
+  "dataset_fingerprints": {
+    "hikari": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+    "cse_2018_02_28": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+    "iot23": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c"
+  },
+  "split_ids": [
+    "fit:cse_2018_02_28/calibrate:iot23/test:hikari",
+    "fit:iot23/calibrate:cse_2018_02_28/test:hikari",
+    "fit:hikari/calibrate:iot23/test:cse_2018_02_28",
+    "fit:iot23/calibrate:hikari/test:cse_2018_02_28",
+    "fit:hikari/calibrate:cse_2018_02_28/test:iot23",
+    "fit:cse_2018_02_28/calibrate:hikari/test:iot23"
+  ],
+  "seed": 431,
+  "preprocessing": "fit-environment benign-only quantile clipping plus robust scaling",
+  "sampling": "deterministic 10000-row cap per source and binary class, exact-vector deduplication, conflicting-label removal",
+  "models": [
+    "isolation_forest",
+    "robust_covariance",
+    "local_outlier_factor_novelty",
+    "one_class_svm",
+    "denoising_autoencoder"
+  ],
+  "calibration": {
+    "scope": "benign rows from a second environment disjoint from fit and test",
+    "direct_threshold": "empirical 1 percent calibration benign FPR budget",
+    "review_threshold": "empirical 5 percent calibration benign FPR budget"
+  },
+  "fusion": "not_applicable_anomaly_baseline",
+  "completed_runs": 30,
+  "failed_runs": 0,
+  "artifacts": [
+    {
+      "path": "docs/research/experiments/dev-anomaly-baselines-v1.json",
+      "sha256": "0b9bdb7a0235db714849e642a7bf68ca985dcbfe2ceb17a728ad2b8389fb2023"
+    },
+    {
+      "path": "docs/research/anomaly-baselines.md",
+      "sha256": "8af8fa595314cf2d6b03e286574bd72319ef3f8e4452706e34e58b82703d3a0c"
+    }
+  ],
+  "disposition": "All five anomaly families fail cross-environment development objectives; no candidate selected or locked."
+}

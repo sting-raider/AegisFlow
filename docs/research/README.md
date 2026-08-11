@@ -33,11 +33,14 @@ hypothesis; current evidence has not established it.
 | Experiment | Question | Result | Artifacts |
 |---|---|---|---|
 | DEV-SUP-001 | Do standard supervised maliciousness models transfer across all three fresh environments on the numerical core? | No. Every model misses development objectives; no candidate selected. | `experiments/dev-supervised-baselines-v1.json`, `supervised-baselines.md` |
+| DEV-ANO-001 | Do benign-only anomaly models transfer when fit, calibration, and test environments are mutually disjoint? | No. All five model families fail; every model has a zero or near-zero worst-environment unknown recall. | `experiments/dev-anomaly-baselines-v1.json`, `anomaly-baselines.md` |
 
 ## Current conclusion
 
 The compact MLP has the strongest mean supervised baseline, but its worst-environment
-malicious recall is 3.64% and worst benign FPR is 18.20%. Logistic regression, calibrated
-random forest, and HistGradientBoosting are also unstable. Binary supervised evidence
-alone is insufficient. The next experiment must test benign-only anomaly/open-set signals
-and repeated held-family detection; it must not tune on frozen evidence.
+malicious recall is 3.64% and worst benign FPR is 18.20%. The benign-only anomaly study
+also rejects all five model families: mean direct unknown recall is at most 6.28%, and
+every family has a zero or near-zero worst-environment result. Neither supervised
+maliciousness nor a universal benign-only anomaly score is sufficient on the numerical
+core. The next experiment must test controlled hybrid fusion, temporal Schema B
+contribution, and repeated held-family detection without tuning on frozen evidence.

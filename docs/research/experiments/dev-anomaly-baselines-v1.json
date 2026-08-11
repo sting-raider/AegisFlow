@@ -1,0 +1,5353 @@
+{
+  "calibration_policy": "benign only from a second environment; direct threshold at 1% calibration FPR and review threshold at 5%",
+  "code_commit": "c91aadc678e179d000cc1f549bbff50b703cc99d",
+  "experiment_id": "DEV-ANO-001",
+  "experiment_type": "three_way_cross_environment_benign_only_anomaly_baselines",
+  "feature_order": [
+    "duration_log1p_ms",
+    "packets_total_log1p",
+    "packets_forward_fraction",
+    "bytes_total_log1p",
+    "bytes_forward_fraction",
+    "packet_rate_log1p_derived",
+    "byte_rate_log1p_derived",
+    "packet_length_mean_log1p_derived",
+    "forward_reverse_byte_log_ratio"
+  ],
+  "feature_schema": "2.0.0-research-a",
+  "feature_view": "portable_numerical_core_after_origin_ablation",
+  "fit_policy": "benign only from one environment",
+  "generated_at": "2026-08-10T08:43:27.504165+00:00",
+  "limitations": [
+    "Class sampling and exact-vector deduplication prevent representative false-alerts-per-hour estimates.",
+    "Anomaly results are not classifier probabilities; ECE and Brier are not applicable.",
+    "This experiment does not include temporal Schema B or signature evidence."
+  ],
+  "models": [
+    "isolation_forest",
+    "robust_covariance",
+    "local_outlier_factor",
+    "one_class_svm",
+    "denoising_autoencoder"
+  ],
+  "runs": [
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.004861448711716091,
+      "calibration_review_rate": 0.043996110841030625,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.018118693718129544,
+      "direct_suspicious_unknown_recall": 0.000976456547683628,
+      "direct_threshold": 0.16923744562994114,
+      "false_alerts_per_10000_benign": 56.87973997833153,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.234375,
+      "fit_rss_delta_bytes": 2134016,
+      "fit_seconds": 0.23183860001154244,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.078125,
+      "inference_seconds": 0.08402339997701347,
+      "model": "isolation_forest",
+      "model_config": {
+        "contamination": "auto",
+        "n_estimators": 200,
+        "n_jobs": -1
+      },
+      "model_fit_benign_rows": 7509,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 56.87973997833153,
+          "test_benign_fpr": 0.005687973997833153,
+          "test_malicious_recall": 0.000976456547683628,
+          "threshold": 0.16923744562994114
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 56.87973997833153,
+          "test_benign_fpr": 0.005687973997833153,
+          "test_malicious_recall": 0.000976456547683628,
+          "threshold": 0.16923744562994114
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.023091881380651436,
+          "test_alerts_per_10000_benign": 58.234019501625134,
+          "test_benign_fpr": 0.0058234019501625135,
+          "test_malicious_recall": 0.0014104372355430183,
+          "threshold": 0.16878480187624612
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.043996110841030625,
+          "test_alerts_per_10000_benign": 260.0216684723727,
+          "test_benign_fpr": 0.02600216684723727,
+          "test_malicious_recall": 0.018118693718129544,
+          "threshold": 0.15430493452222271
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.058066759388038944,
+          "direct_suspicious_unknown_recall": 0.003129346314325452,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.696486637882111,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.15430493452222271,
+      "roc_auc": 0.7632604565307569,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -0.04726386974223634,
+          "p90": 0.12800616642597185,
+          "p95": 0.15430493452222271,
+          "p99": 0.16923744562994114
+        },
+        "testing_benign": {
+          "p50": -0.04321715957388961,
+          "p90": 0.10445039350082894,
+          "p95": 0.14498078765265174,
+          "p99": 0.16462485380454125
+        },
+        "testing_malicious": {
+          "p50": 0.04658730472284622,
+          "p90": 0.1194159708301753,
+          "p95": 0.12194222631939408,
+          "p99": 0.16462543607443414
+        }
+      },
+      "single_row_latency_ms_p50": 3.8709500222466886,
+      "single_row_latency_ms_p95": 4.399745038244873,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.005687973997833153,
+      "test_benign_review_or_alert_rate": 0.02600216684723727,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 197575.9134305632
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": -3048.5767171674142,
+      "false_alerts_per_10000_benign": 2.7085590465872156,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.5,
+      "fit_rss_delta_bytes": 589824,
+      "fit_seconds": 0.4934002999216318,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0008470999309793115,
+      "model": "robust_covariance",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 5000,
+        "support_fraction": 0.9
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 2.7085590465872156,
+          "test_benign_fpr": 0.00027085590465872155,
+          "test_malicious_recall": 0.0,
+          "threshold": -3047.3587167146006
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 2.7085590465872156,
+          "test_benign_fpr": 0.00027085590465872155,
+          "test_malicious_recall": 0.0,
+          "threshold": -3048.5767171674142
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 2.7085590465872156,
+          "test_benign_fpr": 0.00027085590465872155,
+          "test_malicious_recall": 0.0,
+          "threshold": -3053.0597771089124
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 47.399783315276274,
+          "test_benign_fpr": 0.004739978331527627,
+          "test_malicious_recall": 0.0,
+          "threshold": -4142.531798164798
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.6514443522148132,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -4142.531798164798,
+      "roc_auc": 0.709190181692386,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -6213.416600672541,
+          "p90": -5246.935195219409,
+          "p95": -4142.532636866471,
+          "p99": -3048.5841070933343
+        },
+        "testing_benign": {
+          "p50": -6220.9220314689155,
+          "p90": -6094.344578644162,
+          "p95": -5542.023119485565,
+          "p99": -4334.315215706888
+        },
+        "testing_malicious": {
+          "p50": -6208.167940786601,
+          "p90": -6039.019315415383,
+          "p95": -5728.185305022859,
+          "p99": -5289.175566817261
+        }
+      },
+      "single_row_latency_ms_p50": 0.1306000049225986,
+      "single_row_latency_ms_p95": 0.21002496941946447,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.00027085590465872155,
+      "test_benign_review_or_alert_rate": 0.004739978331527627,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 19597451.72072909
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 587.8071880592283,
+      "false_alerts_per_10000_benign": 0.0,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.546875,
+      "fit_rss_delta_bytes": 3100672,
+      "fit_seconds": 0.08256329991854727,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 2.453125,
+      "inference_seconds": 0.20045480004046112,
+      "model": "local_outlier_factor",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 10000,
+        "n_jobs": -1,
+        "n_neighbors": 35,
+        "novelty": true
+      },
+      "model_fit_benign_rows": 7509,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 587.8297949046193
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 587.8071880592283
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 587.707444439514
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 387.1355914000631
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.5791421838349993,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 387.1355914000631,
+      "roc_auc": 0.5789347778276305,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -19.38439338246347,
+          "p90": -12.971107611095835,
+          "p95": 387.1186799605931,
+          "p99": 587.8071870911239
+        },
+        "testing_benign": {
+          "p50": -19.765201303704956,
+          "p90": -17.99288716124225,
+          "p95": -14.074799306957631,
+          "p99": 0.9288830372533917
+        },
+        "testing_malicious": {
+          "p50": -19.656060737810407,
+          "p90": -18.869743060156573,
+          "p95": -17.890105886269485,
+          "p99": -10.377185827909376
+        }
+      },
+      "single_row_latency_ms_p50": 16.822049976326525,
+      "single_row_latency_ms_p95": 19.826464966172352,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0,
+      "test_benign_review_or_alert_rate": 0.0,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 82816.67486460361
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.16274275794727133,
+      "direct_suspicious_unknown_recall": 0.0442660301616578,
+      "direct_threshold": 0.12780640631799578,
+      "false_alerts_per_10000_benign": 534.9404117009751,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.0,
+      "fit_rss_delta_bytes": 700416,
+      "fit_seconds": 0.018009599996730685,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.046875,
+      "inference_seconds": 0.04551889991853386,
+      "model": "one_class_svm",
+      "model_config": {
+        "fit_cap": 5000,
+        "gamma": "scale",
+        "kernel": "rbf",
+        "nu": 0.01
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 325.02708559046584,
+          "test_benign_fpr": 0.032502708559046585,
+          "test_malicious_recall": 0.021916024736899208,
+          "threshold": 0.42406359571788776
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 534.9404117009751,
+          "test_benign_fpr": 0.05349404117009751,
+          "test_malicious_recall": 0.0442660301616578,
+          "threshold": 0.12780640631799578
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 1050.9209100758396,
+          "test_benign_fpr": 0.10509209100758396,
+          "test_malicious_recall": 0.16252576760334164,
+          "threshold": -0.17343577353085315
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 1053.6294691224268,
+          "test_benign_fpr": 0.10536294691224268,
+          "test_malicious_recall": 0.16274275794727133,
+          "threshold": -0.1764006444347057
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.45375521557719056,
+          "direct_suspicious_unknown_recall": 0.14186369958275383,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.03214109114883797,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.6821140397539767,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -0.1764006444347057,
+      "roc_auc": 0.7405578638370311,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -1.3134027531392367,
+          "p90": -0.3026469776779116,
+          "p95": -0.17642442738803346,
+          "p99": 0.12621906867616542
+        },
+        "testing_benign": {
+          "p50": -1.1937372613028465,
+          "p90": -0.1466993074222674,
+          "p95": 0.17255375627229136,
+          "p99": 0.6670588475980135
+        },
+        "testing_malicious": {
+          "p50": -0.7775897447302382,
+          "p90": -0.05112843935401785,
+          "p95": 0.08718547162736408,
+          "p99": 0.7517248543301656
+        }
+      },
+      "single_row_latency_ms_p50": 0.06185000529512763,
+      "single_row_latency_ms_p95": 0.2245199575554579,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.05349404117009751,
+      "test_benign_review_or_alert_rate": 0.10536294691224268,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 364705.650393818
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.032331561245524575,
+      "direct_suspicious_unknown_recall": 0.01464684821525442,
+      "direct_threshold": 0.6999858617782593,
+      "false_alerts_per_10000_benign": 169.28494041170097,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 1.25,
+      "fit_rss_delta_bytes": 28049408,
+      "fit_seconds": 1.5550147999310866,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0018907999619841576,
+      "model": "denoising_autoencoder",
+      "model_config": {
+        "epochs": 100,
+        "fit_cap": 10000,
+        "noise_std": 0.06,
+        "optimizer": "Adam(lr=0.004, weight_decay=1e-5)"
+      },
+      "model_fit_benign_rows": 7509,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 153.03358613217767,
+          "test_benign_fpr": 0.015303358613217768,
+          "test_malicious_recall": 0.01334490615167625,
+          "threshold": 0.709356963634491
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 169.28494041170097,
+          "test_benign_fpr": 0.016928494041170097,
+          "test_malicious_recall": 0.01464684821525442,
+          "threshold": 0.6999858617782593
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 169.28494041170097,
+          "test_benign_fpr": 0.016928494041170097,
+          "test_malicious_recall": 0.01464684821525442,
+          "threshold": 0.6995705962181091
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 495.6663055254604,
+          "test_benign_fpr": 0.049566630552546044,
+          "test_malicious_recall": 0.032331561245524575,
+          "threshold": 0.4526858925819397
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.10361613351877608,
+          "direct_suspicious_unknown_recall": 0.04694019471488178,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.6211313258019757,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.4526858925819397,
+      "roc_auc": 0.6432774031709976,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.05005505867302418,
+          "p90": 0.17998404800891876,
+          "p95": 0.45268571823835374,
+          "p99": 0.6999838083982468
+        },
+        "testing_benign": {
+          "p50": 0.04595546796917915,
+          "p90": 0.3108653426170349,
+          "p95": 0.4454881623387336,
+          "p99": 0.80062217950821
+        },
+        "testing_malicious": {
+          "p50": 0.09896285086870193,
+          "p90": 0.3261978685855865,
+          "p95": 0.38656288981437664,
+          "p99": 0.7337403678894044
+        }
+      },
+      "single_row_latency_ms_p50": 0.04830001853406429,
+      "single_row_latency_ms_p95": 0.08615495753474532,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.016928494041170097,
+      "test_benign_review_or_alert_rate": 0.049566630552546044,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 8779881.708152423
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.2919605077574048,
+      "direct_suspicious_unknown_recall": 0.020722577845285885,
+      "direct_threshold": 0.21342131540964493,
+      "false_alerts_per_10000_benign": 465.8721560130011,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.234375,
+      "fit_rss_delta_bytes": 4009984,
+      "fit_seconds": 0.2104380999226123,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.078125,
+      "inference_seconds": 0.07762829994317144,
+      "model": "isolation_forest",
+      "model_config": {
+        "contamination": "auto",
+        "n_estimators": 200,
+        "n_jobs": -1
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 176.05633802816902,
+          "test_benign_fpr": 0.017605633802816902,
+          "test_malicious_recall": 0.0,
+          "threshold": 0.226552612490725
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 465.8721560130011,
+          "test_benign_fpr": 0.04658721560130011,
+          "test_malicious_recall": 0.020722577845285885,
+          "threshold": 0.21342131540964493
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 1048.2123510292524,
+          "test_benign_fpr": 0.10482123510292525,
+          "test_malicious_recall": 0.17435174134751003,
+          "threshold": 0.17172376039545234
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 1389.4907908992416,
+          "test_benign_fpr": 0.13894907908992415,
+          "test_malicious_recall": 0.2919605077574048,
+          "threshold": 0.16405282341815408
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.5170375521557719,
+          "direct_suspicious_unknown_recall": 0.06641168289290682,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.19845063458051757,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.7247966636585416,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.16405282341815408,
+      "roc_auc": 0.794313834744809,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.06410052331042104,
+          "p90": 0.1498531226438109,
+          "p95": 0.16403592331311537,
+          "p99": 0.2133764038148619
+        },
+        "testing_benign": {
+          "p50": 0.03802341886589178,
+          "p90": 0.17635411348913302,
+          "p95": 0.21158910246714427,
+          "p99": 0.22809483784381457
+        },
+        "testing_malicious": {
+          "p50": 0.1610738602946551,
+          "p90": 0.20365317203448124,
+          "p95": 0.21110994456190724,
+          "p99": 0.22093822262517085
+        }
+      },
+      "single_row_latency_ms_p50": 3.8852999568916857,
+      "single_row_latency_ms_p95": 4.468485026154667,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.04658721560130011,
+      "test_benign_review_or_alert_rate": 0.13894907908992415,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 213852.42253344366
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 488264.04641898256,
+      "false_alerts_per_10000_benign": 0.0,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.46875,
+      "fit_rss_delta_bytes": 884736,
+      "fit_seconds": 0.47181409993208945,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0008259000023826957,
+      "model": "robust_covariance",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 5000,
+        "support_fraction": 0.9
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 502393.37121780164
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 488264.04641898256
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 411753.2005300325
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 88966.87225755496
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.5901023998029524,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 88966.87225755496,
+      "roc_auc": 0.649211643871122,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -17580.665486741527,
+          "p90": 6024.823858716361,
+          "p95": 88731.8193325445,
+          "p99": 488236.9829845711
+        },
+        "testing_benign": {
+          "p50": -17666.49278257261,
+          "p90": -14202.99990090876,
+          "p95": -10305.939901172867,
+          "p99": -1457.5324571742499
+        },
+        "testing_malicious": {
+          "p50": -17446.345085256176,
+          "p90": -16847.566059430195,
+          "p95": -15669.957681437221,
+          "p99": -4587.611135765492
+        }
+      },
+      "single_row_latency_ms_p50": 0.13840000610798597,
+      "single_row_latency_ms_p95": 0.31970497802831227,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0,
+      "test_benign_review_or_alert_rate": 0.0,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 20100496.370149698
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": -454.6268901902258,
+      "false_alerts_per_10000_benign": 13.542795232936077,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.078125,
+      "fit_rss_delta_bytes": 1331200,
+      "fit_seconds": 0.04723050002939999,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.75,
+      "inference_seconds": 0.06829269998706877,
+      "model": "local_outlier_factor",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 10000,
+        "n_jobs": -1,
+        "n_neighbors": 35,
+        "novelty": true
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 13.542795232936077,
+          "test_benign_fpr": 0.0013542795232936078,
+          "test_malicious_recall": 0.0,
+          "threshold": 19.280273866083007
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 13.542795232936077,
+          "test_benign_fpr": 0.0013542795232936078,
+          "test_malicious_recall": 0.0,
+          "threshold": -454.6268901902258
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 18.95991332611051,
+          "test_benign_fpr": 0.001895991332611051,
+          "test_malicious_recall": 0.0,
+          "threshold": -1114.1927687498064
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 25.73131094257855,
+          "test_benign_fpr": 0.0025731310942578548,
+          "test_malicious_recall": 0.0,
+          "threshold": -2261.996893871432
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.39767940248405453,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -2261.996893871432,
+      "roc_auc": 0.19203191415457635,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -14238.699056895779,
+          "p90": -14207.938898073284,
+          "p95": -2263.7003679952763,
+          "p99": -454.92110054627705
+        },
+        "testing_benign": {
+          "p50": -14240.903060470393,
+          "p90": -14230.024603299356,
+          "p95": -14225.008379338082,
+          "p99": -3415.238389393162
+        },
+        "testing_malicious": {
+          "p50": -14241.901789400346,
+          "p90": -14241.752714268147,
+          "p95": -14241.75056580362,
+          "p99": -12920.082215245504
+        }
+      },
+      "single_row_latency_ms_p50": 17.02165004098788,
+      "single_row_latency_ms_p95": 18.58332003466785,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0013542795232936078,
+      "test_benign_review_or_alert_rate": 0.0025731310942578548,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 243086.01070309713
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 1.5890350746903272,
+      "false_alerts_per_10000_benign": 58.234019501625134,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.0,
+      "fit_rss_delta_bytes": 1507328,
+      "fit_seconds": 0.007693200022913516,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.03125,
+      "inference_seconds": 0.03545480000320822,
+      "model": "one_class_svm",
+      "model_config": {
+        "fit_cap": 5000,
+        "gamma": "scale",
+        "kernel": "rbf",
+        "nu": 0.01
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 58.234019501625134,
+          "test_benign_fpr": 0.0058234019501625135,
+          "test_malicious_recall": 0.0,
+          "threshold": 1.5920537251778217
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 58.234019501625134,
+          "test_benign_fpr": 0.0058234019501625135,
+          "test_malicious_recall": 0.0,
+          "threshold": 1.5890350746903272
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 58.234019501625134,
+          "test_benign_fpr": 0.0058234019501625135,
+          "test_malicious_recall": 0.0,
+          "threshold": 1.5490509305501763
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 58.234019501625134,
+          "test_benign_fpr": 0.0058234019501625135,
+          "test_malicious_recall": 0.0,
+          "threshold": 1.5193490167607617
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.4523551550527038,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 1.5193490167607617,
+      "roc_auc": 0.3492062426217699,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.05953732501148945,
+          "p90": 1.1794002734226015,
+          "p95": 1.5192221365172327,
+          "p99": 1.589035074676306
+        },
+        "testing_benign": {
+          "p50": -0.150363573886648,
+          "p90": 0.056147556778484174,
+          "p95": 0.1898263832326954,
+          "p99": 0.7551481452251076
+        },
+        "testing_malicious": {
+          "p50": -0.24053436282037044,
+          "p90": -0.027069985034663627,
+          "p95": -0.023372995614144916,
+          "p99": 4.693462341689303e-05
+        }
+      },
+      "single_row_latency_ms_p50": 0.06125000072643161,
+      "single_row_latency_ms_p95": 0.13962000957690174,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0058234019501625135,
+      "test_benign_review_or_alert_rate": 0.0058234019501625135,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 468229.97163988557
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 10.753902435302734,
+      "false_alerts_per_10000_benign": 0.0,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.140625,
+      "fit_rss_delta_bytes": 16384,
+      "fit_seconds": 0.1325470000738278,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0017850999720394611,
+      "model": "denoising_autoencoder",
+      "model_config": {
+        "epochs": 100,
+        "fit_cap": 10000,
+        "noise_std": 0.06,
+        "optimizer": "Adam(lr=0.004, weight_decay=1e-5)"
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 10.929006576538086
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 10.753902435302734
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02863230789719004,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 10.311613082885742
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 10.18993091583252
+        }
+      ],
+      "per_family": {
+        "brute_force": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2876
+        },
+        "cryptomining": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 274
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 6067
+        }
+      },
+      "pr_auc_malicious": 0.43244459642117006,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 10.18993091583252,
+      "roc_auc": 0.328488447438791,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 1.2569003105163574,
+          "p90": 7.710233879089356,
+          "p95": 10.189928245544433,
+          "p99": 10.75381332397461
+        },
+        "testing_benign": {
+          "p50": 0.6515976786613464,
+          "p90": 1.4628572463989258,
+          "p95": 2.4677031993865954,
+          "p99": 4.311471347808861
+        },
+        "testing_malicious": {
+          "p50": 0.594193696975708,
+          "p90": 0.6415444850921631,
+          "p95": 0.8559629082679747,
+          "p99": 1.0229910516738892
+        }
+      },
+      "single_row_latency_ms_p50": 0.04970002919435501,
+      "single_row_latency_ms_p95": 0.07845000945962963,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0,
+      "test_benign_review_or_alert_rate": 0.0,
+      "testing_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "testing_rows": 16601,
+      "testing_source": "hikari",
+      "throughput_rows_per_second": 9299759.26280112
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.04861448711716091,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.1545212765957447,
+      "direct_suspicious_unknown_recall": 0.00013297872340425532,
+      "direct_threshold": 0.19659851065789047,
+      "false_alerts_per_10000_benign": 3.9952057530962843,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.265625,
+      "fit_rss_delta_bytes": 2957312,
+      "fit_seconds": 0.23425739991944283,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.109375,
+      "inference_seconds": 0.11467139993328601,
+      "model": "isolation_forest",
+      "model_config": {
+        "contamination": "auto",
+        "n_estimators": 200,
+        "n_jobs": -1
+      },
+      "model_fit_benign_rows": 7384,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 2.6634705020641896,
+          "test_benign_fpr": 0.00026634705020641894,
+          "test_malicious_recall": 0.0,
+          "threshold": 0.21564642761173314
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 3.9952057530962843,
+          "test_benign_fpr": 0.00039952057530962844,
+          "test_malicious_recall": 0.00013297872340425532,
+          "threshold": 0.19659851065789047
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.029654837141468156,
+          "test_alerts_per_10000_benign": 848.3153549074444,
+          "test_benign_fpr": 0.08483153549074444,
+          "test_malicious_recall": 0.07965425531914894,
+          "threshold": 0.15328801728022234
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04861448711716091,
+          "test_alerts_per_10000_benign": 1479.5578638966572,
+          "test_benign_fpr": 0.14795578638966572,
+          "test_malicious_recall": 0.1545212765957447,
+          "threshold": 0.13857757587679842
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.1545212765957447,
+          "direct_suspicious_unknown_recall": 0.00013297872340425532,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.49368738716430177,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.13857757587679842,
+      "roc_auc": 0.4931451053062566,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -0.021250063078628423,
+          "p90": 0.11837775775202741,
+          "p95": 0.13857757587679842,
+          "p99": 0.19659122249229607
+        },
+        "testing_benign": {
+          "p50": -0.00027081173725557184,
+          "p90": 0.1516074066890829,
+          "p95": 0.1588087980972812,
+          "p99": 0.1664889642885391
+        },
+        "testing_malicious": {
+          "p50": -0.0016955393882118752,
+          "p90": 0.15136228603882076,
+          "p95": 0.1573756117110542,
+          "p99": 0.16627209772809876
+        }
+      },
+      "single_row_latency_ms_p50": 3.890549996867776,
+      "single_row_latency_ms_p95": 4.382260056445375,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.00039952057530962844,
+      "test_benign_review_or_alert_rate": 0.14795578638966572,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 131061.45044661207
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.09428191489361702,
+      "direct_suspicious_unknown_recall": 0.08563829787234042,
+      "direct_threshold": -4705.373820653595,
+      "false_alerts_per_10000_benign": 1085.3642295911573,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.59375,
+      "fit_rss_delta_bytes": 86016,
+      "fit_seconds": 0.663164300029166,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0009815999073907733,
+      "model": "robust_covariance",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 5000,
+        "support_fraction": 0.9
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 985.4840857637502,
+          "test_benign_fpr": 0.09854840857637502,
+          "test_malicious_recall": 0.07739361702127659,
+          "threshold": -1825.6050253351295
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 1085.3642295911573,
+          "test_benign_fpr": 0.10853642295911572,
+          "test_malicious_recall": 0.08563829787234042,
+          "threshold": -4705.373820653595
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 1163.9366094020509,
+          "test_benign_fpr": 0.11639366094020509,
+          "test_malicious_recall": 0.09109042553191489,
+          "threshold": -5981.47386513274
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 1181.2491676654681,
+          "test_benign_fpr": 0.11812491676654681,
+          "test_malicious_recall": 0.09428191489361702,
+          "threshold": -6121.460977406434
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.09428191489361702,
+          "direct_suspicious_unknown_recall": 0.08563829787234042,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.4833580113267156,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -6121.460977406434,
+      "roc_auc": 0.4888430514588168,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -12705.345966930232,
+          "p90": -10280.622627166475,
+          "p95": -6249.340626270899,
+          "p99": -4705.39039231846
+        },
+        "testing_benign": {
+          "p50": -12705.4223772727,
+          "p90": -1899.5598380645647,
+          "p95": 27071.558157948886,
+          "p99": 170105.61993793037
+        },
+        "testing_malicious": {
+          "p50": -12707.083866231864,
+          "p90": -6214.013325059183,
+          "p95": 12628.5329993896,
+          "p99": 152082.89753248854
+        }
+      },
+      "single_row_latency_ms_p50": 0.1304500037804246,
+      "single_row_latency_ms_p95": 0.27000996051356196,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.10853642295911572,
+      "test_benign_review_or_alert_rate": 0.11812491676654681,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 15310718.640906492
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.07912234042553191,
+      "direct_suspicious_unknown_recall": 0.07912234042553191,
+      "direct_threshold": 1019.4050569925129,
+      "false_alerts_per_10000_benign": 653.8820082567586,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.859375,
+      "fit_rss_delta_bytes": 2928640,
+      "fit_seconds": 0.10119770001620054,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 2.75,
+      "inference_seconds": 0.19293220003601164,
+      "model": "local_outlier_factor",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 10000,
+        "n_jobs": -1,
+        "n_neighbors": 35,
+        "novelty": true
+      },
+      "model_fit_benign_rows": 7384,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 653.8820082567586,
+          "test_benign_fpr": 0.06538820082567585,
+          "test_malicious_recall": 0.07912234042553191,
+          "threshold": 1019.7095131644502
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 653.8820082567586,
+          "test_benign_fpr": 0.06538820082567585,
+          "test_malicious_recall": 0.07912234042553191,
+          "threshold": 1019.4050569925129
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 653.8820082567586,
+          "test_benign_fpr": 0.06538820082567585,
+          "test_malicious_recall": 0.07912234042553191,
+          "threshold": 1017.941348155047
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 653.8820082567586,
+          "test_benign_fpr": 0.06538820082567585,
+          "test_malicious_recall": 0.07912234042553191,
+          "threshold": 1016.1178803338317
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.07912234042553191,
+          "direct_suspicious_unknown_recall": 0.07912234042553191,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.49519010974559524,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 1016.1178803338317,
+      "roc_auc": 0.4878813508895708,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -19.41509756751121,
+          "p90": 639.2576225321237,
+          "p95": 1016.0826312465327,
+          "p99": 1019.4023193065125
+        },
+        "testing_benign": {
+          "p50": -20.35992704451959,
+          "p90": 21.76469873197518,
+          "p95": 6324.489264740575,
+          "p99": 6983.163507839913
+        },
+        "testing_malicious": {
+          "p50": -20.45523762677589,
+          "p90": 22.932035364238303,
+          "p95": 6325.078239983259,
+          "p99": 7072.099175313593
+        }
+      },
+      "single_row_latency_ms_p50": 16.703850007615983,
+      "single_row_latency_ms_p95": 18.588020018069074,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.06538820082567585,
+      "test_benign_review_or_alert_rate": 0.06538820082567585,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 77897.83145164349
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.2026595744680851,
+      "direct_suspicious_unknown_recall": 0.17606382978723403,
+      "direct_threshold": 0.0931947638598345,
+      "false_alerts_per_10000_benign": 1881.7419097083498,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.015625,
+      "fit_rss_delta_bytes": 65536,
+      "fit_seconds": 0.009086100035347044,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.03125,
+      "inference_seconds": 0.03683879994787276,
+      "model": "one_class_svm",
+      "model_config": {
+        "fit_cap": 5000,
+        "gamma": "scale",
+        "kernel": "rbf",
+        "nu": 0.01
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 1158.6096683979224,
+          "test_benign_fpr": 0.11586096683979225,
+          "test_malicious_recall": 0.1247340425531915,
+          "threshold": 0.6852442570019459
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 1881.7419097083498,
+          "test_benign_fpr": 0.188174190970835,
+          "test_malicious_recall": 0.17606382978723403,
+          "threshold": 0.0931947638598345
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 2074.8435211080036,
+          "test_benign_fpr": 0.20748435211080038,
+          "test_malicious_recall": 0.19507978723404254,
+          "threshold": -0.03132255700703368
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 2118.790784392063,
+          "test_benign_fpr": 0.21187907843920628,
+          "test_malicious_recall": 0.2026595744680851,
+          "threshold": -0.04668535487742709
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.2026595744680851,
+          "direct_suspicious_unknown_recall": 0.17606382978723403,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.498301892079406,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -0.04668535487742709,
+      "roc_auc": 0.5017668691187596,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -0.3682441479661147,
+          "p90": -0.17268464229486521,
+          "p95": -0.04668628393644729,
+          "p99": 0.09282682245018506
+        },
+        "testing_benign": {
+          "p50": -0.3083738552186581,
+          "p90": 0.9516115561499126,
+          "p95": 1.1333094085453468,
+          "p99": 4.616031933108462
+        },
+        "testing_malicious": {
+          "p50": -0.3106096264660003,
+          "p90": 0.9614591583895171,
+          "p95": 1.1254589685866077,
+          "p99": 4.5212189183432665
+        }
+      },
+      "single_row_latency_ms_p50": 0.06239995127543807,
+      "single_row_latency_ms_p95": 0.10036994935944674,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.188174190970835,
+      "test_benign_review_or_alert_rate": 0.21187907843920628,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 407966.60100942955
+    },
+    {
+      "calibration_benign_rows": 4114,
+      "calibration_direct_fpr": 0.009965969859017987,
+      "calibration_review_rate": 0.049829849295089934,
+      "calibration_source": "iot23",
+      "detection_or_review_recall": 0.3259308510638298,
+      "direct_suspicious_unknown_recall": 0.06888297872340425,
+      "direct_threshold": 8.398734092712402,
+      "false_alerts_per_10000_benign": 609.9347449726994,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.1875,
+      "fit_rss_delta_bytes": 0,
+      "fit_seconds": 0.17546469997614622,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0012676999904215336,
+      "model": "denoising_autoencoder",
+      "model_config": {
+        "epochs": 100,
+        "fit_cap": 10000,
+        "noise_std": 0.06,
+        "optimizer": "Adam(lr=0.004, weight_decay=1e-5)"
+      },
+      "model_fit_benign_rows": 7384,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004861448711716091,
+          "test_alerts_per_10000_benign": 609.9347449726994,
+          "test_benign_fpr": 0.06099347449726994,
+          "test_malicious_recall": 0.06888297872340425,
+          "threshold": 8.559494972229004
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009965969859017987,
+          "test_alerts_per_10000_benign": 609.9347449726994,
+          "test_benign_fpr": 0.06099347449726994,
+          "test_malicious_recall": 0.06888297872340425,
+          "threshold": 8.398734092712402
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02989790957705396,
+          "test_alerts_per_10000_benign": 2658.143561060061,
+          "test_benign_fpr": 0.2658143561060061,
+          "test_malicious_recall": 0.23962765957446808,
+          "threshold": 1.704685091972351
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.049829849295089934,
+          "test_alerts_per_10000_benign": 3438.5404181648687,
+          "test_benign_fpr": 0.3438540418164869,
+          "test_malicious_recall": 0.3259308510638298,
+          "threshold": 1.0823737382888794
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.3259308510638298,
+          "direct_suspicious_unknown_recall": 0.06888297872340425,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.4960716661743867,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 1.0823737382888794,
+      "roc_auc": 0.48848338554018866,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.4168752431869507,
+          "p90": 0.787382197380066,
+          "p95": 1.0821189641952513,
+          "p99": 8.398116188049316
+        },
+        "testing_benign": {
+          "p50": 0.6168204545974731,
+          "p90": 3.9282874584197995,
+          "p95": 9.578712463378906,
+          "p99": 12.21487979888916
+        },
+        "testing_malicious": {
+          "p50": 0.5899444222450256,
+          "p90": 4.10341477394104,
+          "p95": 9.649226188659668,
+          "p99": 12.161140947341917
+        }
+      },
+      "single_row_latency_ms_p50": 0.04815001739189029,
+      "single_row_latency_ms_p95": 0.10648499010130758,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.06099347449726994,
+      "test_benign_review_or_alert_rate": 0.3438540418164869,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 11855328.63733996
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.013297872340425532,
+      "direct_suspicious_unknown_recall": 0.00026595744680851064,
+      "direct_threshold": 0.22809483784381457,
+      "false_alerts_per_10000_benign": 7.990411506192569,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.21875,
+      "fit_rss_delta_bytes": 794624,
+      "fit_seconds": 0.20696209999732673,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.109375,
+      "inference_seconds": 0.10266149998642504,
+      "model": "isolation_forest",
+      "model_config": {
+        "contamination": "auto",
+        "n_estimators": 200,
+        "n_jobs": -1
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004604550379198266,
+          "test_alerts_per_10000_benign": 6.658676255160474,
+          "test_benign_fpr": 0.0006658676255160474,
+          "test_malicious_recall": 0.0,
+          "threshold": 0.22975488994124127
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 7.990411506192569,
+          "test_benign_fpr": 0.0007990411506192569,
+          "test_malicious_recall": 0.00026595744680851064,
+          "threshold": 0.22809483784381457
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 81.23585031295778,
+          "test_benign_fpr": 0.008123585031295778,
+          "test_malicious_recall": 0.010106382978723405,
+          "threshold": 0.21924222013142347
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 106.53882008256758,
+          "test_benign_fpr": 0.010653882008256758,
+          "test_malicious_recall": 0.013297872340425532,
+          "threshold": 0.21159123461768203
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.013297872340425532,
+          "direct_suspicious_unknown_recall": 0.00026595744680851064,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.5023101484595206,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.21159123461768203,
+      "roc_auc": 0.5003783048993691,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.03802341886589178,
+          "p90": 0.17635411348913302,
+          "p95": 0.21158910246714427,
+          "p99": 0.22809483784381457
+        },
+        "testing_benign": {
+          "p50": 0.06410052331042104,
+          "p90": 0.1498531226438109,
+          "p95": 0.16403592331311537,
+          "p99": 0.2133764038148619
+        },
+        "testing_malicious": {
+          "p50": 0.05953274159997518,
+          "p90": 0.15059614034097202,
+          "p95": 0.16431451753241538,
+          "p99": 0.21913629333974335
+        }
+      },
+      "single_row_latency_ms_p50": 3.6565500195138156,
+      "single_row_latency_ms_p95": 4.392375017050654,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0007990411506192569,
+      "test_benign_review_or_alert_rate": 0.010653882008256758,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 146393.7308726961
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.13018617021276596,
+      "direct_suspicious_unknown_recall": 0.08191489361702127,
+      "direct_threshold": -1186.4647327758612,
+      "false_alerts_per_10000_benign": 1037.4217605540018,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.46875,
+      "fit_rss_delta_bytes": 0,
+      "fit_seconds": 0.45479509991128,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0009001999860629439,
+      "model": "robust_covariance",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 5000,
+        "support_fraction": 0.9
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 1024.104408043681,
+          "test_benign_fpr": 0.10241044080436809,
+          "test_malicious_recall": 0.07925531914893617,
+          "threshold": 2154.9583192675927
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 1037.4217605540018,
+          "test_benign_fpr": 0.10374217605540019,
+          "test_malicious_recall": 0.08191489361702127,
+          "threshold": -1186.4647327758612
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 1175.9222266613397,
+          "test_benign_fpr": 0.11759222266613398,
+          "test_malicious_recall": 0.09840425531914894,
+          "threshold": -5568.5580201207395
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 1459.581835131176,
+          "test_benign_fpr": 0.1459581835131176,
+          "test_malicious_recall": 0.13018617021276596,
+          "threshold": -10305.939265410168
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.13018617021276596,
+          "direct_suspicious_unknown_recall": 0.08191489361702127,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.4846163603513526,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -10305.939265410168,
+      "roc_auc": 0.4926014846014569,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -17666.49278257261,
+          "p90": -14202.99990090876,
+          "p95": -10305.939901172867,
+          "p99": -1457.5324571742499
+        },
+        "testing_benign": {
+          "p50": -17580.665486741527,
+          "p90": 6024.823858716361,
+          "p95": 88731.8193325445,
+          "p99": 488236.9829845711
+        },
+        "testing_malicious": {
+          "p50": -17570.51670825453,
+          "p90": -6762.224090157391,
+          "p95": 56450.917971372706,
+          "p99": 421686.6169160705
+        }
+      },
+      "single_row_latency_ms_p50": 0.13594998745247722,
+      "single_row_latency_ms_p95": 0.282510049873963,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.10374217605540019,
+      "test_benign_review_or_alert_rate": 0.1459581835131176,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 16695179.107622359
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.21409574468085107,
+      "direct_suspicious_unknown_recall": 0.07007978723404255,
+      "direct_threshold": -3415.198987898786,
+      "false_alerts_per_10000_benign": 705.8196830470102,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.171875,
+      "fit_rss_delta_bytes": 1155072,
+      "fit_seconds": 0.04533849994186312,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.953125,
+      "inference_seconds": 0.0975217999657616,
+      "model": "local_outlier_factor",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 10000,
+        "n_jobs": -1,
+        "n_neighbors": 35,
+        "novelty": true
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 704.4879477959781,
+          "test_benign_fpr": 0.07044879477959781,
+          "test_malicious_recall": 0.0699468085106383,
+          "threshold": -3166.5069597894744
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 705.8196830470102,
+          "test_benign_fpr": 0.07058196830470102,
+          "test_malicious_recall": 0.07007978723404255,
+          "threshold": -3415.198987898786
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 1014.7822612864562,
+          "test_benign_fpr": 0.10147822612864563,
+          "test_malicious_recall": 0.1026595744680851,
+          "threshold": -14208.679691519397
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 2048.208816087362,
+          "test_benign_fpr": 0.20482088160873618,
+          "test_malicious_recall": 0.21409574468085107,
+          "threshold": -14225.008378114953
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.21409574468085107,
+          "direct_suspicious_unknown_recall": 0.07007978723404255,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.5028884815789808,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -14225.008378114953,
+      "roc_auc": 0.5008222756805308,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -14240.903060470393,
+          "p90": -14230.024603299356,
+          "p95": -14225.008379338082,
+          "p99": -3415.238389393162
+        },
+        "testing_benign": {
+          "p50": -14238.699056895779,
+          "p90": -14207.938898073284,
+          "p95": -2263.7003679952763,
+          "p99": -454.92110054627705
+        },
+        "testing_malicious": {
+          "p50": -14238.706371895501,
+          "p90": -14207.646507506084,
+          "p95": -2273.439975951992,
+          "p99": -424.89201498383557
+        }
+      },
+      "single_row_latency_ms_p50": 16.75130001967773,
+      "single_row_latency_ms_p95": 18.146499962313097,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.07058196830470102,
+      "test_benign_review_or_alert_rate": 0.20482088160873618,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 154109.13257626962
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.3672872340425532,
+      "direct_suspicious_unknown_recall": 0.15651595744680852,
+      "direct_threshold": 0.7551504433082732,
+      "false_alerts_per_10000_benign": 1745.9049141030764,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.0,
+      "fit_rss_delta_bytes": 0,
+      "fit_seconds": 0.007112300023436546,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.03125,
+      "inference_seconds": 0.03168590005952865,
+      "model": "one_class_svm",
+      "model_config": {
+        "fit_cap": 5000,
+        "gamma": "scale",
+        "kernel": "rbf",
+        "nu": 0.01
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 10.653882008256758,
+          "test_benign_fpr": 0.0010653882008256758,
+          "test_malicious_recall": 0.0005319148936170213,
+          "threshold": 1.9759016444188626
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 1745.9049141030764,
+          "test_benign_fpr": 0.17459049141030764,
+          "test_malicious_recall": 0.15651595744680852,
+          "threshold": 0.7551504433082732
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 3289.3860700492746,
+          "test_benign_fpr": 0.32893860700492744,
+          "test_malicious_recall": 0.3246010638297872,
+          "threshold": 0.25208806607825895
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 3732.853908642962,
+          "test_benign_fpr": 0.3732853908642962,
+          "test_malicious_recall": 0.3672872340425532,
+          "threshold": 0.18988458110127393
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.3672872340425532,
+          "direct_suspicious_unknown_recall": 0.15651595744680852,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.49640735405381,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.18988458110127393,
+      "roc_auc": 0.5006112877313181,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -0.150363573886648,
+          "p90": 0.056147556778484174,
+          "p95": 0.1898263832326954,
+          "p99": 0.7551481452251076
+        },
+        "testing_benign": {
+          "p50": 0.05953732501148945,
+          "p90": 1.1794002734226015,
+          "p95": 1.5192221365172327,
+          "p99": 1.589035074676306
+        },
+        "testing_malicious": {
+          "p50": 0.046933874668769526,
+          "p90": 1.1859788730298475,
+          "p95": 1.524963108584367,
+          "p99": 1.5890345785967495
+        }
+      },
+      "single_row_latency_ms_p50": 0.05974998930469155,
+      "single_row_latency_ms_p95": 0.07385998032987116,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.17459049141030764,
+      "test_benign_review_or_alert_rate": 0.3732853908642962,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 474311.9170282319
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.28856382978723405,
+      "direct_suspicious_unknown_recall": 0.1586436170212766,
+      "direct_threshold": 4.5715460777282715,
+      "false_alerts_per_10000_benign": 1735.2510320948195,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 4114,
+      "fit_cpu_seconds": 0.125,
+      "fit_rss_delta_bytes": 0,
+      "fit_seconds": 0.12174600001890212,
+      "fit_source": "iot23",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.001588399987667799,
+      "model": "denoising_autoencoder",
+      "model_config": {
+        "epochs": 100,
+        "fit_cap": 10000,
+        "noise_std": 0.06,
+        "optimizer": "Adam(lr=0.004, weight_decay=1e-5)"
+      },
+      "model_fit_benign_rows": 4114,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 588.6269809561859,
+          "test_benign_fpr": 0.058862698095618594,
+          "test_malicious_recall": 0.06702127659574468,
+          "threshold": 9.018415451049805
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 1735.2510320948195,
+          "test_benign_fpr": 0.17352510320948195,
+          "test_malicious_recall": 0.1586436170212766,
+          "threshold": 4.5715460777282715
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 2271.940338260754,
+          "test_benign_fpr": 0.22719403382607536,
+          "test_malicious_recall": 0.2131648936170213,
+          "threshold": 3.387484073638916
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 2999.0677853242773,
+          "test_benign_fpr": 0.29990677853242775,
+          "test_malicious_recall": 0.28856382978723405,
+          "threshold": 2.4680981636047363
+        }
+      ],
+      "per_family": {
+        "infiltration": {
+          "detection_or_review_recall": 0.28856382978723405,
+          "direct_suspicious_unknown_recall": 0.1586436170212766,
+          "rows": 7520
+        }
+      },
+      "pr_auc_malicious": 0.49774758028076493,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.5,
+          4.875197323201151,
+          0.12149532710280374,
+          0.045590063396716514,
+          1.8407373393595985,
+          3.8066624897703196,
+          -1.9652033519899925
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.782185868127645,
+          1.0986122886681098,
+          0.5,
+          5.198497031265826,
+          0.5,
+          3.2247399657464166,
+          7.552418739829526,
+          4.343805421853684,
+          0.0
+        ],
+        "scales": [
+          5.2134235870816905,
+          1.2992829841302609,
+          0.09999999999999998,
+          1.8702927426527376,
+          0.06478866764736785,
+          3.522108601702421,
+          3.683944406730096,
+          0.05411599818904733,
+          0.25966034213509115
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.613165309190004,
+          5.235736320073785,
+          1.0,
+          11.305574265079654,
+          1.0,
+          13.815511557963774,
+          18.928562773504222,
+          6.177984780554478,
+          8.77155103999249
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 2.4680981636047363,
+      "roc_auc": 0.4983769210989366,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.6515976786613464,
+          "p90": 1.4628572463989258,
+          "p95": 2.4677031993865954,
+          "p99": 4.311471347808861
+        },
+        "testing_benign": {
+          "p50": 1.2569003105163574,
+          "p90": 7.710233879089356,
+          "p95": 10.189928245544433,
+          "p99": 10.75381332397461
+        },
+        "testing_malicious": {
+          "p50": 1.24543696641922,
+          "p90": 7.587782669067386,
+          "p95": 10.192300748825073,
+          "p99": 10.808078908920287
+        }
+      },
+      "single_row_latency_ms_p50": 0.050600036047399044,
+      "single_row_latency_ms_p95": 0.176215055398643,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.17352510320948195,
+      "test_benign_review_or_alert_rate": 0.29990677853242775,
+      "testing_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "testing_rows": 15029,
+      "testing_source": "cse_2018_02_28",
+      "throughput_rows_per_second": 9461722.561498277
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04980689838860035,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.004594180704441042,
+      "direct_suspicious_unknown_recall": 0.0035732516590096988,
+      "direct_threshold": 0.1664889642885391,
+      "false_alerts_per_10000_benign": 150.70491006319884,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.21875,
+      "fit_rss_delta_bytes": 819200,
+      "fit_seconds": 0.22007090004626662,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.03125,
+      "inference_seconds": 0.033975400030612946,
+      "model": "isolation_forest",
+      "model_config": {
+        "contamination": "auto",
+        "n_estimators": 200,
+        "n_jobs": -1
+      },
+      "model_fit_benign_rows": 7384,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004794246903715541,
+          "test_alerts_per_10000_benign": 140.98201263976665,
+          "test_benign_fpr": 0.014098201263976665,
+          "test_malicious_recall": 0.0030627871362940277,
+          "threshold": 0.17130116952513286
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 150.70491006319884,
+          "test_benign_fpr": 0.015070491006319884,
+          "test_malicious_recall": 0.0035732516590096988,
+          "threshold": 0.1664889642885391
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 162.85853184248907,
+          "test_benign_fpr": 0.016285853184248907,
+          "test_malicious_recall": 0.004594180704441042,
+          "threshold": 0.159874231819925
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04980689838860035,
+          "test_alerts_per_10000_benign": 165.28925619834712,
+          "test_benign_fpr": 0.01652892561983471,
+          "test_malicious_recall": 0.004594180704441042,
+          "threshold": 0.1588087980972812
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.001026167265264238,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.8,
+          "direct_suspicious_unknown_recall": 0.8,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 1.0,
+          "direct_suspicious_unknown_recall": 1.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.5685602460137106,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.1588087980972812,
+      "roc_auc": 0.7932943151821876,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -0.00027081173725557184,
+          "p90": 0.1516074066890829,
+          "p95": 0.1588087980972812,
+          "p99": 0.1664889642885391
+        },
+        "testing_benign": {
+          "p50": -0.021250063078628423,
+          "p90": 0.11837775775202741,
+          "p95": 0.13857757587679842,
+          "p99": 0.19659122249229607
+        },
+        "testing_malicious": {
+          "p50": 0.10846830863997625,
+          "p90": 0.1086741841265374,
+          "p95": 0.1086741841265374,
+          "p99": 0.1086741841265374
+        }
+      },
+      "single_row_latency_ms_p50": 3.6365999840199947,
+      "single_row_latency_ms_p95": 4.118350014323369,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.015070491006319884,
+      "test_benign_review_or_alert_rate": 0.01652892561983471,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 178746.97559198798
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 170114.39119125158,
+      "false_alerts_per_10000_benign": 0.0,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.578125,
+      "fit_rss_delta_bytes": 4096,
+      "fit_seconds": 0.5952423000708222,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.000597700010985136,
+      "model": "robust_covariance",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 5000,
+        "support_fraction": 0.9
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 180054.0076443723
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 170114.39119125158
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 142979.1385732828
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 27073.02016256508
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.46961284840669054,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 27073.02016256508,
+      "roc_auc": 0.7488624979309685,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -12705.4223772727,
+          "p90": -1899.5598380645647,
+          "p95": 27071.558157948886,
+          "p99": 170105.61993793037
+        },
+        "testing_benign": {
+          "p50": -12705.345966930232,
+          "p90": -10280.622627166475,
+          "p95": -6249.340626270899,
+          "p99": -4705.39039231846
+        },
+        "testing_malicious": {
+          "p50": -10935.178418332533,
+          "p90": -10928.036842051952,
+          "p95": -10926.994369880676,
+          "p99": -10926.275728515096
+        }
+      },
+      "single_row_latency_ms_p50": 0.125400023534894,
+      "single_row_latency_ms_p95": 0.1903699361719191,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0,
+      "test_benign_review_or_alert_rate": 0.0,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 10160615.506749634
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 6983.20662555698,
+      "false_alerts_per_10000_benign": 0.0,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 1.171875,
+      "fit_rss_delta_bytes": 2068480,
+      "fit_seconds": 0.10214319999795407,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.59375,
+      "inference_seconds": 0.08375400002114475,
+      "model": "local_outlier_factor",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 10000,
+        "n_jobs": -1,
+        "n_neighbors": 35,
+        "novelty": true
+      },
+      "model_fit_benign_rows": 7384,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 7563.737716253228
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 6983.20662555698
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 6643.928602240811
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 0.0,
+          "test_benign_fpr": 0.0,
+          "test_malicious_recall": 0.0,
+          "threshold": 6324.726307461257
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.6686029632904941,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 6324.726307461257,
+      "roc_auc": 0.7633495654599404,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -20.35992704451959,
+          "p90": 21.76469873197518,
+          "p95": 6324.489264740575,
+          "p99": 6983.163507839913
+        },
+        "testing_benign": {
+          "p50": -19.41509756751121,
+          "p90": 639.2576225321237,
+          "p95": 1016.0826312465327,
+          "p99": 1019.4023193065125
+        },
+        "testing_malicious": {
+          "p50": 1015.5135790599799,
+          "p90": 1018.9795857614615,
+          "p95": 1019.3437892102712,
+          "p99": 1019.6986613243487
+        }
+      },
+      "single_row_latency_ms_p50": 16.706949973013252,
+      "single_row_latency_ms_p95": 18.833874980919063,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0,
+      "test_benign_review_or_alert_rate": 0.0,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 72509.96965478419
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04994007191370355,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 4.616435996164286,
+      "false_alerts_per_10000_benign": 2.430724355858046,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.015625,
+      "fit_rss_delta_bytes": 0,
+      "fit_seconds": 0.009122599964030087,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.015625,
+      "inference_seconds": 0.014948499971069396,
+      "model": "one_class_svm",
+      "model_config": {
+        "fit_cap": 5000,
+        "gamma": "scale",
+        "kernel": "rbf",
+        "nu": 0.01
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 2.430724355858046,
+          "test_benign_fpr": 0.00024307243558580456,
+          "test_malicious_recall": 0.0,
+          "threshold": 4.82298452195579
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 2.430724355858046,
+          "test_benign_fpr": 0.00024307243558580456,
+          "test_malicious_recall": 0.0,
+          "threshold": 4.616435996164286
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 2.430724355858046,
+          "test_benign_fpr": 0.00024307243558580456,
+          "test_malicious_recall": 0.0,
+          "threshold": 4.116412148649469
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04994007191370355,
+          "test_alerts_per_10000_benign": 19.445794846864366,
+          "test_benign_fpr": 0.0019445794846864365,
+          "test_malicious_recall": 0.0,
+          "threshold": 1.1333094091032017
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.433946885883862,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 1.1333094091032017,
+      "roc_auc": 0.7223833605936775,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -0.3083738552186581,
+          "p90": 0.9516115561499126,
+          "p95": 1.1333094085453468,
+          "p99": 4.616031933108462
+        },
+        "testing_benign": {
+          "p50": -0.3682441479661147,
+          "p90": -0.17268464229486521,
+          "p95": -0.04668628393644729,
+          "p99": 0.09282682245018506
+        },
+        "testing_malicious": {
+          "p50": -0.2748704916398328,
+          "p90": -0.2736596201017697,
+          "p95": -0.1761989358035246,
+          "p99": -0.12419118840214398
+        }
+      },
+      "single_row_latency_ms_p50": 0.062350009102374315,
+      "single_row_latency_ms_p95": 0.08348504779860375,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.00024307243558580456,
+      "test_benign_review_or_alert_rate": 0.0019445794846864365,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 406261.4985954036
+    },
+    {
+      "calibration_benign_rows": 7509,
+      "calibration_direct_fpr": 0.00998801438274071,
+      "calibration_review_rate": 0.04980689838860035,
+      "calibration_source": "cse_2018_02_28",
+      "detection_or_review_recall": 0.0,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 12.215266227722168,
+      "false_alerts_per_10000_benign": 4.861448711716092,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7384,
+      "fit_cpu_seconds": 0.1875,
+      "fit_rss_delta_bytes": 0,
+      "fit_seconds": 0.1785950999474153,
+      "fit_source": "hikari",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0006478000432252884,
+      "model": "denoising_autoencoder",
+      "model_config": {
+        "epochs": 100,
+        "fit_cap": 10000,
+        "noise_std": 0.06,
+        "optimizer": "Adam(lr=0.004, weight_decay=1e-5)"
+      },
+      "model_fit_benign_rows": 7384,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.0049274204288187505,
+          "test_alerts_per_10000_benign": 4.861448711716092,
+          "test_benign_fpr": 0.0004861448711716091,
+          "test_malicious_recall": 0.0,
+          "threshold": 12.702052116394043
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.00998801438274071,
+          "test_alerts_per_10000_benign": 4.861448711716092,
+          "test_benign_fpr": 0.0004861448711716091,
+          "test_malicious_recall": 0.0,
+          "threshold": 12.215266227722168
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02996404314822213,
+          "test_alerts_per_10000_benign": 4.861448711716092,
+          "test_benign_fpr": 0.0004861448711716091,
+          "test_malicious_recall": 0.0,
+          "threshold": 9.773272514343262
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04980689838860035,
+          "test_alerts_per_10000_benign": 4.861448711716092,
+          "test_benign_fpr": 0.0004861448711716091,
+          "test_malicious_recall": 0.0,
+          "threshold": 9.578712463378906
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.2512333762752138,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.0,
+          0.6931471805599453,
+          0.14285714285714285,
+          3.713572066704308,
+          0.01494657974992068,
+          0.024693870703254274,
+          1.404887503554644,
+          3.044522437723423,
+          -4.184671155293254
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          3.8826250901905572,
+          1.6094379124341003,
+          0.5,
+          5.993961427306569,
+          0.2912233364717678,
+          4.446857895771167,
+          9.227502393447105,
+          4.61512051684126,
+          -0.8874503635703559
+        ],
+        "scales": [
+          3.6592728416297344,
+          1.5260563034950494,
+          0.004854368932038833,
+          3.53156721616795,
+          0.1649647647536313,
+          1.9122920798266274,
+          1.8020961510148865,
+          1.6058944742736214,
+          0.8540382960668711
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.580139605080477,
+          7.426759827910187,
+          1.0,
+          14.500335349783086,
+          1.0,
+          13.815511557963774,
+          17.006667237258256,
+          7.626875303637576,
+          6.321294095307746
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 9.578712463378906,
+      "roc_auc": 0.30333851738966755,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.6168204545974731,
+          "p90": 3.9282874584197995,
+          "p95": 9.578712463378906,
+          "p99": 12.21487979888916
+        },
+        "testing_benign": {
+          "p50": 0.4168752431869507,
+          "p90": 0.787382197380066,
+          "p95": 1.0821189641952513,
+          "p99": 8.398116188049316
+        },
+        "testing_malicious": {
+          "p50": 0.20573849976062775,
+          "p90": 1.0703962087631225,
+          "p95": 1.2664198398590083,
+          "p99": 1.5019842338562015
+        }
+      },
+      "single_row_latency_ms_p50": 0.05709996912628412,
+      "single_row_latency_ms_p95": 0.1597350463271141,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0004861448711716091,
+      "test_benign_review_or_alert_rate": 0.0004861448711716091,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 9374806.413663615
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.0035732516590096988,
+      "direct_suspicious_unknown_recall": 0.0030627871362940277,
+      "direct_threshold": 0.16471892837794122,
+      "false_alerts_per_10000_benign": 333.0092367525522,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.234375,
+      "fit_rss_delta_bytes": 339968,
+      "fit_seconds": 0.23320929997134954,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.03125,
+      "inference_seconds": 0.0349988000234589,
+      "model": "isolation_forest",
+      "model_config": {
+        "contamination": "auto",
+        "n_estimators": 200,
+        "n_jobs": -1
+      },
+      "model_fit_benign_rows": 7509,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 41.32231404958678,
+          "test_benign_fpr": 0.004132231404958678,
+          "test_malicious_recall": 0.0030627871362940277,
+          "threshold": 0.17282406399602024
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 333.0092367525522,
+          "test_benign_fpr": 0.03330092367525522,
+          "test_malicious_recall": 0.0030627871362940277,
+          "threshold": 0.16471892837794122
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02925243770314193,
+          "test_alerts_per_10000_benign": 517.7442877977637,
+          "test_benign_fpr": 0.05177442877977637,
+          "test_malicious_recall": 0.0030627871362940277,
+          "threshold": 0.15315710893585766
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 602.8196402527954,
+          "test_benign_fpr": 0.060281964025279536,
+          "test_malicious_recall": 0.0035732516590096988,
+          "threshold": 0.14498763121664604
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.8,
+          "direct_suspicious_unknown_recall": 0.6,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 1.0,
+          "direct_suspicious_unknown_recall": 1.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.5640492048166609,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.14498763121664604,
+      "roc_auc": 0.7625973933800421,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -0.04321715957388961,
+          "p90": 0.10445039350082894,
+          "p95": 0.14498078765265174,
+          "p99": 0.16462485380454125
+        },
+        "testing_benign": {
+          "p50": -0.04726386974223634,
+          "p90": 0.12800616642597185,
+          "p95": 0.15430493452222271,
+          "p99": 0.16923744562994114
+        },
+        "testing_malicious": {
+          "p50": 0.11850936458655026,
+          "p90": 0.11871863746825795,
+          "p95": 0.11871863746825795,
+          "p99": 0.11871863746825795
+        }
+      },
+      "single_row_latency_ms_p50": 3.6868000752292573,
+      "single_row_latency_ms_p95": 4.3659699556883425,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.03330092367525522,
+      "test_benign_review_or_alert_rate": 0.060281964025279536,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 173520.23486317834
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.7243491577335375,
+      "direct_suspicious_unknown_recall": 0.005104645227156712,
+      "direct_threshold": -4329.389528680188,
+      "false_alerts_per_10000_benign": 544.4822557122022,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.484375,
+      "fit_rss_delta_bytes": 32768,
+      "fit_seconds": 0.47819589998107404,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.00048100005369633436,
+      "model": "robust_covariance",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 5000,
+        "support_fraction": 0.9
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 537.1900826446281,
+          "test_benign_fpr": 0.05371900826446281,
+          "test_malicious_recall": 0.004594180704441042,
+          "threshold": -4185.26571630398
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 544.4822557122022,
+          "test_benign_fpr": 0.05444822557122023,
+          "test_malicious_recall": 0.005104645227156712,
+          "threshold": -4329.389528680188
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 707.3407875546912,
+          "test_benign_fpr": 0.07073407875546912,
+          "test_malicious_recall": 0.005615109749872384,
+          "threshold": -5226.763281953102
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 1915.41079241614,
+          "test_benign_fpr": 0.191541079241614,
+          "test_malicious_recall": 0.7243491577335375,
+          "threshold": -5541.48219654337
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.72396100564392,
+          "direct_suspicious_unknown_recall": 0.0015392508978963571,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 1.0,
+          "direct_suspicious_unknown_recall": 0.8,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 1.0,
+          "direct_suspicious_unknown_recall": 1.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.5131629295525537,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -5541.48219654337,
+      "roc_auc": 0.733958894329377,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -6220.9220314689155,
+          "p90": -6094.344578644162,
+          "p95": -5542.023119485565,
+          "p99": -4334.315215706888
+        },
+        "testing_benign": {
+          "p50": -6213.416600672541,
+          "p90": -5246.935195219409,
+          "p95": -4142.532636866471,
+          "p99": -3048.5841070933343
+        },
+        "testing_malicious": {
+          "p50": -5247.222453887216,
+          "p90": -5246.619292660341,
+          "p95": -5246.531936044109,
+          "p99": -5246.471815610565
+        }
+      },
+      "single_row_latency_ms_p50": 0.14204997569322586,
+      "single_row_latency_ms_p95": 0.28358493582345534,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.05444822557122023,
+      "test_benign_review_or_alert_rate": 0.191541079241614,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 12625778.216303516
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.11077080142930067,
+      "direct_suspicious_unknown_recall": 0.09392547217968351,
+      "direct_threshold": 0.9301577311379283,
+      "false_alerts_per_10000_benign": 636.849781234808,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.78125,
+      "fit_rss_delta_bytes": 2117632,
+      "fit_seconds": 0.10446060006506741,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 1.40625,
+      "inference_seconds": 0.11509450001176447,
+      "model": "local_outlier_factor",
+      "model_config": {
+        "contamination": 0.01,
+        "fit_cap": 10000,
+        "n_jobs": -1,
+        "n_neighbors": 35,
+        "novelty": true
+      },
+      "model_fit_benign_rows": 7509,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 576.0816723383568,
+          "test_benign_fpr": 0.05760816723383568,
+          "test_malicious_recall": 0.09239407861153649,
+          "threshold": 5.216068473810786
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 636.849781234808,
+          "test_benign_fpr": 0.0636849781234808,
+          "test_malicious_recall": 0.09392547217968351,
+          "threshold": 0.9301577311379283
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 658.7263004375304,
+          "test_benign_fpr": 0.06587263004375304,
+          "test_malicious_recall": 0.09443593670239918,
+          "threshold": -5.183197999714974
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 1137.5789985415654,
+          "test_benign_fpr": 0.11375789985415653,
+          "test_malicious_recall": 0.11077080142930067,
+          "threshold": -14.057855558879323
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.11082606464853771,
+          "direct_suspicious_unknown_recall": 0.09389430477167779,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.2,
+          "direct_suspicious_unknown_recall": 0.2,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.3058582545337861,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": -14.057855558879323,
+      "roc_auc": 0.24565404104511968,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -19.765201303704956,
+          "p90": -17.99288716124225,
+          "p95": -14.074799306957631,
+          "p99": 0.9288830372533917
+        },
+        "testing_benign": {
+          "p50": -19.38439338246347,
+          "p90": -12.971107611095835,
+          "p95": 387.1186799605931,
+          "p99": 587.8071870911239
+        },
+        "testing_malicious": {
+          "p50": -20.09597928491092,
+          "p90": -8.46761022724947,
+          "p95": 381.5310795022574,
+          "p99": 599.1245872579146
+        }
+      },
+      "single_row_latency_ms_p50": 16.746549983508885,
+      "single_row_latency_ms_p95": 17.667360050836578,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0636849781234808,
+      "test_benign_review_or_alert_rate": 0.11375789985415653,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 52765.3363052035
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.004594180704441042,
+      "direct_suspicious_unknown_recall": 0.0,
+      "direct_threshold": 0.670725841570575,
+      "false_alerts_per_10000_benign": 12.153621779290228,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.0,
+      "fit_rss_delta_bytes": 4096,
+      "fit_seconds": 0.009539199993014336,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.015625,
+      "inference_seconds": 0.016590700019150972,
+      "model": "one_class_svm",
+      "model_config": {
+        "fit_cap": 5000,
+        "gamma": "scale",
+        "kernel": "rbf",
+        "nu": 0.01
+      },
+      "model_fit_benign_rows": 5000,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 9.722897423432183,
+          "test_benign_fpr": 0.0009722897423432182,
+          "test_malicious_recall": 0.0,
+          "threshold": 0.7832099651695978
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 12.153621779290228,
+          "test_benign_fpr": 0.0012153621779290229,
+          "test_malicious_recall": 0.0,
+          "threshold": 0.670725841570575
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 46.183762761302866,
+          "test_benign_fpr": 0.004618376276130287,
+          "test_malicious_recall": 0.0030627871362940277,
+          "threshold": 0.4579046319562501
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 82.64462809917356,
+          "test_benign_fpr": 0.008264462809917356,
+          "test_malicious_recall": 0.004594180704441042,
+          "threshold": 0.17259209637265815
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.8,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 1.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 1.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.4483264972407305,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.17259209637265815,
+      "roc_auc": 0.6821665980505071,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": -1.1937372613028465,
+          "p90": -0.1466993074222674,
+          "p95": 0.17255375627229136,
+          "p99": 0.6670588475980135
+        },
+        "testing_benign": {
+          "p50": -1.3134027531392367,
+          "p90": -0.3026469776779116,
+          "p95": -0.17642442738803346,
+          "p99": 0.12621906867616542
+        },
+        "testing_malicious": {
+          "p50": -0.4169826809090633,
+          "p90": -0.4155155244432905,
+          "p95": -0.41530402557792384,
+          "p99": -0.4151586130474775
+        }
+      },
+      "single_row_latency_ms_p50": 0.06035005208104849,
+      "single_row_latency_ms_p95": 0.09852004004642362,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.0012153621779290229,
+      "test_benign_review_or_alert_rate": 0.008264462809917356,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 366048.44840722915
+    },
+    {
+      "calibration_benign_rows": 7384,
+      "calibration_direct_fpr": 0.009886240520043338,
+      "calibration_review_rate": 0.04997291440953413,
+      "calibration_source": "hikari",
+      "detection_or_review_recall": 0.004594180704441042,
+      "direct_suspicious_unknown_recall": 0.0035732516590096988,
+      "direct_threshold": 0.8096593022346497,
+      "false_alerts_per_10000_benign": 26.7379679144385,
+      "false_alerts_per_hour": null,
+      "false_alerts_per_hour_reason": "not reported because deterministic class sampling changes replay density",
+      "fit_benign_rows": 7509,
+      "fit_cpu_seconds": 0.1875,
+      "fit_rss_delta_bytes": 0,
+      "fit_seconds": 0.1813035000814125,
+      "fit_source": "cse_2018_02_28",
+      "inference_cpu_seconds": 0.0,
+      "inference_seconds": 0.0007191000040620565,
+      "model": "denoising_autoencoder",
+      "model_config": {
+        "epochs": 100,
+        "fit_cap": 10000,
+        "noise_std": 0.06,
+        "optimizer": "Adam(lr=0.004, weight_decay=1e-5)"
+      },
+      "model_fit_benign_rows": 7509,
+      "operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004875406283856988,
+          "test_alerts_per_10000_benign": 26.7379679144385,
+          "test_benign_fpr": 0.00267379679144385,
+          "test_malicious_recall": 0.0035732516590096988,
+          "threshold": 0.8877441883087158
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.009886240520043338,
+          "test_alerts_per_10000_benign": 26.7379679144385,
+          "test_benign_fpr": 0.00267379679144385,
+          "test_malicious_recall": 0.0035732516590096988,
+          "threshold": 0.8096593022346497
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02992957746478873,
+          "test_alerts_per_10000_benign": 410.7924161400097,
+          "test_benign_fpr": 0.04107924161400097,
+          "test_malicious_recall": 0.0035732516590096988,
+          "threshold": 0.5950706005096436
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.04997291440953413,
+          "test_alerts_per_10000_benign": 517.7442877977637,
+          "test_benign_fpr": 0.05177442877977637,
+          "test_malicious_recall": 0.004594180704441042,
+          "threshold": 0.4455067813396454
+        }
+      ],
+      "per_family": {
+        "command_and_control": {
+          "detection_or_review_recall": 0.000513083632632119,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 1949
+        },
+        "ddos": {
+          "detection_or_review_recall": 0.8,
+          "direct_suspicious_unknown_recall": 0.8,
+          "rows": 5
+        },
+        "file_download": {
+          "detection_or_review_recall": 0.5,
+          "direct_suspicious_unknown_recall": 0.0,
+          "rows": 2
+        },
+        "port_scan": {
+          "detection_or_review_recall": 1.0,
+          "direct_suspicious_unknown_recall": 1.0,
+          "rows": 3
+        }
+      },
+      "pr_auc_malicious": 0.42727254199378645,
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04453338473879102,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026284927748896656,
+          0.0,
+          0.0,
+          -4.189438262603047
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          4.227213235296525,
+          1.6094379124341003,
+          0.5,
+          5.231108616854587,
+          0.3008849557522124,
+          4.356424807177442,
+          8.21179533376547,
+          4.269697449699962,
+          -0.4795730802618863
+        ],
+        "scales": [
+          7.704992260302329,
+          1.6739764335716714,
+          0.045454545454545414,
+          3.350827022273206,
+          0.2590170588443659,
+          6.164572035238146,
+          6.857720298703545,
+          1.316177152506699,
+          1.1755733298042381
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          11.690099720932343,
+          4.9997258321447955,
+          1.0,
+          11.412511294553564,
+          1.0,
+          11.17799431201059,
+          13.999264469797406,
+          6.645673678135076,
+          8.006700845440367
+        ],
+        "upper_quantile": 0.995
+      },
+      "review_threshold": 0.4455067813396454,
+      "roc_auc": 0.683554555306486,
+      "score_percentiles": {
+        "calibration_benign": {
+          "p50": 0.04595546796917915,
+          "p90": 0.3108653426170349,
+          "p95": 0.4454881623387336,
+          "p99": 0.80062217950821
+        },
+        "testing_benign": {
+          "p50": 0.05005505867302418,
+          "p90": 0.17998404800891876,
+          "p95": 0.45268571823835374,
+          "p99": 0.6999838083982468
+        },
+        "testing_malicious": {
+          "p50": 0.13990885019302368,
+          "p90": 0.1402093470096588,
+          "p95": 0.14025415182113649,
+          "p99": 0.14028237909078597
+        }
+      },
+      "single_row_latency_ms_p50": 0.05075003718957305,
+      "single_row_latency_ms_p95": 0.15073008253239084,
+      "status": "complete",
+      "test_benign_false_positive_rate": 0.00267379679144385,
+      "test_benign_review_or_alert_rate": 0.05177442877977637,
+      "testing_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "testing_rows": 6073,
+      "testing_source": "iot23",
+      "throughput_rows_per_second": 8445278.773042414
+    }
+  ],
+  "schema_version": "1.0.0",
+  "seed": 431,
+  "sources": [
+    {
+      "ambiguous_feature_vectors_removed": 228,
+      "ambiguous_rows_removed": 614,
+      "dataset": "hikari2021",
+      "dataset_fingerprint": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+      "duplicate_rows_removed": 3171,
+      "input_groups": 1,
+      "input_rows": 555278,
+      "provenance_sha256": [
+        "fddcf2a9fe496ed5a2306df4586f7029e2d4150b0fe7ad70337d5d63e61c645f"
+      ],
+      "retained_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "retained_indices_sha256": "c5d312cb80499f657dc63bfc123e6b8085c73bbb680f8c34983667322ca7f05e",
+      "retained_rows": 16601,
+      "sample_limit_per_binary_class": 10000,
+      "sampled_binary_distribution": {
+        "benign": 10000,
+        "malicious": 10000
+      },
+      "sampled_indices_sha256": "281c65797cd69455b22ef8b268bbe746e4553e45c3b471e7410f59ec7ba33e01",
+      "sampled_rows": 20000,
+      "source_id": "hikari",
+      "unique_feature_vectors": 16829
+    },
+    {
+      "ambiguous_feature_vectors_removed": 676,
+      "ambiguous_rows_removed": 4342,
+      "dataset": "cse_cic_ids2018",
+      "dataset_fingerprint": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+      "duplicate_rows_removed": 4295,
+      "input_groups": 1,
+      "input_rows": 606902,
+      "provenance_sha256": [
+        "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771"
+      ],
+      "retained_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "retained_indices_sha256": "a3e711e5b45dc354f7e20b37b1a39368ae1f9cbc5a980be2f734f433491cd75f",
+      "retained_rows": 15029,
+      "sample_limit_per_binary_class": 10000,
+      "sampled_binary_distribution": {
+        "benign": 10000,
+        "malicious": 10000
+      },
+      "sampled_indices_sha256": "fe3fc4dbc052e91e0647e92f111661a20dffb3bc599f2c75bd67dd16f27a934d",
+      "sampled_rows": 20000,
+      "source_id": "cse_2018_02_28",
+      "unique_feature_vectors": 15705
+    },
+    {
+      "ambiguous_feature_vectors_removed": 58,
+      "ambiguous_rows_removed": 3633,
+      "dataset": "iot23_zeek",
+      "dataset_fingerprint": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c",
+      "duplicate_rows_removed": 13869,
+      "input_groups": 6,
+      "input_rows": 43009,
+      "provenance_sha256": [
+        "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e",
+        "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711",
+        "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa",
+        "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a",
+        "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e",
+        "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262"
+      ],
+      "retained_binary_distribution": {
+        "benign": 4114,
+        "malicious": 1959
+      },
+      "retained_indices_sha256": "f9b0c3bee15a41c2ce80885acad8d22bd0c5c738bbc10b42a6eaa9ed3c6d3f26",
+      "retained_rows": 6073,
+      "sample_limit_per_binary_class": 10000,
+      "sampled_binary_distribution": {
+        "benign": 10000,
+        "malicious": 10000
+      },
+      "sampled_indices_sha256": "bb0ec8e1d99ca40f5b5a099d4ca1fa90f87bc83f019f829c8cbb28009cbbd602",
+      "sampled_rows": 20000,
+      "source_id": "iot23",
+      "unique_feature_vectors": 6131
+    }
+  ],
+  "status": "development_evidence_only_no_candidate_selected",
+  "summary": {
+    "denoising_autoencoder": {
+      "benign_fpr_max": 0.17352510320948195,
+      "benign_fpr_mean": 0.04243450223508957,
+      "benign_review_or_alert_rate_mean": 0.12426467075873476,
+      "completed_runs": 6,
+      "detection_or_review_mean": 0.10857007046683825,
+      "detection_or_review_min": 0.0,
+      "direct_unknown_recall_mean": 0.0409577826031575,
+      "direct_unknown_recall_min": 0.0,
+      "failed_runs": 0,
+      "runs": 6
+    },
+    "isolation_forest": {
+      "benign_fpr_max": 0.04658721560130011,
+      "benign_fpr_mean": 0.01697419433443954,
+      "benign_review_or_alert_rate_mean": 0.06672863399669969,
+      "completed_runs": 6,
+      "detection_or_review_mean": 0.08101096379585922,
+      "detection_or_review_min": 0.0035732516590096988,
+      "direct_unknown_recall_mean": 0.0047890015597476686,
+      "direct_unknown_recall_min": 0.00013297872340425532,
+      "failed_runs": 0,
+      "runs": 6
+    },
+    "local_outlier_factor": {
+      "benign_fpr_max": 0.07058196830470102,
+      "benign_fpr_mean": 0.03350157112952521,
+      "benign_review_or_alert_rate_mean": 0.06442335223047106,
+      "completed_runs": 6,
+      "detection_or_review_mean": 0.06733148108928061,
+      "detection_or_review_min": 0.0,
+      "direct_unknown_recall_mean": 0.040521266639876326,
+      "direct_unknown_recall_min": 0.0,
+      "failed_runs": 0,
+      "runs": 6
+    },
+    "one_class_svm": {
+      "benign_fpr_max": 0.188174190970835,
+      "benign_fpr_mean": 0.07059009335248624,
+      "benign_review_or_alert_rate_mean": 0.11775997674341858,
+      "completed_runs": 6,
+      "detection_or_review_mean": 0.12288062452705845,
+      "detection_or_review_min": 0.0,
+      "direct_unknown_recall_mean": 0.06280763623261672,
+      "direct_unknown_recall_min": 0.0,
+      "failed_runs": 0,
+      "runs": 6
+    },
+    "robust_covariance": {
+      "benign_fpr_max": 0.10853642295911572,
+      "benign_fpr_mean": 0.04449961341506581,
+      "benign_review_or_alert_rate_mean": 0.07672735964213434,
+      "completed_runs": 6,
+      "detection_or_review_mean": 0.15813620713998675,
+      "detection_or_review_min": 0.0,
+      "direct_unknown_recall_mean": 0.028776306119419736,
+      "direct_unknown_recall_min": 0.0,
+      "failed_runs": 0,
+      "runs": 6
+    }
+  },
+  "test_policy": "third environment held out completely; every malicious family is absent from anomaly fit and calibration"
+}

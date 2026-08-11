@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-08-10.
+Last updated: 2026-08-11.
 
 ## Active final model and production-acceptance phase
 
@@ -45,14 +45,18 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   clean code commit, source fingerprints, schema/order, seed, aggregate report hashes,
   and development-only/frozen-source policy and rejects report tampering or per-row
   predictions.
-- A three-way benign-only anomaly harness now compares Isolation Forest, robust
+- A three-way benign-only anomaly experiment compares Isolation Forest, robust
   covariance, Local Outlier Factor novelty, one-class SVM, and a CPU denoising
   autoencoder. Fit, threshold-calibration, and test environments are mutually disjoint;
   both fit/calibration orientations are repeated for every held environment. Direct and
   review thresholds come only from calibration benign FPR budgets, every test attack
-  family is absent from fit/calibration, and model failures remain visible. The real
-  experiment has not run yet.
-- Remaining work begins with challenger and held-family experiments, then sustained
+  family is absent from fit/calibration, and model failures remain visible. `DEV-ANO-001`
+  completed all 30 runs. No family qualifies: best mean direct unknown recall is 6.28%,
+  every family has a zero or near-zero worst-rotation result, and the strongest mean
+  detection-or-review result is 15.81% with 10.85% worst benign FPR. No candidate was
+  selected or locked.
+- Remaining model work begins with controlled hybrid/temporal and held-family experiments,
+  then sustained
   performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
 - Research Schema A now emits 24 portable features from exporter-independent counts,
