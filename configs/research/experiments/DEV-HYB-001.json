@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV-HYB-001",
+  "status": "complete_no_candidate_selected",
+  "permitted_use": "development_only",
+  "code_commit": "0b98eebfc3eb1bf37c24a7a7da68a7928e4c0625",
+  "feature_schema": "2.0.0-research-b",
+  "feature_view": "portable_numerical_core_plus_bounded_temporal_context",
+  "feature_order": [
+    "duration_log1p_ms",
+    "packets_total_log1p",
+    "packets_forward_fraction",
+    "bytes_total_log1p",
+    "bytes_forward_fraction",
+    "packet_rate_log1p_derived",
+    "byte_rate_log1p_derived",
+    "packet_length_mean_log1p_derived",
+    "forward_reverse_byte_log_ratio",
+    "source_flows_10s_log1p",
+    "source_flows_60s_log1p",
+    "unique_destinations_10s_log1p",
+    "unique_destinations_60s_log1p",
+    "unique_destination_ports_10s_log1p",
+    "unique_destination_ports_60s_log1p",
+    "destination_novelty_60s",
+    "service_port_rarity_60s",
+    "protocol_rarity_60s",
+    "destination_fanout_entropy_60s",
+    "connection_interval_mean_log1p_ms_60s",
+    "connection_interval_std_log1p_ms_60s",
+    "connection_burstiness_60s",
+    "short_lived_ratio_60s",
+    "temporal_cold_start",
+    "temporal_late_event"
+  ],
+  "dataset_fingerprints": {
+    "hikari": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+    "cse_2018_02_28": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+    "iot23": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c"
+  },
+  "split_ids": [
+    "held:command_and_control/fit:hue/calibrate:echo/test:attack_captures",
+    "held:command_and_control/fit:echo/calibrate:hue/test:attack_captures",
+    "held:ddos/fit:hue/calibrate:echo/test:capture_34",
+    "held:ddos/fit:echo/calibrate:hue/test:capture_34",
+    "held:port_scan/fit:hue/calibrate:echo/test:capture_34",
+    "held:port_scan/fit:echo/calibrate:hue/test:capture_34"
+  ],
+  "seed": 431,
+  "preprocessing": "train-scope quantile clipping plus robust scaling independently for supervised and anomaly/context signals",
+  "sampling": "deterministic 10000-row binary-class cap and ambiguity removal for supervised sources; ordered unsampled IoT capture replay",
+  "models": [
+    "compact_mlp_supervised",
+    "isolation_forest_anomaly"
+  ],
+  "calibration": {
+    "scope": "second all-benign IoT capture disjoint from anomaly fit and attack test captures",
+    "direct_budget": 0.01,
+    "review_budget": 0.05,
+    "multi_signal_policy": "divide total budget equally across fused signals before OR fusion"
+  },
+  "fusion": "supervised, anomaly, and temporal-context OR evidence with anomaly precedence for suspicious-unknown accounting",
+  "held_families": [
+    "command_and_control",
+    "ddos",
+    "port_scan"
+  ],
+  "excluded_families": {
+    "file_download": 3
+  },
+  "ablations": [
+    "supervised_only",
+    "anomaly_core_only",
+    "context_only",
+    "supervised_plus_anomaly",
+    "supervised_plus_context",
+    "anomaly_plus_context",
+    "full_hybrid",
+    "without_temporal",
+    "without_destination_port_information"
+  ],
+  "artifacts": [
+    {
+      "path": "docs/research/experiments/dev-hybrid-temporal-held-family-v1.json",
+      "sha256": "b7267131af5c6291a1290f5ab89b07aff618b242c5f76f59a3eda5a01fbcc896"
+    },
+    {
+      "path": "docs/research/hybrid-temporal-held-family.md",
+      "sha256": "04dbe086a29d254156856c6e79c87147e22dd76c88cd69a70056cbcec431766b"
+    }
+  ],
+  "disposition": "Hybrid temporal evidence is orientation-sensitive and fails worst-family recall and transferred benign-FPR objectives; no candidate selected or locked."
+}

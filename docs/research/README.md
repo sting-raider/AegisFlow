@@ -34,6 +34,7 @@ hypothesis; current evidence has not established it.
 |---|---|---|---|
 | DEV-SUP-001 | Do standard supervised maliciousness models transfer across all three fresh environments on the numerical core? | No. Every model misses development objectives; no candidate selected. | `experiments/dev-supervised-baselines-v1.json`, `supervised-baselines.md` |
 | DEV-ANO-001 | Do benign-only anomaly models transfer when fit, calibration, and test environments are mutually disjoint? | No. All five model families fail; every model has a zero or near-zero worst-environment unknown recall. | `experiments/dev-anomaly-baselines-v1.json`, `anomaly-baselines.md` |
+| DEV-HYB-001 | Does bounded temporal context improve a calibrated hybrid on repeated held-family IoT tests? | Not reliably. Some rotations improve, but the full hybrid has near-zero worst recall and exceeds the transferred 1% benign-FPR target. | `experiments/dev-hybrid-temporal-held-family-v1.json`, `hybrid-temporal-held-family.md` |
 
 ## Current conclusion
 
@@ -42,5 +43,8 @@ malicious recall is 3.64% and worst benign FPR is 18.20%. The benign-only anomal
 also rejects all five model families: mean direct unknown recall is at most 6.28%, and
 every family has a zero or near-zero worst-environment result. Neither supervised
 maliciousness nor a universal benign-only anomaly score is sufficient on the numerical
-core. The next experiment must test controlled hybrid fusion, temporal Schema B
-contribution, and repeated held-family detection without tuning on frozen evidence.
+core. Controlled hybrid and temporal evidence also fails: the full hybrid reaches 52.14%
+mean detection-or-review but only 0.067% in its worst family/orientation, while worst
+benign FPR reaches 1.61%. Context-only behavior is even less stable. The evidence now
+points to environment calibration and flow-level cross-domain observability as the next
+root-cause questions; no model is eligible for locking and frozen evidence remains sealed.

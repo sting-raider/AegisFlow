@@ -55,8 +55,16 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   every family has a zero or near-zero worst-rotation result, and the strongest mean
   detection-or-review result is 15.81% with 10.85% worst benign FPR. No candidate was
   selected or locked.
-- Remaining model work begins with controlled hybrid/temporal and held-family experiments,
-  then sustained
+- `DEV-HYB-001` removes each held family from HIKARI/CSE supervised fitting, uses the two
+  all-benign IoT device captures for anomaly fit/calibration in both orientations, and
+  tests three eligible families on separate attack captures. Nine ablations cover
+  supervised, anomaly, temporal context, pairwise fusion, full hybrid, no-temporal, and
+  no-port-context views. The full hybrid fails: worst direct and suspicious-unknown recall
+  are effectively zero, worst detection-or-review is 0.067%, and worst benign FPR is
+  1.61%. Temporal context helps selected rotations but is highly calibration-sensitive;
+  no candidate was selected or locked.
+- Remaining model work begins with development-only root-cause/error analysis and an
+  environment-aware-calibration versus scientific-NO-GO decision, then sustained
   performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
 - Research Schema A now emits 24 portable features from exporter-independent counts,

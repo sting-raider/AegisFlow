@@ -523,3 +523,20 @@ train-fit preprocessing from the origin-cleared baseline. Do not report false al
 from class-sampled/deduplicated data. Combining fit and calibration environments, fitting
 on attacks, interpreting anomaly scores as calibrated probabilities, or hiding a model
 fit failure were rejected.
+
+## D-039 - Test temporal contribution with disjoint benign capture calibration
+
+Use the two all-benign IoT-23 device captures as anomaly fit and threshold-calibration
+environments, repeating both orientations. Fit the supervised head on HIKARI and the fresh
+CSE day after removing every row of the held family. Test command-and-control, DDoS, and
+port-scan separately using all family rows plus benign rows from their attack capture
+groups; exclude the three file-download rows from quantitative claims.
+
+Compare supervised-only, anomaly-only, context-only, pairwise combinations, the full
+hybrid, no-temporal, and no-port-context views. Divide each total calibration FPR budget
+equally across signals before OR fusion so a hybrid does not silently double its budget.
+Treat the binary supervised score as maliciousness evidence rather than proof of a known
+family, and let direct anomaly evidence account for `suspicious_unknown`. IoT-23 supplies
+no replay-correlated signature evidence, so signature ablations remain visibly not
+evaluable. Random row splits, using attack-capture benign rows for calibration, including
+the held family in supervised fit, and inventing signature results were rejected.

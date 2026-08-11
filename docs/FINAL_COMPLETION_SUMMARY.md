@@ -28,9 +28,10 @@ checksum-reviewed fresh development environments. Six IoT-23 captures provide 43
 full Schema B rows. The origin diagnostic blocks the full portable schema at 0.95416
 balanced accuracy while its numerical-core ablation clears the 0.90 shortcut threshold at
 0.68428. The first four supervised and five benign-only anomaly model families all fail
-cross-environment development objectives, so no candidate is selected. Hybrid/temporal
-and held-family experiments, final frozen evaluation, and operational acceptance remain
-open.
+cross-environment development objectives. A subsequent nine-view hybrid/temporal study
+also fails repeated held-family objectives and exposes strong benign-device calibration
+sensitivity. No candidate is selected. Root-cause/NO-GO analysis, final frozen evaluation,
+and operational acceptance remain open.
 
 ## What was implemented
 

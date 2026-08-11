@@ -189,3 +189,40 @@ contribution, and repeated held-family ablations using development evidence only
 Machine-readable evidence is in
 `docs/research/experiments/dev-anomaly-baselines-v1.json`; its SHA-256 is
 `0b9bdb7a0235db714849e642a7bf68ca985dcbfe2ceb17a728ad2b8389fb2023`.
+
+## MR-006 - Held-family hybrid and temporal ablations
+
+Date: 2026-08-11
+
+Experiment: `DEV-HYB-001`
+
+Code commit: `0b98eebfc3eb1bf37c24a7a7da68a7928e4c0625`
+
+Status: complete; no candidate selected
+
+The compact MLP was fitted on HIKARI plus the fresh CSE day after removing each held
+family. Isolation Forest used one all-benign IoT capture for fit and the other for
+threshold calibration, then repeated the reversed orientation. Command-and-control,
+DDoS, and port-scan were tested separately on their attack capture groups. Nine ablations
+measured supervised, anomaly, temporal context, pairwise fusion, the full hybrid, removal
+of temporal context, and removal of port-derived context. Multi-signal calibration budgets
+were divided before OR fusion. File-download was excluded because it has only three rows;
+signature evidence was marked not evaluable rather than fabricated.
+
+The full hybrid does not meet the objectives. Across six family/orientation runs its mean
+direct detection is `0.18586`, but the worst result is `0.00007`. Mean direct
+suspicious-unknown recall is `0.02072`, with the same near-zero worst result. Mean
+detection-or-review is `0.52139`, but the worst result is `0.00067`; worst benign FPR is
+`0.01612`. Context-only evidence reaches higher average recall but transfers with up to
+`0.38898` benign FPR. Removing temporal context is more restrained (mean benign FPR
+`0.00630`) but worst detection-or-review remains only `0.09016`. Reversing the two benign
+device captures materially changes DDoS and port-scan results, demonstrating site/device
+calibration sensitivity rather than robust transfer.
+
+Disposition: the current temporal representation sometimes helps within IoT-23, but it
+does not provide a stable universal challenger and cannot be locked. Continue with
+development-only root-cause/error analysis and an explicit decision on environment-aware
+calibration versus a scientific flow-level NO-GO. No frozen report was run.
+Machine-readable evidence is in
+`docs/research/experiments/dev-hybrid-temporal-held-family-v1.json`; its SHA-256 is
+`b7267131af5c6291a1290f5ab89b07aff618b242c5f76f59a3eda5a01fbcc896`.

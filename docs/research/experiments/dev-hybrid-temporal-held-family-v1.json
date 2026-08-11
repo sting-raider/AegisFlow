@@ -1,0 +1,4257 @@
+{
+  "anomaly_model": "isolation_forest",
+  "anomaly_orientations": [
+    {
+      "anomaly_signals": [
+        {
+          "calibration_benign_rows": 1374,
+          "feature_order": [
+            "duration_log1p_ms",
+            "packets_total_log1p",
+            "packets_forward_fraction",
+            "bytes_total_log1p",
+            "bytes_forward_fraction",
+            "packet_rate_log1p_derived",
+            "byte_rate_log1p_derived",
+            "packet_length_mean_log1p_derived",
+            "forward_reverse_byte_log_ratio"
+          ],
+          "fit_benign_rows": 452,
+          "fit_cpu_seconds": 0.234375,
+          "fit_rss_delta_bytes": 1671168,
+          "fit_seconds": 0.2006952001247555,
+          "inference_seconds_all_temporal_rows": 0.16700339992530644,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 452,
+          "preprocessing": {
+            "binary_passthrough": [],
+            "feature_order": [
+              "duration_log1p_ms",
+              "packets_total_log1p",
+              "packets_forward_fraction",
+              "bytes_total_log1p",
+              "bytes_forward_fraction",
+              "packet_rate_log1p_derived",
+              "byte_rate_log1p_derived",
+              "packet_length_mean_log1p_derived",
+              "forward_reverse_byte_log_ratio"
+            ],
+            "lower_bounds": [
+              0.4041308850950277,
+              1.0986122886681098,
+              0.5,
+              4.9344739331306915,
+              0.12149532710280374,
+              0.1072715584482671,
+              3.682027779472879,
+              3.793882763123921,
+              -1.9652033519899925
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              4.00878778335652,
+              1.0986122886681098,
+              0.5,
+              5.670356321162281,
+              0.5,
+              4.675813978967772,
+              9.178118338032561,
+              4.722913713910815,
+              0.0
+            ],
+            "scales": [
+              2.5572968390070225,
+              0.980829253011726,
+              0.008333333333333304,
+              0.6931471805599454,
+              0.35653502974223394,
+              3.5970420072351468,
+              3.522816256337067,
+              0.9266267412048173,
+              1.532441760963744
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              14.310778458546903,
+              5.25463688803206,
+              1.0,
+              11.08422554521828,
+              1.0,
+              8.298306630504213,
+              13.353459284067585,
+              5.8377304471659395,
+              11.034618973401614
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "anomaly_core",
+          "throughput_rows_per_second": 257533.67907022315
+        },
+        {
+          "calibration_benign_rows": 1374,
+          "feature_order": [
+            "source_flows_10s_log1p",
+            "source_flows_60s_log1p",
+            "unique_destinations_10s_log1p",
+            "unique_destinations_60s_log1p",
+            "unique_destination_ports_10s_log1p",
+            "unique_destination_ports_60s_log1p",
+            "destination_novelty_60s",
+            "service_port_rarity_60s",
+            "protocol_rarity_60s",
+            "destination_fanout_entropy_60s",
+            "connection_interval_mean_log1p_ms_60s",
+            "connection_interval_std_log1p_ms_60s",
+            "connection_burstiness_60s",
+            "short_lived_ratio_60s",
+            "temporal_cold_start",
+            "temporal_late_event"
+          ],
+          "fit_benign_rows": 452,
+          "fit_cpu_seconds": 0.203125,
+          "fit_rss_delta_bytes": 700416,
+          "fit_seconds": 0.1911776999477297,
+          "inference_seconds_all_temporal_rows": 0.15592010016553104,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 452,
+          "preprocessing": {
+            "binary_passthrough": [
+              "destination_novelty_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "feature_order": [
+              "source_flows_10s_log1p",
+              "source_flows_60s_log1p",
+              "unique_destinations_10s_log1p",
+              "unique_destinations_60s_log1p",
+              "unique_destination_ports_10s_log1p",
+              "unique_destination_ports_60s_log1p",
+              "destination_novelty_60s",
+              "service_port_rarity_60s",
+              "protocol_rarity_60s",
+              "destination_fanout_entropy_60s",
+              "connection_interval_mean_log1p_ms_60s",
+              "connection_interval_std_log1p_ms_60s",
+              "connection_burstiness_60s",
+              "short_lived_ratio_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "lower_bounds": [
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.08499999999999996,
+              0.0,
+              0.0
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              1.0986122886681098,
+              1.0986122886681098,
+              1.0986122886681098,
+              1.0986122886681098,
+              0.6931471805599453,
+              1.0986122886681098,
+              0.0,
+              0.4,
+              0.375,
+              0.7896900821428474,
+              3.903736907548913,
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "scales": [
+              0.6931471805599453,
+              1.0986122886681096,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.4054651081081645,
+              0.4054651081081645,
+              1.0,
+              1.0,
+              0.6666666666666667,
+              0.9999999999999998,
+              5.029750471523879,
+              3.962823068781476,
+              0.4884210892668514,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              2.9306518377425204,
+              3.0791798493714184,
+              1.9459101490553132,
+              2.045391036560583,
+              1.3862943611198906,
+              1.552536306848978,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              10.578222024362844,
+              9.031214799594544,
+              0.7282436100211394,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "context_only",
+          "throughput_rows_per_second": 275839.9972443573
+        },
+        {
+          "calibration_benign_rows": 1374,
+          "feature_order": [
+            "duration_log1p_ms",
+            "packets_total_log1p",
+            "packets_forward_fraction",
+            "bytes_total_log1p",
+            "bytes_forward_fraction",
+            "packet_rate_log1p_derived",
+            "byte_rate_log1p_derived",
+            "packet_length_mean_log1p_derived",
+            "forward_reverse_byte_log_ratio",
+            "source_flows_10s_log1p",
+            "source_flows_60s_log1p",
+            "unique_destinations_10s_log1p",
+            "unique_destinations_60s_log1p",
+            "unique_destination_ports_10s_log1p",
+            "unique_destination_ports_60s_log1p",
+            "destination_novelty_60s",
+            "service_port_rarity_60s",
+            "protocol_rarity_60s",
+            "destination_fanout_entropy_60s",
+            "connection_interval_mean_log1p_ms_60s",
+            "connection_interval_std_log1p_ms_60s",
+            "connection_burstiness_60s",
+            "short_lived_ratio_60s",
+            "temporal_cold_start",
+            "temporal_late_event"
+          ],
+          "fit_benign_rows": 452,
+          "fit_cpu_seconds": 0.203125,
+          "fit_rss_delta_bytes": 679936,
+          "fit_seconds": 0.2009389998856932,
+          "inference_seconds_all_temporal_rows": 0.1704140999354422,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 452,
+          "preprocessing": {
+            "binary_passthrough": [
+              "destination_novelty_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "feature_order": [
+              "duration_log1p_ms",
+              "packets_total_log1p",
+              "packets_forward_fraction",
+              "bytes_total_log1p",
+              "bytes_forward_fraction",
+              "packet_rate_log1p_derived",
+              "byte_rate_log1p_derived",
+              "packet_length_mean_log1p_derived",
+              "forward_reverse_byte_log_ratio",
+              "source_flows_10s_log1p",
+              "source_flows_60s_log1p",
+              "unique_destinations_10s_log1p",
+              "unique_destinations_60s_log1p",
+              "unique_destination_ports_10s_log1p",
+              "unique_destination_ports_60s_log1p",
+              "destination_novelty_60s",
+              "service_port_rarity_60s",
+              "protocol_rarity_60s",
+              "destination_fanout_entropy_60s",
+              "connection_interval_mean_log1p_ms_60s",
+              "connection_interval_std_log1p_ms_60s",
+              "connection_burstiness_60s",
+              "short_lived_ratio_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "lower_bounds": [
+              0.4041308850950277,
+              1.0986122886681098,
+              0.5,
+              4.9344739331306915,
+              0.12149532710280374,
+              0.1072715584482671,
+              3.682027779472879,
+              3.793882763123921,
+              -1.9652033519899925,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.08499999999999996,
+              0.0,
+              0.0
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              4.00878778335652,
+              1.0986122886681098,
+              0.5,
+              5.670356321162281,
+              0.5,
+              4.675813978967772,
+              9.178118338032561,
+              4.722913713910815,
+              0.0,
+              1.0986122886681098,
+              1.0986122886681098,
+              1.0986122886681098,
+              1.0986122886681098,
+              0.6931471805599453,
+              1.0986122886681098,
+              0.0,
+              0.4,
+              0.375,
+              0.7896900821428474,
+              3.903736907548913,
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "scales": [
+              2.5572968390070225,
+              0.980829253011726,
+              0.008333333333333304,
+              0.6931471805599454,
+              0.35653502974223394,
+              3.5970420072351468,
+              3.522816256337067,
+              0.9266267412048173,
+              1.532441760963744,
+              0.6931471805599453,
+              1.0986122886681096,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.4054651081081645,
+              0.4054651081081645,
+              1.0,
+              1.0,
+              0.6666666666666667,
+              0.9999999999999998,
+              5.029750471523879,
+              3.962823068781476,
+              0.4884210892668514,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              14.310778458546903,
+              5.25463688803206,
+              1.0,
+              11.08422554521828,
+              1.0,
+              8.298306630504213,
+              13.353459284067585,
+              5.8377304471659395,
+              11.034618973401614,
+              2.9306518377425204,
+              3.0791798493714184,
+              1.9459101490553132,
+              2.045391036560583,
+              1.3862943611198906,
+              1.552536306848978,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              10.578222024362844,
+              9.031214799594544,
+              0.7282436100211394,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "anomaly_temporal",
+          "throughput_rows_per_second": 252379.3513347373
+        },
+        {
+          "calibration_benign_rows": 1374,
+          "feature_order": [
+            "duration_log1p_ms",
+            "packets_total_log1p",
+            "packets_forward_fraction",
+            "bytes_total_log1p",
+            "bytes_forward_fraction",
+            "packet_rate_log1p_derived",
+            "byte_rate_log1p_derived",
+            "packet_length_mean_log1p_derived",
+            "forward_reverse_byte_log_ratio",
+            "source_flows_10s_log1p",
+            "source_flows_60s_log1p",
+            "unique_destinations_10s_log1p",
+            "unique_destinations_60s_log1p",
+            "destination_novelty_60s",
+            "protocol_rarity_60s",
+            "destination_fanout_entropy_60s",
+            "connection_interval_mean_log1p_ms_60s",
+            "connection_interval_std_log1p_ms_60s",
+            "connection_burstiness_60s",
+            "short_lived_ratio_60s",
+            "temporal_cold_start",
+            "temporal_late_event"
+          ],
+          "fit_benign_rows": 452,
+          "fit_cpu_seconds": 0.1875,
+          "fit_rss_delta_bytes": 286720,
+          "fit_seconds": 0.2154061000328511,
+          "inference_seconds_all_temporal_rows": 0.18631440005265176,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 452,
+          "preprocessing": {
+            "binary_passthrough": [
+              "destination_novelty_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "feature_order": [
+              "duration_log1p_ms",
+              "packets_total_log1p",
+              "packets_forward_fraction",
+              "bytes_total_log1p",
+              "bytes_forward_fraction",
+              "packet_rate_log1p_derived",
+              "byte_rate_log1p_derived",
+              "packet_length_mean_log1p_derived",
+              "forward_reverse_byte_log_ratio",
+              "source_flows_10s_log1p",
+              "source_flows_60s_log1p",
+              "unique_destinations_10s_log1p",
+              "unique_destinations_60s_log1p",
+              "destination_novelty_60s",
+              "protocol_rarity_60s",
+              "destination_fanout_entropy_60s",
+              "connection_interval_mean_log1p_ms_60s",
+              "connection_interval_std_log1p_ms_60s",
+              "connection_burstiness_60s",
+              "short_lived_ratio_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "lower_bounds": [
+              0.4041308850950277,
+              1.0986122886681098,
+              0.5,
+              4.9344739331306915,
+              0.12149532710280374,
+              0.1072715584482671,
+              3.682027779472879,
+              3.793882763123921,
+              -1.9652033519899925,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.08499999999999996,
+              0.0,
+              0.0
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              4.00878778335652,
+              1.0986122886681098,
+              0.5,
+              5.670356321162281,
+              0.5,
+              4.675813978967772,
+              9.178118338032561,
+              4.722913713910815,
+              0.0,
+              1.0986122886681098,
+              1.0986122886681098,
+              1.0986122886681098,
+              1.0986122886681098,
+              0.0,
+              0.375,
+              0.7896900821428474,
+              3.903736907548913,
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "scales": [
+              2.5572968390070225,
+              0.980829253011726,
+              0.008333333333333304,
+              0.6931471805599454,
+              0.35653502974223394,
+              3.5970420072351468,
+              3.522816256337067,
+              0.9266267412048173,
+              1.532441760963744,
+              0.6931471805599453,
+              1.0986122886681096,
+              0.6931471805599453,
+              0.6931471805599453,
+              1.0,
+              0.6666666666666667,
+              0.9999999999999998,
+              5.029750471523879,
+              3.962823068781476,
+              0.4884210892668514,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              14.310778458546903,
+              5.25463688803206,
+              1.0,
+              11.08422554521828,
+              1.0,
+              8.298306630504213,
+              13.353459284067585,
+              5.8377304471659395,
+              11.034618973401614,
+              2.9306518377425204,
+              3.0791798493714184,
+              1.9459101490553132,
+              2.045391036560583,
+              1.0,
+              1.0,
+              1.0,
+              10.578222024362844,
+              9.031214799594544,
+              0.7282436100211394,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "anomaly_no_port_context",
+          "throughput_rows_per_second": 230840.98699749357
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "calibration_benign_rows": 1374,
+      "fit_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "fit_benign_rows": 452
+    },
+    {
+      "anomaly_signals": [
+        {
+          "calibration_benign_rows": 452,
+          "feature_order": [
+            "duration_log1p_ms",
+            "packets_total_log1p",
+            "packets_forward_fraction",
+            "bytes_total_log1p",
+            "bytes_forward_fraction",
+            "packet_rate_log1p_derived",
+            "byte_rate_log1p_derived",
+            "packet_length_mean_log1p_derived",
+            "forward_reverse_byte_log_ratio"
+          ],
+          "fit_benign_rows": 1374,
+          "fit_cpu_seconds": 0.234375,
+          "fit_rss_delta_bytes": 331776,
+          "fit_seconds": 0.2145834998227656,
+          "inference_seconds_all_temporal_rows": 0.17800830001942813,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 1374,
+          "preprocessing": {
+            "binary_passthrough": [],
+            "feature_order": [
+              "duration_log1p_ms",
+              "packets_total_log1p",
+              "packets_forward_fraction",
+              "bytes_total_log1p",
+              "bytes_forward_fraction",
+              "packet_rate_log1p_derived",
+              "byte_rate_log1p_derived",
+              "packet_length_mean_log1p_derived",
+              "forward_reverse_byte_log_ratio"
+            ],
+            "lower_bounds": [
+              0.0,
+              0.6931471805599453,
+              0.39110456081822575,
+              3.713572066704308,
+              0.03257460131122459,
+              0.04558424783978346,
+              1.838907991905998,
+              3.713572066704308,
+              -3.3899268646950538
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              3.8496661785267836,
+              1.3862943611198906,
+              0.6666666666666666,
+              5.796057750765372,
+              0.6585365853658537,
+              4.400550925973851,
+              9.036114156740927,
+              4.610779424752602,
+              0.6525095348281189
+            ],
+            "scales": [
+              6.471928558363545,
+              1.2992829841302609,
+              0.5,
+              2.3841349599581534,
+              0.5631067961165048,
+              6.249829002809821,
+              6.120709643767414,
+              1.0942738870695115,
+              5.073352537460719
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              12.614757211680573,
+              5.256428782393171,
+              1.0,
+              11.340733447289809,
+              1.0,
+              13.815511557963774,
+              19.95754796570217,
+              6.4946932445142735,
+              8.705730738295856
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "anomaly_core",
+          "throughput_rows_per_second": 241612.32928636431
+        },
+        {
+          "calibration_benign_rows": 452,
+          "feature_order": [
+            "source_flows_10s_log1p",
+            "source_flows_60s_log1p",
+            "unique_destinations_10s_log1p",
+            "unique_destinations_60s_log1p",
+            "unique_destination_ports_10s_log1p",
+            "unique_destination_ports_60s_log1p",
+            "destination_novelty_60s",
+            "service_port_rarity_60s",
+            "protocol_rarity_60s",
+            "destination_fanout_entropy_60s",
+            "connection_interval_mean_log1p_ms_60s",
+            "connection_interval_std_log1p_ms_60s",
+            "connection_burstiness_60s",
+            "short_lived_ratio_60s",
+            "temporal_cold_start",
+            "temporal_late_event"
+          ],
+          "fit_benign_rows": 1374,
+          "fit_cpu_seconds": 0.265625,
+          "fit_rss_delta_bytes": 516096,
+          "fit_seconds": 0.20950610004365444,
+          "inference_seconds_all_temporal_rows": 0.16403000010177493,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 1374,
+          "preprocessing": {
+            "binary_passthrough": [
+              "destination_novelty_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "feature_order": [
+              "source_flows_10s_log1p",
+              "source_flows_60s_log1p",
+              "unique_destinations_10s_log1p",
+              "unique_destinations_60s_log1p",
+              "unique_destination_ports_10s_log1p",
+              "unique_destination_ports_60s_log1p",
+              "destination_novelty_60s",
+              "service_port_rarity_60s",
+              "protocol_rarity_60s",
+              "destination_fanout_entropy_60s",
+              "connection_interval_mean_log1p_ms_60s",
+              "connection_interval_std_log1p_ms_60s",
+              "connection_burstiness_60s",
+              "short_lived_ratio_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "lower_bounds": [
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              0.6931471805599453,
+              1.3862943611198906,
+              0.6931471805599453,
+              1.0986122886681098,
+              0.6931471805599453,
+              1.0986122886681098,
+              0.0,
+              0.375,
+              0.30000000000000004,
+              0.7854752972273344,
+              6.691693598800229,
+              4.567217916514889,
+              0.27846448558155873,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "scales": [
+              0.6931471805599453,
+              1.3862943611198904,
+              0.4054651081081645,
+              0.6931471805599453,
+              0.4054651081081645,
+              0.4054651081081645,
+              1.0,
+              1.0,
+              0.6,
+              0.920619835714305,
+              7.882602047255992,
+              8.254678702151969,
+              0.6194426059750708,
+              0.19999999999999996,
+              1.0,
+              1.0
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              2.8976708327676515,
+              3.4339872044851463,
+              1.791759469228055,
+              2.0794415416798357,
+              1.6094379124341003,
+              1.6094379124341003,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              10.9001204551326,
+              10.165462912014615,
+              0.7262034780097524,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "context_only",
+          "throughput_rows_per_second": 262202.03605020064
+        },
+        {
+          "calibration_benign_rows": 452,
+          "feature_order": [
+            "duration_log1p_ms",
+            "packets_total_log1p",
+            "packets_forward_fraction",
+            "bytes_total_log1p",
+            "bytes_forward_fraction",
+            "packet_rate_log1p_derived",
+            "byte_rate_log1p_derived",
+            "packet_length_mean_log1p_derived",
+            "forward_reverse_byte_log_ratio",
+            "source_flows_10s_log1p",
+            "source_flows_60s_log1p",
+            "unique_destinations_10s_log1p",
+            "unique_destinations_60s_log1p",
+            "unique_destination_ports_10s_log1p",
+            "unique_destination_ports_60s_log1p",
+            "destination_novelty_60s",
+            "service_port_rarity_60s",
+            "protocol_rarity_60s",
+            "destination_fanout_entropy_60s",
+            "connection_interval_mean_log1p_ms_60s",
+            "connection_interval_std_log1p_ms_60s",
+            "connection_burstiness_60s",
+            "short_lived_ratio_60s",
+            "temporal_cold_start",
+            "temporal_late_event"
+          ],
+          "fit_benign_rows": 1374,
+          "fit_cpu_seconds": 0.21875,
+          "fit_rss_delta_bytes": 249856,
+          "fit_seconds": 0.20707660005427897,
+          "inference_seconds_all_temporal_rows": 0.18799609993584454,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 1374,
+          "preprocessing": {
+            "binary_passthrough": [
+              "destination_novelty_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "feature_order": [
+              "duration_log1p_ms",
+              "packets_total_log1p",
+              "packets_forward_fraction",
+              "bytes_total_log1p",
+              "bytes_forward_fraction",
+              "packet_rate_log1p_derived",
+              "byte_rate_log1p_derived",
+              "packet_length_mean_log1p_derived",
+              "forward_reverse_byte_log_ratio",
+              "source_flows_10s_log1p",
+              "source_flows_60s_log1p",
+              "unique_destinations_10s_log1p",
+              "unique_destinations_60s_log1p",
+              "unique_destination_ports_10s_log1p",
+              "unique_destination_ports_60s_log1p",
+              "destination_novelty_60s",
+              "service_port_rarity_60s",
+              "protocol_rarity_60s",
+              "destination_fanout_entropy_60s",
+              "connection_interval_mean_log1p_ms_60s",
+              "connection_interval_std_log1p_ms_60s",
+              "connection_burstiness_60s",
+              "short_lived_ratio_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "lower_bounds": [
+              0.0,
+              0.6931471805599453,
+              0.39110456081822575,
+              3.713572066704308,
+              0.03257460131122459,
+              0.04558424783978346,
+              1.838907991905998,
+              3.713572066704308,
+              -3.3899268646950538,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              3.8496661785267836,
+              1.3862943611198906,
+              0.6666666666666666,
+              5.796057750765372,
+              0.6585365853658537,
+              4.400550925973851,
+              9.036114156740927,
+              4.610779424752602,
+              0.6525095348281189,
+              0.6931471805599453,
+              1.3862943611198906,
+              0.6931471805599453,
+              1.0986122886681098,
+              0.6931471805599453,
+              1.0986122886681098,
+              0.0,
+              0.375,
+              0.30000000000000004,
+              0.7854752972273344,
+              6.691693598800229,
+              4.567217916514889,
+              0.27846448558155873,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "scales": [
+              6.471928558363545,
+              1.2992829841302609,
+              0.5,
+              2.3841349599581534,
+              0.5631067961165048,
+              6.249829002809821,
+              6.120709643767414,
+              1.0942738870695115,
+              5.073352537460719,
+              0.6931471805599453,
+              1.3862943611198904,
+              0.4054651081081645,
+              0.6931471805599453,
+              0.4054651081081645,
+              0.4054651081081645,
+              1.0,
+              1.0,
+              0.6,
+              0.920619835714305,
+              7.882602047255992,
+              8.254678702151969,
+              0.6194426059750708,
+              0.19999999999999996,
+              1.0,
+              1.0
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              12.614757211680573,
+              5.256428782393171,
+              1.0,
+              11.340733447289809,
+              1.0,
+              13.815511557963774,
+              19.95754796570217,
+              6.4946932445142735,
+              8.705730738295856,
+              2.8976708327676515,
+              3.4339872044851463,
+              1.791759469228055,
+              2.0794415416798357,
+              1.6094379124341003,
+              1.6094379124341003,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              10.9001204551326,
+              10.165462912014615,
+              0.7262034780097524,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "anomaly_temporal",
+          "throughput_rows_per_second": 228776.0225593894
+        },
+        {
+          "calibration_benign_rows": 452,
+          "feature_order": [
+            "duration_log1p_ms",
+            "packets_total_log1p",
+            "packets_forward_fraction",
+            "bytes_total_log1p",
+            "bytes_forward_fraction",
+            "packet_rate_log1p_derived",
+            "byte_rate_log1p_derived",
+            "packet_length_mean_log1p_derived",
+            "forward_reverse_byte_log_ratio",
+            "source_flows_10s_log1p",
+            "source_flows_60s_log1p",
+            "unique_destinations_10s_log1p",
+            "unique_destinations_60s_log1p",
+            "destination_novelty_60s",
+            "protocol_rarity_60s",
+            "destination_fanout_entropy_60s",
+            "connection_interval_mean_log1p_ms_60s",
+            "connection_interval_std_log1p_ms_60s",
+            "connection_burstiness_60s",
+            "short_lived_ratio_60s",
+            "temporal_cold_start",
+            "temporal_late_event"
+          ],
+          "fit_benign_rows": 1374,
+          "fit_cpu_seconds": 0.234375,
+          "fit_rss_delta_bytes": 266240,
+          "fit_seconds": 0.21458820020779967,
+          "inference_seconds_all_temporal_rows": 0.19289010018110275,
+          "model": "isolation_forest",
+          "model_config": {
+            "contamination": "auto",
+            "n_estimators": 200,
+            "n_jobs": -1
+          },
+          "model_fit_benign_rows": 1374,
+          "preprocessing": {
+            "binary_passthrough": [
+              "destination_novelty_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "feature_order": [
+              "duration_log1p_ms",
+              "packets_total_log1p",
+              "packets_forward_fraction",
+              "bytes_total_log1p",
+              "bytes_forward_fraction",
+              "packet_rate_log1p_derived",
+              "byte_rate_log1p_derived",
+              "packet_length_mean_log1p_derived",
+              "forward_reverse_byte_log_ratio",
+              "source_flows_10s_log1p",
+              "source_flows_60s_log1p",
+              "unique_destinations_10s_log1p",
+              "unique_destinations_60s_log1p",
+              "destination_novelty_60s",
+              "protocol_rarity_60s",
+              "destination_fanout_entropy_60s",
+              "connection_interval_mean_log1p_ms_60s",
+              "connection_interval_std_log1p_ms_60s",
+              "connection_burstiness_60s",
+              "short_lived_ratio_60s",
+              "temporal_cold_start",
+              "temporal_late_event"
+            ],
+            "lower_bounds": [
+              0.0,
+              0.6931471805599453,
+              0.39110456081822575,
+              3.713572066704308,
+              0.03257460131122459,
+              0.04558424783978346,
+              1.838907991905998,
+              3.713572066704308,
+              -3.3899268646950538,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.6931471805599453,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "lower_quantile": 0.005,
+            "medians": [
+              3.8496661785267836,
+              1.3862943611198906,
+              0.6666666666666666,
+              5.796057750765372,
+              0.6585365853658537,
+              4.400550925973851,
+              9.036114156740927,
+              4.610779424752602,
+              0.6525095348281189,
+              0.6931471805599453,
+              1.3862943611198906,
+              0.6931471805599453,
+              1.0986122886681098,
+              0.0,
+              0.30000000000000004,
+              0.7854752972273344,
+              6.691693598800229,
+              4.567217916514889,
+              0.27846448558155873,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "scales": [
+              6.471928558363545,
+              1.2992829841302609,
+              0.5,
+              2.3841349599581534,
+              0.5631067961165048,
+              6.249829002809821,
+              6.120709643767414,
+              1.0942738870695115,
+              5.073352537460719,
+              0.6931471805599453,
+              1.3862943611198904,
+              0.4054651081081645,
+              0.6931471805599453,
+              1.0,
+              0.6,
+              0.920619835714305,
+              7.882602047255992,
+              8.254678702151969,
+              0.6194426059750708,
+              0.19999999999999996,
+              1.0,
+              1.0
+            ],
+            "type": "training_quantile_clip_and_robust_scale",
+            "upper_bounds": [
+              12.614757211680573,
+              5.256428782393171,
+              1.0,
+              11.340733447289809,
+              1.0,
+              13.815511557963774,
+              19.95754796570217,
+              6.4946932445142735,
+              8.705730738295856,
+              2.8976708327676515,
+              3.4339872044851463,
+              1.791759469228055,
+              2.0794415416798357,
+              1.0,
+              1.0,
+              1.0,
+              10.9001204551326,
+              10.165462912014615,
+              0.7262034780097524,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "upper_quantile": 0.995
+          },
+          "signal": "anomaly_no_port_context",
+          "throughput_rows_per_second": 222971.526063905
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "calibration_benign_rows": 452,
+      "fit_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "fit_benign_rows": 1374
+    }
+  ],
+  "calibration_policy": "thresholds use a second all-benign IoT capture; multi-signal budgets are split equally so combined direct/review calibration budgets remain 1%/5%",
+  "classifier_fits": [
+    {
+      "fit_cpu_seconds": 2.578125,
+      "fit_rss_delta_bytes": 5464064,
+      "fit_seconds": 2.637794600101188,
+      "held_family": "command_and_control",
+      "held_family_rows_excluded": 0,
+      "inference_seconds_all_temporal_rows": 0.010620299959555268,
+      "model": "compact_mlp",
+      "model_config": {
+        "alpha": 0.0005,
+        "batch_size": 256,
+        "early_stopping": true,
+        "hidden_layer_sizes": [
+          32,
+          16
+        ],
+        "max_iter": 250
+      },
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04511192274835312,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.02628599687721931,
+          0.0,
+          0.0,
+          -4.197500232320877
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          5.571556895571453,
+          2.70805020110221,
+          0.5,
+          7.783015639587866,
+          0.241821032692979,
+          4.363766491868448,
+          9.400796516773713,
+          5.003946305945459,
+          -0.9114007465799627
+        ],
+        "scales": [
+          4.765012788857309,
+          1.7917594692280552,
+          0.04941176470588238,
+          4.193843336800201,
+          0.2519655521783181,
+          2.9273238412029303,
+          3.635446942184476,
+          1.8959972731763228,
+          1.6628367737227743
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.055506210170716,
+          7.835960820808397,
+          1.0,
+          13.835007935707427,
+          1.0,
+          11.002116507732017,
+          14.031956249856794,
+          7.325222386960144,
+          6.025099342939488
+        ],
+        "upper_quantile": 0.995
+      },
+      "throughput_rows_per_second": 4049697.2932769246,
+      "training_attack_families": [
+        "brute_force",
+        "cryptomining",
+        "infiltration",
+        "port_scan"
+      ],
+      "training_binary_distribution": {
+        "benign": 14893,
+        "malicious": 16737
+      },
+      "training_rows": 31630
+    },
+    {
+      "fit_cpu_seconds": 2.796875,
+      "fit_rss_delta_bytes": 598016,
+      "fit_seconds": 2.882222899934277,
+      "held_family": "ddos",
+      "held_family_rows_excluded": 0,
+      "inference_seconds_all_temporal_rows": 0.008436999982222915,
+      "model": "compact_mlp",
+      "model_config": {
+        "alpha": 0.0005,
+        "batch_size": 256,
+        "early_stopping": true,
+        "hidden_layer_sizes": [
+          32,
+          16
+        ],
+        "max_iter": 250
+      },
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.04511192274835312,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.02628599687721931,
+          0.0,
+          0.0,
+          -4.197500232320877
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          5.571556895571453,
+          2.70805020110221,
+          0.5,
+          7.783015639587866,
+          0.241821032692979,
+          4.363766491868448,
+          9.400796516773713,
+          5.003946305945459,
+          -0.9114007465799627
+        ],
+        "scales": [
+          4.765012788857309,
+          1.7917594692280552,
+          0.04941176470588238,
+          4.193843336800201,
+          0.2519655521783181,
+          2.9273238412029303,
+          3.635446942184476,
+          1.8959972731763228,
+          1.6628367737227743
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.055506210170716,
+          7.835960820808397,
+          1.0,
+          13.835007935707427,
+          1.0,
+          11.002116507732017,
+          14.031956249856794,
+          7.325222386960144,
+          6.025099342939488
+        ],
+        "upper_quantile": 0.995
+      },
+      "throughput_rows_per_second": 5097665.057558566,
+      "training_attack_families": [
+        "brute_force",
+        "cryptomining",
+        "infiltration",
+        "port_scan"
+      ],
+      "training_binary_distribution": {
+        "benign": 14893,
+        "malicious": 16737
+      },
+      "training_rows": 31630
+    },
+    {
+      "fit_cpu_seconds": 1.453125,
+      "fit_rss_delta_bytes": 3473408,
+      "fit_seconds": 1.5080655000638217,
+      "held_family": "port_scan",
+      "held_family_rows_excluded": 6067,
+      "inference_seconds_all_temporal_rows": 0.012203100137412548,
+      "model": "compact_mlp",
+      "model_config": {
+        "alpha": 0.0005,
+        "batch_size": 256,
+        "early_stopping": true,
+        "hidden_layer_sizes": [
+          32,
+          16
+        ],
+        "max_iter": 250
+      },
+      "preprocessing": {
+        "binary_passthrough": [],
+        "feature_order": [
+          "duration_log1p_ms",
+          "packets_total_log1p",
+          "packets_forward_fraction",
+          "bytes_total_log1p",
+          "bytes_forward_fraction",
+          "packet_rate_log1p_derived",
+          "byte_rate_log1p_derived",
+          "packet_length_mean_log1p_derived",
+          "forward_reverse_byte_log_ratio"
+        ],
+        "lower_bounds": [
+          0.03999918510171724,
+          1.0986122886681098,
+          0.25,
+          0.0,
+          0.0,
+          0.026285220879972083,
+          0.0,
+          0.0,
+          -4.263180363025603
+        ],
+        "lower_quantile": 0.005,
+        "medians": [
+          5.324126428847164,
+          1.6094379124341003,
+          0.5,
+          5.777652323222656,
+          0.29207088345621524,
+          4.2664830805462595,
+          8.68418438635384,
+          4.4942386252808095,
+          -0.8377284093710529
+        ],
+        "scales": [
+          5.892213338149457,
+          2.079441541679836,
+          0.033333333333333326,
+          3.8834896934518364,
+          0.25754629761425457,
+          3.5902759964389563,
+          4.315262245104224,
+          1.6188737738225445,
+          1.0688377599668781
+        ],
+        "type": "training_quantile_clip_and_robust_scale",
+        "upper_bounds": [
+          12.083588767482013,
+          6.0463512464648,
+          1.0,
+          13.065812204683958,
+          1.0,
+          11.141376408432622,
+          14.223791913461652,
+          7.383530959987935,
+          6.259581464064923
+        ],
+        "upper_quantile": 0.995
+      },
+      "throughput_rows_per_second": 3524432.276691888,
+      "training_attack_families": [
+        "brute_force",
+        "cryptomining",
+        "infiltration"
+      ],
+      "training_binary_distribution": {
+        "benign": 14893,
+        "malicious": 10670
+      },
+      "training_rows": 25563
+    }
+  ],
+  "code_commit": "0b98eebfc3eb1bf37c24a7a7da68a7928e4c0625",
+  "excluded_families": {
+    "file_download": 3
+  },
+  "experiment_id": "DEV-HYB-001",
+  "experiment_type": "cross_environment_held_family_hybrid_temporal_ablation",
+  "feature_order": [
+    "duration_log1p_ms",
+    "packets_total_log1p",
+    "packets_forward_fraction",
+    "bytes_total_log1p",
+    "bytes_forward_fraction",
+    "packet_rate_log1p_derived",
+    "byte_rate_log1p_derived",
+    "packet_length_mean_log1p_derived",
+    "forward_reverse_byte_log_ratio",
+    "source_flows_10s_log1p",
+    "source_flows_60s_log1p",
+    "unique_destinations_10s_log1p",
+    "unique_destinations_60s_log1p",
+    "unique_destination_ports_10s_log1p",
+    "unique_destination_ports_60s_log1p",
+    "destination_novelty_60s",
+    "service_port_rarity_60s",
+    "protocol_rarity_60s",
+    "destination_fanout_entropy_60s",
+    "connection_interval_mean_log1p_ms_60s",
+    "connection_interval_std_log1p_ms_60s",
+    "connection_burstiness_60s",
+    "short_lived_ratio_60s",
+    "temporal_cold_start",
+    "temporal_late_event"
+  ],
+  "feature_schema": "2.0.0-research-b",
+  "feature_view": "portable_numerical_core_plus_bounded_temporal_context",
+  "fit_policy": "supervised fit on non-temporal development environments after removing the held family; anomaly fit on one all-benign IoT capture",
+  "generated_at": "2026-08-11T13:18:18.674209+00:00",
+  "held_families": [
+    "command_and_control",
+    "ddos",
+    "port_scan"
+  ],
+  "held_family_minimum_rows": 20,
+  "limitations": [
+    "Only IoT-23 provides Schema B, so temporal transfer across organizations is not established.",
+    "The temporal state is replayed over complete captures; other behavior in the same stream can influence context, but no test row enters fitting or threshold calibration.",
+    "The supervised head is binary maliciousness evidence, not an attack-family classifier; anomaly evidence takes precedence for suspicious-unknown verdict accounting.",
+    "File-download has too few rows for an independent quantitative claim.",
+    "IoT-23 has no replay-correlated signature evidence, so signatures-only and signatures-plus-hybrid performance are not evaluated.",
+    "Class sampling in supervised sources prevents representative false-alerts-per-hour estimates."
+  ],
+  "runs": [
+    {
+      "ablations": [
+        {
+          "ablation": "supervised_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.049490538573508006,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.34020204723355857,
+          "direct_confusion_matrix": [
+            [
+              11711,
+              6
+            ],
+            [
+              14946,
+              1
+            ]
+          ],
+          "direct_detection_recall": 6.690305746972637e-05,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "supervised": 0.8607051927492156
+          },
+          "false_alerts_per_10000_benign": 5.120764700861995,
+          "review_thresholds": {
+            "supervised": 0.4122130076211904
+          },
+          "signals": [
+            "supervised"
+          ],
+          "test_benign_fpr": 0.0005120764700861995,
+          "test_benign_review_or_alert_rate": 0.18434752923103184,
+          "verdict_distribution": {
+            "benign": 19419,
+            "known_attack_evidence": 7,
+            "needs_review": 7238,
+            "suspicious_unknown": 0
+          }
+        },
+        {
+          "ablation": "anomaly_core_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.023289665211062592,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.5750986820097679,
+          "direct_confusion_matrix": [
+            [
+              11707,
+              10
+            ],
+            [
+              14940,
+              7
+            ]
+          ],
+          "direct_detection_recall": 0.0004683214022880846,
+          "direct_suspicious_unknown_recall": 0.0004683214022880846,
+          "direct_thresholds": {
+            "anomaly_core": 0.21168830917073145
+          },
+          "false_alerts_per_10000_benign": 8.534607834769993,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997
+          },
+          "signals": [
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0008534607834769992,
+          "test_benign_review_or_alert_rate": 0.05129299308696766,
+          "verdict_distribution": {
+            "benign": 17467,
+            "known_attack_evidence": 0,
+            "needs_review": 9180,
+            "suspicious_unknown": 17
+          }
+        },
+        {
+          "ablation": "context_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.027656477438136828,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.40830935973774,
+          "direct_confusion_matrix": [
+            [
+              11356,
+              361
+            ],
+            [
+              10614,
+              4333
+            ]
+          ],
+          "direct_detection_recall": 0.28989094801632437,
+          "direct_suspicious_unknown_recall": 0.28989094801632437,
+          "direct_thresholds": {
+            "context_only": 0.19968352065590522
+          },
+          "false_alerts_per_10000_benign": 308.09934283519675,
+          "review_thresholds": {
+            "context_only": 0.18061460663192863
+          },
+          "signals": [
+            "context_only"
+          ],
+          "test_benign_fpr": 0.030809934283519674,
+          "test_benign_review_or_alert_rate": 0.08961338226508492,
+          "verdict_distribution": {
+            "benign": 19511,
+            "known_attack_evidence": 0,
+            "needs_review": 2459,
+            "suspicious_unknown": 4694
+          }
+        },
+        {
+          "ablation": "supervised_plus_anomaly",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.048034934497816595,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.5756339064695256,
+          "direct_confusion_matrix": [
+            [
+              11705,
+              12
+            ],
+            [
+              14943,
+              4
+            ]
+          ],
+          "direct_detection_recall": 0.0002676122298789055,
+          "direct_suspicious_unknown_recall": 0.0002676122298789055,
+          "direct_thresholds": {
+            "anomaly_core": 0.2152212912972743,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 10.24152940172399,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.001024152940172399,
+          "test_benign_review_or_alert_rate": 0.052317146027140056,
+          "verdict_distribution": {
+            "benign": 17447,
+            "known_attack_evidence": 3,
+            "needs_review": 9201,
+            "suspicious_unknown": 13
+          }
+        },
+        {
+          "ablation": "supervised_plus_context",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.049490538573508006,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.4054994313240115,
+          "direct_confusion_matrix": [
+            [
+              11674,
+              43
+            ],
+            [
+              14525,
+              422
+            ]
+          ],
+          "direct_detection_recall": 0.02823309025222453,
+          "direct_suspicious_unknown_recall": 0.02823309025222453,
+          "direct_thresholds": {
+            "context_only": 0.21284812512973095,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 36.69881368951096,
+          "review_thresholds": {
+            "context_only": 0.1835544890149693,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "context_only"
+          ],
+          "test_benign_fpr": 0.0036698813689510965,
+          "test_benign_review_or_alert_rate": 0.08654092344456772,
+          "verdict_distribution": {
+            "benign": 19589,
+            "known_attack_evidence": 2,
+            "needs_review": 6610,
+            "suspicious_unknown": 463
+          }
+        },
+        {
+          "ablation": "anomaly_plus_context",
+          "calibration_direct_fpr": 0.00727802037845706,
+          "calibration_review_rate": 0.00727802037845706,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.00013380611493945274,
+          "direct_confusion_matrix": [
+            [
+              11694,
+              23
+            ],
+            [
+              14945,
+              2
+            ]
+          ],
+          "direct_detection_recall": 0.00013380611493945274,
+          "direct_suspicious_unknown_recall": 0.00013380611493945274,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.20226014039652074
+          },
+          "false_alerts_per_10000_benign": 19.629598019970985,
+          "review_thresholds": {
+            "anomaly_temporal": 0.20226014039652074
+          },
+          "signals": [
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.0019629598019970983,
+          "test_benign_review_or_alert_rate": 0.0019629598019970983,
+          "verdict_distribution": {
+            "benign": 26639,
+            "known_attack_evidence": 0,
+            "needs_review": 0,
+            "suspicious_unknown": 25
+          }
+        },
+        {
+          "ablation": "full_hybrid",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.03202328966521106,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.0006690305746972637,
+          "direct_confusion_matrix": [
+            [
+              11699,
+              18
+            ],
+            [
+              14946,
+              1
+            ]
+          ],
+          "direct_detection_recall": 6.690305746972637e-05,
+          "direct_suspicious_unknown_recall": 6.690305746972637e-05,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.2045904259600415,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 15.362294102585986,
+          "review_thresholds": {
+            "anomaly_temporal": 0.20226014039652074,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.0015362294102585986,
+          "test_benign_review_or_alert_rate": 0.0029871127421694974,
+          "verdict_distribution": {
+            "benign": 26619,
+            "known_attack_evidence": 3,
+            "needs_review": 26,
+            "suspicious_unknown": 16
+          }
+        },
+        {
+          "ablation": "without_temporal",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.048034934497816595,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.5756339064695256,
+          "direct_confusion_matrix": [
+            [
+              11705,
+              12
+            ],
+            [
+              14943,
+              4
+            ]
+          ],
+          "direct_detection_recall": 0.0002676122298789055,
+          "direct_suspicious_unknown_recall": 0.0002676122298789055,
+          "direct_thresholds": {
+            "anomaly_core": 0.2152212912972743,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 10.24152940172399,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.001024152940172399,
+          "test_benign_review_or_alert_rate": 0.052317146027140056,
+          "verdict_distribution": {
+            "benign": 17447,
+            "known_attack_evidence": 3,
+            "needs_review": 9201,
+            "suspicious_unknown": 13
+          }
+        },
+        {
+          "ablation": "without_destination_port_information",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.03275109170305677,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.014384157355991169,
+          "direct_confusion_matrix": [
+            [
+              11662,
+              55
+            ],
+            [
+              14947,
+              0
+            ]
+          ],
+          "direct_detection_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "anomaly_no_port_context": 0.21075945125081963,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 46.94034309123496,
+          "review_thresholds": {
+            "anomaly_no_port_context": 0.20260022588717286,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_no_port_context"
+          ],
+          "test_benign_fpr": 0.004694034309123496,
+          "test_benign_review_or_alert_rate": 0.008961338226508492,
+          "verdict_distribution": {
+            "benign": 26344,
+            "known_attack_evidence": 3,
+            "needs_review": 265,
+            "suspicious_unknown": 52
+          }
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "classifier_brier": 0.31237654138802046,
+      "classifier_ece": 0.3604138245858366,
+      "classifier_pr_auc": 0.7188777803913087,
+      "fit_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "full_hybrid_operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004366812227074236,
+          "test_alerts_per_10000_benign": 3.413843133907997,
+          "test_benign_fpr": 0.0003413843133907997,
+          "test_malicious_recall": 0.0
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.008733624454148471,
+          "test_alerts_per_10000_benign": 15.362294102585986,
+          "test_benign_fpr": 0.0015362294102585986,
+          "test_malicious_recall": 6.690305746972637e-05
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.021834061135371178,
+          "test_alerts_per_10000_benign": 26.457284287786972,
+          "test_benign_fpr": 0.0026457284287786974,
+          "test_malicious_recall": 0.0002676122298789055
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.03202328966521106,
+          "test_alerts_per_10000_benign": 29.871127421694975,
+          "test_benign_fpr": 0.0029871127421694974,
+          "test_malicious_recall": 0.0006690305746972637
+        }
+      ],
+      "held_family": "command_and_control",
+      "held_family_rows": 14947,
+      "signature_ablation": {
+        "reason": "IoT-23 flow logs do not include replay-correlated Suricata signature evidence; no signature result is fabricated",
+        "status": "not_evaluable"
+      },
+      "test_benign_rows": 11717,
+      "test_groups": [
+        "CTU-IoT-Malware-Capture-20-1.conn.log.labeled",
+        "CTU-IoT-Malware-Capture-34-1.conn.log.labeled",
+        "CTU-IoT-Malware-Capture-42-1.conn.log.labeled",
+        "CTU-IoT-Malware-Capture-8-1.conn.log.labeled"
+      ],
+      "test_rows": 26664
+    },
+    {
+      "ablations": [
+        {
+          "ablation": "supervised_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.33197297116478225,
+          "direct_confusion_matrix": [
+            [
+              11113,
+              604
+            ],
+            [
+              9988,
+              4959
+            ]
+          ],
+          "direct_detection_recall": 0.33177226199237303,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "supervised": 0.5213191229847478
+          },
+          "false_alerts_per_10000_benign": 515.4903132201075,
+          "review_thresholds": {
+            "supervised": 0.5066599267500046
+          },
+          "signals": [
+            "supervised"
+          ],
+          "test_benign_fpr": 0.051549031322010753,
+          "test_benign_review_or_alert_rate": 0.05274387641887855,
+          "verdict_distribution": {
+            "benign": 21084,
+            "known_attack_evidence": 5563,
+            "needs_review": 17,
+            "suspicious_unknown": 0
+          }
+        },
+        {
+          "ablation": "anomaly_core_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.0008697397471064428,
+          "direct_confusion_matrix": [
+            [
+              11695,
+              22
+            ],
+            [
+              14942,
+              5
+            ]
+          ],
+          "direct_detection_recall": 0.00033451528734863183,
+          "direct_suspicious_unknown_recall": 0.00033451528734863183,
+          "direct_thresholds": {
+            "anomaly_core": 0.15749985029883917
+          },
+          "false_alerts_per_10000_benign": 18.776137236493984,
+          "review_thresholds": {
+            "anomaly_core": 0.09702763375441892
+          },
+          "signals": [
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0018776137236493984,
+          "test_benign_review_or_alert_rate": 0.03618673721942477,
+          "verdict_distribution": {
+            "benign": 26227,
+            "known_attack_evidence": 0,
+            "needs_review": 410,
+            "suspicious_unknown": 27
+          }
+        },
+        {
+          "ablation": "context_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.4149996654847127,
+          "direct_confusion_matrix": [
+            [
+              10823,
+              894
+            ],
+            [
+              13495,
+              1452
+            ]
+          ],
+          "direct_detection_recall": 0.09714323944604268,
+          "direct_suspicious_unknown_recall": 0.09714323944604268,
+          "direct_thresholds": {
+            "context_only": 0.1235927550263003
+          },
+          "false_alerts_per_10000_benign": 762.9939404284373,
+          "review_thresholds": {
+            "context_only": 0.09137336562515452
+          },
+          "signals": [
+            "context_only"
+          ],
+          "test_benign_fpr": 0.07629939404284374,
+          "test_benign_review_or_alert_rate": 0.15934112827515576,
+          "verdict_distribution": {
+            "benign": 18594,
+            "known_attack_evidence": 0,
+            "needs_review": 5724,
+            "suspicious_unknown": 2346
+          }
+        },
+        {
+          "ablation": "supervised_plus_anomaly",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.046460176991150445,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.33250819562454004,
+          "direct_confusion_matrix": [
+            [
+              11694,
+              23
+            ],
+            [
+              14943,
+              4
+            ]
+          ],
+          "direct_detection_recall": 0.0002676122298789055,
+          "direct_suspicious_unknown_recall": 0.0002007091724091791,
+          "direct_thresholds": {
+            "anomaly_core": 0.16589712301124293,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 19.629598019970985,
+          "review_thresholds": {
+            "anomaly_core": 0.10038895780699719,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0019629598019970983,
+          "test_benign_review_or_alert_rate": 0.08688230775795852,
+          "verdict_distribution": {
+            "benign": 20676,
+            "known_attack_evidence": 3,
+            "needs_review": 5961,
+            "suspicious_unknown": 24
+          }
+        },
+        {
+          "ablation": "supervised_plus_context",
+          "calibration_direct_fpr": 0.004424778761061947,
+          "calibration_review_rate": 0.03982300884955752,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.44898641867933364,
+          "direct_confusion_matrix": [
+            [
+              10859,
+              858
+            ],
+            [
+              14244,
+              703
+            ]
+          ],
+          "direct_detection_recall": 0.04703284940121764,
+          "direct_suspicious_unknown_recall": 0.04696594634374791,
+          "direct_thresholds": {
+            "context_only": 0.127398515391822,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 732.2693522232654,
+          "review_thresholds": {
+            "context_only": 0.11481796492726304,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "context_only"
+          ],
+          "test_benign_fpr": 0.07322693522232654,
+          "test_benign_review_or_alert_rate": 0.13663907143466758,
+          "verdict_distribution": {
+            "benign": 18352,
+            "known_attack_evidence": 4,
+            "needs_review": 6751,
+            "suspicious_unknown": 1557
+          }
+        },
+        {
+          "ablation": "anomaly_plus_context",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.43961999063357193,
+          "direct_confusion_matrix": [
+            [
+              11683,
+              34
+            ],
+            [
+              14945,
+              2
+            ]
+          ],
+          "direct_detection_recall": 0.00013380611493945274,
+          "direct_suspicious_unknown_recall": 0.00013380611493945274,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.1311291738693644
+          },
+          "false_alerts_per_10000_benign": 29.017666638217975,
+          "review_thresholds": {
+            "anomaly_temporal": 0.07088941601520127
+          },
+          "signals": [
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.0029017666638217975,
+          "test_benign_review_or_alert_rate": 0.17564222923956643,
+          "verdict_distribution": {
+            "benign": 18035,
+            "known_attack_evidence": 0,
+            "needs_review": 8593,
+            "suspicious_unknown": 36
+          }
+        },
+        {
+          "ablation": "full_hybrid",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.3325750986820098,
+          "direct_confusion_matrix": [
+            [
+              11681,
+              36
+            ],
+            [
+              14943,
+              4
+            ]
+          ],
+          "direct_detection_recall": 0.0002676122298789055,
+          "direct_suspicious_unknown_recall": 0.00013380611493945274,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.132298223647345,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 30.724588205171973,
+          "review_thresholds": {
+            "anomaly_temporal": 0.10633772441159017,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.0030724588205171973,
+          "test_benign_review_or_alert_rate": 0.07587266365110523,
+          "verdict_distribution": {
+            "benign": 20804,
+            "known_attack_evidence": 4,
+            "needs_review": 5820,
+            "suspicious_unknown": 36
+          }
+        },
+        {
+          "ablation": "without_temporal",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.046460176991150445,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.33250819562454004,
+          "direct_confusion_matrix": [
+            [
+              11694,
+              23
+            ],
+            [
+              14943,
+              4
+            ]
+          ],
+          "direct_detection_recall": 0.0002676122298789055,
+          "direct_suspicious_unknown_recall": 0.0002007091724091791,
+          "direct_thresholds": {
+            "anomaly_core": 0.16589712301124293,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 19.629598019970985,
+          "review_thresholds": {
+            "anomaly_core": 0.10038895780699719,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0019629598019970983,
+          "test_benign_review_or_alert_rate": 0.08688230775795852,
+          "verdict_distribution": {
+            "benign": 20676,
+            "known_attack_evidence": 3,
+            "needs_review": 5961,
+            "suspicious_unknown": 24
+          }
+        },
+        {
+          "ablation": "without_destination_port_information",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.37184719341673916,
+          "direct_confusion_matrix": [
+            [
+              11611,
+              106
+            ],
+            [
+              14935,
+              12
+            ]
+          ],
+          "direct_detection_recall": 0.0008028366896367164,
+          "direct_suspicious_unknown_recall": 0.00073593363216699,
+          "direct_thresholds": {
+            "anomaly_no_port_context": 0.12858983510416255,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 90.46684304856191,
+          "review_thresholds": {
+            "anomaly_no_port_context": 0.09895624195290398,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_no_port_context"
+          ],
+          "test_benign_fpr": 0.009046684304856192,
+          "test_benign_review_or_alert_rate": 0.12545873517111888,
+          "verdict_distribution": {
+            "benign": 19636,
+            "known_attack_evidence": 3,
+            "needs_review": 6910,
+            "suspicious_unknown": 115
+          }
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "classifier_brier": 0.31237654138802046,
+      "classifier_ece": 0.3604138245858366,
+      "classifier_pr_auc": 0.7188777803913087,
+      "fit_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "full_hybrid_operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004424778761061947,
+          "test_alerts_per_10000_benign": 30.724588205171973,
+          "test_benign_fpr": 0.0030724588205171973,
+          "test_malicious_recall": 0.0002676122298789055
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.008849557522123894,
+          "test_alerts_per_10000_benign": 30.724588205171973,
+          "test_benign_fpr": 0.0030724588205171973,
+          "test_malicious_recall": 0.0002676122298789055
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02654867256637168,
+          "test_alerts_per_10000_benign": 547.0683622087565,
+          "test_benign_fpr": 0.05470683622087565,
+          "test_malicious_recall": 0.33203987422225195
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.048672566371681415,
+          "test_alerts_per_10000_benign": 758.7266365110523,
+          "test_benign_fpr": 0.07587266365110523,
+          "test_malicious_recall": 0.3325750986820098
+        }
+      ],
+      "held_family": "command_and_control",
+      "held_family_rows": 14947,
+      "signature_ablation": {
+        "reason": "IoT-23 flow logs do not include replay-correlated Suricata signature evidence; no signature result is fabricated",
+        "status": "not_evaluable"
+      },
+      "test_benign_rows": 11717,
+      "test_groups": [
+        "CTU-IoT-Malware-Capture-20-1.conn.log.labeled",
+        "CTU-IoT-Malware-Capture-34-1.conn.log.labeled",
+        "CTU-IoT-Malware-Capture-42-1.conn.log.labeled",
+        "CTU-IoT-Malware-Capture-8-1.conn.log.labeled"
+      ],
+      "test_rows": 26664
+    },
+    {
+      "ablations": [
+        {
+          "ablation": "supervised_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.049490538573508006,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9908295122967903,
+          "direct_confusion_matrix": [
+            [
+              1917,
+              6
+            ],
+            [
+              134,
+              14260
+            ]
+          ],
+          "direct_detection_recall": 0.9906905655134084,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "supervised": 0.8607051927492156
+          },
+          "false_alerts_per_10000_benign": 31.201248049921997,
+          "review_thresholds": {
+            "supervised": 0.4122130076211904
+          },
+          "signals": [
+            "supervised"
+          ],
+          "test_benign_fpr": 0.0031201248049922,
+          "test_benign_review_or_alert_rate": 0.0967238689547582,
+          "verdict_distribution": {
+            "benign": 1869,
+            "known_attack_evidence": 14266,
+            "needs_review": 182,
+            "suspicious_unknown": 0
+          }
+        },
+        {
+          "ablation": "anomaly_core_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.023289665211062592,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.0007642073086008059,
+          "direct_confusion_matrix": [
+            [
+              1914,
+              9
+            ],
+            [
+              14383,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.0007642073086008059,
+          "direct_suspicious_unknown_recall": 0.0007642073086008059,
+          "direct_thresholds": {
+            "anomaly_core": 0.21168830917073145
+          },
+          "false_alerts_per_10000_benign": 46.80187207488299,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997
+          },
+          "signals": [
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0046801872074883,
+          "test_benign_review_or_alert_rate": 0.0358814352574103,
+          "verdict_distribution": {
+            "benign": 16237,
+            "known_attack_evidence": 0,
+            "needs_review": 60,
+            "suspicious_unknown": 20
+          }
+        },
+        {
+          "ablation": "context_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.027656477438136828,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.0004863137418368765,
+          "direct_confusion_matrix": [
+            [
+              1646,
+              277
+            ],
+            [
+              14393,
+              1
+            ]
+          ],
+          "direct_detection_recall": 6.947339169098236e-05,
+          "direct_suspicious_unknown_recall": 6.947339169098236e-05,
+          "direct_thresholds": {
+            "context_only": 0.19968352065590522
+          },
+          "false_alerts_per_10000_benign": 1440.457618304732,
+          "review_thresholds": {
+            "context_only": 0.18061460663192863
+          },
+          "signals": [
+            "context_only"
+          ],
+          "test_benign_fpr": 0.1440457618304732,
+          "test_benign_review_or_alert_rate": 0.3983359334373375,
+          "verdict_distribution": {
+            "benign": 15544,
+            "known_attack_evidence": 0,
+            "needs_review": 495,
+            "suspicious_unknown": 278
+          }
+        },
+        {
+          "ablation": "supervised_plus_anomaly",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.048034934497816595,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9914547728220092,
+          "direct_confusion_matrix": [
+            [
+              1912,
+              11
+            ],
+            [
+              14383,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.0007642073086008059,
+          "direct_suspicious_unknown_recall": 0.0007642073086008059,
+          "direct_thresholds": {
+            "anomaly_core": 0.2152212912972743,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 57.202288091523656,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.005720228809152366,
+          "test_benign_review_or_alert_rate": 0.0405616224648986,
+          "verdict_distribution": {
+            "benign": 1968,
+            "known_attack_evidence": 3,
+            "needs_review": 14327,
+            "suspicious_unknown": 19
+          }
+        },
+        {
+          "ablation": "supervised_plus_context",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.049490538573508006,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9911074058635543,
+          "direct_confusion_matrix": [
+            [
+              1899,
+              24
+            ],
+            [
+              14393,
+              1
+            ]
+          ],
+          "direct_detection_recall": 6.947339169098236e-05,
+          "direct_suspicious_unknown_recall": 6.947339169098236e-05,
+          "direct_thresholds": {
+            "context_only": 0.21284812512973095,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 124.80499219968799,
+          "review_thresholds": {
+            "context_only": 0.1835544890149693,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "context_only"
+          ],
+          "test_benign_fpr": 0.0124804992199688,
+          "test_benign_review_or_alert_rate": 0.39313572542901715,
+          "verdict_distribution": {
+            "benign": 1295,
+            "known_attack_evidence": 2,
+            "needs_review": 14997,
+            "suspicious_unknown": 23
+          }
+        },
+        {
+          "ablation": "anomaly_plus_context",
+          "calibration_direct_fpr": 0.00727802037845706,
+          "calibration_review_rate": 0.00727802037845706,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.00041684035014589413,
+          "direct_confusion_matrix": [
+            [
+              1901,
+              22
+            ],
+            [
+              14388,
+              6
+            ]
+          ],
+          "direct_detection_recall": 0.00041684035014589413,
+          "direct_suspicious_unknown_recall": 0.00041684035014589413,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.20226014039652074
+          },
+          "false_alerts_per_10000_benign": 114.40457618304731,
+          "review_thresholds": {
+            "anomaly_temporal": 0.20226014039652074
+          },
+          "signals": [
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.011440457618304731,
+          "test_benign_review_or_alert_rate": 0.011440457618304731,
+          "verdict_distribution": {
+            "benign": 16289,
+            "known_attack_evidence": 0,
+            "needs_review": 0,
+            "suspicious_unknown": 28
+          }
+        },
+        {
+          "ablation": "full_hybrid",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.03202328966521106,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9911074058635543,
+          "direct_confusion_matrix": [
+            [
+              1906,
+              17
+            ],
+            [
+              14389,
+              5
+            ]
+          ],
+          "direct_detection_recall": 0.0003473669584549118,
+          "direct_suspicious_unknown_recall": 0.0003473669584549118,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.2045904259600415,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 88.40353614144566,
+          "review_thresholds": {
+            "anomaly_temporal": 0.20226014039652074,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.008840353614144566,
+          "test_benign_review_or_alert_rate": 0.01612064482579303,
+          "verdict_distribution": {
+            "benign": 2020,
+            "known_attack_evidence": 3,
+            "needs_review": 14275,
+            "suspicious_unknown": 19
+          }
+        },
+        {
+          "ablation": "without_temporal",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.048034934497816595,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9914547728220092,
+          "direct_confusion_matrix": [
+            [
+              1912,
+              11
+            ],
+            [
+              14383,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.0007642073086008059,
+          "direct_suspicious_unknown_recall": 0.0007642073086008059,
+          "direct_thresholds": {
+            "anomaly_core": 0.2152212912972743,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 57.202288091523656,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.005720228809152366,
+          "test_benign_review_or_alert_rate": 0.0405616224648986,
+          "verdict_distribution": {
+            "benign": 1968,
+            "known_attack_evidence": 3,
+            "needs_review": 14327,
+            "suspicious_unknown": 19
+          }
+        },
+        {
+          "ablation": "without_destination_port_information",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.03275109170305677,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9915242462137002,
+          "direct_confusion_matrix": [
+            [
+              1868,
+              55
+            ],
+            [
+              14384,
+              10
+            ]
+          ],
+          "direct_detection_recall": 0.0006947339169098236,
+          "direct_suspicious_unknown_recall": 0.0006947339169098236,
+          "direct_thresholds": {
+            "anomaly_no_port_context": 0.21075945125081963,
+            "supervised": 0.9243915562237978
+          },
+          "false_alerts_per_10000_benign": 286.0114404576183,
+          "review_thresholds": {
+            "anomaly_no_port_context": 0.20260022588717286,
+            "supervised": 0.5967255437264007
+          },
+          "signals": [
+            "supervised",
+            "anomaly_no_port_context"
+          ],
+          "test_benign_fpr": 0.02860114404576183,
+          "test_benign_review_or_alert_rate": 0.04940197607904316,
+          "verdict_distribution": {
+            "benign": 1950,
+            "known_attack_evidence": 3,
+            "needs_review": 14302,
+            "suspicious_unknown": 62
+          }
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "classifier_brier": 0.019824104861711017,
+      "classifier_ece": 0.09897780940647671,
+      "classifier_pr_auc": 0.9991174159145539,
+      "fit_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "full_hybrid_operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004366812227074236,
+          "test_alerts_per_10000_benign": 15.600624024960998,
+          "test_benign_fpr": 0.0015600624024961,
+          "test_malicious_recall": 0.00020842017507294707
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.008733624454148471,
+          "test_alerts_per_10000_benign": 88.40353614144566,
+          "test_benign_fpr": 0.008840353614144566,
+          "test_malicious_recall": 0.0003473669584549118
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.021834061135371178,
+          "test_alerts_per_10000_benign": 150.80603224128964,
+          "test_benign_fpr": 0.015080603224128965,
+          "test_malicious_recall": 0.9911074058635543
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.03202328966521106,
+          "test_alerts_per_10000_benign": 161.2064482579303,
+          "test_benign_fpr": 0.01612064482579303,
+          "test_malicious_recall": 0.9911074058635543
+        }
+      ],
+      "held_family": "ddos",
+      "held_family_rows": 14394,
+      "signature_ablation": {
+        "reason": "IoT-23 flow logs do not include replay-correlated Suricata signature evidence; no signature result is fabricated",
+        "status": "not_evaluable"
+      },
+      "test_benign_rows": 1923,
+      "test_groups": [
+        "CTU-IoT-Malware-Capture-34-1.conn.log.labeled"
+      ],
+      "test_rows": 16317
+    },
+    {
+      "ablations": [
+        {
+          "ablation": "supervised_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9906905655134084,
+          "direct_confusion_matrix": [
+            [
+              1875,
+              48
+            ],
+            [
+              134,
+              14260
+            ]
+          ],
+          "direct_detection_recall": 0.9906905655134084,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "supervised": 0.5213191229847478
+          },
+          "false_alerts_per_10000_benign": 249.60998439937597,
+          "review_thresholds": {
+            "supervised": 0.5066599267500046
+          },
+          "signals": [
+            "supervised"
+          ],
+          "test_benign_fpr": 0.0249609984399376,
+          "test_benign_review_or_alert_rate": 0.02704108164326573,
+          "verdict_distribution": {
+            "benign": 2005,
+            "known_attack_evidence": 14308,
+            "needs_review": 4,
+            "suspicious_unknown": 0
+          }
+        },
+        {
+          "ablation": "anomaly_core_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9915937196053911,
+          "direct_confusion_matrix": [
+            [
+              1903,
+              20
+            ],
+            [
+              14382,
+              12
+            ]
+          ],
+          "direct_detection_recall": 0.0008336807002917883,
+          "direct_suspicious_unknown_recall": 0.0008336807002917883,
+          "direct_thresholds": {
+            "anomaly_core": 0.15749985029883917
+          },
+          "false_alerts_per_10000_benign": 104.00416016640665,
+          "review_thresholds": {
+            "anomaly_core": 0.09702763375441892
+          },
+          "signals": [
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.010400416016640665,
+          "test_benign_review_or_alert_rate": 0.078003120124805,
+          "verdict_distribution": {
+            "benign": 1894,
+            "known_attack_evidence": 0,
+            "needs_review": 14391,
+            "suspicious_unknown": 32
+          }
+        },
+        {
+          "ablation": "context_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9986105321661803,
+          "direct_confusion_matrix": [
+            [
+              1175,
+              748
+            ],
+            [
+              102,
+              14292
+            ]
+          ],
+          "direct_detection_recall": 0.9929137140475198,
+          "direct_suspicious_unknown_recall": 0.9929137140475198,
+          "direct_thresholds": {
+            "context_only": 0.1235927550263003
+          },
+          "false_alerts_per_10000_benign": 3889.755590223609,
+          "review_thresholds": {
+            "context_only": 0.09137336562515452
+          },
+          "signals": [
+            "context_only"
+          ],
+          "test_benign_fpr": 0.3889755590223609,
+          "test_benign_review_or_alert_rate": 0.4622984919396776,
+          "verdict_distribution": {
+            "benign": 1054,
+            "known_attack_evidence": 0,
+            "needs_review": 223,
+            "suspicious_unknown": 15040
+          }
+        },
+        {
+          "ablation": "supervised_plus_anomaly",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.046460176991150445,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9915937196053911,
+          "direct_confusion_matrix": [
+            [
+              1902,
+              21
+            ],
+            [
+              123,
+              14271
+            ]
+          ],
+          "direct_detection_recall": 0.9914547728220092,
+          "direct_suspicious_unknown_recall": 0.0007642073086008059,
+          "direct_thresholds": {
+            "anomaly_core": 0.16589712301124293,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 109.204368174727,
+          "review_thresholds": {
+            "anomaly_core": 0.10038895780699719,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0109204368174727,
+          "test_benign_review_or_alert_rate": 0.09932397295891836,
+          "verdict_distribution": {
+            "benign": 1853,
+            "known_attack_evidence": 14261,
+            "needs_review": 172,
+            "suspicious_unknown": 31
+          }
+        },
+        {
+          "ablation": "supervised_plus_context",
+          "calibration_direct_fpr": 0.004424778761061947,
+          "calibration_review_rate": 0.03982300884955752,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9974989578991247,
+          "direct_confusion_matrix": [
+            [
+              1188,
+              735
+            ],
+            [
+              92,
+              14302
+            ]
+          ],
+          "direct_detection_recall": 0.9936084479644296,
+          "direct_suspicious_unknown_recall": 0.9906210921217173,
+          "direct_thresholds": {
+            "context_only": 0.127398515391822,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 3822.1528861154447,
+          "review_thresholds": {
+            "context_only": 0.11481796492726304,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "context_only"
+          ],
+          "test_benign_fpr": 0.38221528861154447,
+          "test_benign_review_or_alert_rate": 0.4128965158606344,
+          "verdict_distribution": {
+            "benign": 1165,
+            "known_attack_evidence": 45,
+            "needs_review": 115,
+            "suspicious_unknown": 14992
+          }
+        },
+        {
+          "ablation": "anomaly_plus_context",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9999305266083091,
+          "direct_confusion_matrix": [
+            [
+              1893,
+              30
+            ],
+            [
+              14382,
+              12
+            ]
+          ],
+          "direct_detection_recall": 0.0008336807002917883,
+          "direct_suspicious_unknown_recall": 0.0008336807002917883,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.1311291738693644
+          },
+          "false_alerts_per_10000_benign": 156.00624024961,
+          "review_thresholds": {
+            "anomaly_temporal": 0.07088941601520127
+          },
+          "signals": [
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.015600624024960999,
+          "test_benign_review_or_alert_rate": 0.5018200728029121,
+          "verdict_distribution": {
+            "benign": 959,
+            "known_attack_evidence": 0,
+            "needs_review": 15316,
+            "suspicious_unknown": 42
+          }
+        },
+        {
+          "ablation": "full_hybrid",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9924968736973739,
+          "direct_confusion_matrix": [
+            [
+              1892,
+              31
+            ],
+            [
+              122,
+              14272
+            ]
+          ],
+          "direct_detection_recall": 0.9915242462137002,
+          "direct_suspicious_unknown_recall": 0.0008336807002917883,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.132298223647345,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 161.2064482579303,
+          "review_thresholds": {
+            "anomaly_temporal": 0.10633772441159017,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.01612064482579303,
+          "test_benign_review_or_alert_rate": 0.15496619864794592,
+          "verdict_distribution": {
+            "benign": 1733,
+            "known_attack_evidence": 14261,
+            "needs_review": 281,
+            "suspicious_unknown": 42
+          }
+        },
+        {
+          "ablation": "without_temporal",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.046460176991150445,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9915937196053911,
+          "direct_confusion_matrix": [
+            [
+              1902,
+              21
+            ],
+            [
+              123,
+              14271
+            ]
+          ],
+          "direct_detection_recall": 0.9914547728220092,
+          "direct_suspicious_unknown_recall": 0.0007642073086008059,
+          "direct_thresholds": {
+            "anomaly_core": 0.16589712301124293,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 109.204368174727,
+          "review_thresholds": {
+            "anomaly_core": 0.10038895780699719,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0109204368174727,
+          "test_benign_review_or_alert_rate": 0.09932397295891836,
+          "verdict_distribution": {
+            "benign": 1853,
+            "known_attack_evidence": 14261,
+            "needs_review": 172,
+            "suspicious_unknown": 31
+          }
+        },
+        {
+          "ablation": "without_destination_port_information",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9999305266083091,
+          "direct_confusion_matrix": [
+            [
+              1822,
+              101
+            ],
+            [
+              122,
+              14272
+            ]
+          ],
+          "direct_detection_recall": 0.9915242462137002,
+          "direct_suspicious_unknown_recall": 0.006599972210643324,
+          "direct_thresholds": {
+            "anomaly_no_port_context": 0.12858983510416255,
+            "supervised": 0.6491823645453682
+          },
+          "false_alerts_per_10000_benign": 525.2210088403536,
+          "review_thresholds": {
+            "anomaly_no_port_context": 0.09895624195290398,
+            "supervised": 0.5067358377790662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_no_port_context"
+          ],
+          "test_benign_fpr": 0.05252210088403536,
+          "test_benign_review_or_alert_rate": 0.33489339573582944,
+          "verdict_distribution": {
+            "benign": 1280,
+            "known_attack_evidence": 14178,
+            "needs_review": 664,
+            "suspicious_unknown": 195
+          }
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "classifier_brier": 0.019824104861711017,
+      "classifier_ece": 0.09897780940647671,
+      "classifier_pr_auc": 0.9991174159145539,
+      "fit_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "full_hybrid_operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004424778761061947,
+          "test_alerts_per_10000_benign": 161.2064482579303,
+          "test_benign_fpr": 0.01612064482579303,
+          "test_malicious_recall": 0.9915242462137002
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.008849557522123894,
+          "test_alerts_per_10000_benign": 161.2064482579303,
+          "test_benign_fpr": 0.01612064482579303,
+          "test_malicious_recall": 0.9915242462137002
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02654867256637168,
+          "test_alerts_per_10000_benign": 384.81539261570464,
+          "test_benign_fpr": 0.03848153926157046,
+          "test_malicious_recall": 0.9915242462137002
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.048672566371681415,
+          "test_alerts_per_10000_benign": 1549.661986479459,
+          "test_benign_fpr": 0.15496619864794592,
+          "test_malicious_recall": 0.9924968736973739
+        }
+      ],
+      "held_family": "ddos",
+      "held_family_rows": 14394,
+      "signature_ablation": {
+        "reason": "IoT-23 flow logs do not include replay-correlated Suricata signature evidence; no signature result is fabricated",
+        "status": "not_evaluable"
+      },
+      "test_benign_rows": 1923,
+      "test_groups": [
+        "CTU-IoT-Malware-Capture-34-1.conn.log.labeled"
+      ],
+      "test_rows": 16317
+    },
+    {
+      "ablations": [
+        {
+          "ablation": "supervised_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.049490538573508006,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.0,
+          "direct_confusion_matrix": [
+            [
+              1917,
+              6
+            ],
+            [
+              122,
+              0
+            ]
+          ],
+          "direct_detection_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "supervised": 0.6206088703478415
+          },
+          "false_alerts_per_10000_benign": 31.201248049921997,
+          "review_thresholds": {
+            "supervised": 0.36892166265952775
+          },
+          "signals": [
+            "supervised"
+          ],
+          "test_benign_fpr": 0.0031201248049922,
+          "test_benign_review_or_alert_rate": 0.029121164846593862,
+          "verdict_distribution": {
+            "benign": 1989,
+            "known_attack_evidence": 6,
+            "needs_review": 50,
+            "suspicious_unknown": 0
+          }
+        },
+        {
+          "ablation": "anomaly_core_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.023289665211062592,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.09016393442622951,
+          "direct_confusion_matrix": [
+            [
+              1914,
+              9
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_core": 0.21168830917073145
+          },
+          "false_alerts_per_10000_benign": 46.80187207488299,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997
+          },
+          "signals": [
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0046801872074883,
+          "test_benign_review_or_alert_rate": 0.0358814352574103,
+          "verdict_distribution": {
+            "benign": 1965,
+            "known_attack_evidence": 0,
+            "needs_review": 60,
+            "suspicious_unknown": 20
+          }
+        },
+        {
+          "ablation": "context_only",
+          "calibration_direct_fpr": 0.009461426491994178,
+          "calibration_review_rate": 0.027656477438136828,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9426229508196722,
+          "direct_confusion_matrix": [
+            [
+              1646,
+              277
+            ],
+            [
+              100,
+              22
+            ]
+          ],
+          "direct_detection_recall": 0.18032786885245902,
+          "direct_suspicious_unknown_recall": 0.18032786885245902,
+          "direct_thresholds": {
+            "context_only": 0.19968352065590522
+          },
+          "false_alerts_per_10000_benign": 1440.457618304732,
+          "review_thresholds": {
+            "context_only": 0.18061460663192863
+          },
+          "signals": [
+            "context_only"
+          ],
+          "test_benign_fpr": 0.1440457618304732,
+          "test_benign_review_or_alert_rate": 0.3983359334373375,
+          "verdict_distribution": {
+            "benign": 1164,
+            "known_attack_evidence": 0,
+            "needs_review": 582,
+            "suspicious_unknown": 299
+          }
+        },
+        {
+          "ablation": "supervised_plus_anomaly",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.04730713245997089,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.09016393442622951,
+          "direct_confusion_matrix": [
+            [
+              1909,
+              14
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_core": 0.2152212912972743,
+            "supervised": 0.6734544491768677
+          },
+          "false_alerts_per_10000_benign": 72.80291211648466,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997,
+            "supervised": 0.532406798366662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.007280291211648466,
+          "test_benign_review_or_alert_rate": 0.0405616224648986,
+          "verdict_distribution": {
+            "benign": 1956,
+            "known_attack_evidence": 6,
+            "needs_review": 64,
+            "suspicious_unknown": 19
+          }
+        },
+        {
+          "ablation": "supervised_plus_context",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.049490538573508006,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9344262295081968,
+          "direct_confusion_matrix": [
+            [
+              1896,
+              27
+            ],
+            [
+              122,
+              0
+            ]
+          ],
+          "direct_detection_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "context_only": 0.21284812512973095,
+            "supervised": 0.6734544491768677
+          },
+          "false_alerts_per_10000_benign": 140.40561622464898,
+          "review_thresholds": {
+            "context_only": 0.1835544890149693,
+            "supervised": 0.532406798366662
+          },
+          "signals": [
+            "supervised",
+            "context_only"
+          ],
+          "test_benign_fpr": 0.014040561622464899,
+          "test_benign_review_or_alert_rate": 0.39313572542901715,
+          "verdict_distribution": {
+            "benign": 1175,
+            "known_attack_evidence": 5,
+            "needs_review": 843,
+            "suspicious_unknown": 22
+          }
+        },
+        {
+          "ablation": "anomaly_plus_context",
+          "calibration_direct_fpr": 0.00727802037845706,
+          "calibration_review_rate": 0.00727802037845706,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.040983606557377046,
+          "direct_confusion_matrix": [
+            [
+              1901,
+              22
+            ],
+            [
+              117,
+              5
+            ]
+          ],
+          "direct_detection_recall": 0.040983606557377046,
+          "direct_suspicious_unknown_recall": 0.040983606557377046,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.20226014039652074
+          },
+          "false_alerts_per_10000_benign": 114.40457618304731,
+          "review_thresholds": {
+            "anomaly_temporal": 0.20226014039652074
+          },
+          "signals": [
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.011440457618304731,
+          "test_benign_review_or_alert_rate": 0.011440457618304731,
+          "verdict_distribution": {
+            "benign": 2018,
+            "known_attack_evidence": 0,
+            "needs_review": 0,
+            "suspicious_unknown": 27
+          }
+        },
+        {
+          "ablation": "full_hybrid",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.03202328966521106,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.040983606557377046,
+          "direct_confusion_matrix": [
+            [
+              1903,
+              20
+            ],
+            [
+              118,
+              4
+            ]
+          ],
+          "direct_detection_recall": 0.03278688524590164,
+          "direct_suspicious_unknown_recall": 0.03278688524590164,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.2045904259600415,
+            "supervised": 0.6734544491768677
+          },
+          "false_alerts_per_10000_benign": 104.00416016640665,
+          "review_thresholds": {
+            "anomaly_temporal": 0.20226014039652074,
+            "supervised": 0.532406798366662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.010400416016640665,
+          "test_benign_review_or_alert_rate": 0.016640665626625067,
+          "verdict_distribution": {
+            "benign": 2008,
+            "known_attack_evidence": 6,
+            "needs_review": 13,
+            "suspicious_unknown": 18
+          }
+        },
+        {
+          "ablation": "without_temporal",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.04730713245997089,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.09016393442622951,
+          "direct_confusion_matrix": [
+            [
+              1909,
+              14
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_core": 0.2152212912972743,
+            "supervised": 0.6734544491768677
+          },
+          "false_alerts_per_10000_benign": 72.80291211648466,
+          "review_thresholds": {
+            "anomaly_core": 0.20680573878333997,
+            "supervised": 0.532406798366662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.007280291211648466,
+          "test_benign_review_or_alert_rate": 0.0405616224648986,
+          "verdict_distribution": {
+            "benign": 1956,
+            "known_attack_evidence": 6,
+            "needs_review": 64,
+            "suspicious_unknown": 19
+          }
+        },
+        {
+          "ablation": "without_destination_port_information",
+          "calibration_direct_fpr": 0.008733624454148471,
+          "calibration_review_rate": 0.03275109170305677,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.07377049180327869,
+          "direct_confusion_matrix": [
+            [
+              1865,
+              58
+            ],
+            [
+              114,
+              8
+            ]
+          ],
+          "direct_detection_recall": 0.06557377049180328,
+          "direct_suspicious_unknown_recall": 0.06557377049180328,
+          "direct_thresholds": {
+            "anomaly_no_port_context": 0.21075945125081963,
+            "supervised": 0.6734544491768677
+          },
+          "false_alerts_per_10000_benign": 301.6120644825793,
+          "review_thresholds": {
+            "anomaly_no_port_context": 0.20260022588717286,
+            "supervised": 0.532406798366662
+          },
+          "signals": [
+            "supervised",
+            "anomaly_no_port_context"
+          ],
+          "test_benign_fpr": 0.03016120644825793,
+          "test_benign_review_or_alert_rate": 0.0499219968798752,
+          "verdict_distribution": {
+            "benign": 1940,
+            "known_attack_evidence": 6,
+            "needs_review": 39,
+            "suspicious_unknown": 60
+          }
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "classifier_brier": 0.08644541918169014,
+      "classifier_ece": 0.13654061869447565,
+      "classifier_pr_auc": 0.12315749116191536,
+      "fit_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "full_hybrid_operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004366812227074236,
+          "test_alerts_per_10000_benign": 31.201248049921997,
+          "test_benign_fpr": 0.0031201248049922,
+          "test_malicious_recall": 0.0
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.008733624454148471,
+          "test_alerts_per_10000_benign": 104.00416016640665,
+          "test_benign_fpr": 0.010400416016640665,
+          "test_malicious_recall": 0.03278688524590164
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.021834061135371178,
+          "test_alerts_per_10000_benign": 150.80603224128964,
+          "test_benign_fpr": 0.015080603224128965,
+          "test_malicious_recall": 0.040983606557377046
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.03202328966521106,
+          "test_alerts_per_10000_benign": 166.40665626625068,
+          "test_benign_fpr": 0.016640665626625067,
+          "test_malicious_recall": 0.040983606557377046
+        }
+      ],
+      "held_family": "port_scan",
+      "held_family_rows": 122,
+      "signature_ablation": {
+        "reason": "IoT-23 flow logs do not include replay-correlated Suricata signature evidence; no signature result is fabricated",
+        "status": "not_evaluable"
+      },
+      "test_benign_rows": 1923,
+      "test_groups": [
+        "CTU-IoT-Malware-Capture-34-1.conn.log.labeled"
+      ],
+      "test_rows": 2045
+    },
+    {
+      "ablations": [
+        {
+          "ablation": "supervised_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.0,
+          "direct_confusion_matrix": [
+            [
+              1915,
+              8
+            ],
+            [
+              122,
+              0
+            ]
+          ],
+          "direct_detection_recall": 0.0,
+          "direct_suspicious_unknown_recall": 0.0,
+          "direct_thresholds": {
+            "supervised": 0.5985526766350011
+          },
+          "false_alerts_per_10000_benign": 41.60166406656267,
+          "review_thresholds": {
+            "supervised": 0.5822823168526515
+          },
+          "signals": [
+            "supervised"
+          ],
+          "test_benign_fpr": 0.004160166406656267,
+          "test_benign_review_or_alert_rate": 0.004160166406656267,
+          "verdict_distribution": {
+            "benign": 2037,
+            "known_attack_evidence": 8,
+            "needs_review": 0,
+            "suspicious_unknown": 0
+          }
+        },
+        {
+          "ablation": "anomaly_core_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.09016393442622951,
+          "direct_confusion_matrix": [
+            [
+              1903,
+              20
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_core": 0.15749985029883917
+          },
+          "false_alerts_per_10000_benign": 104.00416016640665,
+          "review_thresholds": {
+            "anomaly_core": 0.09702763375441892
+          },
+          "signals": [
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.010400416016640665,
+          "test_benign_review_or_alert_rate": 0.078003120124805,
+          "verdict_distribution": {
+            "benign": 1884,
+            "known_attack_evidence": 0,
+            "needs_review": 130,
+            "suspicious_unknown": 31
+          }
+        },
+        {
+          "ablation": "context_only",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9918032786885246,
+          "direct_confusion_matrix": [
+            [
+              1175,
+              748
+            ],
+            [
+              5,
+              117
+            ]
+          ],
+          "direct_detection_recall": 0.9590163934426229,
+          "direct_suspicious_unknown_recall": 0.9590163934426229,
+          "direct_thresholds": {
+            "context_only": 0.1235927550263003
+          },
+          "false_alerts_per_10000_benign": 3889.755590223609,
+          "review_thresholds": {
+            "context_only": 0.09137336562515452
+          },
+          "signals": [
+            "context_only"
+          ],
+          "test_benign_fpr": 0.3889755590223609,
+          "test_benign_review_or_alert_rate": 0.4622984919396776,
+          "verdict_distribution": {
+            "benign": 1035,
+            "known_attack_evidence": 0,
+            "needs_review": 145,
+            "suspicious_unknown": 865
+          }
+        },
+        {
+          "ablation": "supervised_plus_anomaly",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.046460176991150445,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.09016393442622951,
+          "direct_confusion_matrix": [
+            [
+              1902,
+              21
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_core": 0.16589712301124293,
+            "supervised": 0.602008175408896
+          },
+          "false_alerts_per_10000_benign": 109.204368174727,
+          "review_thresholds": {
+            "anomaly_core": 0.10038895780699719,
+            "supervised": 0.593521657665917
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0109204368174727,
+          "test_benign_review_or_alert_rate": 0.078003120124805,
+          "verdict_distribution": {
+            "benign": 1884,
+            "known_attack_evidence": 1,
+            "needs_review": 129,
+            "suspicious_unknown": 31
+          }
+        },
+        {
+          "ablation": "supervised_plus_context",
+          "calibration_direct_fpr": 0.004424778761061947,
+          "calibration_review_rate": 0.04424778761061947,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9836065573770492,
+          "direct_confusion_matrix": [
+            [
+              1187,
+              736
+            ],
+            [
+              5,
+              117
+            ]
+          ],
+          "direct_detection_recall": 0.9590163934426229,
+          "direct_suspicious_unknown_recall": 0.9590163934426229,
+          "direct_thresholds": {
+            "context_only": 0.127398515391822,
+            "supervised": 0.602008175408896
+          },
+          "false_alerts_per_10000_benign": 3827.353094123765,
+          "review_thresholds": {
+            "context_only": 0.11481796492726304,
+            "supervised": 0.593521657665917
+          },
+          "signals": [
+            "supervised",
+            "context_only"
+          ],
+          "test_benign_fpr": 0.3827353094123765,
+          "test_benign_review_or_alert_rate": 0.4030161206448258,
+          "verdict_distribution": {
+            "benign": 1150,
+            "known_attack_evidence": 3,
+            "needs_review": 42,
+            "suspicious_unknown": 850
+          }
+        },
+        {
+          "ablation": "anomaly_plus_context",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9918032786885246,
+          "direct_confusion_matrix": [
+            [
+              1893,
+              30
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.1311291738693644
+          },
+          "false_alerts_per_10000_benign": 156.00624024961,
+          "review_thresholds": {
+            "anomaly_temporal": 0.07088941601520127
+          },
+          "signals": [
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.015600624024960999,
+          "test_benign_review_or_alert_rate": 0.5018200728029121,
+          "verdict_distribution": {
+            "benign": 959,
+            "known_attack_evidence": 0,
+            "needs_review": 1045,
+            "suspicious_unknown": 41
+          }
+        },
+        {
+          "ablation": "full_hybrid",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.7704918032786885,
+          "direct_confusion_matrix": [
+            [
+              1892,
+              31
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_temporal": 0.132298223647345,
+            "supervised": 0.602008175408896
+          },
+          "false_alerts_per_10000_benign": 161.2064482579303,
+          "review_thresholds": {
+            "anomaly_temporal": 0.10633772441159017,
+            "supervised": 0.593521657665917
+          },
+          "signals": [
+            "supervised",
+            "anomaly_temporal"
+          ],
+          "test_benign_fpr": 0.01612064482579303,
+          "test_benign_review_or_alert_rate": 0.13416536661466458,
+          "verdict_distribution": {
+            "benign": 1693,
+            "known_attack_evidence": 1,
+            "needs_review": 310,
+            "suspicious_unknown": 41
+          }
+        },
+        {
+          "ablation": "without_temporal",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.046460176991150445,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.09016393442622951,
+          "direct_confusion_matrix": [
+            [
+              1902,
+              21
+            ],
+            [
+              111,
+              11
+            ]
+          ],
+          "direct_detection_recall": 0.09016393442622951,
+          "direct_suspicious_unknown_recall": 0.09016393442622951,
+          "direct_thresholds": {
+            "anomaly_core": 0.16589712301124293,
+            "supervised": 0.602008175408896
+          },
+          "false_alerts_per_10000_benign": 109.204368174727,
+          "review_thresholds": {
+            "anomaly_core": 0.10038895780699719,
+            "supervised": 0.593521657665917
+          },
+          "signals": [
+            "supervised",
+            "anomaly_core"
+          ],
+          "test_benign_fpr": 0.0109204368174727,
+          "test_benign_review_or_alert_rate": 0.078003120124805,
+          "verdict_distribution": {
+            "benign": 1884,
+            "known_attack_evidence": 1,
+            "needs_review": 129,
+            "suspicious_unknown": 31
+          }
+        },
+        {
+          "ablation": "without_destination_port_information",
+          "calibration_direct_fpr": 0.008849557522123894,
+          "calibration_review_rate": 0.048672566371681415,
+          "confusion_labels": [
+            "benign",
+            "malicious"
+          ],
+          "detection_or_review_recall": 0.9754098360655737,
+          "direct_confusion_matrix": [
+            [
+              1822,
+              101
+            ],
+            [
+              99,
+              23
+            ]
+          ],
+          "direct_detection_recall": 0.1885245901639344,
+          "direct_suspicious_unknown_recall": 0.1885245901639344,
+          "direct_thresholds": {
+            "anomaly_no_port_context": 0.12858983510416255,
+            "supervised": 0.602008175408896
+          },
+          "false_alerts_per_10000_benign": 525.2210088403536,
+          "review_thresholds": {
+            "anomaly_no_port_context": 0.09895624195290398,
+            "supervised": 0.593521657665917
+          },
+          "signals": [
+            "supervised",
+            "anomaly_no_port_context"
+          ],
+          "test_benign_fpr": 0.05252210088403536,
+          "test_benign_review_or_alert_rate": 0.3255330213208528,
+          "verdict_distribution": {
+            "benign": 1300,
+            "known_attack_evidence": 1,
+            "needs_review": 621,
+            "suspicious_unknown": 123
+          }
+        }
+      ],
+      "calibration_benign_group": "CTU-Honeypot-Capture-4-1.conn.log.labeled",
+      "classifier_brier": 0.08644541918169014,
+      "classifier_ece": 0.13654061869447565,
+      "classifier_pr_auc": 0.12315749116191536,
+      "fit_benign_group": "CTU-Honeypot-Capture-5-1.conn.log.labeled",
+      "full_hybrid_operating_curve": [
+        {
+          "calibration_benign_fpr_budget": 0.005,
+          "calibration_observed_fpr": 0.004424778761061947,
+          "test_alerts_per_10000_benign": 161.2064482579303,
+          "test_benign_fpr": 0.01612064482579303,
+          "test_malicious_recall": 0.09016393442622951
+        },
+        {
+          "calibration_benign_fpr_budget": 0.01,
+          "calibration_observed_fpr": 0.008849557522123894,
+          "test_alerts_per_10000_benign": 161.2064482579303,
+          "test_benign_fpr": 0.01612064482579303,
+          "test_malicious_recall": 0.09016393442622951
+        },
+        {
+          "calibration_benign_fpr_budget": 0.03,
+          "calibration_observed_fpr": 0.02654867256637168,
+          "test_alerts_per_10000_benign": 171.606864274571,
+          "test_benign_fpr": 0.0171606864274571,
+          "test_malicious_recall": 0.09016393442622951
+        },
+        {
+          "calibration_benign_fpr_budget": 0.05,
+          "calibration_observed_fpr": 0.048672566371681415,
+          "test_alerts_per_10000_benign": 1341.6536661466457,
+          "test_benign_fpr": 0.13416536661466458,
+          "test_malicious_recall": 0.7704918032786885
+        }
+      ],
+      "held_family": "port_scan",
+      "held_family_rows": 122,
+      "signature_ablation": {
+        "reason": "IoT-23 flow logs do not include replay-correlated Suricata signature evidence; no signature result is fabricated",
+        "status": "not_evaluable"
+      },
+      "test_benign_rows": 1923,
+      "test_groups": [
+        "CTU-IoT-Malware-Capture-34-1.conn.log.labeled"
+      ],
+      "test_rows": 2045
+    }
+  ],
+  "schema_version": "1.0.0",
+  "seed": 431,
+  "sources": [
+    {
+      "ambiguous_feature_vectors_removed": 228,
+      "ambiguous_rows_removed": 614,
+      "dataset": "hikari2021",
+      "dataset_fingerprint": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+      "duplicate_rows_removed": 3171,
+      "input_groups": 1,
+      "input_rows": 555278,
+      "provenance_sha256": [
+        "fddcf2a9fe496ed5a2306df4586f7029e2d4150b0fe7ad70337d5d63e61c645f"
+      ],
+      "retained_binary_distribution": {
+        "benign": 7384,
+        "malicious": 9217
+      },
+      "retained_indices_sha256": "c5d312cb80499f657dc63bfc123e6b8085c73bbb680f8c34983667322ca7f05e",
+      "retained_rows": 16601,
+      "sample_limit_per_binary_class": 10000,
+      "sampled_binary_distribution": {
+        "benign": 10000,
+        "malicious": 10000
+      },
+      "sampled_indices_sha256": "281c65797cd69455b22ef8b268bbe746e4553e45c3b471e7410f59ec7ba33e01",
+      "sampled_rows": 20000,
+      "source_id": "hikari",
+      "unique_feature_vectors": 16829
+    },
+    {
+      "ambiguous_feature_vectors_removed": 676,
+      "ambiguous_rows_removed": 4342,
+      "dataset": "cse_cic_ids2018",
+      "dataset_fingerprint": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+      "duplicate_rows_removed": 4295,
+      "input_groups": 1,
+      "input_rows": 606902,
+      "provenance_sha256": [
+        "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771"
+      ],
+      "retained_binary_distribution": {
+        "benign": 7509,
+        "malicious": 7520
+      },
+      "retained_indices_sha256": "a3e711e5b45dc354f7e20b37b1a39368ae1f9cbc5a980be2f734f433491cd75f",
+      "retained_rows": 15029,
+      "sample_limit_per_binary_class": 10000,
+      "sampled_binary_distribution": {
+        "benign": 10000,
+        "malicious": 10000
+      },
+      "sampled_indices_sha256": "fe3fc4dbc052e91e0647e92f111661a20dffb3bc599f2c75bd67dd16f27a934d",
+      "sampled_rows": 20000,
+      "source_id": "cse_2018_02_28",
+      "unique_feature_vectors": 15705
+    },
+    {
+      "binary_distribution": {
+        "benign": 13543,
+        "malicious": 29466
+      },
+      "dataset": "iot23_zeek",
+      "dataset_fingerprint": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c",
+      "input_groups": 6,
+      "input_rows": 43009,
+      "provenance_sha256": [
+        "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e",
+        "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711",
+        "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa",
+        "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a",
+        "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e",
+        "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262"
+      ],
+      "source_id": "iot23"
+    }
+  ],
+  "status": "development_evidence_only_no_candidate_selected",
+  "summary": {
+    "anomaly_core_only": {
+      "benign_fpr_max": 0.010400416016640665,
+      "benign_fpr_mean": 0.005482046825897389,
+      "detection_or_review_recall_mean": 0.29144236958722086,
+      "detection_or_review_recall_min": 0.0007642073086008059,
+      "direct_detection_recall_mean": 0.030454765591831388,
+      "direct_detection_recall_min": 0.00033451528734863183,
+      "direct_suspicious_unknown_recall_mean": 0.030454765591831388,
+      "direct_suspicious_unknown_recall_min": 0.00033451528734863183,
+      "runs": 6
+    },
+    "anomaly_plus_context": {
+      "benign_fpr_max": 0.015600624024960999,
+      "benign_fpr_mean": 0.009824481625391726,
+      "detection_or_review_recall_mean": 0.4121480081588113,
+      "detection_or_review_recall_min": 0.00013380611493945274,
+      "direct_detection_recall_mean": 0.02211094571065386,
+      "direct_detection_recall_min": 0.00013380611493945274,
+      "direct_suspicious_unknown_recall_mean": 0.02211094571065386,
+      "direct_suspicious_unknown_recall_min": 0.00013380611493945274,
+      "runs": 6
+    },
+    "context_only": {
+      "benign_fpr_max": 0.3889755590223609,
+      "benign_fpr_mean": 0.19552532833867198,
+      "detection_or_review_recall_mean": 0.6261386834397777,
+      "detection_or_review_recall_min": 0.0004863137418368765,
+      "direct_detection_recall_mean": 0.4198936061994433,
+      "direct_detection_recall_min": 6.947339169098236e-05,
+      "direct_suspicious_unknown_recall_mean": 0.4198936061994433,
+      "direct_suspicious_unknown_recall_min": 6.947339169098236e-05,
+      "runs": 6
+    },
+    "full_hybrid": {
+      "benign_fpr_max": 0.01612064482579303,
+      "benign_fpr_mean": 0.009348457918857848,
+      "detection_or_review_recall_mean": 0.5213873031089501,
+      "detection_or_review_recall_min": 0.0006690305746972637,
+      "direct_detection_recall_mean": 0.18585949135527247,
+      "direct_detection_recall_min": 6.690305746972637e-05,
+      "direct_suspicious_unknown_recall_mean": 0.02072209608388117,
+      "direct_suspicious_unknown_recall_min": 6.690305746972637e-05,
+      "runs": 6
+    },
+    "supervised_only": {
+      "benign_fpr_max": 0.051549031322010753,
+      "benign_fpr_mean": 0.014570420374779203,
+      "detection_or_review_recall_mean": 0.4422825160347566,
+      "detection_or_review_recall_min": 0.0,
+      "direct_detection_recall_mean": 0.38553671601277656,
+      "direct_detection_recall_min": 0.0,
+      "direct_suspicious_unknown_recall_mean": 0.0,
+      "direct_suspicious_unknown_recall_min": 0.0,
+      "runs": 6
+    },
+    "supervised_plus_anomaly": {
+      "benign_fpr_max": 0.0109204368174727,
+      "benign_fpr_mean": 0.006304751066319288,
+      "detection_or_review_recall_mean": 0.5119197438956543,
+      "detection_or_review_recall_min": 0.09016393442622951,
+      "direct_detection_recall_mean": 0.1955136789071378,
+      "direct_detection_recall_min": 0.0002676122298789055,
+      "direct_suspicious_unknown_recall_mean": 0.03038743414532479,
+      "direct_suspicious_unknown_recall_min": 0.0002007091724091791,
+      "runs": 6
+    },
+    "supervised_plus_context": {
+      "benign_fpr_max": 0.3827353094123765,
+      "benign_fpr_mean": 0.1447280792429387,
+      "detection_or_review_recall_mean": 0.7935208334418783,
+      "detection_or_review_recall_min": 0.4054994313240115,
+      "direct_detection_recall_mean": 0.337993375742031,
+      "direct_detection_recall_min": 0.0,
+      "direct_suspicious_unknown_recall_mean": 0.33748433259200056,
+      "direct_suspicious_unknown_recall_min": 0.0,
+      "runs": 6
+    },
+    "without_destination_port_information": {
+      "benign_fpr_max": 0.05252210088403536,
+      "benign_fpr_mean": 0.02959121181267836,
+      "detection_or_review_recall_mean": 0.5711444085772653,
+      "detection_or_review_recall_min": 0.014384157355991169,
+      "direct_detection_recall_mean": 0.20785336291266407,
+      "direct_detection_recall_min": 0.0,
+      "direct_suspicious_unknown_recall_mean": 0.04368816673590964,
+      "direct_suspicious_unknown_recall_min": 0.0,
+      "runs": 6
+    },
+    "without_temporal": {
+      "benign_fpr_max": 0.0109204368174727,
+      "benign_fpr_mean": 0.006304751066319288,
+      "detection_or_review_recall_mean": 0.5119197438956543,
+      "detection_or_review_recall_min": 0.09016393442622951,
+      "direct_detection_recall_mean": 0.1955136789071378,
+      "direct_detection_recall_min": 0.0002676122298789055,
+      "direct_suspicious_unknown_recall_mean": 0.03038743414532479,
+      "direct_suspicious_unknown_recall_min": 0.0002007091724091791,
+      "runs": 6
+    }
+  },
+  "supervised_model": "compact_mlp",
+  "test_policy": "all rows of each eligible IoT family plus benign rows from the same capture groups; fit/calibration capture groups are disjoint from test groups"
+}
