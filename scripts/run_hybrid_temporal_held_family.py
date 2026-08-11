@@ -62,6 +62,46 @@ def _markdown(report: dict[str, Any]) -> str:
                 "",
             ]
         )
+        lines.extend(
+            [
+                "| Error dimension | Highest direct-FP bucket | Highest missed-after-review bucket |",
+                "|---|---|---|",
+            ]
+        )
+        for dimension, grouped in run["full_hybrid_error_analysis"]["groups"].items():
+            buckets = grouped["buckets"]
+            false_positive = [
+                (bucket, values)
+                for bucket, values in buckets.items()
+                if values["direct_false_positive_rate"] is not None
+            ]
+            missed = [
+                (bucket, values)
+                for bucket, values in buckets.items()
+                if values["malicious_missed_after_review_rate"] is not None
+            ]
+            fp_text = "n/a"
+            if false_positive:
+                bucket, values = max(
+                    false_positive,
+                    key=lambda item: item[1]["direct_false_positive_rate"],
+                )
+                fp_text = (
+                    f"{bucket}: {values['direct_false_positive_rate']:.5f} "
+                    f"({values['benign_rows']} benign)"
+                )
+            missed_text = "n/a"
+            if missed:
+                bucket, values = max(
+                    missed,
+                    key=lambda item: item[1]["malicious_missed_after_review_rate"],
+                )
+                missed_text = (
+                    f"{bucket}: {values['malicious_missed_after_review_rate']:.5f} "
+                    f"({values['malicious_rows']} malicious)"
+                )
+            lines.append(f"| {dimension} | {fp_text} | {missed_text} |")
+        lines.append("")
     lines.extend(
         [
             "## Limitations",
