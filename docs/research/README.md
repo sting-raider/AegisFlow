@@ -35,6 +35,7 @@ hypothesis; current evidence has not established it.
 | DEV-SUP-001 | Do standard supervised maliciousness models transfer across all three fresh environments on the numerical core? | No. Every model misses development objectives; no candidate selected. | `experiments/dev-supervised-baselines-v1.json`, `supervised-baselines.md` |
 | DEV-ANO-001 | Do benign-only anomaly models transfer when fit, calibration, and test environments are mutually disjoint? | No. All five model families fail; every model has a zero or near-zero worst-environment unknown recall. | `experiments/dev-anomaly-baselines-v1.json`, `anomaly-baselines.md` |
 | DEV-HYB-001 | Does bounded temporal context improve a calibrated hybrid on repeated held-family IoT tests? | Not reliably. Some rotations improve, but the full hybrid has near-zero worst recall and exceeds the transferred 1% benign-FPR target. | `experiments/dev-hybrid-temporal-held-family-v1.json`, `hybrid-temporal-held-family.md` |
+| DEV-ERR-001 | Which aggregate flow/context buckets explain held-family errors and calibration instability? | Device calibration orientation and low-observability zero/one-packet behavior dominate; port removal is not a remedy. | `../error_analysis/held-family-root-cause-v1.json`, `../error_analysis/held-family-root-cause-v1.md` |
 
 ## Current conclusion
 
@@ -48,3 +49,6 @@ mean detection-or-review but only 0.067% in its worst family/orientation, while 
 benign FPR reaches 1.61%. Context-only behavior is even less stable. The evidence now
 points to environment calibration and flow-level cross-domain observability as the next
 root-cause questions; no model is eligible for locking and frozen evidence remains sealed.
+The predeclared final development direction is a cross-fitted environment-aware benign
+calibration ensemble. Failure there will support a flow-level scientific NO-GO rather
+than further opportunistic model search.

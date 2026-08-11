@@ -540,3 +540,17 @@ family, and let direct anomaly evidence account for `suspicious_unknown`. IoT-23
 no replay-correlated signature evidence, so signature ablations remain visibly not
 evaluable. Random row splits, using attack-capture benign rows for calibration, including
 the held family in supervised fit, and inventing signature results were rejected.
+
+## D-040 - Keep error analysis aggregate and development-only
+
+Rerun the fixed held-family protocol solely to group false positives and missed malicious
+rows by fixed semantic categories: protocol, service, duration, packet count, direction,
+host behavior, temporal state/missingness, and signal disagreement. Suppress categories
+with fewer than five rows and retain only counts and rates. Do not serialize endpoints,
+row IDs, individual scores, or per-row decisions.
+
+Use the result to choose one predeclared next direction: cross-fitted environment-aware
+benign calibration. This uses both approved benign device captures while ensuring each
+calibration score comes from a model that did not fit that row. Treating attack-capture
+traffic as approved benign, mining frozen-final errors, storing row-level diagnostics, or
+shifting thresholds separately for each held family were rejected.

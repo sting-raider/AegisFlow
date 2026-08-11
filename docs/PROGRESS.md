@@ -63,8 +63,13 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   are effectively zero, worst detection-or-review is 0.067%, and worst benign FPR is
   1.61%. Temporal context helps selected rotations but is highly calibration-sensitive;
   no candidate was selected or locked.
-- Remaining model work begins with development-only root-cause/error analysis and an
-  environment-aware-calibration versus scientific-NO-GO decision, then sustained
+- `DEV-ERR-001` groups the fixed hybrid errors without retaining row-level output. It
+  identifies device-calibration orientation, zero/one-packet and zero-duration attack
+  observability, late-event misses, and concentrated TCP/web high-packet benign errors as
+  the dominant limitations. Port-context removal is not a remedy.
+- Remaining model work begins with one predeclared cross-fitted environment-aware benign
+  calibration ensemble. Its result determines candidate eligibility versus a scientific
+  flow-level NO-GO, then work proceeds to sustained
   performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
 - Research Schema A now emits 24 portable features from exporter-independent counts,

@@ -226,3 +226,32 @@ calibration versus a scientific flow-level NO-GO. No frozen report was run.
 Machine-readable evidence is in
 `docs/research/experiments/dev-hybrid-temporal-held-family-v1.json`; its SHA-256 is
 `b7267131af5c6291a1290f5ab89b07aff618b242c5f76f59a3eda5a01fbcc896`.
+
+## MR-007 - Aggregate held-family root-cause analysis
+
+Date: 2026-08-11
+
+Experiment: `DEV-ERR-001`
+
+Code commit: `b4892c53920f3882db8caa10cf1efe6ff08058e2`
+
+Status: complete; no candidate selected
+
+The fixed `DEV-HYB-001` protocol was rerun with aggregate-only error buckets. Categories
+below five rows were suppressed; no endpoint, row identifier, individual score, or
+per-row output was retained. The run reproduces the earlier metrics and identifies a
+large calibration-orientation effect: reversing HUE and Echo moves DDoS direct detection
+from `0.00035` to `0.99152` and port-scan detection-or-review from `0.04098` to `0.77049`.
+
+Command-and-control is dominated by zero/one-packet, often zero-duration flows and remains
+almost completely missed. Late-event buckets have elevated missed rates for DDoS and port
+scan. Benign direct errors concentrate in TCP/web and small high-packet buckets; removing
+port context worsens the maximum FPR rather than solving the problem. These patterns point
+to limited flow observability plus device-specific benign calibration, not a single
+threshold defect.
+
+Disposition: run one predeclared cross-fitted benign-device calibration ensemble using
+development evidence only. If it cannot meet repeated held-family objectives, record a
+development scientific NO-GO rather than expanding model complexity opportunistically.
+Evidence is in `docs/error_analysis/held-family-root-cause-v1.json`; its SHA-256 is
+`105d015726ed4886314111f137c93f3bf6a626484ce93218d00e5e33702f6b20`.
