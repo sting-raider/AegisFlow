@@ -829,3 +829,265 @@ def run_held_family_hybrid_temporal(
             "false-alerts-per-hour estimates.",
         ],
     }
+
+
+def _empirical_percentiles(reference: np.ndarray, values: np.ndarray) -> np.ndarray:
+    ordered = np.sort(np.asarray(reference, dtype=np.float64))
+    if not len(ordered) or not np.isfinite(ordered).all():
+        raise ValueError("empirical percentile reference must be finite and nonempty")
+    percentiles = np.searchsorted(ordered, values, side="right") / len(ordered)
+    return np.asarray(percentiles, dtype=np.float64)
+
+
+def run_cross_fitted_site_calibration(
+    supervised_datasets: dict[str, CanonicalDataset],
+    temporal_source_id: str,
+    temporal_dataset: CanonicalDataset,
+    *,
+    supervised_model_name: str = DEFAULT_HYBRID_SUPERVISED_MODEL,
+    anomaly_model_name: str = DEFAULT_HYBRID_ANOMALY_MODEL,
+    max_rows_per_class: int = 10_000,
+    minimum_family_rows: int = 20,
+    seed: int = RESEARCH_SEED,
+) -> dict[str, Any]:
+    if len(supervised_datasets) < 2:
+        raise ValueError("site calibration requires two supervised sources")
+    if temporal_dataset.runtime_enriched_features is None:
+        raise ValueError("site calibration requires research Schema B")
+    matrix = temporal_dataset.runtime_enriched_features
+    labels = temporal_dataset.labels
+    groups = np.asarray(temporal_dataset.groups, dtype=str)
+    benign_groups = sorted(
+        group
+        for group in set(groups.tolist())
+        if np.all(labels[groups == group] == "benign")
+    )
+    if len(benign_groups) < 2:
+        raise ValueError("site calibration requires two all-benign capture groups")
+    first_group, second_group = benign_groups[:2]
+    first_indices = np.flatnonzero(
+        (groups == first_group) & (labels == "benign")
+    )
+    second_indices = np.flatnonzero(
+        (groups == second_group) & (labels == "benign")
+    )
+    full_names = PORTABLE_NUMERICAL_CORE_FEATURE_NAMES + tuple(TEMPORAL_FEATURE_NAMES)
+    first_fit = _fit_anomaly_signal(
+        "fit_first_calibrate_second",
+        full_names,
+        matrix,
+        first_indices,
+        second_indices,
+        model_name=anomaly_model_name,
+        seed=seed,
+    )
+    second_fit = _fit_anomaly_signal(
+        "fit_second_calibrate_first",
+        full_names,
+        matrix,
+        second_indices,
+        first_indices,
+        model_name=anomaly_model_name,
+        seed=seed,
+    )
+    first_calibration_percentiles = _empirical_percentiles(
+        first_fit.calibration, first_fit.calibration
+    )
+    second_calibration_percentiles = _empirical_percentiles(
+        second_fit.calibration, second_fit.calibration
+    )
+    first_test_percentiles = _empirical_percentiles(
+        first_fit.calibration, first_fit.testing
+    )
+    second_test_percentiles = _empirical_percentiles(
+        second_fit.calibration, second_fit.testing
+    )
+    calibration_percentiles = np.concatenate(
+        [first_calibration_percentiles, second_calibration_percentiles]
+    )
+    strategy_values = {
+        "min": np.minimum(first_test_percentiles, second_test_percentiles),
+        "mean": (first_test_percentiles + second_test_percentiles) / 2.0,
+        "max": np.maximum(first_test_percentiles, second_test_percentiles),
+    }
+    prepared = prepare_research_sources(
+        supervised_datasets,
+        max_rows_per_class=max_rows_per_class,
+        seed=seed,
+    )
+    family_counts = {
+        family: int(np.sum(labels == family))
+        for family in sorted(set(map(str, labels)))
+        if family != "benign"
+    }
+    held_families = [
+        family for family, count in family_counts.items() if count >= minimum_family_rows
+    ]
+    if len(held_families) < 2:
+        raise ValueError("site calibration requires at least two eligible held families")
+    pooled_calibration_indices = np.concatenate([second_indices, first_indices])
+    runs: list[dict[str, Any]] = []
+    classifier_fits: list[dict[str, Any]] = []
+    for family in held_families:
+        probabilities, classifier_manifest = _fit_classifier(
+            prepared,
+            family,
+            matrix,
+            model_name=supervised_model_name,
+            seed=seed,
+        )
+        classifier_fits.append(classifier_manifest)
+        supervised_signal = _SignalScores(
+            name="supervised",
+            calibration=probabilities[pooled_calibration_indices],
+            testing=probabilities,
+            fit_manifest=classifier_manifest,
+        )
+        family_groups = sorted(set(groups[labels == family].tolist()))
+        if set(family_groups) & {first_group, second_group}:
+            raise ValueError(f"held family appears in benign calibration groups: {family}")
+        test_indices = np.flatnonzero(
+            (labels == family)
+            | ((labels == "benign") & np.isin(groups, family_groups))
+        )
+        anomaly_signals = {
+            strategy: _SignalScores(
+                name=f"site_anomaly_{strategy}",
+                calibration=calibration_percentiles,
+                testing=values,
+                fit_manifest={
+                    "strategy": strategy,
+                    "inputs": [first_fit.fit_manifest, second_fit.fit_manifest],
+                },
+            )
+            for strategy, values in strategy_values.items()
+        }
+        ablations: list[dict[str, Any]] = []
+        for strategy, anomaly_signal in anomaly_signals.items():
+            ablations.append(
+                _evaluate_ablation(
+                    f"crossfit_{strategy}_anomaly_only",
+                    (anomaly_signal,),
+                    frozenset({anomaly_signal.name}),
+                    test_indices,
+                    labels,
+                )
+            )
+            ablations.append(
+                _evaluate_ablation(
+                    f"crossfit_{strategy}_hybrid",
+                    (supervised_signal, anomaly_signal),
+                    frozenset({anomaly_signal.name}),
+                    test_indices,
+                    labels,
+                )
+            )
+        truth = (labels[test_indices] != "benign").astype(np.int8)
+        primary_signals = (supervised_signal, anomaly_signals["mean"])
+        runs.append(
+            {
+                "held_family": family,
+                "held_family_rows": int(np.sum(labels[test_indices] == family)),
+                "test_groups": family_groups,
+                "test_rows": len(test_indices),
+                "test_benign_rows": int(np.sum(labels[test_indices] == "benign")),
+                "classifier_brier": float(
+                    brier_score_loss(truth, probabilities[test_indices])
+                ),
+                "classifier_ece": _expected_calibration_error(
+                    probabilities[test_indices], truth
+                ),
+                "classifier_pr_auc": float(
+                    average_precision_score(truth, probabilities[test_indices])
+                ),
+                "ablations": ablations,
+                "primary_operating_curve": _operating_curve(
+                    primary_signals, test_indices, labels
+                ),
+            }
+        )
+    summary: dict[str, Any] = {}
+    for name in [item["ablation"] for item in runs[0]["ablations"]]:
+        selected = [
+            ablation
+            for run in runs
+            for ablation in run["ablations"]
+            if ablation["ablation"] == name
+        ]
+        summary[name] = {
+            "runs": len(selected),
+            "direct_detection_recall_mean": float(
+                np.mean([item["direct_detection_recall"] for item in selected])
+            ),
+            "direct_detection_recall_min": float(
+                np.min([item["direct_detection_recall"] for item in selected])
+            ),
+            "direct_suspicious_unknown_recall_mean": float(
+                np.mean(
+                    [item["direct_suspicious_unknown_recall"] for item in selected]
+                )
+            ),
+            "direct_suspicious_unknown_recall_min": float(
+                np.min(
+                    [item["direct_suspicious_unknown_recall"] for item in selected]
+                )
+            ),
+            "detection_or_review_recall_mean": float(
+                np.mean([item["detection_or_review_recall"] for item in selected])
+            ),
+            "detection_or_review_recall_min": float(
+                np.min([item["detection_or_review_recall"] for item in selected])
+            ),
+            "benign_fpr_mean": float(
+                np.mean([item["test_benign_fpr"] for item in selected])
+            ),
+            "benign_fpr_max": float(
+                np.max([item["test_benign_fpr"] for item in selected])
+            ),
+        }
+    return {
+        "schema_version": "1.0.0",
+        "experiment_type": "cross_fitted_environment_aware_benign_calibration",
+        "status": "development_evidence_only_no_candidate_selected",
+        "seed": seed,
+        "feature_schema": TEMPORAL_SCHEMA_VERSION,
+        "feature_view": "portable_numerical_core_plus_bounded_temporal_context",
+        "feature_order": list(full_names),
+        "supervised_model": supervised_model_name,
+        "anomaly_model": anomaly_model_name,
+        "primary_strategy": "crossfit_mean_hybrid",
+        "primary_strategy_predeclared": True,
+        "fit_policy": (
+            "two anomaly models, each fitted on one approved all-benign device capture"
+        ),
+        "calibration_policy": (
+            "each benign capture is scored only by the model fitted on the other capture; "
+            "cross-fitted empirical percentiles are pooled before fixed 1%/5% budgets"
+        ),
+        "test_policy": (
+            "same held-family attack-capture tests as DEV-HYB-001; no attack row enters "
+            "fit, preprocessing, empirical CDF construction, or threshold calibration"
+        ),
+        "held_family_minimum_rows": minimum_family_rows,
+        "held_families": held_families,
+        "excluded_families": {
+            family: count
+            for family, count in family_counts.items()
+            if count < minimum_family_rows
+        },
+        "sources": [source.manifest for source in prepared]
+        + [_source_manifest(temporal_source_id, temporal_dataset)],
+        "classifier_fits": classifier_fits,
+        "anomaly_fits": [first_fit.fit_manifest, second_fit.fit_manifest],
+        "runs": runs,
+        "summary": summary,
+        "limitations": [
+            "This is environment-aware calibration inside one CTU environment, not "
+            "evidence of cross-organization temporal transfer.",
+            "The mean percentile strategy was fixed before test results; min and max are "
+            "sensitivity analyses and cannot replace it after results are visible.",
+            "File-download remains below the minimum sample count.",
+            "No suspicious or attack-capture traffic enters the approved benign baseline.",
+            "IoT-23 does not provide replay-correlated signature evidence.",
+        ],
+    }

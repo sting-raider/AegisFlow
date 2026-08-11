@@ -10,7 +10,10 @@ from packages.features.research import (
     RUNTIME_ENRICHED_FEATURE_NAMES,
 )
 from training.data.models import CanonicalDataset, InputProvenance
-from training.research.hybrid import run_held_family_hybrid_temporal
+from training.research.hybrid import (
+    run_cross_fitted_site_calibration,
+    run_held_family_hybrid_temporal,
+)
 
 
 def _supervised_source(name: str, offset: float) -> CanonicalDataset:
@@ -139,3 +142,31 @@ def test_hybrid_temporal_requires_schema_b() -> None:
             max_rows_per_class=50,
             minimum_family_rows=5,
         )
+
+
+def test_cross_fitted_site_calibration_uses_predeclared_mean_strategy() -> None:
+    report = run_cross_fitted_site_calibration(
+        {
+            "first": _supervised_source("first", 0.0),
+            "second": _supervised_source("second", 0.4),
+        },
+        "temporal",
+        _temporal_source(),
+        supervised_model_name="logistic_regression",
+        max_rows_per_class=50,
+        minimum_family_rows=5,
+    )
+
+    assert report["primary_strategy"] == "crossfit_mean_hybrid"
+    assert report["primary_strategy_predeclared"] is True
+    assert len(report["anomaly_fits"]) == 2
+    assert len(report["runs"]) == 2
+    for run in report["runs"]:
+        primary = next(
+            item
+            for item in run["ablations"]
+            if item["ablation"] == report["primary_strategy"]
+        )
+        assert primary["calibration_direct_fpr"] <= 0.01
+        assert primary["calibration_review_rate"] <= 0.05
+    assert "predictions" not in str(report)
