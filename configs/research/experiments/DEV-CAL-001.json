@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV-CAL-001",
+  "status": "complete_no_candidate_selected",
+  "permitted_use": "development_only",
+  "code_commit": "020431d5caf5497938adaab97a14076865f95401",
+  "feature_schema": "2.0.0-research-b",
+  "feature_view": "portable_numerical_core_plus_bounded_temporal_context",
+  "feature_order": [
+    "duration_log1p_ms",
+    "packets_total_log1p",
+    "packets_forward_fraction",
+    "bytes_total_log1p",
+    "bytes_forward_fraction",
+    "packet_rate_log1p_derived",
+    "byte_rate_log1p_derived",
+    "packet_length_mean_log1p_derived",
+    "forward_reverse_byte_log_ratio",
+    "source_flows_10s_log1p",
+    "source_flows_60s_log1p",
+    "unique_destinations_10s_log1p",
+    "unique_destinations_60s_log1p",
+    "unique_destination_ports_10s_log1p",
+    "unique_destination_ports_60s_log1p",
+    "destination_novelty_60s",
+    "service_port_rarity_60s",
+    "protocol_rarity_60s",
+    "destination_fanout_entropy_60s",
+    "connection_interval_mean_log1p_ms_60s",
+    "connection_interval_std_log1p_ms_60s",
+    "connection_burstiness_60s",
+    "short_lived_ratio_60s",
+    "temporal_cold_start",
+    "temporal_late_event"
+  ],
+  "dataset_fingerprints": {
+    "hikari": "bba878fb9de7023c9d1b3caa7220d916d73b3b4f5cb129c222027395302739ad",
+    "cse_2018_02_28": "bf32ba7261a6447ce120adf8dfba30cf61cb5904ea3719753e6942d92a41cad0",
+    "iot23": "a5f450a34e4af3a66388883b90cff3e2fc6eda5b52dc67527bd0fb7d356e2a5c"
+  },
+  "split_ids": [
+    "crossfit:hue_to_echo+echo_to_hue/held:command_and_control",
+    "crossfit:hue_to_echo+echo_to_hue/held:ddos",
+    "crossfit:hue_to_echo+echo_to_hue/held:port_scan"
+  ],
+  "seed": 431,
+  "preprocessing": "independent train-fit robust preprocessing for both anomaly models and the external supervised head",
+  "sampling": "deterministic 10000-row binary-class cap for supervised sources; ordered unsampled IoT replay",
+  "models": [
+    "compact_mlp_supervised",
+    "two_cross_fitted_isolation_forests"
+  ],
+  "calibration": {
+    "policy": "each approved benign capture is scored only by the anomaly model fitted on the other capture",
+    "empirical_score": "cross-fitted benign empirical percentile",
+    "direct_budget": 0.01,
+    "review_budget": 0.05
+  },
+  "fusion": "predeclared mean of two anomaly percentiles fused with supervised evidence; min and max are sensitivity-only",
+  "primary_strategy": "crossfit_mean_hybrid",
+  "primary_strategy_predeclared": true,
+  "held_families": [
+    "command_and_control",
+    "ddos",
+    "port_scan"
+  ],
+  "artifacts": [
+    {
+      "path": "docs/research/experiments/dev-site-calibration-v1.json",
+      "sha256": "076f2ab08abc48deb9fc0d144219ac4875c69f978819b96de74874529b6fc3a4"
+    },
+    {
+      "path": "docs/research/site-calibration.md",
+      "sha256": "84da7026e6078e198823cfbac38ee4f444b5c8cb695100c59229ce0a062dc13b"
+    }
+  ],
+  "disposition": "The predeclared primary ensemble fails direct unknown, worst-family detection/review, and transferred benign-FPR objectives. Development scientific NO-GO; no candidate is eligible for frozen final evaluation."
+}

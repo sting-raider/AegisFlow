@@ -67,9 +67,12 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   identifies device-calibration orientation, zero/one-packet and zero-duration attack
   observability, late-event misses, and concentrated TCP/web high-packet benign errors as
   the dominant limitations. Port-context removal is not a remedy.
-- Remaining model work begins with one predeclared cross-fitted environment-aware benign
-  calibration ensemble. Its result determines candidate eligibility versus a scientific
-  flow-level NO-GO, then work proceeds to sustained
+- `DEV-CAL-001` is the predeclared cross-fitted environment-aware calibration ensemble.
+  It removes the arbitrary HUE/Echo orientation but still has 0% direct C2 detection,
+  4.10% port-scan detection-or-review, 0% worst direct unknown recall, and 1.09% worst
+  benign FPR. The current challenger family receives a development scientific NO-GO. No
+  candidate is locked and the frozen final matrix remains sealed.
+- Remaining repository work proceeds to sustained
   performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
 - Research Schema A now emits 24 portable features from exporter-independent counts,

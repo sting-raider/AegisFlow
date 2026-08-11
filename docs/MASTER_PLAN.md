@@ -12,8 +12,8 @@ scientific NO-GO with the engineering platform explicitly separated from detecto
 | A0 | Freeze legacy final evidence and prevent development use | Complete; automated guard green |
 | A1 | Audit feature portability; implement portable and bounded temporal schemas with parity | Complete for research: full Schema A blocked by origin diagnostic; numerical-core ablation remains eligible |
 | A2 | Acquire and provenance a fresh non-frozen development corpus | Complete for initial experiments: three official environments, six temporal IoT captures, frozen boundary green |
-| A3 | Register baselines/challengers; run cost, ablation, held-family and cross-environment development experiments | In progress; three model experiments fail and DEV-ERR-001 isolates calibration/observability causes; cross-fitted calibration is the final predeclared development test |
-| A4 | Lock one challenger; run frozen final evidence once; issue scientific GO/NO-GO | Not started |
+| A3 | Register baselines/challengers; run cost, ablation, held-family and cross-environment development experiments | Complete for current family; DEV-CAL-001 fails final predeclared development test |
+| A4 | Lock one challenger; run frozen final evidence once; issue scientific GO/NO-GO | Development NO-GO: no eligible challenger to lock; frozen evidence remains sealed |
 | A5 | Sustained/burst/failure performance and multi-worker correctness acceptance | Not started |
 | A6 | Real local OIDC, Kubernetes, restore, rollout/failure and security drills | Not started |
 | A7 | Production validator, release provenance, operator package and final acceptance report | Not started |

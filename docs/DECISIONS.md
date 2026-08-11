@@ -554,3 +554,18 @@ benign calibration. This uses both approved benign device captures while ensurin
 calibration score comes from a model that did not fit that row. Treating attack-capture
 traffic as approved benign, mining frozen-final errors, storing row-level diagnostics, or
 shifting thresholds separately for each held family were rejected.
+
+## D-041 - End the current challenger search with a development NO-GO
+
+Use cross-fitted benign-device calibration as the final predeclared experiment for the
+current feature/model family. Fit one anomaly model per approved benign capture, score
+each capture only with the model fitted on the other, convert scores to empirical
+percentiles, and use their mean as the primary site anomaly signal. Keep min/max
+aggregation as sensitivity analysis only; it cannot replace the mean after test results
+are visible.
+
+Because the primary configuration fails the development recall and transferred-FPR
+objectives, do not lock it and do not run the frozen final matrix. Record a development
+scientific NO-GO and preserve the frozen boundary. Searching more algorithms over the
+same low-observability fields, selecting the better min/max result post hoc, lowering
+gates, or spending frozen evidence on an ineligible candidate were rejected.

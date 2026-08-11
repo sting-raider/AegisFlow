@@ -30,8 +30,10 @@ balanced accuracy while its numerical-core ablation clears the 0.90 shortcut thr
 0.68428. The first four supervised and five benign-only anomaly model families all fail
 cross-environment development objectives. A subsequent nine-view hybrid/temporal study
 also fails repeated held-family objectives and exposes strong benign-device calibration
-sensitivity. No candidate is selected. Root-cause/NO-GO analysis, final frozen evaluation,
-and operational acceptance remain open.
+sensitivity. Cross-fitted benign-device calibration also fails, so the current challenger
+family receives a development scientific NO-GO and no candidate is selected. The frozen
+final matrix remains sealed because no model is eligible to cross that boundary.
+Operational acceptance remains open.
 
 ## What was implemented
 

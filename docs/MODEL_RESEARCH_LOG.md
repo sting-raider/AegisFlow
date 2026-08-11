@@ -255,3 +255,35 @@ development evidence only. If it cannot meet repeated held-family objectives, re
 development scientific NO-GO rather than expanding model complexity opportunistically.
 Evidence is in `docs/error_analysis/held-family-root-cause-v1.json`; its SHA-256 is
 `105d015726ed4886314111f137c93f3bf6a626484ce93218d00e5e33702f6b20`.
+
+## MR-008 - Cross-fitted site calibration and development NO-GO
+
+Date: 2026-08-11
+
+Experiment: `DEV-CAL-001`
+
+Code commit: `020431d5caf5497938adaab97a14076865f95401`
+
+Status: complete; development scientific NO-GO
+
+Two Isolation Forests were fitted independently on the approved HUE and Echo benign
+captures. Each benign capture was scored only by the model fitted on the other capture;
+the resulting empirical percentiles formed a pooled calibration reference. The mean of
+the two test percentiles was the predeclared primary anomaly signal. Minimum and maximum
+aggregation were retained only as sensitivity checks. The supervised head and held-family
+tests remained unchanged, and no attack row entered preprocessing, CDF construction, or
+threshold calibration.
+
+The primary cross-fitted mean hybrid still fails. Direct command-and-control detection is
+`0.00000`; port-scan detection-or-review is `0.04098`; worst direct unknown recall is
+`0.00000`; and worst benign FPR is `0.01092`. DDoS direct detection is high (`0.99111`),
+but one family cannot compensate for the other failures. The max sensitivity rule raises
+unknown recall only to a 3.04% mean while worsening maximum benign FPR to 1.61%; it was not
+eligible for post-hoc selection.
+
+Disposition: no current challenger meets development objectives. No model, schema,
+threshold, or bundle is locked, and the frozen final reports remain sealed. This is a
+development scientific NO-GO for a universal detector under the current flow-level
+contract, not a universal impossibility claim. Evidence is in
+`docs/research/experiments/dev-site-calibration-v1.json`; its SHA-256 is
+`076f2ab08abc48deb9fc0d144219ac4875c69f978819b96de74874529b6fc3a4`.
