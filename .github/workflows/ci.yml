@@ -52,6 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose -f compose.yml -f compose.demo.yml config --quiet
+      - run: docker compose -f compose.yml -f compose.oidc.yml config --quiet
       - run: INTERFACE=eth0 docker compose -f compose.yml -f compose.live.yml --profile live config --quiet
       - run: SURICATA_PCAP="$PWD/tests/fixtures/demo.pcap" docker compose -f compose.suricata.yml --profile suricata config --quiet
       - run: >-
@@ -116,6 +117,30 @@ jobs:
         run: docker compose -f compose.yml -f compose.demo.yml logs
       - if: always()
         run: docker compose -f compose.yml -f compose.demo.yml down -v
+
+  oidc-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.3"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked --extra dev
+      - run: make oidc-acceptance OIDC_OUTPUT=docs/acceptance/oidc-ci.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oidc-acceptance-report
+          path: docs/acceptance/oidc-ci.json
+          if-no-files-found: warn
+      - if: always()
+        run: docker compose -f compose.yml -f compose.oidc.yml logs
+      - if: always()
+        run: docker compose -f compose.yml -f compose.oidc.yml down -v
 
   security:
     runs-on: ubuntu-24.04

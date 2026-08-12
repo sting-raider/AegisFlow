@@ -1,0 +1,48 @@
+services:
+  dex:
+    image: ghcr.io/dexidp/dex:v2.44.0
+    command: ["dex", "serve", "/run/aegisflow-oidc/dex.yaml"]
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5556:5556"
+    volumes:
+      - ./.runtime/oidc/dex.yaml:/run/aegisflow-oidc/dex.yaml:ro
+      - ./.runtime/oidc/server.pem:/run/aegisflow-oidc/server.pem:ro
+      - ./.runtime/oidc/server-key.pem:/run/aegisflow-oidc/server-key.pem:ro
+    read_only: true
+    tmpfs:
+      - /var/dex:size=64m,mode=0700,uid=1001,gid=1001
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+
+  api:
+    environment:
+      AEGISFLOW_DEMO: "0"
+      AEGISFLOW_DEMO_SEED: "0"
+      AEGISFLOW_AUTH_MODE: oidc
+      AEGISFLOW_OIDC_ISSUER: https://localhost:5556/dex
+      AEGISFLOW_OIDC_AUDIENCE: aegisflow-api
+      AEGISFLOW_OIDC_JWKS_URL: https://dex:5556/dex/keys
+      AEGISFLOW_OIDC_ALGORITHMS: RS256
+      AEGISFLOW_OIDC_ROLES_CLAIM: email
+      AEGISFLOW_OIDC_ROLE_MAP: '{"viewer@aegisflow.invalid":"viewer","analyst@aegisflow.invalid":"analyst","admin@aegisflow.invalid":"admin","rate-viewer@aegisflow.invalid":"viewer","expiry-viewer@aegisflow.invalid":"viewer","rotation-viewer@aegisflow.invalid":"viewer"}'
+      AEGISFLOW_OIDC_CLOCK_SKEW_SECONDS: "2"
+      AEGISFLOW_OIDC_MAX_TOKEN_LIFETIME_SECONDS: "60"
+      AEGISFLOW_OIDC_JWKS_CACHE_SECONDS: "30"
+      AEGISFLOW_AUTH_READS_PER_MINUTE: "5"
+      AEGISFLOW_AUTH_MUTATIONS_PER_MINUTE: "5"
+      AEGISFLOW_AUTH_WEBSOCKETS_PER_MINUTE: "5"
+      AEGISFLOW_CORS_ORIGINS: http://127.0.0.1:5173
+      SSL_CERT_FILE: /run/aegisflow-oidc/ca.pem
+      NO_PROXY: dex,localhost,127.0.0.1
+    volumes:
+      - ./.runtime/oidc/ca.pem:/run/aegisflow-oidc/ca.pem:ro
+    depends_on:
+      dex: {condition: service_started}
+
+  detector:
+    environment:
+      AEGISFLOW_DEMO: "0"
+
+  sensor:
+    profiles: []

@@ -584,3 +584,19 @@ only aggregate measurements. Write the report even for a NO-GO and exit nonzero 
 automation cannot confuse partial persistence or an undrained queue with capacity.
 Treating a short burst, eventual drain after unbounded growth, or publisher throughput
 alone as sustainable capacity was rejected.
+
+## D-043 - Exercise OIDC with an optional disposable Dex profile
+
+Add a local-only Dex 2.44.0 profile that is separate from production Compose and uses a
+generated seven-day CA, generated static-user passwords, public acceptance clients, and a
+tmpfs SQLite store. Map the signed email claim through AegisFlow's explicit role allow-list
+to exercise viewer, analyst, and admin behavior without pretending the fixture represents
+an organizational directory. Keep every plaintext credential and private key under the
+ignored `.runtime/oidc` directory and never include either in the aggregate report.
+
+Use the password grant only for non-interactive local acceptance; production clients must
+use authorization code with PKCE. Require the drill to cover token issuance, discovery,
+JWKS/TLS, issuer/audience/lifetime checks, roles, escalation denial, WebSockets, rate
+limits, audit attribution, key rotation, and expiry. Making Dex a production dependency,
+committing static passwords, using cleartext non-loopback identity traffic, or claiming
+that a local fixture validates a target organization's IdP were rejected.

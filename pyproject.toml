@@ -33,6 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "bcrypt==5.0.0",
   "mypy==1.17.0",
   "pandas-stubs==2.3.3.260113",
   "pytest==8.4.1",

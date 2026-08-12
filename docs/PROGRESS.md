@@ -99,8 +99,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 176 tests pass, Ruff passes across the repository, strict MyPy passes across
-  82 source files including migrations, and measured backend coverage is 84%.
+- Python: 179 tests pass, Ruff passes across the repository, strict MyPy passes across
+  84 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -112,6 +112,10 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   conservation, requested ingress pace, queue depth and second-half growth, durable P95
   latency, and final zero pending plus lag. The required 10/30-minute and failure runs
   remain open; the harness alone is not capacity evidence.
+- An optional local Dex acceptance profile now generates uncommitted TLS and user
+  credentials and has a fail-closed drill for discovery/JWKS, token and role validation,
+  escalation denial, WebSockets, rate limits, audit identity, key rotation, and expiry.
+  Its containerized acceptance run remains open and must not be inferred from unit tests.
   The local Compose Redis-to-PostgreSQL gate initially timed out at 150 seconds with
   1,828/2,000 rows durable; bounded persistence transactions and transaction-local
   incident-context caching then completed 2,000/2,000 in 25.39 seconds (78.78 flows/s)

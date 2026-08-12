@@ -3,12 +3,15 @@ UV ?= uv
 COMPOSE = docker compose -f compose.yml -f compose.demo.yml
 LIVE_COMPOSE = docker compose -f compose.yml -f compose.live.yml
 SURICATA_COMPOSE = docker compose -f compose.suricata.yml
+OIDC_COMPOSE = docker compose -f compose.yml -f compose.oidc.yml
 SUSTAINED_DURATION ?= 600
 SUSTAINED_RATE ?= 50
 SUSTAINED_OUTPUT ?= sustained-compose-local.json
+OIDC_OUTPUT ?= docs/acceptance/oidc-local.json
 
 .PHONY: install lint typecheck test frozen-evidence-check research-evidence-check train-smoke demo demo-stop replay \
-	live live-stop suricata-replay benchmark benchmark-sustained retention-cleanup reset
+	live live-stop suricata-replay benchmark benchmark-sustained oidc-prepare oidc-acceptance oidc-stop \
+	retention-cleanup reset
 
 install:
 	$(UV) sync --extra dev
@@ -78,6 +81,17 @@ benchmark-sustained:
 		--duration-seconds "$(SUSTAINED_DURATION)" \
 		--target-rate "$(SUSTAINED_RATE)" \
 		--output "/app/docs/benchmarks/$(SUSTAINED_OUTPUT)"
+
+oidc-prepare:
+	$(UV) run --extra dev python -m scripts.prepare_oidc_acceptance
+
+oidc-acceptance: oidc-prepare
+	$(OIDC_COMPOSE) up -d --build postgres redis dex api detector
+	$(OIDC_COMPOSE) run --rm sensor
+	$(UV) run python -m scripts.accept_oidc --output "$(OIDC_OUTPUT)"
+
+oidc-stop:
+	$(OIDC_COMPOSE) down
 
 retention-cleanup:
 	$(UV) run python -m scripts.retention_cleanup

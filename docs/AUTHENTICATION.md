@@ -47,6 +47,35 @@ refresh backoff so unauthenticated tokens cannot amplify outbound JWKS traffic. 
 mapping is an explicit allow-list; an
 authenticated token with no mapped role cannot read the API.
 
+## Optional local Dex acceptance profile
+
+`compose.oidc.yml` exercises the resource-server contract against a real local Dex IdP;
+it is not a production dependency or a substitute for the organization's IdP. The profile
+uses HTTPS with a generated seven-day local CA, a pinned Dex image, an ephemeral tmpfs
+database, public OAuth clients, and generated viewer/analyst/admin credentials. Plaintext
+test credentials and private keys exist only under ignored `.runtime/oidc/`; the tooling
+never prints or commits them.
+
+Run the complete acceptance drill with:
+
+```text
+make oidc-acceptance OIDC_OUTPUT=docs/acceptance/oidc-local.json
+make oidc-stop
+```
+
+The drill validates HTTPS discovery and JWKS retrieval, signed token issuance, issuer and
+audience binding, server-derived viewer/analyst/admin roles, denied escalation, raw-export
+authorization, durable audit attribution, browser-compatible WebSocket authentication,
+malformed and wrong-audience token rejection, per-principal rate limiting, signing-key
+rotation, expiry, and the configured clock skew. It recreates only the disposable Dex
+container during the key-rotation check. A failed check writes a NO-GO report and exits
+nonzero. To intentionally rotate the local passwords and certificates before rerunning,
+use `uv run --extra dev python -m scripts.prepare_oidc_acceptance --force`.
+
+The password grant exists only to automate this isolated acceptance profile. Production
+browser clients must use authorization code with PKCE; do not copy the local static-user
+configuration into a real deployment.
+
 Send the access token as `Authorization: Bearer <token>`. The dashboard can be placed
 behind an identity-aware reverse proxy that injects the verified bearer token into both
 HTTP and WebSocket upstream requests. A SPA OIDC client can alternatively call the
