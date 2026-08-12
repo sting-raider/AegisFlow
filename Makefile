@@ -3,9 +3,12 @@ UV ?= uv
 COMPOSE = docker compose -f compose.yml -f compose.demo.yml
 LIVE_COMPOSE = docker compose -f compose.yml -f compose.live.yml
 SURICATA_COMPOSE = docker compose -f compose.suricata.yml
+SUSTAINED_DURATION ?= 600
+SUSTAINED_RATE ?= 50
+SUSTAINED_OUTPUT ?= sustained-compose-local.json
 
 .PHONY: install lint typecheck test frozen-evidence-check research-evidence-check train-smoke demo demo-stop replay \
-	live live-stop suricata-replay benchmark retention-cleanup reset
+	live live-stop suricata-replay benchmark benchmark-sustained retention-cleanup reset
 
 install:
 	$(UV) sync --extra dev
@@ -66,6 +69,15 @@ endif
 
 benchmark:
 	$(UV) run python -m scripts.benchmark
+
+benchmark-sustained:
+	$(COMPOSE) up -d --build postgres redis api detector
+	$(COMPOSE) run --rm --no-deps \
+		--volume "$(CURDIR)/docs/benchmarks:/app/docs/benchmarks" api \
+		python -m scripts.benchmark_sustained \
+		--duration-seconds "$(SUSTAINED_DURATION)" \
+		--target-rate "$(SUSTAINED_RATE)" \
+		--output "/app/docs/benchmarks/$(SUSTAINED_OUTPUT)"
 
 retention-cleanup:
 	$(UV) run python -m scripts.retention_cleanup

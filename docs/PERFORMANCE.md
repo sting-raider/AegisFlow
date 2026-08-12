@@ -30,6 +30,22 @@ CPU, memory, queue, and machine evidence is stored in
 The processing latency above is intentionally a burst-drain measurement: all 2,000
 events enter a bounded queue immediately. It is not steady-state network latency.
 
+## Sustained acceptance harness
+
+`scripts/benchmark_sustained.py` paces metadata-only flows through the local Compose
+Redis-to-PostgreSQL path and samples both consumer groups throughout ingress and drain.
+It fails closed unless the requested input rate is maintained, every published flow and
+detection is durable, queue depth and second-half growth stay within explicit budgets,
+durable P95 latency stays within its budget, and both queues return to zero pending plus
+lag. Reports contain aggregate counts, latencies, queue/resource samples, the configured
+budgets, and a machine-readable verdict; they contain no packet payloads or endpoint
+identities. Redis and PostgreSQL URLs are restricted to localhost or service names in the
+AegisFlow Compose network.
+
+The harness is an acceptance instrument, not evidence by itself. A rate is supportable
+only after a committed report records a passing verdict for the required duration and the
+failure/recovery scenarios have been exercised.
+
 ## Redis-to-PostgreSQL pipeline
 
 `scripts/benchmark_pipeline.py` is restricted to localhost and the AegisFlow Compose
@@ -93,6 +109,18 @@ docker compose -f compose.yml -f compose.demo.yml run --rm --no-deps api \
   python -m scripts.benchmark_pipeline --total 2000 --timeout-seconds 150 \
   --publish-batch-size 64
 ```
+
+Ten-minute paced durable-path run (defaults shown):
+
+```text
+make benchmark-sustained SUSTAINED_DURATION=600 SUSTAINED_RATE=50 \
+  SUSTAINED_OUTPUT=sustained-compose-local.json
+```
+
+Use explicit filenames for retained evidence. The command starts only PostgreSQL, Redis,
+API persistence, and the detector; stop them afterward with `make demo-stop` when they are
+no longer needed. A nonzero exit is an acceptance failure even when a JSON report was
+written.
 
 Two detector replicas:
 

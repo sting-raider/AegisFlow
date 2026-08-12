@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-08-11.
+Last updated: 2026-08-12.
 
 ## Active final model and production-acceptance phase
 
@@ -99,8 +99,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 169 tests pass, Ruff passes across the repository, strict MyPy passes across
-  78 source files including migrations, and measured backend coverage is 84%.
+- Python: 176 tests pass, Ruff passes across the repository, strict MyPy passes across
+  82 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -108,6 +108,10 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Exact runtime profiling isolated single-row Isolation Forest traversal as 66.3% of
   measured detector stage time. On the same 2,000-flow Windows burst with no drops,
   64-row hybrid batching raised throughput from 153.50 to 3,496.81 flows/s (22.78x).
+- A local-only paced sustained benchmark now fails closed on exact flow/detection
+  conservation, requested ingress pace, queue depth and second-half growth, durable P95
+  latency, and final zero pending plus lag. The required 10/30-minute and failure runs
+  remain open; the harness alone is not capacity evidence.
   The local Compose Redis-to-PostgreSQL gate initially timed out at 150 seconds with
   1,828/2,000 rows durable; bounded persistence transactions and transaction-local
   incident-context caching then completed 2,000/2,000 in 25.39 seconds (78.78 flows/s)

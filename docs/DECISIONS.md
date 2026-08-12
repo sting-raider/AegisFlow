@@ -569,3 +569,18 @@ objectives, do not lock it and do not run the frozen final matrix. Record a deve
 scientific NO-GO and preserve the frozen boundary. Searching more algorithms over the
 same low-observability fields, selecting the better min/max result post hoc, lowering
 gates, or spending frozen evidence on an ineligible candidate were rejected.
+
+## D-042 - Fail sustained capacity closed on conservation, lag, and latency
+
+Measure the durable Redis-to-PostgreSQL path with paced, metadata-only local Compose
+traffic rather than extrapolating from the existing burst-drain result. A rate is
+sustainable only when at least 98% of the requested pace is maintained, published and
+durable flow/detection counts match exactly, both queue depths stay within the declared
+budget without positive second-half growth above a 2% rate tolerance, durable P95 latency
+meets its declared budget, and both consumer groups return to zero pending plus lag.
+
+Keep every service URL restricted to localhost or the AegisFlow Compose network and retain
+only aggregate measurements. Write the report even for a NO-GO and exit nonzero so
+automation cannot confuse partial persistence or an undrained queue with capacity.
+Treating a short burst, eventual drain after unbounded growth, or publisher throughput
+alone as sustainable capacity was rejected.
