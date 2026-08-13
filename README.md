@@ -90,6 +90,7 @@ make benchmark
 make production-check
 make benchmark-sustained SUSTAINED_DURATION=600 SUSTAINED_RATE=50
 make oidc-acceptance
+make restore-acceptance
 make reset
 ```
 
@@ -207,9 +208,10 @@ guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Read the full
   acknowledgement, bounded retries, and idempotent event IDs. The Compose fault matrix is
   documented in `docs/PROGRESS.md`.
 - No active response or automatic blocking is implemented.
-- The production Compose override and Kustomize base render locally, but no external
-  cluster rollout, managed-service integration, restore drill, or representative capacity
-  validation is claimed.
+- The production Compose override and Kustomize base render locally. A disposable local
+  PostgreSQL backup/restore/API-smoke drill passes, but no external cluster rollout,
+  managed backup/service integration, or representative target capacity validation is
+  claimed.
 
 The active production-readiness expansion and unresolved evidence requirements are
 tracked in [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md). The completed offline

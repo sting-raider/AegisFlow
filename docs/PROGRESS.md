@@ -73,7 +73,7 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   benign FPR. The current challenger family receives a development scientific NO-GO. No
   candidate is locked and the frozen final matrix remains sealed.
 - Remaining repository work proceeds to sustained
-  performance, local Kubernetes, restore, rollback/failure, security, and final
+  performance, local Kubernetes, rollback/failure, security, release evidence, and final
   GO/NO-GO evidence.
 - Research Schema A now emits 24 portable features from exporter-independent counts,
   fractions, derived rates, log transforms, protocol categories, port ranges, service
@@ -171,14 +171,17 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   controls without echoing secrets. Eight negative/positive tests pass. The rejected smoke
   bundle and absent operator attestations intentionally keep the checked-in defaults at
   production NO-GO.
-- A fail-closed restore drill now creates a separately named Compose project, refuses any
+- A fail-closed restore drill creates a separately named Compose project, refuses any
   pre-existing project container or volume, seeds required flow/detection/alert/incident/
   feedback/audit state, records every table count and primary-identity digest, performs a
   custom-format backup, force-drops only the disposable database, restores to a clean
   database, re-runs migrations, compares exact identities, smokes the real API, removes
-  the temporary dump, and deletes the isolated project volumes. The clean-runner CI
-  execution and retained aggregate evidence are pending; documentation alone is not
-  counted as a restore pass.
+  the temporary dump, and deletes the isolated project volumes. GitHub Actions run
+  `31689272384` passed: all 15 tables, migration state, counts, and primary identities
+  matched; the real API returned the expected 6 flows, 5 alerts, and 1 incident; cleanup
+  passed in a 102.00-second drill. Aggregate evidence is retained at
+  `docs/acceptance/restore-ci-2026-08-13.json`. This closes disposable local PostgreSQL
+  mechanics, not managed backup, encryption, off-host durability, RPO, or RTO validation.
 - Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic

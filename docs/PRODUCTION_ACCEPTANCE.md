@@ -21,7 +21,7 @@ production NIDS. Detection never authorizes automatic blocking.
 | Multi-worker correctness | Partitioning, recovery, idempotency and shared state under sustained load | Pass for local Compose persistence workers: controlled pending-work SIGKILL/reclaim/restart, 6,000/6,000 exact conservation, zero final depth ([evidence](acceptance/multiworker-compose-windows-2026-08-13.json)); multi-host scaling remains deployment-specific |
 | Real local OIDC | Local IdP, roles, token/JWKS lifecycle and abuse cases | Pass on disposable local Dex profile ([evidence](acceptance/oidc-ci-2026-08-13.json)); organizational IdP validation remains deployment-specific |
 | Local Kubernetes | Actual kind/k3d deployment, probes, policies, migration, rollout and failure drill | Open |
-| Restore | Disposable database backup and measured restore validation | Automated isolated Compose drill added; clean-runner execution evidence pending |
+| Restore | Disposable database backup and measured restore validation | Pass for local PostgreSQL mechanics: 15 tables and primary identities match after destructive restore; API smoke and cleanup pass ([evidence](acceptance/restore-ci-2026-08-13.json)). Managed backup/RPO/RTO remain deployment-specific. |
 | Security acceptance | Controlled auth, input, secret, network and privilege abuse tests | Open |
 | Production validator | Fail-closed unsafe-config checks | Implemented with negative controls for identity, secrets, CORS/WebSockets, provider TLS, datastore exposure, filesystems/capabilities, model/evidence/approval, readiness, retention, and backup. The checked-in rejected smoke model correctly remains a production NO-GO. |
 | Release evidence | Reproducible artifacts, SBOM/provenance and release manifest | Open |

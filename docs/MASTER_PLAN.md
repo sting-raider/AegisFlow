@@ -15,7 +15,7 @@ scientific NO-GO with the engineering platform explicitly separated from detecto
 | A3 | Register baselines/challengers; run cost, ablation, held-family and cross-environment development experiments | Complete for current family; DEV-CAL-001 fails final predeclared development test |
 | A4 | Lock one challenger; run frozen final evidence once; issue scientific GO/NO-GO | Development NO-GO: no eligible challenger to lock; frozen evidence remains sealed |
 | A5 | Sustained/burst/failure performance and multi-worker correctness acceptance | In progress; 10-minute point and local multi-worker recovery pass, 30-minute 50 flows/s capacity point fails, lower-rate ladder/failures open |
-| A6 | Real local OIDC, Kubernetes, restore, rollout/failure and security drills | In progress; disposable real OIDC passes, Kubernetes/restore/security remain open |
+| A6 | Real local OIDC, Kubernetes, restore, rollout/failure and security drills | In progress; disposable real OIDC and local PostgreSQL restore pass; Kubernetes/security remain open |
 | A7 | Production validator, release provenance, operator package and final acceptance report | In progress; fail-closed production preflight implemented, release provenance/operator package/final report open |
 
 The four reports listed in `configs/evaluation/frozen-evidence-v1.json` are final-only.

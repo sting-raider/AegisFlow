@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T10:02:09.433743+00:00",
+  "completed_at": "2026-08-13T10:03:51.431400+00:00",
+  "scope": "disposable local PostgreSQL backup, destruction, restore, and API smoke",
+  "safety": {
+    "isolated_compose_project": "aegisflow-restore-acceptance",
+    "preexisting_project_replaced": false,
+    "developer_volumes_touched": false,
+    "backup_retained": false,
+    "packet_payloads_stored": false,
+    "external_targets": false
+  },
+  "backup": {
+    "format": "PostgreSQL custom",
+    "bytes": 39687,
+    "sha256": "aa9bc6b4bae39aab17cefc5d372b4d019c556a256495dc9b3f275d975df6822f"
+  },
+  "timing_seconds": {
+    "startup_seconds": 72.139019867,
+    "migration_and_seed_seconds": 8.710814232999994,
+    "backup_seconds": 0.1870583890000006,
+    "destroy_and_restore_seconds": 0.49517704699999854,
+    "validation_seconds": 4.295176245999997,
+    "api_smoke_seconds": 5.556020162999985,
+    "total": 101.997662676
+  },
+  "validation": {
+    "table_count": 15,
+    "counts_and_primary_identities_match": true,
+    "required_entities": [
+      "alerts",
+      "analyst_feedback",
+      "audit_log",
+      "detection_results",
+      "flows",
+      "incident_alerts",
+      "incidents"
+    ],
+    "before": {
+      "alembic_version": {"count": 1, "identity_columns": ["version_num"], "identity_sha256": "9b2ceacddadab2f33b8f3a036eb7deb7b589d627371238db105d22887b93427d"},
+      "alerts": {"count": 5, "identity_columns": ["id"], "identity_sha256": "a3683fc7c870f593e0a160f8637cb8b032d886ca9809056477b660cc120bf313"},
+      "analyst_feedback": {"count": 1, "identity_columns": ["id"], "identity_sha256": "82e369e6c37b857be1863ecac8689d712072171d37eb811343c906ffb1728ec4"},
+      "audit_log": {"count": 5, "identity_columns": ["id"], "identity_sha256": "9cabc306ee636c5a391fc2aaac028d9153b33b4528f170ca99c662ae1e934ce7"},
+      "detection_results": {"count": 6, "identity_columns": ["event_id"], "identity_sha256": "b49aa53c7d5b868ac08ed388edbf90e8e278b33ad07c5ce9025448840a2a4115"},
+      "drift_events": {"count": 0, "identity_columns": ["id"], "identity_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"},
+      "flows": {"count": 6, "identity_columns": ["event_id"], "identity_sha256": "c6410524357a594a285fb3988b363638193d4e7ba442bdfe067fc7db45b5dd28"},
+      "incident_alerts": {"count": 5, "identity_columns": ["alert_id"], "identity_sha256": "a3683fc7c870f593e0a160f8637cb8b032d886ca9809056477b660cc120bf313"},
+      "incidents": {"count": 1, "identity_columns": ["id"], "identity_sha256": "3e1f0b71d2e3905b20f804a14022aa37ef4179b4a0261061a394cf653df1968f"},
+      "model_candidates": {"count": 0, "identity_columns": ["id"], "identity_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"},
+      "model_reviews": {"count": 0, "identity_columns": ["id"], "identity_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"},
+      "model_versions": {"count": 1, "identity_columns": ["id"], "identity_sha256": "c82157580bc1c921d98326d451e20c0fc63b1b46df00f9a7011dba1a5e9f4d43"},
+      "sensors": {"count": 1, "identity_columns": ["id"], "identity_sha256": "4d57554fec78da96bfe654dc6022244668aab2160d049003e29d50aa56ff54fe"},
+      "signature_events": {"count": 1, "identity_columns": ["event_id"], "identity_sha256": "f756fc7f226129cae03e561798ae5258d1218f3d4bc91cd42e6db66bb8db921b"},
+      "system_health_events": {"count": 1, "identity_columns": ["id"], "identity_sha256": "4390c8e4742193257e495119e39d536f17845dc2f68e76af175f47813d7e6b7c"}
+    },
+    "after": {
+      "alembic_version": {"count": 1, "identity_columns": ["version_num"], "identity_sha256": "9b2ceacddadab2f33b8f3a036eb7deb7b589d627371238db105d22887b93427d"},
+      "alerts": {"count": 5, "identity_columns": ["id"], "identity_sha256": "a3683fc7c870f593e0a160f8637cb8b032d886ca9809056477b660cc120bf313"},
+      "analyst_feedback": {"count": 1, "identity_columns": ["id"], "identity_sha256": "82e369e6c37b857be1863ecac8689d712072171d37eb811343c906ffb1728ec4"},
+      "audit_log": {"count": 5, "identity_columns": ["id"], "identity_sha256": "9cabc306ee636c5a391fc2aaac028d9153b33b4528f170ca99c662ae1e934ce7"},
+      "detection_results": {"count": 6, "identity_columns": ["event_id"], "identity_sha256": "b49aa53c7d5b868ac08ed388edbf90e8e278b33ad07c5ce9025448840a2a4115"},
+      "drift_events": {"count": 0, "identity_columns": ["id"], "identity_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"},
+      "flows": {"count": 6, "identity_columns": ["event_id"], "identity_sha256": "c6410524357a594a285fb3988b363638193d4e7ba442bdfe067fc7db45b5dd28"},
+      "incident_alerts": {"count": 5, "identity_columns": ["alert_id"], "identity_sha256": "a3683fc7c870f593e0a160f8637cb8b032d886ca9809056477b660cc120bf313"},
+      "incidents": {"count": 1, "identity_columns": ["id"], "identity_sha256": "3e1f0b71d2e3905b20f804a14022aa37ef4179b4a0261061a394cf653df1968f"},
+      "model_candidates": {"count": 0, "identity_columns": ["id"], "identity_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"},
+      "model_reviews": {"count": 0, "identity_columns": ["id"], "identity_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"},
+      "model_versions": {"count": 1, "identity_columns": ["id"], "identity_sha256": "c82157580bc1c921d98326d451e20c0fc63b1b46df00f9a7011dba1a5e9f4d43"},
+      "sensors": {"count": 1, "identity_columns": ["id"], "identity_sha256": "4d57554fec78da96bfe654dc6022244668aab2160d049003e29d50aa56ff54fe"},
+      "signature_events": {"count": 1, "identity_columns": ["event_id"], "identity_sha256": "f756fc7f226129cae03e561798ae5258d1218f3d4bc91cd42e6db66bb8db921b"},
+      "system_health_events": {"count": 1, "identity_columns": ["id"], "identity_sha256": "4390c8e4742193257e495119e39d536f17845dc2f68e76af175f47813d7e6b7c"}
+    },
+    "migration_version_before": "0003_incident_membership",
+    "migration_version_after": "0003_incident_membership",
+    "api_smoke": {
+      "counts": {"alerts": 5, "flows": 6, "incidents": 1},
+      "database": "ready",
+      "passed": true,
+      "readiness": "ready"
+    },
+    "cleanup_passed": true
+  },
+  "verdict": {"passed": true, "failures": []},
+  "limitations": [
+    "This drill validates local PostgreSQL mechanics, not a managed backup service.",
+    "The fixture contains synthetic metadata only and no packet payloads.",
+    "Operators must separately validate encryption, retention, access control, and off-host storage."
+  ]
+}
