@@ -1,4 +1,4 @@
-from scripts.accept_kubernetes import assess_counts
+from scripts.accept_kubernetes import _safe_command, assess_counts
 
 
 def test_assess_counts_accepts_exact_demo_conservation() -> None:
@@ -11,3 +11,16 @@ def test_assess_counts_rejects_loss_and_duplicates() -> None:
         "flows count was 5, expected 6",
         "detections count was 7, expected 6",
     ]
+
+
+def test_safe_command_redacts_disposable_secrets() -> None:
+    rendered = _safe_command(
+        [
+            "kubectl",
+            "--from-literal=POSTGRES_PASSWORD=aegisflow-kind-only",
+            "--from-literal=AEGISFLOW_DATABASE_URL=postgresql+psycopg://secret",
+        ]
+    )
+    assert "aegisflow-kind-only" not in rendered
+    assert "psycopg" not in rendered
+    assert rendered.count("<redacted>") == 2

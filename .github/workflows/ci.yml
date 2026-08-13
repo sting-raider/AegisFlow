@@ -73,6 +73,10 @@ jobs:
           docker compose -f compose.yml -f compose.production.yml config --quiet
       - run: kubectl kustomize infra/kubernetes >/dev/null
       - run: docker compose -f compose.yml -f compose.demo.yml build
+      - name: Validate read-only dashboard resolver rendering
+        run: >-
+          docker compose -f compose.yml -f compose.demo.yml run --rm --no-deps dashboard
+          nginx -T 2>&1 | grep -F 'resolver 127.0.0.11'
       - run: docker build -f infra/docker/backend.Dockerfile --target sensor-live -t aegisflow-sensor-live:ci .
       - run: >-
           docker run --rm --network none --read-only
@@ -208,6 +212,54 @@ jobs:
           kubectl -n aegisflow logs -l app.kubernetes.io/name=aegisflow-detector --all-containers || true
       - if: always()
         run: kind delete cluster --name aegisflow-acceptance || true
+
+  release-evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.3"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked --extra dev
+      - name: Build candidate images
+        run: |
+          docker build -f infra/docker/backend.Dockerfile --target backend \
+            -t aegisflow-backend:release-evidence .
+          docker build -f infra/docker/dashboard.Dockerfile \
+            -t aegisflow-dashboard:release-evidence apps/dashboard
+      - name: Install pinned Syft
+        run: |
+          curl --fail --location --output /tmp/syft.tar.gz \
+            https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_linux_amd64.tar.gz
+          echo "2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f  /tmp/syft.tar.gz" \
+            | sha256sum --check
+          sudo tar -xzf /tmp/syft.tar.gz -C /usr/local/bin syft
+      - name: Generate SBOMs and bound manifest
+        run: |
+          mkdir -p .runtime/release
+          syft aegisflow-backend:release-evidence \
+            -o cyclonedx-json=.runtime/release/backend.cdx.json
+          syft aegisflow-dashboard:release-evidence \
+            -o cyclonedx-json=.runtime/release/dashboard.cdx.json
+          uv run python -m scripts.build_release_manifest \
+            --backend-image aegisflow-backend:release-evidence \
+            --dashboard-image aegisflow-dashboard:release-evidence \
+            --backend-sbom .runtime/release/backend.cdx.json \
+            --dashboard-sbom .runtime/release/dashboard.cdx.json \
+            --output docs/acceptance/release-ci.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-evidence
+          path: |
+            docs/acceptance/release-ci.json
+            .runtime/release/backend.cdx.json
+            .runtime/release/dashboard.cdx.json
+          if-no-files-found: warn
 
   security:
     runs-on: ubuntu-24.04

@@ -30,6 +30,19 @@ class KubernetesAcceptanceError(RuntimeError):
     pass
 
 
+def _safe_command(arguments: list[str]) -> str:
+    rendered: list[str] = []
+    for argument in arguments:
+        if argument.startswith("--from-literal="):
+            key = argument.removeprefix("--from-literal=").split("=", 1)[0]
+            rendered.append(f"--from-literal={key}=<redacted>")
+        elif "postgresql+" in argument or "aegisflow-kind-only" in argument:
+            rendered.append("<redacted>")
+        else:
+            rendered.append(argument)
+    return " ".join(rendered)
+
+
 def assess_counts(counts: dict[str, int]) -> list[str]:
     failures: list[str] = []
     expected = {"flows": 6, "detections": 6, "alerts": 5, "incidents": 1}
@@ -55,12 +68,18 @@ def _run(
             check=False,
             timeout=timeout,
         )
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        raise KubernetesAcceptanceError("bounded acceptance command could not complete") from exc
+    except subprocess.TimeoutExpired as exc:
+        raise KubernetesAcceptanceError(
+            f"bounded acceptance command timed out: {_safe_command(arguments)}"
+        ) from exc
+    except OSError as exc:
+        raise KubernetesAcceptanceError(
+            f"acceptance command could not start: {_safe_command(arguments)}"
+        ) from exc
     if check and result.returncode != 0:
         detail = (result.stderr or result.stdout).strip()
         raise KubernetesAcceptanceError(
-            f"command returned nonzero ({' '.join(arguments)}): {detail[-800:]}"
+            f"command returned nonzero ({_safe_command(arguments)}): {detail[-800:]}"
         )
     return result
 

@@ -147,7 +147,11 @@ services:
     depends_on:
       api: { condition: service_started }
     read_only: true
-    tmpfs: ["/tmp", "/var/cache/nginx", "/var/run"]
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+      - /etc/nginx/conf.d:uid=101,gid=101,mode=0755
     security_opt: ["no-new-privileges:true"]
     cap_drop: ["ALL"]
 

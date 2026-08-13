@@ -692,3 +692,27 @@ configurable resolver while preserving Docker's resolver default. Treat this onl
 single-node deployment-mechanics evidence. Editing the production base into a demo,
 committing test secrets, applying traffic externally, replacing an existing cluster, or
 calling a local kind result managed-cloud readiness were rejected.
+
+## D-050 - Support one organization and one security domain per deployment
+
+Declare AegisFlow single-organization, single-security-domain software. Viewer, analyst,
+and admin roles separate duties inside that domain; they do not partition database rows,
+streams, metrics, model registries, audit history, exports, or encryption keys by tenant.
+Operators needing mutually untrusted tenants must deploy isolated instances with separate
+identity audiences, secrets, data services, registries, gateways, backups, and audit
+ownership. Inferring tenant isolation from RBAC or adding an untested `tenant_id` field
+without end-to-end policy enforcement were rejected.
+
+## D-051 - Bind release evidence even when the scientific verdict is NO-GO
+
+Build both container images from a clean commit, generate CycloneDX SBOMs with a pinned
+checksum-verified Syft binary, and emit one aggregate manifest binding application/commit,
+local immutable image content IDs, SBOM hashes, Alembic head, model/checksum manifest,
+feature schema, Suricata/rules, configuration validator, and dependency locks. Preserve
+the scientific eligibility in the same artifact so mechanically reproducible images
+cannot be mistaken for an approved detector.
+
+Require registry digests and external signing/transparency evidence from the actual
+release owner before deployment. Committing large SBOMs, inventing registry digests,
+declaring a release GO from image builds, or omitting the rejected-model status were
+rejected.

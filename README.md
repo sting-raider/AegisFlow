@@ -179,7 +179,10 @@ an incident. The deterministic explanation always remains available; configured 
 or loopback-local providers have timeout, retry, rate, privacy, and cache bounds. See
 [`docs/AI_EXPLANATIONS.md`](docs/AI_EXPLANATIONS.md),
 [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md), and the production Compose/Kubernetes
-guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Read the full
+guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Follow the practical
+[`installation`](docs/INSTALLATION.md), [`sensor`](docs/SENSOR_DEPLOYMENT.md),
+[`security`](docs/SECURITY.md), [`incident response`](docs/INCIDENT_RESPONSE.md),
+[`upgrade`](docs/UPGRADE.md), and [`rollback`](docs/ROLLBACK.md) runbooks. Read the full
 [`threat model`](docs/THREAT_MODEL.md) before live deployment.
 
 ## Known limitations

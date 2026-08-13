@@ -16,7 +16,7 @@ scientific NO-GO with the engineering platform explicitly separated from detecto
 | A4 | Lock one challenger; run frozen final evidence once; issue scientific GO/NO-GO | Development NO-GO: no eligible challenger to lock; frozen evidence remains sealed |
 | A5 | Sustained/burst/failure performance and multi-worker correctness acceptance | In progress; 10-minute point and local multi-worker recovery pass, 30-minute 50 flows/s capacity point fails, lower-rate ladder/failures open |
 | A6 | Real local OIDC, Kubernetes, restore, rollout/failure and security drills | In progress; disposable real OIDC and local PostgreSQL restore pass; Kubernetes/security remain open |
-| A7 | Production validator, release provenance, operator package and final acceptance report | In progress; fail-closed production preflight implemented, release provenance/operator package/final report open |
+| A7 | Production validator, release provenance, operator package and final acceptance report | In progress; preflight and operator package complete; release provenance/final report open |
 
 The four reports listed in `configs/evaluation/frozen-evidence-v1.json` are final-only.
 They cannot be used to choose A1-A4 features, models, hyperparameters, thresholds, or

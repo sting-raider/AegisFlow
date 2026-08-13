@@ -24,7 +24,8 @@ production NIDS. Detection never authorizes automatic blocking.
 | Restore | Disposable database backup and measured restore validation | Pass for local PostgreSQL mechanics: 15 tables and primary identities match after destructive restore; API smoke and cleanup pass ([evidence](acceptance/restore-ci-2026-08-13.json)). Managed backup/RPO/RTO remain deployment-specific. |
 | Security acceptance | Controlled auth, input, secret, network and privilege abuse tests | Open |
 | Production validator | Fail-closed unsafe-config checks | Implemented with negative controls for identity, secrets, CORS/WebSockets, provider TLS, datastore exposure, filesystems/capabilities, model/evidence/approval, readiness, retention, and backup. The checked-in rejected smoke model correctly remains a production NO-GO. |
-| Release evidence | Reproducible artifacts, SBOM/provenance and release manifest | Open |
+| Release evidence | Reproducible artifacts, SBOM/provenance and release manifest | Bound-manifest generator and pinned image-SBOM CI job implemented; clean-runner evidence pending |
+| Operator package | Installation, deployment, configuration, identity, sensor, model, backup, incident, troubleshooting, upgrade, rollback, performance, capacity and security procedures | Complete as repository procedures; organization-specific contacts and service values remain external |
 | Final report | `docs/FINAL_ACCEPTANCE_REPORT.md` with safe-claim boundary | Open |
 
 Production acceptance can end in either a GO for one immutable candidate/environment or a

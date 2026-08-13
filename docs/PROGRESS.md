@@ -190,6 +190,18 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   rolling replacement, detector scale/restart, duplicate-replay idempotency, measured
   recovery, and exact-cluster cleanup. Clean Linux runner evidence remains pending and no
   managed-cloud claim is made.
+- The operator package now has practical installation, deployment, configuration,
+  authentication, sensor, model-governance, backup/restore, incident-response,
+  troubleshooting, upgrade, rollback, performance, capacity-planning, and security
+  procedures. Security scope is explicit: one organization and one security domain per
+  deployment; RBAC is not tenant isolation. Target owners must still supply environment
+  values, contacts, immutable digests, SLOs, and approvals.
+- A release-evidence job now builds the exact backend/dashboard images, generates pinned-
+  tool CycloneDX SBOMs, and emits a manifest binding the clean Git commit, application
+  version, immutable local image content IDs, SBOM digests, migration head, checksum-
+  verified model bundle, feature schema, Suricata/rules, configuration validator, and
+  dependency locks. It records the current scientific NO-GO and requires registry digests
+  plus external signing for production. Clean-runner evidence is pending.
 - Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic
