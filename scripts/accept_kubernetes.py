@@ -191,6 +191,21 @@ def _pods(selector: str) -> list[dict[str, str]]:
     ]
 
 
+def _uids_replaced(previous: set[str], current: list[dict[str, str]]) -> bool:
+    return bool(current) and previous.isdisjoint({item["uid"] for item in current})
+
+
+def _wait_uids_replaced(
+    selector: str, previous: set[str], timeout_seconds: float = 60
+) -> bool:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        if _uids_replaced(previous, _pods(selector)):
+            return True
+        time.sleep(1)
+    return False
+
+
 def _database_counts() -> dict[str, int]:
     tables = {
         "flows": "flows",
@@ -480,8 +495,9 @@ def run_acceptance(output: Path) -> dict[str, Any]:
             _kubectl("-n", NAMESPACE, "rollout", "restart", "deployment/api")
             _wait_rollout("deployment/api", "420s")
             api_rollout_seconds = time.monotonic() - rollout_started
-            api_replaced = {item["uid"] for item in old_api}.isdisjoint(
-                {item["uid"] for item in _pods("app.kubernetes.io/name=aegisflow-api")}
+            api_replaced = _wait_uids_replaced(
+                "app.kubernetes.io/name=aegisflow-api",
+                {item["uid"] for item in old_api},
             )
 
             _kubectl("-n", NAMESPACE, "scale", "deployment/detector", "--replicas=3")
@@ -492,9 +508,9 @@ def run_acceptance(output: Path) -> dict[str, Any]:
             _kubectl("-n", NAMESPACE, "delete", "pod", deleted_detector["name"], "--wait=false")
             _wait_rollout("deployment/detector", "420s")
             detector_recovery_seconds = time.monotonic() - restart_started
-            detector_replaced = deleted_detector["uid"] not in {
-                item["uid"] for item in _pods("app.kubernetes.io/name=aegisflow-detector")
-            }
+            detector_replaced = _wait_uids_replaced(
+                "app.kubernetes.io/name=aegisflow-detector", {deleted_detector["uid"]}
+            )
             _kubectl("-n", NAMESPACE, "scale", "deployment/detector", "--replicas=2")
             _wait_rollout("deployment/detector", "420s")
 
@@ -521,8 +537,10 @@ def run_acceptance(output: Path) -> dict[str, Any]:
         failures = assess_counts(final_counts)
         if initial_counts != final_counts:
             failures.append("deterministic replay changed durable counts after rollout")
-        if not api_replaced or not detector_replaced:
-            failures.append("rolling/pod replacement did not create replacement pod identities")
+        if not api_replaced:
+            failures.append("API rollout retained an old pod identity past the deletion budget")
+        if not detector_replaced:
+            failures.append("detector restart retained the deleted pod identity")
         if scale_up_replicas != 3:
             failures.append("detector scale-up did not reach three ready replicas")
         if dashboard_status != "200":

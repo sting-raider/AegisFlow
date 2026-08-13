@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from scripts.accept_kubernetes import _safe_command, assess_counts
+from scripts.accept_kubernetes import _safe_command, _uids_replaced, assess_counts
 
 
 def test_assess_counts_accepts_exact_demo_conservation() -> None:
@@ -41,3 +41,11 @@ def test_nonroot_model_seed_does_not_preserve_pvc_root_metadata() -> None:
     )
     assert "cp -a" not in manifest
     assert "cp -R /app/models/registry/* /models/" in manifest
+
+
+def test_uid_replacement_requires_a_nonempty_disjoint_pod_set() -> None:
+    previous = {"old-a", "old-b"}
+
+    assert not _uids_replaced(previous, [])
+    assert not _uids_replaced(previous, [{"name": "terminating", "uid": "old-a"}])
+    assert _uids_replaced(previous, [{"name": "ready", "uid": "new-a"}])
