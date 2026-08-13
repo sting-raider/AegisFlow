@@ -716,3 +716,17 @@ Require registry digests and external signing/transparency evidence from the act
 release owner before deployment. Committing large SBOMs, inventing registry digests,
 declaring a release GO from image builds, or omitting the rejected-model status were
 rejected.
+
+## D-052 - Run the next sustained point at 30 flows/s on a clean Linux runner
+
+Predeclare a separate 30-minute 30 flows/s point after the local 50 flows/s 30-minute
+NO-GO. Keep the existing acceptance semantics and budgets unchanged: at least 98% of
+requested ingress, exact published/flow/detection conservation, 5-second durable P95,
+10,000 maximum queue depth, second-half growth within the two-percent rate tolerance,
+and zero final pending plus lag. Retain and publish the report even when it fails.
+
+Use a clean disposable GitHub-hosted Linux runner because unrelated workstation memory
+pressure invalidates another local capacity attribution. This does not make hosted-runner
+hardware representative of a target deployment; it supplies a reproducible lower-rate
+point and recovery/conservation evidence. Raising observed budgets, overwriting the
+50-flows/s failure, or treating eventual drain as a pass were rejected.
