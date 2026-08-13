@@ -73,7 +73,7 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   benign FPR. The current challenger family receives a development scientific NO-GO. No
   candidate is locked and the frozen final matrix remains sealed.
 - Remaining repository work proceeds to sustained
-  performance, real local OIDC/Kubernetes, restore, rollback/failure, security, and final
+  performance, local Kubernetes, restore, rollback/failure, security, and final
   GO/NO-GO evidence.
 - Research Schema A now emits 24 portable features from exporter-independent counts,
   fractions, derived rates, log transforms, protocol categories, port ranges, service
@@ -99,8 +99,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 180 tests pass, Ruff passes across the repository, strict MyPy passes across
-  87 source files including migrations, and measured backend coverage is 84%.
+- Python: 187 tests pass, Ruff passes across the repository, strict MyPy passes across
+  85 source files, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -131,7 +131,18 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   growth +2.538 messages/s. The API was killed once without a Docker OOM flag, restarted
   automatically, reclaimed its backlog, and eventually drained it. That is useful restart
   recovery evidence but cannot turn the failed latency/depth/growth gates into a pass.
-  The lower-rate ladder, multi-worker, and controlled failure matrix remain open.
+  The lower-rate ladder and remaining controlled failure matrix remain open.
+- A repeatable two-API-worker drill now proves persistence partitioning and recovery under
+  a paced 120-second, 50 flows/s workload. The acceptance-only replica durably persisted
+  50 detections before a controlled SIGKILL while owning 25 pending messages; the primary
+  reclaimed that work after the 30-second idle boundary, and a restarted replica persisted
+  2,800 more. All 6,000 flows and detections became durable, both queues ended at zero,
+  and all 6,000 durable latency samples were reconciled. The first drill exposed that a
+  timestamp high-water mark omitted 25 late out-of-order latency observations even though
+  database conservation was exact. The benchmark now deduplicates by event ID, performs
+  a final reconciliation query, and fails closed unless every published event has a
+  latency sample. This closes local multi-worker persistence correctness, not multi-host
+  scaling or capacity.
 - An optional local Dex acceptance profile generates uncommitted TLS and user credentials
   and has a fail-closed drill for discovery/JWKS, token and role validation, escalation
   denial, WebSockets, rate limits, audit identity, key rotation, and expiry. The first

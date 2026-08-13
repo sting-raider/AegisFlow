@@ -92,9 +92,30 @@ The exact report is
 
 The supported evidence boundary on this host is therefore narrow: 50 flows/s passes for
 10 minutes but is not sustainable for 30 minutes under the declared 5-second latency and
-10,000-depth budgets. Rate-ladder, lower-rate 30-minute, clean-host, and multi-worker
-evidence remain open. Eventual drain after an unplanned restart is recovery evidence, not
-a capacity pass.
+10,000-depth budgets. Rate-ladder, lower-rate 30-minute, and clean-host capacity evidence
+remain open. Eventual drain after an unplanned restart is recovery evidence, not a
+capacity pass.
+
+## Multi-worker persistence recovery
+
+`make multiworker-acceptance` starts an acceptance-only second API replica and runs a
+paced, metadata-only local workload. It requires both replicas to durably persist work,
+stops the extra replica with SIGKILL while Redis shows it owns pending messages, waits for
+the primary to reclaim the abandoned batch after the configured idle boundary, restarts
+the replica, and fails unless exact database conservation and zero final queue depth hold.
+
+The retained 120-second run at 50 flows/s passed: 6,000/6,000 flows and detections were
+durable; the killed replica owned 25 pending messages; the primary reclaimed them; the
+initial, primary, and restarted worker phases logged 50, 3,150, and 2,800 durable writes;
+and both queues ended at zero. P95 latency was 1.504 seconds. The workload report contains
+all 6,000 latency observations, including the late reclaimed batch. Exact evidence is
+[`multiworker-compose-windows-2026-08-13.json`](acceptance/multiworker-compose-windows-2026-08-13.json)
+and
+[`multiworker-recovery-workload-compose-windows-2026-08-13.json`](benchmarks/multiworker-recovery-workload-compose-windows-2026-08-13.json).
+
+The drill proves local shared-consumer partitioning, acknowledgement-after-durability,
+abandoned-work recovery, restart participation, and final idempotent conservation. It is
+not a multi-host or linear-scaling capacity claim.
 
 ## Redis-to-PostgreSQL pipeline
 
@@ -165,6 +186,12 @@ Ten-minute paced durable-path run (defaults shown):
 ```text
 make benchmark-sustained SUSTAINED_DURATION=600 SUSTAINED_RATE=50 \
   SUSTAINED_OUTPUT=sustained-compose-local.json
+```
+
+Multi-worker persistence recovery:
+
+```text
+make multiworker-acceptance
 ```
 
 Use explicit filenames for retained evidence. The command starts only PostgreSQL, Redis,

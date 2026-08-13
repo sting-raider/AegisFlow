@@ -629,3 +629,18 @@ restart recovery. Do not reinterpret eventual drain as sustainable service, hide
 host-contention limitation, raise the budgets after seeing the result, or generalize the
 passing 10-minute point to longer windows. Establish any lower 30-minute rate through a
 separate predeclared run.
+
+## D-046 - Reconcile multi-worker latency by event identity
+
+Exercise persistence replicas with a paced local workload and a controlled SIGKILL only
+after Redis proves the acceptance worker owns pending messages. Require durable work from
+the initial replica, surviving primary, and restarted replica; reclaim after the configured
+idle boundary; exact planned/published/flow/detection conservation; and zero final depth in
+both consumer groups. Keep the workload metadata-only and treat this as correctness and
+recovery evidence, not a multi-host or scaling-capacity claim.
+
+Track observed durable latency by event identity and perform one final all-run
+reconciliation query. Fail the sustained verdict when the latency-sample count differs
+from the published count. A timestamp-only high-water cursor was rejected because an
+abandoned older batch may commit after newer rows on another worker: database conservation
+can remain exact while that cursor silently omits the late observations.

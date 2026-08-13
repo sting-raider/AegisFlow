@@ -18,7 +18,7 @@ production NIDS. Detection never authorizes automatic blocking.
 | Challenger evidence | Registered baselines, costs, ablations, repeated held-family and cross-environment results | Complete for current family; cross-fitted calibration fails and records a development scientific NO-GO |
 | Final scientific gate | Candidate locked before exactly one frozen run; governed GO/NO-GO | No eligible candidate; frozen run not authorized and remains sealed |
 | Sustained capacity | 10/30-minute plus burst/failure tests with loss, lag, latency and resource budgets | 10-minute 50 flows/s local point passes; 30-minute 50 flows/s is a NO-GO on latency/depth/growth despite exact recovery. Lower-rate ladder and failure matrix open ([10m](benchmarks/sustained-compose-windows-2026-08-13-50fps-10m-postfix.json), [30m](benchmarks/sustained-compose-windows-2026-08-13-50fps-30m.json)) |
-| Multi-worker correctness | Partitioning, recovery, idempotency and shared state under sustained load | Open |
+| Multi-worker correctness | Partitioning, recovery, idempotency and shared state under sustained load | Pass for local Compose persistence workers: controlled pending-work SIGKILL/reclaim/restart, 6,000/6,000 exact conservation, zero final depth ([evidence](acceptance/multiworker-compose-windows-2026-08-13.json)); multi-host scaling remains deployment-specific |
 | Real local OIDC | Local IdP, roles, token/JWKS lifecycle and abuse cases | Pass on disposable local Dex profile ([evidence](acceptance/oidc-ci-2026-08-13.json)); organizational IdP validation remains deployment-specific |
 | Local Kubernetes | Actual kind/k3d deployment, probes, policies, migration, rollout and failure drill | Open |
 | Restore | Disposable database backup and measured restore validation | Open |

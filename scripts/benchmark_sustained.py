@@ -33,6 +33,7 @@ class SustainabilityCriteria(TypedDict):
     input_rate_maintained: bool
     queue_depth_bounded: bool
     no_unexplained_loss: bool
+    latency_sample_complete: bool
     latency_within_budget: bool
     returned_to_steady_state: bool
 
@@ -73,6 +74,7 @@ def assess_sustainability(
     published: int,
     persisted_flows: int,
     persisted_detections: int,
+    durable_latency_samples: int,
     achieved_rate: float,
     target_rate: float,
     latency_p95_ms: float | None,
@@ -94,6 +96,11 @@ def assess_sustainability(
             "durability mismatch "
             f"(flows={persisted_flows}, detections={persisted_detections}, "
             f"published={published})"
+        )
+    if durable_latency_samples != published:
+        failures.append(
+            "durable latency sample mismatch "
+            f"(samples={durable_latency_samples}, published={published})"
         )
     minimum_rate = target_rate * 0.98
     if achieved_rate < minimum_rate:
@@ -146,6 +153,7 @@ def assess_sustainability(
                 and persisted_flows == published
                 and persisted_detections == published
             ),
+            "latency_sample_complete": durable_latency_samples == published,
             "latency_within_budget": (
                 latency_p95_ms is not None and latency_p95_ms <= latency_budget_ms
             ),
@@ -162,28 +170,35 @@ def _new_durable_latencies(
     sensor_id: str,
     after: datetime | None,
     observed_at: datetime,
+    seen_event_ids: set[object],
 ) -> tuple[datetime | None, list[float]]:
     with repository.session() as session:
         statement = (
-            select(FlowRow.timestamp_start)
+            select(FlowRow.event_id, FlowRow.timestamp_start)
             .join(DetectionRow, DetectionRow.flow_event_id == FlowRow.event_id)
             .where(FlowRow.sensor_id == sensor_id)
             .order_by(FlowRow.timestamp_start.asc())
         )
         if after is not None:
             statement = statement.where(FlowRow.timestamp_start > after)
-        timestamps = list(session.scalars(statement))
-    if not timestamps:
+        rows = list(session.execute(statement))
+    if not rows:
         return after, []
-    normalized = [
-        value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
-        for value in timestamps
-    ]
+    normalized = []
+    for event_id, value in rows:
+        if event_id in seen_event_ids:
+            continue
+        seen_event_ids.add(event_id)
+        normalized.append(
+            value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+        )
+    newest = rows[-1][1]
+    newest = newest.replace(tzinfo=UTC) if newest.tzinfo is None else newest.astimezone(UTC)
     latencies = [
         max(0.0, (observed_at - timestamp).total_seconds() * 1000.0)
         for timestamp in normalized
     ]
-    return normalized[-1], latencies
+    return newest, latencies
 
 
 def run_sustained_benchmark(
@@ -227,6 +242,7 @@ def run_sustained_benchmark(
     published = 0
     publish_latencies_ms: list[float] = []
     durable_latencies_ms: list[float] = []
+    seen_durable_event_ids: set[object] = set()
     last_durable_timestamp: datetime | None = None
     samples: list[dict[str, float]] = []
     cpu_samples: list[float] = []
@@ -244,6 +260,7 @@ def run_sustained_benchmark(
             run_id,
             last_durable_timestamp,
             observed_at,
+            seen_durable_event_ids,
         )
         durable_latencies_ms.extend(new_latencies)
         flow_depth = flow_status["pending"] + flow_status["lag"]
@@ -324,6 +341,14 @@ def run_sustained_benchmark(
             break
         sleep(min(0.5, sample_interval_seconds))
     completed_at = datetime.now(UTC)
+    _, reconciled_latencies = _new_durable_latencies(
+        repository,
+        run_id,
+        None,
+        completed_at,
+        seen_durable_event_ids,
+    )
+    durable_latencies_ms.extend(reconciled_latencies)
     total_elapsed = perf_counter() - started
     flow_growth = queue_growth_per_second(publish_samples, "flow_queue_depth")
     detection_growth = queue_growth_per_second(
@@ -341,6 +366,7 @@ def run_sustained_benchmark(
         published=published,
         persisted_flows=persisted_flows,
         persisted_detections=persisted_detections,
+        durable_latency_samples=len(durable_latencies_ms),
         achieved_rate=achieved_rate,
         target_rate=target_rate,
         latency_p95_ms=p95_latency,

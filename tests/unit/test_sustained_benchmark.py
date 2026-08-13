@@ -18,6 +18,7 @@ def test_sustainability_passes_only_with_exact_durability_and_steady_state() -> 
         published=1_000,
         persisted_flows=1_000,
         persisted_detections=1_000,
+        durable_latency_samples=1_000,
         achieved_rate=100.0,
         target_rate=100.0,
         latency_p95_ms=900.0,
@@ -42,6 +43,7 @@ def test_sustainability_fails_growing_queue_and_missing_rows() -> None:
         published=1_000,
         persisted_flows=999,
         persisted_detections=998,
+        durable_latency_samples=997,
         achieved_rate=100.0,
         target_rate=100.0,
         latency_p95_ms=900.0,
@@ -58,6 +60,7 @@ def test_sustainability_fails_growing_queue_and_missing_rows() -> None:
 
     assert result["sustainable"] is False
     assert result["criteria"]["no_unexplained_loss"] is False
+    assert result["criteria"]["latency_sample_complete"] is False
     assert result["criteria"]["queue_depth_bounded"] is False
     assert result["criteria"]["returned_to_steady_state"] is False
 
@@ -68,6 +71,7 @@ def test_sustainability_fails_rate_latency_and_queue_budget() -> None:
         published=1_000,
         persisted_flows=1_000,
         persisted_detections=1_000,
+        durable_latency_samples=1_000,
         achieved_rate=97.9,
         target_rate=100.0,
         latency_p95_ms=1_001.0,

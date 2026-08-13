@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T09:26:18.588703+00:00",
+  "completed_at": "2026-08-13T09:28:37.307657+00:00",
+  "scope": "local Compose multi-worker persistence partitioning and recovery",
+  "safety": {
+    "metadata_only": true,
+    "payloads_stored": false,
+    "external_targets": false,
+    "automatic_blocking": false
+  },
+  "configuration": {
+    "duration_seconds": 120.0,
+    "target_flows_per_second": 50.0,
+    "claim_idle_ms": 30000,
+    "controlled_failure": "SIGKILL of one acceptance-only API replica"
+  },
+  "worker_evidence": {
+    "surviving_primary_persisted": 3150,
+    "initial_replica_persisted_before_kill": 50,
+    "restarted_replica_persisted": 2800,
+    "abandoned_pending_at_kill": 25,
+    "abandoned_pending_recovered": true
+  },
+  "workload_report": "docs/benchmarks/multiworker-recovery-workload-compose-windows-2026-08-13.json",
+  "workload_summary": {
+    "counts": {
+      "planned": 6000,
+      "published": 6000,
+      "persisted_flows": 6000,
+      "persisted_detections": 6000,
+      "durable_latency_samples": 6000
+    },
+    "latency_ms": {
+      "durable_p50": 1003.0250000000001,
+      "durable_p95": 1504.4514499999998,
+      "durable_p99": 1506.7990099999997,
+      "publish_batch_p50": 2.2848009998597263,
+      "publish_batch_p95": 4.881696749725961,
+      "publish_batch_p99": 7.413087189979706
+    },
+    "queues": {
+      "maximum_flow_depth": 25,
+      "maximum_detection_depth": 0,
+      "final_flow_depth": 0,
+      "final_detection_depth": 0,
+      "flow_growth_per_second": -0.05781457453470654,
+      "detection_growth_per_second": 0.0
+    },
+    "verdict": {
+      "sustainable": true,
+      "criteria": {
+        "input_rate_maintained": true,
+        "queue_depth_bounded": true,
+        "no_unexplained_loss": true,
+        "latency_sample_complete": true,
+        "latency_within_budget": true,
+        "returned_to_steady_state": true
+      },
+      "failures": []
+    }
+  },
+  "verdict": {
+    "passed": true,
+    "criteria": {
+      "all_worker_phases_persisted": true,
+      "stopped_worker_owned_pending_work": true,
+      "abandoned_work_reclaimed": true,
+      "exact_conservation": true,
+      "queues_drained": true
+    },
+    "failures": []
+  },
+  "limitations": [
+    "This is a synthetic metadata-only single-host recovery drill, not a capacity claim.",
+    "Per-worker counts are derived from structured durable-batch logs and may overlap on idempotent retry; exact database conservation is the authoritative total."
+  ]
+}

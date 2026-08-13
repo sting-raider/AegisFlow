@@ -10,7 +10,7 @@ SUSTAINED_OUTPUT ?= sustained-compose-local.json
 OIDC_OUTPUT ?= docs/acceptance/oidc-local.json
 
 .PHONY: install lint typecheck test frozen-evidence-check research-evidence-check train-smoke demo demo-stop replay \
-	live live-stop suricata-replay benchmark benchmark-sustained oidc-prepare oidc-acceptance oidc-stop \
+	live live-stop suricata-replay benchmark benchmark-sustained multiworker-acceptance oidc-prepare oidc-acceptance oidc-stop \
 	retention-cleanup reset
 
 install:
@@ -81,6 +81,10 @@ benchmark-sustained:
 		--duration-seconds "$(SUSTAINED_DURATION)" \
 		--target-rate "$(SUSTAINED_RATE)" \
 		--output "/app/docs/benchmarks/$(SUSTAINED_OUTPUT)"
+
+multiworker-acceptance:
+	$(COMPOSE) up -d --build postgres redis api detector
+	$(UV) run python -m scripts.accept_multiworker
 
 oidc-prepare:
 	$(UV) run --extra dev python -m scripts.prepare_oidc_acceptance
