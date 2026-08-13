@@ -1,0 +1,161 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T10:50:05.546064+00:00",
+  "completed_at": "2026-08-13T10:50:45.671889+00:00",
+  "scope": "controlled local security acceptance fixtures",
+  "safety": {
+    "external_targets": false,
+    "real_credentials": false,
+    "packet_payloads_stored": false,
+    "automatic_blocking": false
+  },
+  "categories": [
+    {
+      "name": "identity_and_browser_boundary",
+      "controls": [
+        "RBAC bypass and role escalation",
+        "malformed/oversized JWT and algorithm confusion",
+        "unknown/malicious key ID refresh amplification",
+        "oversized JWKS",
+        "WebSocket authentication/origin/connection/frame bounds",
+        "principal and path-scope rate limits",
+        "CORS origin confusion"
+      ],
+      "test_files": [
+        "tests/unit/test_auth.py",
+        "tests/integration/test_api.py"
+      ],
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "duration_seconds": 15.424848791000002,
+      "passed": true
+    },
+    {
+      "name": "exports_and_data_boundary",
+      "controls": [
+        "export authorization and raw-address privilege",
+        "allow-listed/pseudonymized output",
+        "spreadsheet-formula escaping",
+        "retention dependency safety"
+      ],
+      "test_files": [
+        "tests/unit/test_exports.py",
+        "tests/unit/test_retention.py"
+      ],
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "duration_seconds": 3.250682361999999,
+      "passed": true
+    },
+    {
+      "name": "model_and_artifact_governance",
+      "controls": [
+        "model promotion authorization",
+        "creator/reviewer/promoter separation",
+        "path containment and artifact replacement",
+        "checksum/schema/order binding",
+        "audited promotion and rollback"
+      ],
+      "test_files": [
+        "tests/unit/test_model_bundle.py",
+        "tests/unit/test_model_governance.py",
+        "tests/integration/test_model_governance_api.py"
+      ],
+      "counts": {
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "duration_seconds": 6.954786132000002,
+      "passed": true
+    },
+    {
+      "name": "untrusted_input_and_queue_boundary",
+      "controls": [
+        "oversized stream records",
+        "malformed/schema-invalid event quarantine",
+        "hash-only dead letters",
+        "bounded queue and recovery behavior"
+      ],
+      "test_files": [
+        "tests/unit/test_bus_recovery.py",
+        "tests/unit/test_detector_worker.py",
+        "tests/unit/test_consumer_recovery.py"
+      ],
+      "counts": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "duration_seconds": 5.787392284000006,
+      "passed": true
+    },
+    {
+      "name": "optional_provider_boundary",
+      "controls": [
+        "remote HTTPS and local loopback-only provider configuration",
+        "recursive endpoint/payload/secret removal",
+        "prompt-injection data boundary",
+        "active-response output rejection",
+        "bounded retry/rate/output and deterministic fallback"
+      ],
+      "test_files": [
+        "tests/unit/test_explanations.py",
+        "tests/unit/test_drift_explanations.py"
+      ],
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "duration_seconds": 5.357324493000007,
+      "passed": true
+    },
+    {
+      "name": "production_configuration_and_privilege",
+      "controls": [
+        "unsafe identity/secret/provider/datastore configuration",
+        "read-only/non-root/capability deployment shape",
+        "retention and backup ownership",
+        "secret-file parsing"
+      ],
+      "test_files": [
+        "tests/unit/test_production_check.py",
+        "tests/unit/test_compose_safety.py",
+        "tests/unit/test_database_config.py"
+      ],
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "duration_seconds": 3.3500775789999864,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "categories": 6,
+    "tests": 74
+  },
+  "verdict": {
+    "passed": true,
+    "failures": []
+  },
+  "limitations": [
+    "These controlled fixtures do not replace an organizational penetration test.",
+    "Local Dex lifecycle evidence is retained separately in the OIDC acceptance report.",
+    "Gateway, IdP, registry, managed service, and cluster policies require target validation."
+  ]
+}

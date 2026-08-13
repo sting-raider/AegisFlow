@@ -215,9 +215,11 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   fixtures into identity/browser, export/privacy, model/artifact, untrusted queue input,
   optional-provider, and production configuration/privilege categories. New negative
   controls explicitly reject malformed and oversized JWTs, algorithm confusion, and
-  oversized JWKS documents before untrusted processing or refresh amplification. It
-  targets no external system and retains only aggregate test evidence; clean-runner
-  evidence is pending.
+  oversized JWKS documents before untrusted processing or refresh amplification. GitHub
+  Actions run `31692826577` passed all 74 controlled tests across the six categories in
+  40.13 seconds. It targeted no external system and retained only aggregate evidence at
+  `docs/acceptance/security-ci-2026-08-13.json`; an organizational penetration test and
+  target gateway/IdP/cluster validation remain external.
 - Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic
