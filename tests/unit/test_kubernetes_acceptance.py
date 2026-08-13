@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from scripts.accept_kubernetes import _safe_command, assess_counts
 
 
@@ -24,3 +26,10 @@ def test_safe_command_redacts_disposable_secrets() -> None:
     assert "aegisflow-kind-only" not in rendered
     assert "psycopg" not in rendered
     assert rendered.count("<redacted>") == 2
+
+
+def test_nonroot_postgres_initializes_below_the_volume_mount() -> None:
+    manifest = Path("infra/kubernetes-local-acceptance/stateful.yaml").read_text(
+        encoding="utf-8"
+    )
+    assert "PGDATA, value: /var/lib/postgresql/data/pgdata" in manifest
