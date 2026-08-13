@@ -77,7 +77,7 @@ benchmark:
 	$(UV) run python -m scripts.benchmark
 
 benchmark-sustained:
-	$(COMPOSE) up -d --build postgres redis api detector
+	$(COMPOSE) up -d --build --wait --wait-timeout 180 postgres redis api detector
 	$(COMPOSE) run --rm --no-deps \
 		--volume "$(CURDIR)/docs/benchmarks:/app/docs/benchmarks" api \
 		python -m scripts.benchmark_sustained \

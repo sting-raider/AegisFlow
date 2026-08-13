@@ -134,7 +134,11 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   The lower-rate ladder and remaining controlled failure matrix remain open.
   A clean Linux-runner 30-minute point at 30 flows/s is predeclared with the unchanged
   98% ingress, exact-conservation, 5-second P95, 10,000-depth, second-half-growth, and
-  zero-final-lag gates; execution evidence is pending.
+  zero-final-lag gates. Its first clean-runner invocation aborted before measurement
+  because Compose container start raced the API migration and the `flows` table did not
+  yet exist. Base Compose now has an API readiness health contract and the harness waits
+  for it; the unchanged point is queued for rerun. The aborted invocation is not a
+  capacity pass or NO-GO.
 - A repeatable two-API-worker drill now proves persistence partitioning and recovery under
   a paced 120-second, 50 flows/s workload. The acceptance-only replica durably persisted
   50 detections before a controlled SIGKILL while owning 25 pending messages; the primary

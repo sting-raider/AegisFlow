@@ -730,3 +730,9 @@ pressure invalidates another local capacity attribution. This does not make host
 hardware representative of a target deployment; it supplies a reproducible lower-rate
 point and recovery/conservation evidence. Raising observed budgets, overwriting the
 50-flows/s failure, or treating eventual drain as a pass were rejected.
+
+The first invocation exited before publishing traffic because `docker compose up -d`
+returned while the API migration command was still creating the schema. Treat that as an
+invalid startup attempt, add `/health/ready` to the base Compose contract, and require the
+benchmark target to wait for readiness. Do not change the predeclared rate, duration, or
+budgets in response.
