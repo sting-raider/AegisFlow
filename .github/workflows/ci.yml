@@ -150,6 +150,30 @@ jobs:
       - if: always()
         run: docker compose -f compose.yml -f compose.oidc.yml down -v
 
+  restore-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.3"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked --extra dev
+      - run: make restore-acceptance RESTORE_OUTPUT=docs/acceptance/restore-ci.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restore-acceptance-report
+          path: docs/acceptance/restore-ci.json
+          if-no-files-found: warn
+      - if: always()
+        run: >-
+          docker compose --project-name aegisflow-restore-acceptance
+          -f compose.yml -f compose.demo.yml down -v --remove-orphans
+
   security:
     runs-on: ubuntu-24.04
     steps:

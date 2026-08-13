@@ -99,8 +99,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 195 tests pass, Ruff passes across the repository, strict MyPy passes across
-  86 source files, and measured backend coverage is 84%.
+- Python: 200 tests pass, Ruff passes across the repository, strict MyPy passes across
+  92 source files, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -171,6 +171,14 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   controls without echoing secrets. Eight negative/positive tests pass. The rejected smoke
   bundle and absent operator attestations intentionally keep the checked-in defaults at
   production NO-GO.
+- A fail-closed restore drill now creates a separately named Compose project, refuses any
+  pre-existing project container or volume, seeds required flow/detection/alert/incident/
+  feedback/audit state, records every table count and primary-identity digest, performs a
+  custom-format backup, force-drops only the disposable database, restores to a clean
+  database, re-runs migrations, compares exact identities, smokes the real API, removes
+  the temporary dump, and deletes the isolated project volumes. The clean-runner CI
+  execution and retained aggregate evidence are pending; documentation alone is not
+  counted as a restore pass.
 - Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic

@@ -658,3 +658,19 @@ NO-GO. A successful Compose render, checksum-valid bundle, or passing scientific
 alone is insufficient: operational ownership and human approval must also be explicit.
 Permissive defaults, accepting fallback models, inferring retention ownership, or treating
 documentation as proof of a backup were rejected.
+
+## D-048 - Restore only inside an isolated disposable Compose project
+
+Exercise backup restoration in a dedicated `aegisflow-restore-acceptance` Compose project
+whose PostgreSQL and Redis volumes are project-scoped. Refuse to start if any container or
+volume with that project label already exists. Seed deterministic synthetic metadata,
+record per-table counts and primary-identity digests, create a custom-format `pg_dump`,
+force-drop only the disposable database, restore into a clean database, re-run migrations,
+compare every table and identity digest, and smoke the real API before deleting the dump
+and project volumes.
+
+Run the destructive sequence on a clean CI runner when the local host is under unrelated
+memory pressure. Retain only aggregate counts, timings, and the backup SHA-256; never
+retain the dump or emit credentials. Reusing the developer database, dropping a database
+without a project-isolation check, treating `pg_restore` exit zero as sufficient, or
+claiming managed-backup readiness from this local drill were rejected.
