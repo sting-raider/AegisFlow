@@ -99,8 +99,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 187 tests pass, Ruff passes across the repository, strict MyPy passes across
-  85 source files, and measured backend coverage is 84%.
+- Python: 195 tests pass, Ruff passes across the repository, strict MyPy passes across
+  86 source files, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -163,6 +163,14 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   PostgreSQL downtime leaves its event pending and records retry errors, and recovery
   persists it after restart. Replaying six deterministic IDs adds no duplicate rows.
 - Queue lag and pending counts are exposed by Prometheus and the System Health API/UI.
+- `make production-check` now fails closed on demo/missing OIDC, unsafe identity/provider
+  URLs, wildcard browser origins, empty/default database secrets, public datastores,
+  writable or overprivileged application containers, missing readiness, absent/corrupt or
+  fallback model bundles, blocking evaluation evidence, missing independent approval,
+  ambiguous retention ownership, and missing backup configuration. Error reports name
+  controls without echoing secrets. Eight negative/positive tests pass. The rejected smoke
+  bundle and absent operator attestations intentionally keep the checked-in defaults at
+  production NO-GO.
 - Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic

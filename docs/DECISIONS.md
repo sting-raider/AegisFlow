@@ -644,3 +644,17 @@ reconciliation query. Fail the sustained verdict when the latency-sample count d
 from the published count. A timestamp-only high-water cursor was rejected because an
 abandoned older batch may commit after newer rows on another worker: database conservation
 can remain exact while that cursor silently omits the late observations.
+
+## D-047 - Make production preflight an evidence and deployment gate
+
+Validate production configuration from the release workspace before deployment and fail
+on any unsafe identity, secret, browser-origin, external-provider, datastore-exposure,
+filesystem, capability, model, readiness, retention, or backup state. Reuse the governed
+candidate evaluator for exact bundle/report binding and require a separate release-time
+approval attestation whose approver differs from its promoter. Never print secret values.
+
+Treat the checked-in scientifically rejected smoke bundle as an intentional production
+NO-GO. A successful Compose render, checksum-valid bundle, or passing scientific report
+alone is insufficient: operational ownership and human approval must also be explicit.
+Permissive defaults, accepting fallback models, inferring retention ownership, or treating
+documentation as proof of a backup were rejected.

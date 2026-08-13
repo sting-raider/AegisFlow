@@ -87,6 +87,7 @@ make replay PCAP=/absolute/path/capture.pcap
 make live INTERFACE=eth0
 make suricata-replay PCAP=/absolute/path/capture.pcap
 make benchmark
+make production-check
 make benchmark-sustained SUSTAINED_DURATION=600 SUSTAINED_RATE=50
 make oidc-acceptance
 make reset

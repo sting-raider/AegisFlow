@@ -23,7 +23,7 @@ production NIDS. Detection never authorizes automatic blocking.
 | Local Kubernetes | Actual kind/k3d deployment, probes, policies, migration, rollout and failure drill | Open |
 | Restore | Disposable database backup and measured restore validation | Open |
 | Security acceptance | Controlled auth, input, secret, network and privilege abuse tests | Open |
-| Production validator | Fail-closed unsafe-config checks | Open |
+| Production validator | Fail-closed unsafe-config checks | Implemented with negative controls for identity, secrets, CORS/WebSockets, provider TLS, datastore exposure, filesystems/capabilities, model/evidence/approval, readiness, retention, and backup. The checked-in rejected smoke model correctly remains a production NO-GO. |
 | Release evidence | Reproducible artifacts, SBOM/provenance and release manifest | Open |
 | Final report | `docs/FINAL_ACCEPTANCE_REPORT.md` with safe-claim boundary | Open |
 

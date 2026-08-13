@@ -25,6 +25,14 @@ jobs:
       - run: uv run python -m scripts.verify_frozen_evidence
       - run: uv run python -m scripts.verify_research_experiments
       - run: uv run pytest --cov=packages --cov=services --cov=apps.api
+      - name: Production preflight rejects checked-in defaults
+        run: |
+          set +e
+          uv run python -m scripts.production_check --output production-check.json
+          status=$?
+          set -e
+          test "$status" -ne 0
+          uv run python -c "import json; report=json.load(open('production-check.json')); codes={item['code'] for item in report['errors']}; assert report['passed'] is False and {'demo_enabled','missing_readiness_report'} <= codes"
       - run: uv run python scripts/evaluate_nfstream.py --pcap tests/fixtures/demo.pcap
       - run: uv run python -m training.cli.train_smoke
       - run: AEGISFLOW_DATABASE_URL=sqlite:///ci-migration.db uv run python -m scripts.migrate
