@@ -2,7 +2,7 @@
 
 Current verdict: **NOT ACCEPTED / IN PROGRESS**
 
-Last updated: 2026-08-11
+Last updated: 2026-08-13
 
 The repository is a demoable engineering and evaluation platform. The current detector is
 scientifically rejected and there is not yet enough operational evidence to deploy it as a
@@ -19,7 +19,7 @@ production NIDS. Detection never authorizes automatic blocking.
 | Final scientific gate | Candidate locked before exactly one frozen run; governed GO/NO-GO | No eligible candidate; frozen run not authorized and remains sealed |
 | Sustained capacity | 10/30-minute plus burst/failure tests with loss, lag, latency and resource budgets | Open |
 | Multi-worker correctness | Partitioning, recovery, idempotency and shared state under sustained load | Open |
-| Real local OIDC | Local IdP, roles, token/JWKS lifecycle and abuse cases | Open |
+| Real local OIDC | Local IdP, roles, token/JWKS lifecycle and abuse cases | Pass on disposable local Dex profile ([evidence](acceptance/oidc-ci-2026-08-13.json)); organizational IdP validation remains deployment-specific |
 | Local Kubernetes | Actual kind/k3d deployment, probes, policies, migration, rollout and failure drill | Open |
 | Restore | Disposable database backup and measured restore validation | Open |
 | Security acceptance | Controlled auth, input, secret, network and privilege abuse tests | Open |

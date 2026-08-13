@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T07:48:48.002573+00:00",
+  "scope": "local Dex-to-AegisFlow OIDC production-acceptance profile",
+  "identity_provider": {
+    "name": "Dex",
+    "image": "ghcr.io/dexidp/dex:v2.44.0"
+  },
+  "configuration": {
+    "issuer": "https://localhost:5556/dex",
+    "audience": "aegisflow-api",
+    "algorithm": "RS256",
+    "roles_claim": "email",
+    "clock_skew_seconds": 2,
+    "jwks_cache_seconds": 30,
+    "id_token_lifetime_seconds": 60
+  },
+  "checks": [
+    {
+      "name": "discovery_and_jwks",
+      "passed": true,
+      "detail": "HTTPS discovery and non-empty JWKS passed"
+    },
+    {
+      "name": "api_readiness",
+      "passed": true,
+      "detail": "API and database readiness passed"
+    },
+    {
+      "name": "token_issuance",
+      "passed": true,
+      "detail": "viewer, analyst, and admin ID tokens issued"
+    },
+    {
+      "name": "role_mapping",
+      "passed": true,
+      "detail": "server-derived viewer/analyst/admin roles passed"
+    },
+    {
+      "name": "rbac_boundaries",
+      "passed": true,
+      "detail": "viewer denial and analyst/admin boundaries passed"
+    },
+    {
+      "name": "audit_actor",
+      "passed": true,
+      "detail": "admin OIDC subject was durably attributed"
+    },
+    {
+      "name": "websocket_authentication",
+      "passed": true,
+      "detail": "viewer bearer subprotocol passed"
+    },
+    {
+      "name": "token_abuse_controls",
+      "passed": true,
+      "detail": "malformed and wrong-audience tokens denied"
+    },
+    {
+      "name": "principal_rate_limit",
+      "passed": true,
+      "detail": "sixth read in one window was rejected"
+    },
+    {
+      "name": "jwks_key_rotation",
+      "passed": true,
+      "detail": "old key denied and new key accepted; Dex recreation 0.35s"
+    },
+    {
+      "name": "expiry_and_clock_skew",
+      "passed": true,
+      "detail": "2-second skew accepted then expiry denied"
+    }
+  ],
+  "timing": {
+    "total_seconds": 95.082245188
+  },
+  "safety": {
+    "loopback_only": true,
+    "ephemeral_credentials": true,
+    "credentials_or_tokens_recorded": false,
+    "production_dependency": false
+  },
+  "verdict": {
+    "accepted": true,
+    "failures": []
+  },
+  "limitations": [
+    "Dex static users exercise the OIDC contract but do not represent an organizational IdP.",
+    "Application rate limits are process-local; multi-replica deployments still need a gateway-wide limit.",
+    "The profile validates deployment mechanics on one local Compose host only."
+  ]
+}

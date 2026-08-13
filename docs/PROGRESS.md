@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-08-12.
+Last updated: 2026-08-13.
 
 ## Active final model and production-acceptance phase
 
@@ -99,8 +99,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 179 tests pass, Ruff passes across the repository, strict MyPy passes across
-  84 source files including migrations, and measured backend coverage is 84%.
+- Python: 180 tests pass, Ruff passes across the repository, strict MyPy passes across
+  87 source files including migrations, and measured backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -112,10 +112,15 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   conservation, requested ingress pace, queue depth and second-half growth, durable P95
   latency, and final zero pending plus lag. The required 10/30-minute and failure runs
   remain open; the harness alone is not capacity evidence.
-- An optional local Dex acceptance profile now generates uncommitted TLS and user
-  credentials and has a fail-closed drill for discovery/JWKS, token and role validation,
-  escalation denial, WebSockets, rate limits, audit identity, key rotation, and expiry.
-  Its containerized acceptance run remains open and must not be inferred from unit tests.
+- An optional local Dex acceptance profile generates uncommitted TLS and user credentials
+  and has a fail-closed drill for discovery/JWKS, token and role validation, escalation
+  denial, WebSockets, rate limits, audit identity, key rotation, and expiry. The first
+  clean-host run exposed Dex's need for an ephemeral `/tmp` workspace under a read-only
+  root; the bounded tmpfs fix is regression-covered. GitHub Actions run `31679100788`
+  then passed all 11 checks in 95.08 seconds with no credentials or tokens recorded.
+  Aggregate evidence is retained at `docs/acceptance/oidc-ci-2026-08-13.json`. This closes
+  the disposable local-IdP acceptance item, not organizational-IdP validation or the need
+  for gateway-wide rate limits in replicated deployments.
   The local Compose Redis-to-PostgreSQL gate initially timed out at 150 seconds with
   1,828/2,000 rows durable; bounded persistence transactions and transaction-local
   incident-context caching then completed 2,000/2,000 in 25.39 seconds (78.78 flows/s)

@@ -76,6 +76,12 @@ The password grant exists only to automate this isolated acceptance profile. Pro
 browser clients must use authorization code with PKCE; do not copy the local static-user
 configuration into a real deployment.
 
+The secret-free aggregate from the accepted Linux CI drill is retained at
+`docs/acceptance/oidc-ci-2026-08-13.json` (GitHub Actions run `31679100788`). It passed
+all 11 checks in 95.08 seconds. This evidence applies only to the disposable local Dex
+contract; each target deployment must still validate its organizational provider and
+gateway-wide rate limiting.
+
 Send the access token as `Authorization: Bearer <token>`. The dashboard can be placed
 behind an identity-aware reverse proxy that injects the verified bearer token into both
 HTTP and WebSocket upstream requests. A SPA OIDC client can alternatively call the
