@@ -182,6 +182,14 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   passed in a 102.00-second drill. Aggregate evidence is retained at
   `docs/acceptance/restore-ci-2026-08-13.json`. This closes disposable local PostgreSQL
   mechanics, not managed backup, encryption, off-host durability, RPO, or RTO validation.
+- A disposable kind acceptance profile now deploys the actual Kustomize base with local
+  PostgreSQL/Redis, generated runtime/TLS secrets, seeded model/evaluation volumes, two
+  API/dashboard/detector replicas, migration init, probes, bounded resources, ingress,
+  NetworkPolicies, and external retention ownership. Its fail-closed harness adds safe
+  synthetic sensor replay, exact durable conservation, unlabelled-client denial, API
+  rolling replacement, detector scale/restart, duplicate-replay idempotency, measured
+  recovery, and exact-cluster cleanup. Clean Linux runner evidence remains pending and no
+  managed-cloud claim is made.
 - Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic

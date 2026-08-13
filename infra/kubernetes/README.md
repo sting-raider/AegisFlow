@@ -33,3 +33,12 @@ The base is a deployment starting point, not evidence of production capacity. Da
 Redis, storage, ingress, and identity-provider limits must be validated in the target
 environment. Prometheus scraping of `/metrics` needs a viewer credential because metrics
 are authenticated outside demo mode.
+
+## Disposable local acceptance profile
+
+`../kubernetes-local-acceptance` deploys this base into a disposable kind cluster with local
+PostgreSQL/Redis, loopback-only ingress, a generated test TLS certificate, local images,
+and the synthetic demo identity/traffic fixture. It exists only to prove deployment
+mechanics and must never be adapted into a production environment. Run it through
+`make kubernetes-acceptance`; the harness refuses to replace an existing cluster with its
+fixed acceptance name and deletes only that cluster during cleanup.

@@ -174,6 +174,41 @@ jobs:
           docker compose --project-name aegisflow-restore-acceptance
           -f compose.yml -f compose.demo.yml down -v --remove-orphans
 
+  kubernetes-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.3"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked --extra dev
+      - name: Install pinned kind
+        run: |
+          curl --fail --location --output /tmp/kind \
+            https://github.com/kubernetes-sigs/kind/releases/download/v0.32.0/kind-linux-amd64
+          echo "50030de23cf40a18505f20426f6a8506bedf13c6e509244bd1fa9463721b0f54  /tmp/kind" \
+            | sha256sum --check
+          sudo install -m 0755 /tmp/kind /usr/local/bin/kind
+      - run: make kubernetes-acceptance KUBERNETES_OUTPUT=docs/acceptance/kubernetes-ci.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kubernetes-acceptance-report
+          path: docs/acceptance/kubernetes-ci.json
+          if-no-files-found: warn
+      - if: failure()
+        run: |
+          kubectl get pods -A -o wide || true
+          kubectl -n aegisflow describe pods || true
+          kubectl -n aegisflow logs -l app.kubernetes.io/name=aegisflow-api --all-containers || true
+          kubectl -n aegisflow logs -l app.kubernetes.io/name=aegisflow-detector --all-containers || true
+      - if: always()
+        run: kind delete cluster --name aegisflow-acceptance || true
+
   security:
     runs-on: ubuntu-24.04
     steps:

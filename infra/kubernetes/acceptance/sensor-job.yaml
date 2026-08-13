@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sensor-replay
+  namespace: aegisflow
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aegisflow-sensor-replay
+        app.kubernetes.io/part-of: aegisflow
+    spec:
+      restartPolicy: Never
+      serviceAccountName: aegisflow
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: sensor
+          image: aegisflow-backend:acceptance
+          imagePullPolicy: Never
+          command: [python, -m, services.sensor.main, --mode, demo]
+          envFrom:
+            - configMapRef: {name: aegisflow-config}
+            - secretRef: {name: aegisflow-runtime-secrets}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: "1", memory: 512Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - {name: tmp, emptyDir: {sizeLimit: 64Mi}}

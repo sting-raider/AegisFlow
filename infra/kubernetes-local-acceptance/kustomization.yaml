@@ -1,0 +1,92 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: aegisflow
+resources:
+  - ../kubernetes
+  - stateful.yaml
+images:
+  - name: registry.example.invalid/security/aegisflow-backend
+    newName: aegisflow-backend
+    newTag: acceptance
+  - name: registry.example.invalid/security/aegisflow-dashboard
+    newName: aegisflow-dashboard
+    newTag: acceptance
+patches:
+  - patch: |-
+      - op: replace
+        path: /data/AEGISFLOW_DEMO
+        value: "1"
+      - op: replace
+        path: /data/AEGISFLOW_AUTH_MODE
+        value: demo
+      - op: replace
+        path: /data/AEGISFLOW_CORS_ORIGINS
+        value: https://aegisflow.local
+    target:
+      kind: ConfigMap
+      name: aegisflow-config
+  - patch: |-
+      - op: replace
+        path: /spec/accessModes
+        value: [ReadWriteOnce]
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 1Gi
+    target:
+      kind: PersistentVolumeClaim
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 0
+      - op: add
+        path: /spec/template/metadata/labels/app.kubernetes.io~1part-of
+        value: aegisflow
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+    target:
+      kind: Deployment
+      name: api
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 0
+      - op: add
+        path: /spec/template/metadata/labels/app.kubernetes.io~1part-of
+        value: aegisflow
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+    target:
+      kind: Deployment
+      name: detector
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 0
+      - op: add
+        path: /spec/template/metadata/labels/app.kubernetes.io~1part-of
+        value: aegisflow
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: add
+        path: /spec/template/spec/containers/0/env
+        value:
+          - {name: NGINX_RESOLVER, value: "10.96.0.10"}
+    target:
+      kind: Deployment
+      name: dashboard
+  - patch: |-
+      - op: add
+        path: /spec/ingressClassName
+        value: nginx
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: aegisflow.local
+      - op: replace
+        path: /spec/rules/0/host
+        value: aegisflow.local
+    target:
+      kind: Ingress
+      name: aegisflow

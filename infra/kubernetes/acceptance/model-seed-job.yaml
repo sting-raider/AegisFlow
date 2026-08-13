@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: model-seed
+  namespace: aegisflow
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aegisflow-model-seed
+        app.kubernetes.io/part-of: aegisflow
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: seed
+          image: aegisflow-backend:acceptance
+          imagePullPolicy: Never
+          command: [sh, -c, "cp -a /app/models/registry/. /models/ && cp -a /app/docs/evaluation/. /evaluations/"]
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: models, mountPath: /models}
+            - {name: evaluations, mountPath: /evaluations}
+      volumes:
+        - {name: models, persistentVolumeClaim: {claimName: model-registry}}
+        - {name: evaluations, persistentVolumeClaim: {claimName: evaluation-reports}}

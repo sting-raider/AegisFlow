@@ -674,3 +674,21 @@ memory pressure. Retain only aggregate counts, timings, and the backup SHA-256; 
 retain the dump or emit credentials. Reusing the developer database, dropping a database
 without a project-isolation check, treating `pg_restore` exit zero as sufficient, or
 claiming managed-backup readiness from this local drill were rejected.
+
+## D-049 - Exercise the production Kustomize base through a demo-only kind overlay
+
+Keep the organizational Kustomize base free of databases, credentials, demo identity,
+and mutable image tags. Compose it into a separate local-acceptance root that adds only
+disposable PostgreSQL/Redis, generated secrets and TLS, local images, and zero initial
+application replicas so model volumes can be seeded before migration-bearing pods start.
+Run the profile in a fixed-name kind cluster and refuse to replace any cluster already
+using that name.
+
+Require actual TLS ingress, probes, resource bounds, migration init, two-replica API/
+dashboard/detector startup, safe sensor replay, exact database conservation, enforced
+data-service NetworkPolicy denial, API rolling replacement, detector scale and pod
+replacement, idempotent replay, and exact cleanup. Use cluster DNS as the dashboard's
+configurable resolver while preserving Docker's resolver default. Treat this only as
+single-node deployment-mechanics evidence. Editing the production base into a demo,
+committing test secrets, applying traffic externally, replacing an existing cluster, or
+calling a local kind result managed-cloud readiness were rejected.
