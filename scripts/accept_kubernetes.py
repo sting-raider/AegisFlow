@@ -136,19 +136,31 @@ def _pod_diagnostics() -> list[dict[str, Any]]:
     except json.JSONDecodeError:
         return [{"collection_error": "pod status was invalid JSON"}]
     diagnostics: list[dict[str, Any]] = []
-    for item in payload.get("items", []) if isinstance(payload, dict) else []:
-        if not isinstance(item, dict):
+    raw_items = payload.get("items", []) if isinstance(payload, dict) else []
+    if not isinstance(raw_items, list):
+        return [{"collection_error": "pod status items were not a list"}]
+    for raw_item in raw_items:
+        if not isinstance(raw_item, dict):
             continue
-        metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
-        status = item.get("status") if isinstance(item.get("status"), dict) else {}
+        item = cast(dict[str, Any], raw_item)
+        raw_metadata = item.get("metadata")
+        metadata = cast(dict[str, Any], raw_metadata) if isinstance(raw_metadata, dict) else {}
+        raw_pod_status = item.get("status")
+        status = (
+            cast(dict[str, Any], raw_pod_status) if isinstance(raw_pod_status, dict) else {}
+        )
         containers: list[dict[str, str]] = []
         raw_statuses = status.get("containerStatuses", [])
-        for container in raw_statuses if isinstance(raw_statuses, list) else []:
-            if not isinstance(container, dict):
+        statuses = raw_statuses if isinstance(raw_statuses, list) else []
+        for raw_container in statuses:
+            if not isinstance(raw_container, dict):
                 continue
-            state = container.get("state") if isinstance(container.get("state"), dict) else {}
+            container = cast(dict[str, Any], raw_container)
+            raw_state = container.get("state")
+            state = cast(dict[str, Any], raw_state) if isinstance(raw_state, dict) else {}
             state_name = next(iter(state), "unknown")
-            detail = state.get(state_name) if isinstance(state.get(state_name), dict) else {}
+            raw_detail = state.get(state_name)
+            detail = cast(dict[str, Any], raw_detail) if isinstance(raw_detail, dict) else {}
             containers.append(
                 {
                     "name": str(container.get("name", "unknown")),
