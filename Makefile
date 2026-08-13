@@ -78,6 +78,7 @@ benchmark:
 
 benchmark-sustained:
 	$(COMPOSE) up -d --build --wait --wait-timeout 180 postgres redis api detector
+	$(UV) run python -m scripts.prepare_benchmark_output --name "$(SUSTAINED_OUTPUT)"
 	$(COMPOSE) run --rm --no-deps \
 		--volume "$(CURDIR)/docs/benchmarks:/app/docs/benchmarks" api \
 		python -m scripts.benchmark_sustained \

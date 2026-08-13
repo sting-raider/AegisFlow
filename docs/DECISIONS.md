@@ -736,3 +736,10 @@ returned while the API migration command was still creating the schema. Treat th
 invalid startup attempt, add `/health/ready` to the base Compose contract, and require the
 benchmark target to wait for readiness. Do not change the predeclared rate, duration, or
 budgets in response.
+
+The second invocation completed the 30-minute workload and reconciliation but failed while
+creating the report in the Linux bind mount because the non-root container could not create
+a file in the runner-owned directory. Treat that as another invalid evidence-retention
+attempt. Validate a basename-only JSON output and pre-create exactly that file with write
+permission before starting the container; do not run the benchmark as root, broaden the
+directory permissions, recover a verdict from incomplete logs, or alter the declared point.

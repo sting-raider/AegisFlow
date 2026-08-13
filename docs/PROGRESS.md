@@ -137,8 +137,11 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   zero-final-lag gates. Its first clean-runner invocation aborted before measurement
   because Compose container start raced the API migration and the `flows` table did not
   yet exist. Base Compose now has an API readiness health contract and the harness waits
-  for it; the unchanged point is queued for rerun. The aborted invocation is not a
-  capacity pass or NO-GO.
+  for it. The second invocation completed the full workload and reconciliation but could
+  not create the final report in a Linux bind-mounted directory owned by the runner. The
+  harness now validates and pre-creates only the named JSON output with write permission
+  for the non-root benchmark container. Neither invalid invocation is a capacity pass or
+  NO-GO; the unchanged point is queued for one final rerun.
 - A repeatable two-API-worker drill now proves persistence partitioning and recovery under
   a paced 120-second, 50 flows/s workload. The acceptance-only replica durably persisted
   50 detections before a controlled SIGKILL while owning 25 pending messages; the primary
