@@ -192,6 +192,66 @@ def test_unknown_oidc_key_ids_cannot_force_repeated_jwks_refreshes(
     assert refreshes == 1
 
 
+def test_oidc_rejects_malformed_oversized_and_algorithm_confusion_tokens(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private_key = rsa.generate_private_key(public_exponent=65_537, key_size=2048)
+    public_jwk = jwt.algorithms.RSAAlgorithm.to_jwk(private_key.public_key(), as_dict=True)
+    public_jwk.update({"kid": "test-key", "alg": "RS256"})
+    authenticator = Authenticator(_settings(mode="oidc"))
+    jwks = authenticator.__dict__["_jwks"]
+    lookups = 0
+
+    def key(_key_id: str) -> dict[str, Any]:
+        nonlocal lookups
+        lookups += 1
+        return public_jwk
+
+    monkeypatch.setattr(jwks, "key", key)
+    for token in (
+        "not-a-jwt",
+        "x" * 16_385,
+        jwt.encode(
+            {"sub": "attacker"},
+            "not-a-trusted-secret" * 2,
+            algorithm="HS256",
+            headers={"kid": "test-key"},
+        ),
+    ):
+        with pytest.raises(AuthenticationError) as rejected:
+            authenticator.authenticate_headers({"authorization": f"Bearer {token}"})
+        assert rejected.value.code == "invalid_credentials"
+    assert lookups == 0
+
+
+def test_jwks_refresh_rejects_oversized_documents(monkeypatch: pytest.MonkeyPatch) -> None:
+    cache = _JwksCache("https://identity.example.test/jwks.json", cache_seconds=300)
+
+    class Response:
+        content = b"x" * (1024 * 1024 + 1)
+
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict[str, Any]:
+            raise AssertionError("oversized JWKS must be rejected before JSON parsing")
+
+    class Client:
+        def __enter__(self) -> Client:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def get(self, *_args: object, **_kwargs: object) -> Response:
+            return Response()
+
+    monkeypatch.setattr("apps.api.auth.httpx.Client", lambda **_kwargs: Client())
+    with pytest.raises(AuthenticationError) as rejected:
+        cache.key("known-key")
+    assert rejected.value.code == "identity_provider_unavailable"
+
+
 def _settings(
     *,
     mode: str,

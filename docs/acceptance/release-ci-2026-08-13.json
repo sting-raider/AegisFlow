@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T10:39:40.629036+00:00",
+  "release": {
+    "application": "aegisflow",
+    "application_version": "0.1.0",
+    "git_commit": "0dee152634a606977dda4e5207583a7290a50db6",
+    "workspace_clean": true,
+    "production_eligibility": "no-go",
+    "production_eligibility_reason": "no model candidate passed development selection; frozen final evidence remains sealed"
+  },
+  "containers": {
+    "backend": {
+      "build_reference": "aegisflow-backend:release-evidence",
+      "content_id": "sha256:4e688069f59e25bb77482daab9a37a2c810e249a817433bd903237110cb6598d",
+      "size_bytes": 1496859721,
+      "registry_digest_required_for_production": true,
+      "sbom": {
+        "format": "CycloneDX",
+        "spec_version": "1.7",
+        "component_count": 3664,
+        "bytes": 1520396,
+        "sha256": "e9391092fd92cb4e4692948640305c2274170f6015c835b8486295cde96b44ac"
+      }
+    },
+    "dashboard": {
+      "build_reference": "aegisflow-dashboard:release-evidence",
+      "content_id": "sha256:edffe4f4d4ac0a8ad7ddf77cd5ed8c951050ddde76b44baa7f82dac93500f8a8",
+      "size_bytes": 48823911,
+      "registry_digest_required_for_production": true,
+      "sbom": {
+        "format": "CycloneDX",
+        "spec_version": "1.7",
+        "component_count": 1305,
+        "bytes": 483443,
+        "sha256": "a488dcc6d55fc08d524541a4d405cdeb388cdd5d1bbac27cd21a5ec07ac6ba17"
+      }
+    }
+  },
+  "database": {"migration_head": "0003_incident_membership"},
+  "model": {
+    "name": "aegisflow-smoke",
+    "version": "0.3.0",
+    "bundle_schema_version": 3,
+    "pointer_sha256": "45dc4d8cf19af3244a912107a9ed3df82ed9fb4e8272bee86940ec636f7fd52f",
+    "checksum_manifest_sha256": "2bf1a4aee4e23abd1da4eef18ceb795dbade296ec0829219401b3be1f1ae3265",
+    "verified_artifact_count": 12,
+    "scientific_status": "synthetic-smoke-only-rejected-for-production"
+  },
+  "feature_schema": {
+    "version": "1.0.0",
+    "sha256": "db3cc539b903036053e64445cfde08dbf06ff0a6dda447afff002d833c8e0927",
+    "feature_count": 18
+  },
+  "suricata": {
+    "image": "jasonish/suricata:8.0.6",
+    "rules": [{
+      "path": "configs/suricata/rules/aegisflow-demo.rules",
+      "sha256": "0d46bbda48eab6347dca6e0986c99da54d49791c741212f17827f8cddbb51241"
+    }]
+  },
+  "configuration": {
+    "contract_version": "1.0.0",
+    "production_validator_sha256": "6a7516918e5150a8b971f4511605a59b48f1d3f174c4f019b91ea45a13dc569c"
+  },
+  "dependency_locks": {
+    "python": {"path": "uv.lock", "sha256": "5d5518e2dc9b99ae0f96a5faa9919cae6fa5ead7851154d39274ed0c1515d60f"},
+    "dashboard": {"path": "apps/dashboard/package-lock.json", "sha256": "6a0648d0136353ff32e702e1f174038f7eafaf1dea3b043050b69fe97b99fd8c"}
+  },
+  "provenance": {
+    "builder": "GitHub Actions",
+    "workflow_run_id": "31691923092",
+    "workflow_sha": "0dee152634a606977dda4e5207583a7290a50db6",
+    "runner_os": "Linux",
+    "python": "3.11.15",
+    "sbom_generator": "syft-1.51.0"
+  },
+  "limitations": [
+    "Local Docker content IDs are immutable build evidence but registry digests are required for deployment.",
+    "This manifest records a scientifically rejected development snapshot, not a production release.",
+    "Signing and transparency-log publication require the release owner's external identity and registry."
+  ]
+}

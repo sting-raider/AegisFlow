@@ -200,8 +200,17 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   tool CycloneDX SBOMs, and emits a manifest binding the clean Git commit, application
   version, immutable local image content IDs, SBOM digests, migration head, checksum-
   verified model bundle, feature schema, Suricata/rules, configuration validator, and
-  dependency locks. It records the current scientific NO-GO and requires registry digests
-  plus external signing for production. Clean-runner evidence is pending.
+  dependency locks. GitHub Actions run `31691923092` generated 3,664 backend and 1,305
+  dashboard CycloneDX components and retained their hashes plus the aggregate manifest at
+  `docs/acceptance/release-ci-2026-08-13.json`. It records the current scientific NO-GO;
+  registry digests and signing remain release-owner work.
+- A controlled security-acceptance harness now groups the existing and new adversarial
+  fixtures into identity/browser, export/privacy, model/artifact, untrusted queue input,
+  optional-provider, and production configuration/privilege categories. New negative
+  controls explicitly reject malformed and oversized JWTs, algorithm confusion, and
+  oversized JWKS documents before untrusted processing or refresh amplification. It
+  targets no external system and retains only aggregate test evidence; clean-runner
+  evidence is pending.
 - Smoke bundle v0.3.0 compares logistic regression, random forest, and MLP candidates;
   sigmoid-calibrates the selected classifier on grouped training folds; and packages a
   benign-only Isolation Forest plus benign-only CPU denoising autoencoder. The synthetic

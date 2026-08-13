@@ -22,9 +22,9 @@ production NIDS. Detection never authorizes automatic blocking.
 | Real local OIDC | Local IdP, roles, token/JWKS lifecycle and abuse cases | Pass on disposable local Dex profile ([evidence](acceptance/oidc-ci-2026-08-13.json)); organizational IdP validation remains deployment-specific |
 | Local Kubernetes | Actual kind/k3d deployment, probes, policies, migration, rollout and failure drill | Disposable kind harness and local overlay implemented; clean-runner execution evidence pending |
 | Restore | Disposable database backup and measured restore validation | Pass for local PostgreSQL mechanics: 15 tables and primary identities match after destructive restore; API smoke and cleanup pass ([evidence](acceptance/restore-ci-2026-08-13.json)). Managed backup/RPO/RTO remain deployment-specific. |
-| Security acceptance | Controlled auth, input, secret, network and privilege abuse tests | Open |
+| Security acceptance | Controlled auth, input, secret, network and privilege abuse tests | Six-category aggregate harness implemented; clean-runner evidence pending |
 | Production validator | Fail-closed unsafe-config checks | Implemented with negative controls for identity, secrets, CORS/WebSockets, provider TLS, datastore exposure, filesystems/capabilities, model/evidence/approval, readiness, retention, and backup. The checked-in rejected smoke model correctly remains a production NO-GO. |
-| Release evidence | Reproducible artifacts, SBOM/provenance and release manifest | Bound-manifest generator and pinned image-SBOM CI job implemented; clean-runner evidence pending |
+| Release evidence | Reproducible artifacts, SBOM/provenance and release manifest | Pass for clean-runner build evidence: two CycloneDX SBOMs and bound NO-GO manifest generated ([evidence](acceptance/release-ci-2026-08-13.json)); registry digests/signing remain release-owner work |
 | Operator package | Installation, deployment, configuration, identity, sensor, model, backup, incident, troubleshooting, upgrade, rollback, performance, capacity and security procedures | Complete as repository procedures; organization-specific contacts and service values remain external |
 | Final report | `docs/FINAL_ACCEPTANCE_REPORT.md` with safe-claim boundary | Open |
 

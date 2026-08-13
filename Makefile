@@ -10,9 +10,10 @@ SUSTAINED_OUTPUT ?= sustained-compose-local.json
 OIDC_OUTPUT ?= docs/acceptance/oidc-local.json
 RESTORE_OUTPUT ?= docs/acceptance/restore-local.json
 KUBERNETES_OUTPUT ?= docs/acceptance/kubernetes-local.json
+SECURITY_OUTPUT ?= docs/acceptance/security-local.json
 
 .PHONY: install lint typecheck test frozen-evidence-check research-evidence-check train-smoke demo demo-stop replay \
-	live live-stop suricata-replay benchmark benchmark-sustained multiworker-acceptance restore-acceptance kubernetes-acceptance production-check oidc-prepare oidc-acceptance oidc-stop \
+	live live-stop suricata-replay benchmark benchmark-sustained multiworker-acceptance restore-acceptance kubernetes-acceptance security-acceptance production-check oidc-prepare oidc-acceptance oidc-stop \
 	retention-cleanup reset
 
 install:
@@ -93,6 +94,9 @@ restore-acceptance:
 
 kubernetes-acceptance:
 	$(UV) run python -m scripts.accept_kubernetes --output "$(KUBERNETES_OUTPUT)"
+
+security-acceptance:
+	$(UV) run python -m scripts.accept_security --output "$(SECURITY_OUTPUT)"
 
 production-check:
 	$(UV) run python -m scripts.production_check

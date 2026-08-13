@@ -261,6 +261,26 @@ jobs:
             .runtime/release/dashboard.cdx.json
           if-no-files-found: warn
 
+  security-acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.3"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked --extra dev
+      - run: make security-acceptance SECURITY_OUTPUT=docs/acceptance/security-ci.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-acceptance-report
+          path: docs/acceptance/security-ci.json
+          if-no-files-found: warn
+
   security:
     runs-on: ubuntu-24.04
     steps:
