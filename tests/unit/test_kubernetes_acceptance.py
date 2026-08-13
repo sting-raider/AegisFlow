@@ -33,3 +33,11 @@ def test_nonroot_postgres_initializes_below_the_volume_mount() -> None:
         encoding="utf-8"
     )
     assert "PGDATA, value: /var/lib/postgresql/data/pgdata" in manifest
+
+
+def test_nonroot_model_seed_does_not_preserve_pvc_root_metadata() -> None:
+    manifest = Path("infra/kubernetes/acceptance/model-seed-job.yaml").read_text(
+        encoding="utf-8"
+    )
+    assert "cp -a" not in manifest
+    assert "cp -R /app/models/registry/* /models/" in manifest

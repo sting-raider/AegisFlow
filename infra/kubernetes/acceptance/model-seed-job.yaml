@@ -24,7 +24,7 @@ spec:
         - name: seed
           image: aegisflow-backend:acceptance
           imagePullPolicy: Never
-          command: [sh, -c, "cp -a /app/models/registry/. /models/ && cp -a /app/docs/evaluation/. /evaluations/"]
+          command: [sh, -c, "cp -R /app/models/registry/* /models/ && cp /app/docs/evaluation/* /evaluations/"]
           resources:
             requests: {cpu: 50m, memory: 64Mi}
             limits: {cpu: 500m, memory: 256Mi}

@@ -64,6 +64,8 @@ def _run(
             arguments,
             input=input_text,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             check=False,
             timeout=timeout,
@@ -125,7 +127,7 @@ def _wait_rollout(resource: str, timeout: str = "300s") -> None:
 
 def _pod_diagnostics() -> list[dict[str, Any]]:
     result = _run(
-        ["kubectl", "-n", NAMESPACE, "get", "pods", "-o", "json"],
+        ["kubectl", "get", "pods", "--all-namespaces", "-o", "json"],
         timeout=30,
         check=False,
     )
@@ -171,6 +173,7 @@ def _pod_diagnostics() -> list[dict[str, Any]]:
         diagnostics.append(
             {
                 "name": str(metadata.get("name", "unknown")),
+                "namespace": str(metadata.get("namespace", "unknown")),
                 "phase": str(status.get("phase", "unknown")),
                 "reason": str(status.get("reason", ""))[:128],
                 "containers": containers,
