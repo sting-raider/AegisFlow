@@ -69,6 +69,44 @@ def test_postgres_migrations_hold_advisory_lock(
     assert events == ["lock", "upgrade", "unlock", "dispose"]
 
 
+def test_failed_postgres_migration_releases_advisory_lock_and_disposes_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    events: list[str] = []
+
+    class FakeConnection:
+        def __enter__(self) -> FakeConnection:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def execute(self, statement: object, _parameters: object) -> None:
+            events.append("unlock" if "unlock" in str(statement) else "lock")
+
+    class FakeEngine:
+        dialect = type("Dialect", (), {"name": "postgresql"})()
+
+        def connect(self) -> FakeConnection:
+            return FakeConnection()
+
+        def dispose(self) -> None:
+            events.append("dispose")
+
+    def fail_upgrade(*_args: object, **_kwargs: object) -> None:
+        events.append("upgrade_failed")
+        raise RuntimeError("controlled migration failure")
+
+    monkeypatch.setattr(migrate, "database_url_from_env", lambda: "postgresql://redacted")
+    monkeypatch.setattr(migrate, "create_engine", lambda *_args, **_kwargs: FakeEngine())
+    monkeypatch.setattr(migrate.command, "upgrade", fail_upgrade)
+
+    with pytest.raises(RuntimeError, match="controlled migration failure"):
+        migrate.run_migrations()
+
+    assert events == ["lock", "upgrade_failed", "unlock", "dispose"]
+
+
 def test_incident_membership_migration_backfills_existing_json(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -112,7 +112,59 @@ def _cluster_absent() -> None:
 
 
 def _wait_rollout(resource: str, timeout: str = "300s") -> None:
-    _kubectl("-n", NAMESPACE, "rollout", "status", resource, f"--timeout={timeout}")
+    _kubectl(
+        "-n",
+        NAMESPACE,
+        "rollout",
+        "status",
+        resource,
+        f"--timeout={timeout}",
+        timeout=360,
+    )
+
+
+def _pod_diagnostics() -> list[dict[str, Any]]:
+    result = _run(
+        ["kubectl", "-n", NAMESPACE, "get", "pods", "-o", "json"],
+        timeout=30,
+        check=False,
+    )
+    if result.returncode != 0:
+        return [{"collection_error": "pod status unavailable before cleanup"}]
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return [{"collection_error": "pod status was invalid JSON"}]
+    diagnostics: list[dict[str, Any]] = []
+    for item in payload.get("items", []) if isinstance(payload, dict) else []:
+        if not isinstance(item, dict):
+            continue
+        metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
+        status = item.get("status") if isinstance(item.get("status"), dict) else {}
+        containers: list[dict[str, str]] = []
+        raw_statuses = status.get("containerStatuses", [])
+        for container in raw_statuses if isinstance(raw_statuses, list) else []:
+            if not isinstance(container, dict):
+                continue
+            state = container.get("state") if isinstance(container.get("state"), dict) else {}
+            state_name = next(iter(state), "unknown")
+            detail = state.get(state_name) if isinstance(state.get(state_name), dict) else {}
+            containers.append(
+                {
+                    "name": str(container.get("name", "unknown")),
+                    "state": state_name,
+                    "reason": str(detail.get("reason", ""))[:128],
+                }
+            )
+        diagnostics.append(
+            {
+                "name": str(metadata.get("name", "unknown")),
+                "phase": str(status.get("phase", "unknown")),
+                "reason": str(status.get("reason", ""))[:128],
+                "containers": containers,
+            }
+        )
+    return diagnostics
 
 
 def _pods(selector: str) -> list[dict[str, str]]:
@@ -294,10 +346,14 @@ def run_acceptance(output: Path) -> dict[str, Any]:
             ],
             timeout=600,
         )
+        for image in ("postgres:16.4-alpine", "redis:7.2.5-alpine"):
+            _run(["docker", "pull", image], timeout=300)
         _run(["kind", "load", "docker-image", "--name", CLUSTER, "aegisflow-backend:acceptance"])
         _run(
             ["kind", "load", "docker-image", "--name", CLUSTER, "aegisflow-dashboard:acceptance"]
         )
+        for image in ("postgres:16.4-alpine", "redis:7.2.5-alpine"):
+            _run(["kind", "load", "docker-image", "--name", CLUSTER, image])
 
         _apply_text(_download_ingress())
         _kubectl(
@@ -521,6 +577,7 @@ def run_acceptance(output: Path) -> dict[str, Any]:
         report.update(
             {
                 "completed_at": datetime.now(UTC).isoformat(),
+                "failure_diagnostics": _pod_diagnostics() if cluster_created else [],
                 "verdict": {"passed": False, "failures": [str(exc)]},
             }
         )
