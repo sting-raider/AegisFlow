@@ -6,11 +6,24 @@ from typing import cast
 
 import bcrypt
 import pytest
+import yaml
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID
 
 from scripts.accept_oidc import _load_credentials
 from scripts.prepare_oidc_acceptance import REQUIRED_FILES, prepare
+
+
+def test_dex_hardening_keeps_only_required_runtime_paths_writable() -> None:
+    compose = yaml.safe_load(Path("compose.oidc.yml").read_text(encoding="utf-8"))
+    dex = compose["services"]["dex"]
+
+    assert dex["read_only"] is True
+    assert dex["cap_drop"] == ["ALL"]
+    assert {entry.split(":", 1)[0] for entry in dex["tmpfs"]} == {
+        "/tmp",
+        "/var/dex",
+    }
 
 
 def test_prepare_oidc_acceptance_keeps_plaintext_out_of_dex_config(
