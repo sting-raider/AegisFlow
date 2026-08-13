@@ -79,8 +79,22 @@ and
 [`sustained-compose-windows-2026-08-13-50fps-10m-postfix.json`](benchmarks/sustained-compose-windows-2026-08-13-50fps-10m-postfix.json).
 The host-memory samples include an unrelated roughly 5 GiB process that ran intermittently;
 the passing result is therefore useful contended single-host evidence, not a clean-host or
-production capacity promise. The 30-minute, rate-ladder, multi-worker, and failure runs
-remain open.
+production capacity promise.
+
+The subsequent 30-minute run at the same 50 flows/s is a NO-GO despite exact eventual
+conservation. It published and durably stored 90,000 flows/detections and returned both
+queues to zero, but P95 durable latency reached 73.03 seconds, detection depth peaked at
+11,475, and the second-half detection slope was +2.538 messages/s. Under the same
+intermittent host contention, the API process was killed once without a Docker OOM flag;
+`restart: unless-stopped` brought it back and the consumer reclaimed and drained all work.
+The exact report is
+[`sustained-compose-windows-2026-08-13-50fps-30m.json`](benchmarks/sustained-compose-windows-2026-08-13-50fps-30m.json).
+
+The supported evidence boundary on this host is therefore narrow: 50 flows/s passes for
+10 minutes but is not sustainable for 30 minutes under the declared 5-second latency and
+10,000-depth budgets. Rate-ladder, lower-rate 30-minute, clean-host, and multi-worker
+evidence remain open. Eventual drain after an unplanned restart is recovery evidence, not
+a capacity pass.
 
 ## Redis-to-PostgreSQL pipeline
 

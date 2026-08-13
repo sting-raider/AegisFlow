@@ -125,8 +125,13 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   durable flows/s, 2.002-second P95, maximum detection depth 175, approximately zero
   second-half growth, zero final pending/lag, and a 1.35-second drain. Before/after reports
   are retained under `docs/benchmarks/`. The host was intermittently contended by an
-  unrelated roughly 5 GiB process, and the 30-minute, ladder, multi-worker, and failure
-  matrix remain open.
+  unrelated roughly 5 GiB process. The subsequent 30-minute 50 flows/s run preserved exact 90,000-flow
+  and detection conservation and final zero pending/lag, but is a capacity NO-GO: P95
+  durable latency was 73.03 seconds, maximum detection depth 11,475, and second-half
+  growth +2.538 messages/s. The API was killed once without a Docker OOM flag, restarted
+  automatically, reclaimed its backlog, and eventually drained it. That is useful restart
+  recovery evidence but cannot turn the failed latency/depth/growth gates into a pass.
+  The lower-rate ladder, multi-worker, and controlled failure matrix remain open.
 - An optional local Dex acceptance profile generates uncommitted TLS and user credentials
   and has a fail-closed drill for discovery/JWKS, token and role validation, escalation
   denial, WebSockets, rate limits, audit identity, key rotation, and expiry. The first
@@ -332,6 +337,9 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   `31340692583` passed all Python/coverage/migration/NFStream/training, dashboard/audit,
   Compose/Kustomize/live-loopback, forced API-replacement/Playwright, Gitleaks, and Trivy
   jobs.
+- Incident-normalization milestone commit `efe55f9` is published on public `main`.
+  GitHub Actions run `31683196334` passed all Python, dashboard, security, Compose,
+  integration/E2E, and real local OIDC jobs.
 
 ## Hard blockers and fallbacks
 

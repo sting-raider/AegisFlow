@@ -616,3 +616,16 @@ Redis backup policy. This avoids a dual-persistence disk spike turning a full Do
 into a write outage while preserving fail-visible AOF errors. Increasing queue budgets,
 disabling Redis write safety, deleting pending work, treating post-timeout drain as a pass,
 or claiming the 10-minute local result as production capacity were rejected.
+
+## D-045 - Treat long-run conservation and capacity as separate gates
+
+Retain the 30-minute 50 flows/s result as a capacity NO-GO even though all 90,000 flows
+and detections eventually became durable and both queues returned to zero. The run fails
+the predeclared P95 latency, maximum queue-depth, and second-half growth budgets and also
+contains one unplanned API process kill followed by successful automatic recovery.
+
+Use it to bound the current local evidence envelope and to demonstrate fail-visible
+restart recovery. Do not reinterpret eventual drain as sustainable service, hide the
+host-contention limitation, raise the budgets after seeing the result, or generalize the
+passing 10-minute point to longer windows. Establish any lower 30-minute rate through a
+separate predeclared run.
