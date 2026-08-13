@@ -108,10 +108,25 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Exact runtime profiling isolated single-row Isolation Forest traversal as 66.3% of
   measured detector stage time. On the same 2,000-flow Windows burst with no drops,
   64-row hybrid batching raised throughput from 153.50 to 3,496.81 flows/s (22.78x).
-- A local-only paced sustained benchmark now fails closed on exact flow/detection
-  conservation, requested ingress pace, queue depth and second-half growth, durable P95
-  latency, and final zero pending plus lag. The required 10/30-minute and failure runs
-  remain open; the harness alone is not capacity evidence.
+- A local-only paced sustained benchmark fails closed on exact flow/detection conservation,
+  requested ingress pace, queue depth and second-half growth, durable P95 latency, and
+  final zero pending plus lag. The first 10-minute 50 flows/s run was a valid NO-GO:
+  20,611/30,000 rows were durable at timeout, detection depth peaked at 12,205, P95
+  durable latency reached 322.51 seconds, and 9,389 remained queued. Live inspection
+  isolated a 17,922-ID, roughly 717 KiB incident-membership JSON row that was rewritten
+  for every alert. Docker storage exhaustion also triggered Redis's visible RDB write
+  safety; no event was discarded.
+- Incident membership is now normalized, grouping context stores compact aggregates and
+  only the two recent escalation values, migrations backfill existing memberships, and
+  SQL-order coverage requires the incident parent before its membership row. The preserved
+  queue recovered to exact 30,000 flows/detections with zero duplicate flow IDs. Local
+  Compose now uses AOF without redundant automatic RDB snapshots. Repeating the identical
+  10-minute run passed all gates: 30,000/30,000 durable, 49.9999 flows/s ingress, 49.89
+  durable flows/s, 2.002-second P95, maximum detection depth 175, approximately zero
+  second-half growth, zero final pending/lag, and a 1.35-second drain. Before/after reports
+  are retained under `docs/benchmarks/`. The host was intermittently contended by an
+  unrelated roughly 5 GiB process, and the 30-minute, ladder, multi-worker, and failure
+  matrix remain open.
 - An optional local Dex acceptance profile generates uncommitted TLS and user credentials
   and has a fail-closed drill for discovery/JWKS, token and role validation, escalation
   denial, WebSockets, rate limits, audit identity, key rotation, and expiry. The first

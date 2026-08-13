@@ -134,6 +134,17 @@ class IncidentRow(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     alert_ids: Mapped[list[str]] = mapped_column(JSON)
     grouping_reasons: Mapped[list[str]] = mapped_column(JSON)
+    grouping_context: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+
+
+class IncidentAlertRow(Base):
+    __tablename__ = "incident_alerts"
+    alert_id: Mapped[str] = mapped_column(
+        ForeignKey("alerts.id", ondelete="CASCADE"), primary_key=True
+    )
+    incident_id: Mapped[str] = mapped_column(
+        ForeignKey("incidents.id", ondelete="CASCADE"), index=True
+    )
 
 
 class FeedbackRow(Base):
@@ -213,6 +224,38 @@ class AuditLogRow(Base):
     timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     target_id: Mapped[str] = mapped_column(String(128))
     details: Mapped[dict[str, Any]] = mapped_column(JSON)
+
+
+def _serialize_incident_context(context: IncidentGroupingContext) -> dict[str, Any]:
+    return {
+        "schema_version": "1.0.0",
+        "source_hosts": sorted(context.source_hosts),
+        "destination_hosts": sorted(context.destination_hosts),
+        "signature_ids": sorted(context.signature_ids),
+        "reason_codes": sorted(context.reason_codes),
+        "attack_stages": sorted(context.attack_stages),
+        "recent_severities": list(context.severities[-2:]),
+        "recent_risks": list(context.risks[-2:]),
+    }
+
+
+def _deserialize_incident_context(payload: object) -> IncidentGroupingContext | None:
+    if not isinstance(payload, dict) or payload.get("schema_version") != "1.0.0":
+        return None
+    try:
+        return IncidentGroupingContext(
+            source_hosts=frozenset(str(item) for item in payload["source_hosts"]),
+            destination_hosts=frozenset(
+                str(item) for item in payload["destination_hosts"]
+            ),
+            signature_ids=frozenset(str(item) for item in payload["signature_ids"]),
+            reason_codes=frozenset(str(item) for item in payload["reason_codes"]),
+            attack_stages=frozenset(str(item) for item in payload["attack_stages"]),
+            severities=tuple(str(item) for item in payload["recent_severities"]),
+            risks=tuple(float(item) for item in payload["recent_risks"]),
+        )
+    except (KeyError, TypeError, ValueError):
+        return None
 
 
 @dataclass(frozen=True)
@@ -411,6 +454,15 @@ class Repository:
                 selected_sources = existing.source_hosts
         if incident is None:
             incident_id = str(uuid4())
+            context = IncidentGroupingContext(
+                source_hosts=frozenset({str(flow.src_ip)}),
+                destination_hosts=frozenset({str(flow.dst_ip)}),
+                signature_ids=new_signature_ids,
+                reason_codes=frozenset(detection.reason_codes),
+                attack_stages=frozenset({new_stage}),
+                severities=(detection.severity.value,),
+                risks=(detection.final_risk_score,),
+            )
             session.add(
                 IncidentRow(
                     id=incident_id,
@@ -420,21 +472,16 @@ class Repository:
                     source_host=str(flow.src_ip),
                     created_at=detection.timestamp,
                     updated_at=detection.timestamp,
-                    alert_ids=[alert_id],
+                    alert_ids=[],
                     grouping_reasons=["initial alert"],
+                    grouping_context=_serialize_incident_context(context),
                 )
             )
-            incident_context_cache[incident_id] = IncidentGroupingContext(
-                source_hosts=frozenset({str(flow.src_ip)}),
-                destination_hosts=frozenset({str(flow.dst_ip)}),
-                signature_ids=new_signature_ids,
-                reason_codes=frozenset(detection.reason_codes),
-                attack_stages=frozenset({new_stage}),
-                severities=(detection.severity.value,),
-                risks=(detection.final_risk_score,),
-            )
+            session.flush()
+            session.add(IncidentAlertRow(alert_id=alert_id, incident_id=incident_id))
+            incident_context_cache[incident_id] = context
         else:
-            incident.alert_ids = [*incident.alert_ids, alert_id]
+            session.add(IncidentAlertRow(alert_id=alert_id, incident_id=incident.id))
             incident.updated_at = detection.timestamp
             incident.grouping_reasons = list(
                 dict.fromkeys([*incident.grouping_reasons, *selected_reasons])
@@ -445,25 +492,31 @@ class Repository:
             if severities.index(detection.severity.value) > severities.index(incident.severity):
                 incident.severity = detection.severity.value
             existing = incident_context_cache[incident.id]
-            incident_context_cache[incident.id] = IncidentGroupingContext(
+            updated_context = IncidentGroupingContext(
                 source_hosts=existing.source_hosts | {str(flow.src_ip)},
                 destination_hosts=existing.destination_hosts | {str(flow.dst_ip)},
                 signature_ids=existing.signature_ids | new_signature_ids,
                 reason_codes=existing.reason_codes | frozenset(detection.reason_codes),
                 attack_stages=existing.attack_stages | {new_stage},
-                severities=(*existing.severities, detection.severity.value),
-                risks=(*existing.risks, detection.final_risk_score),
+                severities=(*existing.severities[-1:], detection.severity.value),
+                risks=(*existing.risks[-1:], detection.final_risk_score),
             )
+            incident.grouping_context = _serialize_incident_context(updated_context)
+            incident_context_cache[incident.id] = updated_context
 
     @staticmethod
     def _incident_grouping_context(
         session: Session, incident: IncidentRow
     ) -> IncidentGroupingContext:
+        stored = _deserialize_incident_context(incident.grouping_context)
+        if stored is not None:
+            return stored
         rows = session.execute(
             select(AlertRow, DetectionRow, FlowRow)
+            .join(IncidentAlertRow, IncidentAlertRow.alert_id == AlertRow.id)
             .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
             .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
-            .where(AlertRow.id.in_(incident.alert_ids))
+            .where(IncidentAlertRow.incident_id == incident.id)
             .order_by(AlertRow.created_at.asc())
         ).all()
         community_ids = {flow.community_flow_id for _, _, flow in rows}
@@ -496,7 +549,7 @@ class Repository:
                     verdict=detection.verdict,
                 )
             )
-        return IncidentGroupingContext(
+        context = IncidentGroupingContext(
             source_hosts=frozenset(flow.src_ip for _, _, flow in rows),
             destination_hosts=frozenset(flow.dst_ip for _, _, flow in rows),
             signature_ids=frozenset(item.signature_id for item in signature_rows),
@@ -507,9 +560,11 @@ class Repository:
                 if isinstance(reason, str)
             ),
             attack_stages=frozenset(stages),
-            severities=tuple(alert.severity for alert, _, _ in rows),
-            risks=tuple(alert.risk for alert, _, _ in rows),
+            severities=tuple(alert.severity for alert, _, _ in rows[-2:]),
+            risks=tuple(alert.risk for alert, _, _ in rows[-2:]),
         )
+        incident.grouping_context = _serialize_incident_context(context)
+        return context
 
     def alerts(
         self,
@@ -708,9 +763,10 @@ class Repository:
     ) -> dict[str, Any]:
         rows = session.execute(
             select(AlertRow, DetectionRow, FlowRow)
+            .join(IncidentAlertRow, IncidentAlertRow.alert_id == AlertRow.id)
             .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
             .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
-            .where(AlertRow.id.in_(incident.alert_ids))
+            .where(IncidentAlertRow.incident_id == incident.id)
             .order_by(AlertRow.created_at.asc())
         ).all()
         community_ids = {flow.community_flow_id for _, _, flow in rows}
@@ -780,7 +836,7 @@ class Repository:
             "destination_hosts": sorted({flow.dst_ip for _, _, flow in rows}),
             "created_at": _as_utc(incident.created_at),
             "updated_at": _as_utc(incident.updated_at),
-            "alert_ids": incident.alert_ids,
+            "alert_ids": [alert.id for alert, _, _ in rows],
             "alert_count": len(rows),
             "acknowledged_alerts": sum(alert.acknowledged for alert, _, _ in rows),
             "max_risk": max(risks, default=0.0),
@@ -811,9 +867,10 @@ class Repository:
                 return None
             rows = session.execute(
                 select(AlertRow, DetectionRow, FlowRow)
+                .join(IncidentAlertRow, IncidentAlertRow.alert_id == AlertRow.id)
                 .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
                 .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
-                .where(AlertRow.id.in_(incident.alert_ids))
+                .where(IncidentAlertRow.incident_id == incident.id)
                 .order_by(AlertRow.created_at.asc())
             ).all()
             detections = [detection.payload for _, detection, _ in rows]
@@ -1553,16 +1610,24 @@ class Repository:
                 ).rowcount
                 or 0
             )
-            old_alert_set = set(old_alerts)
-            removed_incidents = 0
-            for incident in session.scalars(select(IncidentRow)).all():
-                remaining = [item for item in incident.alert_ids if item not in old_alert_set]
-                if not remaining:
-                    session.delete(incident)
-                    removed_incidents += 1
-                elif remaining != incident.alert_ids:
-                    incident.alert_ids = remaining
-            counts["incidents"] = removed_incidents
+            session.execute(
+                delete(IncidentAlertRow).where(IncidentAlertRow.alert_id.in_(old_alerts))
+            )
+            empty_incidents = list(
+                session.scalars(
+                    select(IncidentRow.id).where(
+                        ~select(IncidentAlertRow.alert_id)
+                        .where(IncidentAlertRow.incident_id == IncidentRow.id)
+                        .exists()
+                    )
+                )
+            )
+            counts["incidents"] = (
+                session.execute(
+                    delete(IncidentRow).where(IncidentRow.id.in_(empty_incidents))
+                ).rowcount
+                or 0
+            )
             counts["alerts"] = (
                 session.execute(
                     delete(AlertRow).where(AlertRow.detection_id.in_(old_detections))

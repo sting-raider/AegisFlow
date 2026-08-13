@@ -600,3 +600,19 @@ JWKS/TLS, issuer/audience/lifetime checks, roles, escalation denial, WebSockets,
 limits, audit attribution, key rotation, and expiry. Making Dex a production dependency,
 committing static passwords, using cleartext non-loopback identity traffic, or claiming
 that a local fixture validates a target organization's IdP were rejected.
+
+## D-044 - Normalize incident membership before claiming sustained capacity
+
+Replace the growing `incidents.alert_ids` JSON write path with an indexed
+`incident_alerts` membership table. Backfill existing membership in a reversible migration,
+keep API alert-ID and timeline responses derived from the normalized rows, and retain only
+compact grouping aggregates plus the two most recent risk/severity values needed for
+escalation. Explicitly flush a newly created incident before its membership row because
+table foreign keys alone do not guarantee ORM unit-of-work order without relationships.
+
+Use AOF as the sole automatic persistence mechanism for the local Compose Redis service
+and disable default RDB schedules there; target deployments must define their own managed
+Redis backup policy. This avoids a dual-persistence disk spike turning a full Docker disk
+into a write outage while preserving fail-visible AOF errors. Increasing queue budgets,
+disabling Redis write safety, deleting pending work, treating post-timeout drain as a pass,
+or claiming the 10-minute local result as production capacity were rejected.

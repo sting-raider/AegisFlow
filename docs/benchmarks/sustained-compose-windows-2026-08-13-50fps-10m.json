@@ -1,0 +1,6065 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T07:55:40.661033+00:00",
+  "completed_at": "2026-08-13T08:08:40.914907+00:00",
+  "scope": "paced local Compose Redis-to-PostgreSQL sustained benchmark",
+  "safety": {
+    "allowed_hosts": [
+      "127.0.0.1",
+      "::1",
+      "localhost",
+      "postgres",
+      "redis"
+    ],
+    "payloads_stored": false,
+    "external_targets": false
+  },
+  "configuration": {
+    "duration_seconds": 600.0,
+    "target_flows_per_second": 50.0,
+    "publish_batch_size": 25,
+    "sample_interval_seconds": 1.0,
+    "drain_timeout_seconds": 180.0,
+    "p95_latency_budget_ms": 5000.0,
+    "queue_depth_budget": 10000,
+    "queue_growth_tolerance_per_second": 1.0
+  },
+  "counts": {
+    "planned": 30000,
+    "published": 30000,
+    "persisted_flows": 20611,
+    "persisted_detections": 20611,
+    "durable_latency_samples": 20611
+  },
+  "timing": {
+    "paced_publish_seconds": 600.0005583,
+    "total_with_drain_seconds": 780.2535680199999,
+    "achieved_publish_rate": 49.99995347504329,
+    "end_to_end_durable_rate": 38.44903917085455,
+    "drain_seconds": 180.2530097199999
+  },
+  "latency_ms": {
+    "durable_p50": 56502.125,
+    "durable_p95": 322514.3535,
+    "durable_p99": 357610.84589999996,
+    "publish_batch_p50": 1.8603045000418206,
+    "publish_batch_p95": 3.75226099995416,
+    "publish_batch_p99": 6.8931331400494855
+  },
+  "queues": {
+    "maximum_flow_depth": 150,
+    "maximum_detection_depth": 12205,
+    "final_flow_depth": 0,
+    "final_detection_depth": 9389,
+    "flow_growth_per_second": 0.01071848787753059,
+    "detection_growth_per_second": 28.13062246807356
+  },
+  "resources": {
+    "host_cpu_percent_p50": 6.1,
+    "host_cpu_percent_p95": 9.02,
+    "host_memory_percent_p50": 81.4,
+    "host_memory_percent_p95": 88.02
+  },
+  "samples": [
+    {
+      "elapsed_seconds": 0.006080623000002561,
+      "published": 25.0,
+      "durable": 0.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 73.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 1.502974442999971,
+      "published": 100.0,
+      "durable": 75.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.5,
+      "host_memory_percent": 73.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 3.0026211719999765,
+      "published": 175.0,
+      "durable": 150.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.1,
+      "host_memory_percent": 73.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 4.503321195000012,
+      "published": 250.0,
+      "durable": 225.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 1.7,
+      "host_memory_percent": 74.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 6.0025688370000125,
+      "published": 325.0,
+      "durable": 300.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.2,
+      "host_memory_percent": 74.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 7.503064571999971,
+      "published": 400.0,
+      "durable": 375.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.0,
+      "host_memory_percent": 75.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 9.002725198000007,
+      "published": 475.0,
+      "durable": 450.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.3,
+      "host_memory_percent": 76.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 10.503299604999938,
+      "published": 550.0,
+      "durable": 525.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.4,
+      "host_memory_percent": 75.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 12.002462627,
+      "published": 625.0,
+      "durable": 600.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.3,
+      "host_memory_percent": 75.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 13.503265041999953,
+      "published": 700.0,
+      "durable": 675.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.6,
+      "host_memory_percent": 75.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 15.002567914999986,
+      "published": 775.0,
+      "durable": 750.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.5,
+      "host_memory_percent": 75.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 16.503182446999972,
+      "published": 850.0,
+      "durable": 825.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 2.6,
+      "host_memory_percent": 76.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 18.002662140999973,
+      "published": 925.0,
+      "durable": 900.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.3,
+      "host_memory_percent": 75.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 19.503160572999946,
+      "published": 1000.0,
+      "durable": 975.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.1,
+      "host_memory_percent": 76.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 21.006005158999983,
+      "published": 1075.0,
+      "durable": 1025.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 25.0,
+      "host_cpu_percent": 3.4,
+      "host_memory_percent": 76.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 22.503550383999936,
+      "published": 1150.0,
+      "durable": 1125.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.1,
+      "host_memory_percent": 76.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 24.00265853899998,
+      "published": 1225.0,
+      "durable": 1200.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.9,
+      "host_memory_percent": 76.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 25.50289116099998,
+      "published": 1300.0,
+      "durable": 1275.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.5,
+      "host_memory_percent": 76.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 27.00254354599997,
+      "published": 1375.0,
+      "durable": 1350.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.3,
+      "host_memory_percent": 76.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 28.503182823999964,
+      "published": 1450.0,
+      "durable": 1425.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.5,
+      "host_memory_percent": 77.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 30.00245970100002,
+      "published": 1525.0,
+      "durable": 1500.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.1,
+      "host_memory_percent": 76.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 31.50320723499999,
+      "published": 1600.0,
+      "durable": 1575.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.4,
+      "host_memory_percent": 77.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 33.00284894999993,
+      "published": 1675.0,
+      "durable": 1650.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 4.1,
+      "host_memory_percent": 76.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 34.50300612000001,
+      "published": 1750.0,
+      "durable": 1725.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.8,
+      "host_memory_percent": 77.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 36.002837832999944,
+      "published": 1825.0,
+      "durable": 1800.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.9,
+      "host_memory_percent": 76.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 37.50340323599994,
+      "published": 1900.0,
+      "durable": 1875.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 4.6,
+      "host_memory_percent": 77.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 39.00259127999993,
+      "published": 1975.0,
+      "durable": 1950.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 3.9,
+      "host_memory_percent": 77.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 40.503190950999965,
+      "published": 2050.0,
+      "durable": 2025.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 4.6,
+      "host_memory_percent": 77.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 42.002759801000025,
+      "published": 2125.0,
+      "durable": 2100.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 4.1,
+      "host_memory_percent": 77.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 43.50269776899995,
+      "published": 2200.0,
+      "durable": 2175.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 78.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 44.50642649700001,
+      "published": 2250.0,
+      "durable": 2225.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 4.5,
+      "host_memory_percent": 78.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 46.00278597700003,
+      "published": 2325.0,
+      "durable": 2300.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 47.50259276999998,
+      "published": 2400.0,
+      "durable": 2375.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 4.8,
+      "host_memory_percent": 79.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 49.00274746299999,
+      "published": 2475.0,
+      "durable": 2450.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 5.1,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 50.50269904999993,
+      "published": 2550.0,
+      "durable": 2500.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 25.0,
+      "host_cpu_percent": 4.9,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 52.002646556999935,
+      "published": 2625.0,
+      "durable": 2600.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 4.5,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 53.50261241700002,
+      "published": 2700.0,
+      "durable": 2675.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 0.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 54.50888325999995,
+      "published": 2750.0,
+      "durable": 2700.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 25.0,
+      "host_cpu_percent": 4.9,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 56.00266666499999,
+      "published": 2825.0,
+      "durable": 2775.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 25.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 57.503359158999956,
+      "published": 2900.0,
+      "durable": 2825.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 59.00252000699993,
+      "published": 2975.0,
+      "durable": 2900.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 6.6,
+      "host_memory_percent": 81.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 60.50283027599994,
+      "published": 3050.0,
+      "durable": 2975.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 81.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 62.002597939,
+      "published": 3125.0,
+      "durable": 3075.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 25.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 81.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 63.502917632999925,
+      "published": 3200.0,
+      "durable": 3125.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 81.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 65.00281454999993,
+      "published": 3275.0,
+      "durable": 3200.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 81.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 66.503151742,
+      "published": 3350.0,
+      "durable": 3275.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 77.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 68.002697345,
+      "published": 3425.0,
+      "durable": 3350.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 69.50437647599995,
+      "published": 3500.0,
+      "durable": 3450.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 25.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 79.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 71.00291085599997,
+      "published": 3575.0,
+      "durable": 3500.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 72.50309521700001,
+      "published": 3650.0,
+      "durable": 3575.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 78.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 74.005145116,
+      "published": 3725.0,
+      "durable": 3650.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 6.6,
+      "host_memory_percent": 77.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 75.504864441,
+      "published": 3800.0,
+      "durable": 3700.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 75.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 76.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 77.00258580699995,
+      "published": 3875.0,
+      "durable": 3800.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 6.6,
+      "host_memory_percent": 76.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 78.50317949099997,
+      "published": 3950.0,
+      "durable": 3875.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 76.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 80.00250036199998,
+      "published": 4025.0,
+      "durable": 3925.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 75.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 75.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 81.5032913,
+      "published": 4100.0,
+      "durable": 4025.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 75.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 83.00276090599993,
+      "published": 4175.0,
+      "durable": 4075.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 75.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 75.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 84.50751786199999,
+      "published": 4250.0,
+      "durable": 4175.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 75.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 86.00324074899993,
+      "published": 4325.0,
+      "durable": 4225.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 75.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 75.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 87.50358283699995,
+      "published": 4400.0,
+      "durable": 4325.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 50.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 75.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 89.002710611,
+      "published": 4475.0,
+      "durable": 4375.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 75.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 75.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 90.50516480700003,
+      "published": 4550.0,
+      "durable": 4425.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 100.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 75.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 92.00316470299992,
+      "published": 4625.0,
+      "durable": 4489.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 111.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 75.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 93.50364468999999,
+      "published": 4700.0,
+      "durable": 4614.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 61.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 75.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 95.00277986599997,
+      "published": 4775.0,
+      "durable": 4675.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 75.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 75.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 96.50317262700003,
+      "published": 4850.0,
+      "durable": 4739.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 86.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 76.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 98.003243182,
+      "published": 4925.0,
+      "durable": 4803.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 97.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 75.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 99.50430137499995,
+      "published": 5000.0,
+      "durable": 4867.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 108.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 75.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 101.00325504099999,
+      "published": 5075.0,
+      "durable": 4931.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 119.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 75.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 102.50286981599993,
+      "published": 5150.0,
+      "durable": 4995.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 130.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 75.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 104.00406120299999,
+      "published": 5225.0,
+      "durable": 5059.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 141.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 75.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 105.50456910799994,
+      "published": 5300.0,
+      "durable": 5123.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 152.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 75.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 107.00545754199993,
+      "published": 5375.0,
+      "durable": 5187.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 163.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 76.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 108.503793266,
+      "published": 5450.0,
+      "durable": 5251.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 174.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 76.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 110.00329918199998,
+      "published": 5525.0,
+      "durable": 5315.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 185.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 75.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 111.50641999799996,
+      "published": 5600.0,
+      "durable": 5379.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 196.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 76.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 113.002494393,
+      "published": 5675.0,
+      "durable": 5443.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 207.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 77.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 114.50294654100003,
+      "published": 5750.0,
+      "durable": 5507.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 218.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 76.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 116.003233798,
+      "published": 5825.0,
+      "durable": 5571.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 229.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 76.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 117.50297314900001,
+      "published": 5900.0,
+      "durable": 5635.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 240.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 77.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 119.00267392699993,
+      "published": 5975.0,
+      "durable": 5699.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 251.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 77.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 120.50352519299997,
+      "published": 6050.0,
+      "durable": 5763.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 262.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 77.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 122.00251355399996,
+      "published": 6125.0,
+      "durable": 5827.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 273.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 77.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 123.50322464599992,
+      "published": 6200.0,
+      "durable": 5891.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 284.0,
+      "host_cpu_percent": 6.4,
+      "host_memory_percent": 78.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 125.00361933299996,
+      "published": 6275.0,
+      "durable": 5955.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 295.0,
+      "host_cpu_percent": 6.8,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 126.50425074399993,
+      "published": 6350.0,
+      "durable": 6019.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 306.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 128.00292301599995,
+      "published": 6425.0,
+      "durable": 6083.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 317.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 78.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 129.006003619,
+      "published": 6475.0,
+      "durable": 6083.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 367.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 78.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 130.504149869,
+      "published": 6550.0,
+      "durable": 6147.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 378.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 132.00304566499995,
+      "published": 6625.0,
+      "durable": 6211.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 389.0,
+      "host_cpu_percent": 6.8,
+      "host_memory_percent": 78.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 133.50340955599995,
+      "published": 6700.0,
+      "durable": 6275.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 400.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 135.00287401999992,
+      "published": 6775.0,
+      "durable": 6339.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 411.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 136.50288453899998,
+      "published": 6850.0,
+      "durable": 6403.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 422.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 138.00316241899998,
+      "published": 6925.0,
+      "durable": 6467.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 433.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 139.50373123999998,
+      "published": 7000.0,
+      "durable": 6531.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 444.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 141.00315588399997,
+      "published": 7075.0,
+      "durable": 6595.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 455.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 79.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 142.504982015,
+      "published": 7150.0,
+      "durable": 6595.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 530.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 79.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 144.002839267,
+      "published": 7225.0,
+      "durable": 6659.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 541.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 79.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 145.50317925499996,
+      "published": 7300.0,
+      "durable": 6723.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 552.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 147.00616755700003,
+      "published": 7375.0,
+      "durable": 6787.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 563.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 148.50280263799993,
+      "published": 7450.0,
+      "durable": 6851.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 574.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 150.00314298799992,
+      "published": 7525.0,
+      "durable": 6915.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 585.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 79.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 151.00860967899996,
+      "published": 7575.0,
+      "durable": 6915.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 635.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 152.50400994400002,
+      "published": 7650.0,
+      "durable": 6979.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 646.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 77.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 154.00880280599995,
+      "published": 7725.0,
+      "durable": 7043.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 657.0,
+      "host_cpu_percent": 6.4,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 155.508078738,
+      "published": 7800.0,
+      "durable": 7107.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 668.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 157.00294334900002,
+      "published": 7875.0,
+      "durable": 7107.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 743.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 80.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 158.50411139899995,
+      "published": 7950.0,
+      "durable": 7171.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 754.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 81.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 160.00350286899993,
+      "published": 8025.0,
+      "durable": 7235.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 765.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 161.50375667100002,
+      "published": 8100.0,
+      "durable": 7299.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 776.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 81.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 163.00283394099995,
+      "published": 8175.0,
+      "durable": 7363.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 787.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 164.50277036900002,
+      "published": 8250.0,
+      "durable": 7363.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 862.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 80.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 166.003107504,
+      "published": 8325.0,
+      "durable": 7427.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 873.0,
+      "host_cpu_percent": 6.4,
+      "host_memory_percent": 81.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 167.00783129799993,
+      "published": 8375.0,
+      "durable": 7491.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 859.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 168.503512343,
+      "published": 8450.0,
+      "durable": 7555.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 934.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 170.00371297999993,
+      "published": 8525.0,
+      "durable": 7555.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 945.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 171.50288193300003,
+      "published": 8600.0,
+      "durable": 7619.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 956.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 173.00297947,
+      "published": 8675.0,
+      "durable": 7683.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 967.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 174.50339321499996,
+      "published": 8750.0,
+      "durable": 7747.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 978.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 80.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 176.00353149199998,
+      "published": 8825.0,
+      "durable": 7747.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1053.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 177.50324716800003,
+      "published": 8900.0,
+      "durable": 7811.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1064.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 179.003507486,
+      "published": 8975.0,
+      "durable": 7875.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1075.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 80.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 180.503421689,
+      "published": 9050.0,
+      "durable": 7875.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1150.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 182.00279498299994,
+      "published": 9125.0,
+      "durable": 7939.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1161.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 183.50485258999993,
+      "published": 9200.0,
+      "durable": 8003.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1172.0,
+      "host_cpu_percent": 7.0,
+      "host_memory_percent": 80.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 185.00268698000002,
+      "published": 9275.0,
+      "durable": 8003.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1247.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 186.503139165,
+      "published": 9350.0,
+      "durable": 8067.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1258.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 188.002839633,
+      "published": 9425.0,
+      "durable": 8131.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1269.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 79.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 189.503037663,
+      "published": 9500.0,
+      "durable": 8131.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1344.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 79.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 191.00351925099994,
+      "published": 9575.0,
+      "durable": 8195.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1355.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 192.50424353899996,
+      "published": 9650.0,
+      "durable": 8259.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1366.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 78.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 194.002942813,
+      "published": 9725.0,
+      "durable": 8259.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1441.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 78.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 195.50388397899997,
+      "published": 9800.0,
+      "durable": 8323.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1452.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 78.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 197.00425800200003,
+      "published": 9875.0,
+      "durable": 8387.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1463.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 77.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 198.50530364500003,
+      "published": 9950.0,
+      "durable": 8387.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1538.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 77.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 200.00331784799994,
+      "published": 10025.0,
+      "durable": 8451.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1549.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 201.50332984,
+      "published": 10100.0,
+      "durable": 8515.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1560.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 203.00459288799993,
+      "published": 10175.0,
+      "durable": 8515.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1635.0,
+      "host_cpu_percent": 4.8,
+      "host_memory_percent": 79.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 204.507643389,
+      "published": 10250.0,
+      "durable": 8579.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1646.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 78.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 206.003578586,
+      "published": 10325.0,
+      "durable": 8643.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1657.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 207.51071428599994,
+      "published": 10400.0,
+      "durable": 8643.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1732.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 78.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 209.00367504999997,
+      "published": 10475.0,
+      "durable": 8707.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1743.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 210.50503004400002,
+      "published": 10550.0,
+      "durable": 8771.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1754.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 77.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 212.00283979099993,
+      "published": 10625.0,
+      "durable": 8771.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1829.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 78.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 213.00636248599994,
+      "published": 10675.0,
+      "durable": 8835.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1815.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 214.50525117099994,
+      "published": 10750.0,
+      "durable": 8835.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1890.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 78.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 216.00291671799994,
+      "published": 10825.0,
+      "durable": 8899.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1901.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 78.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 217.50598022999998,
+      "published": 10900.0,
+      "durable": 8963.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1912.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 219.009601138,
+      "published": 10975.0,
+      "durable": 8963.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1987.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 220.50490604899994,
+      "published": 11050.0,
+      "durable": 9027.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 1998.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 78.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 222.003225403,
+      "published": 11125.0,
+      "durable": 9091.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2009.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 223.503122717,
+      "published": 11200.0,
+      "durable": 9091.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2084.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 225.00360988299997,
+      "published": 11275.0,
+      "durable": 9155.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2095.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 226.50433146900002,
+      "published": 11350.0,
+      "durable": 9219.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2106.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 228.00300781700003,
+      "published": 11425.0,
+      "durable": 9219.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2181.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 79.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 229.50276071500002,
+      "published": 11500.0,
+      "durable": 9283.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2192.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 79.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 231.00259196499997,
+      "published": 11575.0,
+      "durable": 9347.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2203.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 81.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 232.503094391,
+      "published": 11650.0,
+      "durable": 9411.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2214.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 234.00296297499995,
+      "published": 11725.0,
+      "durable": 9475.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2225.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 235.503001508,
+      "published": 11800.0,
+      "durable": 9475.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2300.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 237.002839504,
+      "published": 11875.0,
+      "durable": 9539.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2311.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 79.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 238.50359484900002,
+      "published": 11950.0,
+      "durable": 9603.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2322.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 240.00338794599998,
+      "published": 12025.0,
+      "durable": 9667.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2333.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 80.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 241.50282915499997,
+      "published": 12100.0,
+      "durable": 9667.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2408.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 243.00293525299992,
+      "published": 12175.0,
+      "durable": 9731.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2419.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 244.50366480699995,
+      "published": 12250.0,
+      "durable": 9795.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2430.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 246.002689831,
+      "published": 12325.0,
+      "durable": 9859.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2441.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 80.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 247.50344359899998,
+      "published": 12400.0,
+      "durable": 9923.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2452.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 249.00247413699992,
+      "published": 12475.0,
+      "durable": 9923.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2527.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 250.50337020899997,
+      "published": 12550.0,
+      "durable": 9987.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2538.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 252.00282015300002,
+      "published": 12625.0,
+      "durable": 10051.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2549.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 253.50257018399998,
+      "published": 12700.0,
+      "durable": 10115.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2560.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 255.00320846699992,
+      "published": 12775.0,
+      "durable": 10115.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2635.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 256.50328633799995,
+      "published": 12850.0,
+      "durable": 10179.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2646.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 81.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 258.002822091,
+      "published": 12925.0,
+      "durable": 10179.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2721.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 81.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 259.5035028049999,
+      "published": 13000.0,
+      "durable": 10243.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2732.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 261.003030608,
+      "published": 13075.0,
+      "durable": 10307.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2743.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 82.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 262.5031342909999,
+      "published": 13150.0,
+      "durable": 10307.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2818.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 264.00271358099997,
+      "published": 13225.0,
+      "durable": 10371.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2829.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 80.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 265.50339736,
+      "published": 13300.0,
+      "durable": 10371.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2904.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 267.002611723,
+      "published": 13375.0,
+      "durable": 10435.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2915.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 81.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 268.503935889,
+      "published": 13450.0,
+      "durable": 10499.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2926.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 82.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 270.002614772,
+      "published": 13525.0,
+      "durable": 10563.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 2937.0,
+      "host_cpu_percent": 5.1,
+      "host_memory_percent": 83.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 271.50307552999993,
+      "published": 13600.0,
+      "durable": 10563.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3012.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 81.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 273.00250748999997,
+      "published": 13675.0,
+      "durable": 10627.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3023.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 82.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 274.50309318799987,
+      "published": 13750.0,
+      "durable": 10691.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3034.0,
+      "host_cpu_percent": 5.1,
+      "host_memory_percent": 83.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 276.00273490099994,
+      "published": 13825.0,
+      "durable": 10691.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3109.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 81.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 277.50314027700006,
+      "published": 13900.0,
+      "durable": 10755.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3120.0,
+      "host_cpu_percent": 5.1,
+      "host_memory_percent": 82.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 279.0024631209999,
+      "published": 13975.0,
+      "durable": 10819.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3131.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 81.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 280.50280251999993,
+      "published": 14050.0,
+      "durable": 10819.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3206.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 82.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 282.003853878,
+      "published": 14125.0,
+      "durable": 10883.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3217.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 83.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 283.5030608079999,
+      "published": 14200.0,
+      "durable": 10883.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3292.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 82.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 285.00291571,
+      "published": 14275.0,
+      "durable": 10947.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3303.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 83.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 286.50355487799993,
+      "published": 14350.0,
+      "durable": 11011.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3314.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 83.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 288.0037551139999,
+      "published": 14425.0,
+      "durable": 11011.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3389.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 289.50367499699996,
+      "published": 14500.0,
+      "durable": 11075.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3400.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 291.00312040099993,
+      "published": 14575.0,
+      "durable": 11139.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3411.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 79.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 292.5032207070001,
+      "published": 14650.0,
+      "durable": 11139.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3486.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 294.0028478229999,
+      "published": 14725.0,
+      "durable": 11203.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3497.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 295.5035678449999,
+      "published": 14800.0,
+      "durable": 11203.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3572.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 297.0029193979999,
+      "published": 14875.0,
+      "durable": 11267.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3583.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 298.50620247100005,
+      "published": 14950.0,
+      "durable": 11331.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3594.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 300.002751367,
+      "published": 15025.0,
+      "durable": 11331.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3669.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 301.5032195179999,
+      "published": 15100.0,
+      "durable": 11395.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3680.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 303.00286535600003,
+      "published": 15175.0,
+      "durable": 11459.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3691.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 304.50361390700004,
+      "published": 15250.0,
+      "durable": 11459.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3766.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 78.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 306.00368713199987,
+      "published": 15325.0,
+      "durable": 11523.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3777.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 80.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 307.503900424,
+      "published": 15400.0,
+      "durable": 11523.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3852.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 79.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 309.002801418,
+      "published": 15475.0,
+      "durable": 11587.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3863.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 310.503920248,
+      "published": 15550.0,
+      "durable": 11587.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3938.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 79.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 312.002718234,
+      "published": 15625.0,
+      "durable": 11651.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3949.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 313.50319975699995,
+      "published": 15700.0,
+      "durable": 11715.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 3960.0,
+      "host_cpu_percent": 5.0,
+      "host_memory_percent": 81.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 315.00253175700004,
+      "published": 15775.0,
+      "durable": 11715.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4035.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 316.50356405499997,
+      "published": 15850.0,
+      "durable": 11779.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4046.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 80.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 318.0048236529999,
+      "published": 15925.0,
+      "durable": 11779.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4121.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 319.50308782799993,
+      "published": 16000.0,
+      "durable": 11843.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4132.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 321.00293161800005,
+      "published": 16075.0,
+      "durable": 11843.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4207.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 322.50296594099996,
+      "published": 16150.0,
+      "durable": 11907.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4218.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 83.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 324.00287274599987,
+      "published": 16225.0,
+      "durable": 11907.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4293.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 80.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 325.5035873669999,
+      "published": 16300.0,
+      "durable": 11971.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4304.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 327.0056847159999,
+      "published": 16375.0,
+      "durable": 11971.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4379.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 80.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 328.518771046,
+      "published": 16450.0,
+      "durable": 12035.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4390.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 82.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 330.00258972100005,
+      "published": 16525.0,
+      "durable": 12035.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4465.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 331.006577847,
+      "published": 16575.0,
+      "durable": 12099.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4451.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 332.5042673979999,
+      "published": 16650.0,
+      "durable": 12099.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4526.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 334.005351412,
+      "published": 16725.0,
+      "durable": 12163.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4537.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 335.5032970069999,
+      "published": 16800.0,
+      "durable": 12163.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4612.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 80.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 336.5206589039999,
+      "published": 16850.0,
+      "durable": 12227.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4598.0,
+      "host_cpu_percent": 7.0,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 338.002975764,
+      "published": 16925.0,
+      "durable": 12227.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4673.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 339.50368918799995,
+      "published": 17000.0,
+      "durable": 12291.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4684.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 341.0027737359999,
+      "published": 17075.0,
+      "durable": 12291.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4759.0,
+      "host_cpu_percent": 5.0,
+      "host_memory_percent": 81.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 342.504841685,
+      "published": 17150.0,
+      "durable": 12355.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4770.0,
+      "host_cpu_percent": 6.4,
+      "host_memory_percent": 81.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 344.003351566,
+      "published": 17225.0,
+      "durable": 12355.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4845.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 81.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 345.50330215400004,
+      "published": 17300.0,
+      "durable": 12419.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4856.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 80.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 347.0037548959999,
+      "published": 17375.0,
+      "durable": 12483.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4867.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 82.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 348.503553537,
+      "published": 17450.0,
+      "durable": 12483.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4942.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 350.0030931219999,
+      "published": 17525.0,
+      "durable": 12547.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 4953.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 81.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 351.5037167999999,
+      "published": 17600.0,
+      "durable": 12547.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5028.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 352.50899736299993,
+      "published": 17650.0,
+      "durable": 12611.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5014.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 81.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 354.00342518,
+      "published": 17725.0,
+      "durable": 12611.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5089.0,
+      "host_cpu_percent": 6.6,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 355.51087889199994,
+      "published": 17800.0,
+      "durable": 12675.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5100.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 82.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 357.0027504039999,
+      "published": 17875.0,
+      "durable": 12675.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5175.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 358.50627595900005,
+      "published": 17950.0,
+      "durable": 12739.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5186.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 82.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 360.0027091929999,
+      "published": 18025.0,
+      "durable": 12739.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5261.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 82.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 361.503764845,
+      "published": 18100.0,
+      "durable": 12803.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5272.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 81.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 363.0046496780001,
+      "published": 18175.0,
+      "durable": 12803.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5347.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 81.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 364.51156876100004,
+      "published": 18250.0,
+      "durable": 12867.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5358.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 80.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 366.00291174099993,
+      "published": 18325.0,
+      "durable": 12867.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5433.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 79.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 367.50404918000004,
+      "published": 18400.0,
+      "durable": 12931.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5444.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 80.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 369.0040752770001,
+      "published": 18475.0,
+      "durable": 12931.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5519.0,
+      "host_cpu_percent": 5.1,
+      "host_memory_percent": 79.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 370.503916376,
+      "published": 18550.0,
+      "durable": 12995.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5530.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 79.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 372.003015107,
+      "published": 18625.0,
+      "durable": 13059.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5541.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 81.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 373.50324183399994,
+      "published": 18700.0,
+      "durable": 13059.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5616.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 78.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 375.00358580500006,
+      "published": 18775.0,
+      "durable": 13123.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5627.0,
+      "host_cpu_percent": 6.7,
+      "host_memory_percent": 80.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 376.503049808,
+      "published": 18850.0,
+      "durable": 13123.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5702.0,
+      "host_cpu_percent": 6.8,
+      "host_memory_percent": 80.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 378.002425014,
+      "published": 18925.0,
+      "durable": 13187.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5713.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 379.50303778199986,
+      "published": 19000.0,
+      "durable": 13187.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5788.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 381.0033041710001,
+      "published": 19075.0,
+      "durable": 13251.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5799.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 382.50275161399986,
+      "published": 19150.0,
+      "durable": 13251.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5874.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 384.00303130299994,
+      "published": 19225.0,
+      "durable": 13315.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5885.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 385.502847362,
+      "published": 19300.0,
+      "durable": 13315.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5960.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 387.003155506,
+      "published": 19375.0,
+      "durable": 13379.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 5971.0,
+      "host_cpu_percent": 6.7,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 388.50425033500005,
+      "published": 19450.0,
+      "durable": 13379.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6046.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 390.003310887,
+      "published": 19525.0,
+      "durable": 13443.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6057.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 81.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 391.504299038,
+      "published": 19600.0,
+      "durable": 13443.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6132.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 393.00266146700005,
+      "published": 19675.0,
+      "durable": 13507.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6143.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 80.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 394.50333716399996,
+      "published": 19750.0,
+      "durable": 13507.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6218.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 395.5080915650001,
+      "published": 19800.0,
+      "durable": 13571.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6204.0,
+      "host_cpu_percent": 6.7,
+      "host_memory_percent": 81.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 397.00301822100005,
+      "published": 19875.0,
+      "durable": 13571.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6279.0,
+      "host_cpu_percent": 6.9,
+      "host_memory_percent": 80.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 398.50375900799986,
+      "published": 19950.0,
+      "durable": 13571.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6354.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 400.0029180219999,
+      "published": 20025.0,
+      "durable": 13635.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6365.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 81.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 401.50322060400003,
+      "published": 20100.0,
+      "durable": 13635.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6440.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 79.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 403.0027785739999,
+      "published": 20175.0,
+      "durable": 13699.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6451.0,
+      "host_cpu_percent": 6.7,
+      "host_memory_percent": 81.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 404.503016719,
+      "published": 20250.0,
+      "durable": 13699.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6526.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 82.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 406.00405651799997,
+      "published": 20325.0,
+      "durable": 13763.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6537.0,
+      "host_cpu_percent": 6.6,
+      "host_memory_percent": 81.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 407.50297034899995,
+      "published": 20400.0,
+      "durable": 13827.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6548.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 409.0026683819999,
+      "published": 20475.0,
+      "durable": 13827.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6623.0,
+      "host_cpu_percent": 6.7,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 410.50478803400006,
+      "published": 20550.0,
+      "durable": 13827.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6698.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 81.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 412.00262670999996,
+      "published": 20625.0,
+      "durable": 13891.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6709.0,
+      "host_cpu_percent": 6.4,
+      "host_memory_percent": 81.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 413.5028557129999,
+      "published": 20700.0,
+      "durable": 13891.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6784.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 415.002905178,
+      "published": 20775.0,
+      "durable": 13955.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6795.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 81.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 416.50352096999995,
+      "published": 20850.0,
+      "durable": 13955.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6870.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 418.00348999900007,
+      "published": 20925.0,
+      "durable": 14019.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6881.0,
+      "host_cpu_percent": 6.9,
+      "host_memory_percent": 81.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 419.50385440900004,
+      "published": 21000.0,
+      "durable": 14019.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6956.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 421.00293671300005,
+      "published": 21075.0,
+      "durable": 14083.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 6967.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 82.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 422.50457295699994,
+      "published": 21150.0,
+      "durable": 14083.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7042.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 80.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 424.003595616,
+      "published": 21225.0,
+      "durable": 14147.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7053.0,
+      "host_cpu_percent": 6.4,
+      "host_memory_percent": 82.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 425.50260176300003,
+      "published": 21300.0,
+      "durable": 14211.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7128.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 80.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 427.00290307,
+      "published": 21375.0,
+      "durable": 14211.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7139.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 81.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 428.50290566600006,
+      "published": 21450.0,
+      "durable": 14275.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7150.0,
+      "host_cpu_percent": 7.3,
+      "host_memory_percent": 82.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 430.00304140799994,
+      "published": 21525.0,
+      "durable": 14275.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7225.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 82.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 431.50273133299993,
+      "published": 21600.0,
+      "durable": 14339.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7236.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 82.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 433.00292049799987,
+      "published": 21675.0,
+      "durable": 14339.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7311.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 81.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 434.5044043579999,
+      "published": 21750.0,
+      "durable": 14403.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7322.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 82.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 436.00275370200006,
+      "published": 21825.0,
+      "durable": 14403.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7397.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 81.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 437.50285920700003,
+      "published": 21900.0,
+      "durable": 14467.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7408.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 81.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 439.0029358029999,
+      "published": 21975.0,
+      "durable": 14467.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7483.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 79.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 440.50351844099987,
+      "published": 22050.0,
+      "durable": 14531.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7494.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 78.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 442.0030855130001,
+      "published": 22125.0,
+      "durable": 14595.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7505.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 78.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 443.502933255,
+      "published": 22200.0,
+      "durable": 14595.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7580.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 78.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 445.0029711970001,
+      "published": 22275.0,
+      "durable": 14659.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7591.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 446.5032953319999,
+      "published": 22350.0,
+      "durable": 14659.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7666.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 78.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 448.0027630100001,
+      "published": 22425.0,
+      "durable": 14723.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7677.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 449.5027652389999,
+      "published": 22500.0,
+      "durable": 14723.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7752.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 77.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 451.0025488030001,
+      "published": 22575.0,
+      "durable": 14787.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7763.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 452.503213811,
+      "published": 22650.0,
+      "durable": 14851.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7774.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 78.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 454.003208629,
+      "published": 22725.0,
+      "durable": 14851.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7849.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 455.5026453569999,
+      "published": 22800.0,
+      "durable": 14915.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7860.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 81.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 457.00255934300003,
+      "published": 22875.0,
+      "durable": 14915.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7935.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 458.50284719,
+      "published": 22950.0,
+      "durable": 14979.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 7946.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 460.0027768140001,
+      "published": 23025.0,
+      "durable": 14979.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8021.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 78.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 461.5029171619999,
+      "published": 23100.0,
+      "durable": 14979.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8096.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 463.002835149,
+      "published": 23175.0,
+      "durable": 15043.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8107.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 464.5033841919999,
+      "published": 23250.0,
+      "durable": 15043.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8182.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 78.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 466.00283113399996,
+      "published": 23325.0,
+      "durable": 15107.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8193.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 467.50281659100006,
+      "published": 23400.0,
+      "durable": 15171.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8204.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 79.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 468.534300391,
+      "published": 23450.0,
+      "durable": 15171.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8254.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 470.00277675000007,
+      "published": 23525.0,
+      "durable": 15171.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8329.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 78.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 471.50407289300006,
+      "published": 23600.0,
+      "durable": 15235.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8340.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 473.00271666699996,
+      "published": 23675.0,
+      "durable": 15235.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8415.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 474.503236734,
+      "published": 23750.0,
+      "durable": 15299.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8426.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 78.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 476.00273522399993,
+      "published": 23825.0,
+      "durable": 15363.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8437.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 77.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 477.502960242,
+      "published": 23900.0,
+      "durable": 15363.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8512.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 79.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 479.0024972629999,
+      "published": 23975.0,
+      "durable": 15427.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8523.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 80.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 480.5028128260001,
+      "published": 24050.0,
+      "durable": 15427.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8598.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 77.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 482.00301060599986,
+      "published": 24125.0,
+      "durable": 15491.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8609.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 79.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 483.50289421799994,
+      "published": 24200.0,
+      "durable": 15491.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8684.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 77.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 485.00281223699994,
+      "published": 24275.0,
+      "durable": 15555.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8695.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 486.502751385,
+      "published": 24350.0,
+      "durable": 15555.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8770.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 79.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 488.00250855600007,
+      "published": 24425.0,
+      "durable": 15619.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8781.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 78.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 489.50276947099997,
+      "published": 24500.0,
+      "durable": 15619.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8856.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 79.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 490.51415541000006,
+      "published": 24550.0,
+      "durable": 15683.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8842.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 492.0024940599999,
+      "published": 24625.0,
+      "durable": 15683.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8917.0,
+      "host_cpu_percent": 6.5,
+      "host_memory_percent": 80.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 493.50327742399986,
+      "published": 24700.0,
+      "durable": 15747.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 8928.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 81.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 495.00307729899987,
+      "published": 24775.0,
+      "durable": 15747.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9003.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 81.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 496.50307105699994,
+      "published": 24850.0,
+      "durable": 15811.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9014.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 81.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 498.0026033009999,
+      "published": 24925.0,
+      "durable": 15811.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9089.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 499.5032415200001,
+      "published": 25000.0,
+      "durable": 15875.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9100.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 81.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 501.0027500399999,
+      "published": 25075.0,
+      "durable": 15875.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9175.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 81.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 502.5039564169999,
+      "published": 25150.0,
+      "durable": 15939.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9186.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 504.00276943699987,
+      "published": 25225.0,
+      "durable": 15939.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9261.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 505.50275994000003,
+      "published": 25300.0,
+      "durable": 16003.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9272.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 81.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 507.00253939799995,
+      "published": 25375.0,
+      "durable": 16003.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9347.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 508.5029122430001,
+      "published": 25450.0,
+      "durable": 16067.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9358.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 82.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 510.002555239,
+      "published": 25525.0,
+      "durable": 16067.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9433.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 511.5031650789999,
+      "published": 25600.0,
+      "durable": 16131.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9444.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 513.0025718719999,
+      "published": 25675.0,
+      "durable": 16131.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9519.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 81.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 514.5029753819999,
+      "published": 25750.0,
+      "durable": 16195.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9530.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 82.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 516.002538127,
+      "published": 25825.0,
+      "durable": 16195.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9605.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 517.5030244039999,
+      "published": 25900.0,
+      "durable": 16259.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9616.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 84.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 519.002595661,
+      "published": 25975.0,
+      "durable": 16259.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9691.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 81.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 520.502853818,
+      "published": 26050.0,
+      "durable": 16323.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9702.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 82.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 522.0025025539999,
+      "published": 26125.0,
+      "durable": 16387.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9713.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 81.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 523.502955793,
+      "published": 26200.0,
+      "durable": 16387.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9788.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 82.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 525.003004829,
+      "published": 26275.0,
+      "durable": 16451.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9799.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 80.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 526.503786327,
+      "published": 26350.0,
+      "durable": 16451.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9874.0,
+      "host_cpu_percent": 7.2,
+      "host_memory_percent": 83.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 528.002764914,
+      "published": 26425.0,
+      "durable": 16451.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9949.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 529.5030186449999,
+      "published": 26500.0,
+      "durable": 16515.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 9960.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 83.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 531.0024747079999,
+      "published": 26575.0,
+      "durable": 16515.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10035.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 82.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 532.503019017,
+      "published": 26650.0,
+      "durable": 16579.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10046.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 83.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 534.002504202,
+      "published": 26725.0,
+      "durable": 16579.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10121.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 83.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 535.503215472,
+      "published": 26800.0,
+      "durable": 16643.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10132.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 85.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 537.0026919730001,
+      "published": 26875.0,
+      "durable": 16643.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10207.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 82.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 538.5029316559999,
+      "published": 26950.0,
+      "durable": 16707.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10218.0,
+      "host_cpu_percent": 6.2,
+      "host_memory_percent": 82.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 540.002596924,
+      "published": 27025.0,
+      "durable": 16707.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10293.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 83.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 541.5033224690001,
+      "published": 27100.0,
+      "durable": 16771.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10304.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 84.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 543.0025971089999,
+      "published": 27175.0,
+      "durable": 16771.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10379.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 81.6,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 544.5027920939999,
+      "published": 27250.0,
+      "durable": 16835.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10390.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 82.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 546.002828311,
+      "published": 27325.0,
+      "durable": 16835.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10465.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 547.502981996,
+      "published": 27400.0,
+      "durable": 16899.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10476.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 82.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 549.003144437,
+      "published": 27475.0,
+      "durable": 16899.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10551.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 81.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 550.5030133939999,
+      "published": 27550.0,
+      "durable": 16963.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10562.0,
+      "host_cpu_percent": 7.1,
+      "host_memory_percent": 83.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 552.0027266509999,
+      "published": 27625.0,
+      "durable": 16963.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10637.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 82.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 553.5042101399999,
+      "published": 27700.0,
+      "durable": 17027.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10648.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 84.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 555.002505984,
+      "published": 27775.0,
+      "durable": 17027.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10723.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 556.5040427459999,
+      "published": 27850.0,
+      "durable": 17091.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10734.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 81.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 558.0041287710001,
+      "published": 27925.0,
+      "durable": 17091.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10809.0,
+      "host_cpu_percent": 6.3,
+      "host_memory_percent": 85.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 559.5033925749999,
+      "published": 28000.0,
+      "durable": 17091.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10884.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 83.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 561.00269454,
+      "published": 28075.0,
+      "durable": 17155.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10895.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 85.0,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 562.5030789499999,
+      "published": 28150.0,
+      "durable": 17155.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 10970.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 82.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 564.0026682,
+      "published": 28225.0,
+      "durable": 17219.0,
+      "flow_queue_depth": 75.0,
+      "detection_queue_depth": 10931.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 85.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 565.502996147,
+      "published": 28300.0,
+      "durable": 17219.0,
+      "flow_queue_depth": 150.0,
+      "detection_queue_depth": 10931.0,
+      "host_cpu_percent": 6.1,
+      "host_memory_percent": 87.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 567.003519549,
+      "published": 28375.0,
+      "durable": 17283.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11067.0,
+      "host_cpu_percent": 6.9,
+      "host_memory_percent": 87.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 568.502739646,
+      "published": 28450.0,
+      "durable": 17283.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11142.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 87.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 570.0027415310001,
+      "published": 28525.0,
+      "durable": 17283.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11217.0,
+      "host_cpu_percent": 5.4,
+      "host_memory_percent": 86.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 571.50297806,
+      "published": 28600.0,
+      "durable": 17347.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11228.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 87.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 573.0029823469999,
+      "published": 28675.0,
+      "durable": 17347.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11303.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 86.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 574.5031375020001,
+      "published": 28750.0,
+      "durable": 17411.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11314.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 87.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 576.0025722349999,
+      "published": 28825.0,
+      "durable": 17411.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11389.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 86.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 577.5028969130001,
+      "published": 28900.0,
+      "durable": 17411.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11464.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 86.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 579.0026032399999,
+      "published": 28975.0,
+      "durable": 17475.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11475.0,
+      "host_cpu_percent": 5.7,
+      "host_memory_percent": 87.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 580.503333789,
+      "published": 29050.0,
+      "durable": 17475.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11550.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 87.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 582.0028851540001,
+      "published": 29125.0,
+      "durable": 17539.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11561.0,
+      "host_cpu_percent": 5.5,
+      "host_memory_percent": 88.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 583.5036071249999,
+      "published": 29200.0,
+      "durable": 17539.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11636.0,
+      "host_cpu_percent": 5.8,
+      "host_memory_percent": 86.7,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 585.0025928969999,
+      "published": 29275.0,
+      "durable": 17539.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11711.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 87.5,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 586.5078881719999,
+      "published": 29350.0,
+      "durable": 17603.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11722.0,
+      "host_cpu_percent": 6.6,
+      "host_memory_percent": 87.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 588.0026995850001,
+      "published": 29425.0,
+      "durable": 17603.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11797.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 92.1,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 589.5038504290001,
+      "published": 29500.0,
+      "durable": 17603.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11872.0,
+      "host_cpu_percent": 6.0,
+      "host_memory_percent": 88.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 591.004029981,
+      "published": 29575.0,
+      "durable": 17667.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11883.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 87.8,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 592.5031773789999,
+      "published": 29650.0,
+      "durable": 17667.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 11958.0,
+      "host_cpu_percent": 5.6,
+      "host_memory_percent": 88.3,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 594.0040738359999,
+      "published": 29725.0,
+      "durable": 17667.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 12033.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 87.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 595.5047069130001,
+      "published": 29800.0,
+      "durable": 17731.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 12044.0,
+      "host_cpu_percent": 6.4,
+      "host_memory_percent": 87.9,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 597.0024030689999,
+      "published": 29875.0,
+      "durable": 17731.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 12119.0,
+      "host_cpu_percent": 5.3,
+      "host_memory_percent": 87.4,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 598.504794817,
+      "published": 29950.0,
+      "durable": 17795.0,
+      "flow_queue_depth": 25.0,
+      "detection_queue_depth": 12130.0,
+      "host_cpu_percent": 5.9,
+      "host_memory_percent": 88.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 600.0005643520001,
+      "published": 30000.0,
+      "durable": 17795.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12205.0,
+      "host_cpu_percent": 5.2,
+      "host_memory_percent": 88.2,
+      "publishing": 1.0
+    },
+    {
+      "elapsed_seconds": 600.00781437,
+      "published": 30000.0,
+      "durable": 17795.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12205.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 88.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 602.635573943,
+      "published": 30000.0,
+      "durable": 17859.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12141.0,
+      "host_cpu_percent": 6.7,
+      "host_memory_percent": 90.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 603.6775381150001,
+      "published": 30000.0,
+      "durable": 17859.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12141.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 90.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 604.6355616420001,
+      "published": 30000.0,
+      "durable": 17859.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12141.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 89.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 605.5525594210001,
+      "published": 30000.0,
+      "durable": 17859.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12141.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 88.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 606.6215341909999,
+      "published": 30000.0,
+      "durable": 17923.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12077.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 88.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 607.573576475,
+      "published": 30000.0,
+      "durable": 17923.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12077.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 88.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 608.475549473,
+      "published": 30000.0,
+      "durable": 17923.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12077.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 87.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 609.3895669880001,
+      "published": 30000.0,
+      "durable": 17923.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12077.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 88.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 610.3515842859999,
+      "published": 30000.0,
+      "durable": 17987.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12013.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 83.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 611.266576107,
+      "published": 30000.0,
+      "durable": 17987.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12013.0,
+      "host_cpu_percent": 8.9,
+      "host_memory_percent": 85.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 612.1915618769999,
+      "published": 30000.0,
+      "durable": 17987.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12013.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 84.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 613.0915329699999,
+      "published": 30000.0,
+      "durable": 17987.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 12013.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 84.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 613.9725733769999,
+      "published": 30000.0,
+      "durable": 18051.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11949.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 83.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 614.8715608509999,
+      "published": 30000.0,
+      "durable": 18051.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11949.0,
+      "host_cpu_percent": 9.3,
+      "host_memory_percent": 82.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 615.7695360380001,
+      "published": 30000.0,
+      "durable": 18051.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11949.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 83.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 616.7695589739999,
+      "published": 30000.0,
+      "durable": 18051.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11949.0,
+      "host_cpu_percent": 8.8,
+      "host_memory_percent": 82.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 617.6835560310001,
+      "published": 30000.0,
+      "durable": 18051.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11949.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 82.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 618.605538175,
+      "published": 30000.0,
+      "durable": 18115.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11885.0,
+      "host_cpu_percent": 8.6,
+      "host_memory_percent": 83.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 619.495529696,
+      "published": 30000.0,
+      "durable": 18115.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11885.0,
+      "host_cpu_percent": 8.6,
+      "host_memory_percent": 82.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 620.4175351680001,
+      "published": 30000.0,
+      "durable": 18115.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11885.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 81.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 621.294526115,
+      "published": 30000.0,
+      "durable": 18115.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11885.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 81.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 622.2276011019999,
+      "published": 30000.0,
+      "durable": 18179.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11821.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 84.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 623.208523751,
+      "published": 30000.0,
+      "durable": 18179.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11821.0,
+      "host_cpu_percent": 8.4,
+      "host_memory_percent": 82.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 624.1085487170001,
+      "published": 30000.0,
+      "durable": 18179.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11821.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 81.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 625.0235606399999,
+      "published": 30000.0,
+      "durable": 18179.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11821.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 79.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 625.9795294,
+      "published": 30000.0,
+      "durable": 18243.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11757.0,
+      "host_cpu_percent": 8.7,
+      "host_memory_percent": 80.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 626.88259902,
+      "published": 30000.0,
+      "durable": 18243.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11757.0,
+      "host_cpu_percent": 9.0,
+      "host_memory_percent": 81.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 627.7856699009999,
+      "published": 30000.0,
+      "durable": 18243.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11757.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 81.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 628.6705504879999,
+      "published": 30000.0,
+      "durable": 18243.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11757.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 80.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 629.63953664,
+      "published": 30000.0,
+      "durable": 18243.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11757.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 80.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 630.5745550669999,
+      "published": 30000.0,
+      "durable": 18307.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11693.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 82.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 631.481578144,
+      "published": 30000.0,
+      "durable": 18307.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11693.0,
+      "host_cpu_percent": 8.4,
+      "host_memory_percent": 82.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 632.368632958,
+      "published": 30000.0,
+      "durable": 18307.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11693.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 81.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 633.271526408,
+      "published": 30000.0,
+      "durable": 18307.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11693.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 81.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 634.176527548,
+      "published": 30000.0,
+      "durable": 18371.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11629.0,
+      "host_cpu_percent": 9.0,
+      "host_memory_percent": 82.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 635.1565769819999,
+      "published": 30000.0,
+      "durable": 18371.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11629.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 80.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 636.069531652,
+      "published": 30000.0,
+      "durable": 18371.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11629.0,
+      "host_cpu_percent": 8.2,
+      "host_memory_percent": 81.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 636.9892639990001,
+      "published": 30000.0,
+      "durable": 18371.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11629.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 81.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 637.913557046,
+      "published": 30000.0,
+      "durable": 18435.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11565.0,
+      "host_cpu_percent": 9.7,
+      "host_memory_percent": 84.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 638.81153713,
+      "published": 30000.0,
+      "durable": 18435.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11565.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 83.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 639.6975902080001,
+      "published": 30000.0,
+      "durable": 18435.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11565.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 84.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 640.58253769,
+      "published": 30000.0,
+      "durable": 18435.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11565.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 83.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 641.566541247,
+      "published": 30000.0,
+      "durable": 18499.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11501.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 82.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 642.4875348579999,
+      "published": 30000.0,
+      "durable": 18499.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11501.0,
+      "host_cpu_percent": 8.9,
+      "host_memory_percent": 83.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 643.3905511099999,
+      "published": 30000.0,
+      "durable": 18499.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11501.0,
+      "host_cpu_percent": 8.4,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 644.305530498,
+      "published": 30000.0,
+      "durable": 18499.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11501.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 85.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 645.223534381,
+      "published": 30000.0,
+      "durable": 18499.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11501.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 85.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 646.1325743719999,
+      "published": 30000.0,
+      "durable": 18563.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11437.0,
+      "host_cpu_percent": 9.6,
+      "host_memory_percent": 85.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 647.1195822509999,
+      "published": 30000.0,
+      "durable": 18563.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11437.0,
+      "host_cpu_percent": 8.4,
+      "host_memory_percent": 87.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 648.051553025,
+      "published": 30000.0,
+      "durable": 18563.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11437.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 85.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 648.991553285,
+      "published": 30000.0,
+      "durable": 18563.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11437.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 85.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 649.950562473,
+      "published": 30000.0,
+      "durable": 18627.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11373.0,
+      "host_cpu_percent": 11.0,
+      "host_memory_percent": 87.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 650.858554792,
+      "published": 30000.0,
+      "durable": 18627.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11373.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 88.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 651.822574344,
+      "published": 30000.0,
+      "durable": 18627.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11373.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 89.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 652.7425282469999,
+      "published": 30000.0,
+      "durable": 18627.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11373.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 85.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 653.6655332299999,
+      "published": 30000.0,
+      "durable": 18627.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11373.0,
+      "host_cpu_percent": 8.5,
+      "host_memory_percent": 85.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 654.57153576,
+      "published": 30000.0,
+      "durable": 18691.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11309.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 84.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 655.473605551,
+      "published": 30000.0,
+      "durable": 18691.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11309.0,
+      "host_cpu_percent": 9.5,
+      "host_memory_percent": 86.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 656.4296699399999,
+      "published": 30000.0,
+      "durable": 18691.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11309.0,
+      "host_cpu_percent": 9.0,
+      "host_memory_percent": 87.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 657.4255318779999,
+      "published": 30000.0,
+      "durable": 18691.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11309.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 658.35454796,
+      "published": 30000.0,
+      "durable": 18691.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11309.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 85.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 659.2875617330001,
+      "published": 30000.0,
+      "durable": 18755.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11245.0,
+      "host_cpu_percent": 9.5,
+      "host_memory_percent": 85.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 660.22658454,
+      "published": 30000.0,
+      "durable": 18755.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11245.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 85.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 661.12754298,
+      "published": 30000.0,
+      "durable": 18755.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11245.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 662.0985483219999,
+      "published": 30000.0,
+      "durable": 18755.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11245.0,
+      "host_cpu_percent": 8.2,
+      "host_memory_percent": 83.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 663.063540378,
+      "published": 30000.0,
+      "durable": 18819.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11181.0,
+      "host_cpu_percent": 8.5,
+      "host_memory_percent": 86.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 663.9855774079999,
+      "published": 30000.0,
+      "durable": 18819.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11181.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 85.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 664.927848106,
+      "published": 30000.0,
+      "durable": 18819.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11181.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 85.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 665.8605338319999,
+      "published": 30000.0,
+      "durable": 18819.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11181.0,
+      "host_cpu_percent": 8.8,
+      "host_memory_percent": 84.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 666.7475655840001,
+      "published": 30000.0,
+      "durable": 18819.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11181.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 84.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 667.72969483,
+      "published": 30000.0,
+      "durable": 18883.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11117.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 84.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 668.6705623119999,
+      "published": 30000.0,
+      "durable": 18883.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11117.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 86.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 669.5615480179999,
+      "published": 30000.0,
+      "durable": 18883.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11117.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 84.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 670.453531422,
+      "published": 30000.0,
+      "durable": 18883.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11117.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 84.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 671.3436383200001,
+      "published": 30000.0,
+      "durable": 18947.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11053.0,
+      "host_cpu_percent": 8.8,
+      "host_memory_percent": 87.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 672.3265514699999,
+      "published": 30000.0,
+      "durable": 18947.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11053.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 86.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 673.2555485119999,
+      "published": 30000.0,
+      "durable": 18947.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11053.0,
+      "host_cpu_percent": 9.3,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 674.1686069059999,
+      "published": 30000.0,
+      "durable": 18947.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11053.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 84.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 675.1005882009999,
+      "published": 30000.0,
+      "durable": 18947.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 11053.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 84.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 675.9955744060001,
+      "published": 30000.0,
+      "durable": 19011.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10989.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 85.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 676.975558004,
+      "published": 30000.0,
+      "durable": 19011.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10989.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 86.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 677.9175576779999,
+      "published": 30000.0,
+      "durable": 19011.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10989.0,
+      "host_cpu_percent": 8.6,
+      "host_memory_percent": 85.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 678.8265236760001,
+      "published": 30000.0,
+      "durable": 19011.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10989.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 679.720526885,
+      "published": 30000.0,
+      "durable": 19075.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10925.0,
+      "host_cpu_percent": 8.9,
+      "host_memory_percent": 87.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 680.616584681,
+      "published": 30000.0,
+      "durable": 19075.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10925.0,
+      "host_cpu_percent": 8.8,
+      "host_memory_percent": 86.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 681.5875328699999,
+      "published": 30000.0,
+      "durable": 19075.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10925.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 85.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 682.5075467039999,
+      "published": 30000.0,
+      "durable": 19075.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10925.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 85.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 683.407547952,
+      "published": 30000.0,
+      "durable": 19139.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10861.0,
+      "host_cpu_percent": 8.2,
+      "host_memory_percent": 85.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 684.3187112779999,
+      "published": 30000.0,
+      "durable": 19139.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10861.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 87.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 685.207603646,
+      "published": 30000.0,
+      "durable": 19139.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10861.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 87.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 686.1886506850001,
+      "published": 30000.0,
+      "durable": 19139.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10861.0,
+      "host_cpu_percent": 8.2,
+      "host_memory_percent": 86.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 687.123569525,
+      "published": 30000.0,
+      "durable": 19139.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10861.0,
+      "host_cpu_percent": 8.4,
+      "host_memory_percent": 85.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 688.056569755,
+      "published": 30000.0,
+      "durable": 19203.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10797.0,
+      "host_cpu_percent": 9.0,
+      "host_memory_percent": 87.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 688.9675520769999,
+      "published": 30000.0,
+      "durable": 19203.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10797.0,
+      "host_cpu_percent": 9.0,
+      "host_memory_percent": 87.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 689.973566142,
+      "published": 30000.0,
+      "durable": 19203.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10797.0,
+      "host_cpu_percent": 9.5,
+      "host_memory_percent": 87.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 690.907597529,
+      "published": 30000.0,
+      "durable": 19203.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10797.0,
+      "host_cpu_percent": 10.0,
+      "host_memory_percent": 89.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 691.82757408,
+      "published": 30000.0,
+      "durable": 19203.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10797.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 90.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 692.775567163,
+      "published": 30000.0,
+      "durable": 19267.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10733.0,
+      "host_cpu_percent": 10.9,
+      "host_memory_percent": 90.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 693.683550925,
+      "published": 30000.0,
+      "durable": 19267.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10733.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 91.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 694.6665518340001,
+      "published": 30000.0,
+      "durable": 19267.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10733.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 90.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 695.614560084,
+      "published": 30000.0,
+      "durable": 19267.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10733.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 89.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 696.738563681,
+      "published": 30000.0,
+      "durable": 19331.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10669.0,
+      "host_cpu_percent": 8.8,
+      "host_memory_percent": 89.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 697.770546208,
+      "published": 30000.0,
+      "durable": 19331.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10669.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 90.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 698.670567702,
+      "published": 30000.0,
+      "durable": 19331.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10669.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 86.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 699.66253594,
+      "published": 30000.0,
+      "durable": 19331.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10669.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 86.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 700.6025502140001,
+      "published": 30000.0,
+      "durable": 19395.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10605.0,
+      "host_cpu_percent": 8.9,
+      "host_memory_percent": 86.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 701.531746673,
+      "published": 30000.0,
+      "durable": 19395.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10605.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 84.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 702.4356732599999,
+      "published": 30000.0,
+      "durable": 19395.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10605.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 703.4335727749999,
+      "published": 30000.0,
+      "durable": 19395.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10605.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 84.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 704.413523769,
+      "published": 30000.0,
+      "durable": 19395.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10605.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 83.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 705.373576035,
+      "published": 30000.0,
+      "durable": 19459.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10541.0,
+      "host_cpu_percent": 9.6,
+      "host_memory_percent": 83.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 706.3035739229999,
+      "published": 30000.0,
+      "durable": 19459.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10541.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 84.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 707.319825882,
+      "published": 30000.0,
+      "durable": 19459.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10541.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 83.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 708.280527163,
+      "published": 30000.0,
+      "durable": 19459.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10541.0,
+      "host_cpu_percent": 8.7,
+      "host_memory_percent": 82.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 709.232653888,
+      "published": 30000.0,
+      "durable": 19523.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10477.0,
+      "host_cpu_percent": 9.3,
+      "host_memory_percent": 82.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 710.1645588270001,
+      "published": 30000.0,
+      "durable": 19523.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10477.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 82.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 711.0795674139999,
+      "published": 30000.0,
+      "durable": 19523.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10477.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 84.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 712.065534393,
+      "published": 30000.0,
+      "durable": 19523.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10477.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 85.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 713.0146400829999,
+      "published": 30000.0,
+      "durable": 19587.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10413.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 84.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 713.9555663159999,
+      "published": 30000.0,
+      "durable": 19587.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10413.0,
+      "host_cpu_percent": 9.6,
+      "host_memory_percent": 84.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 714.850566499,
+      "published": 30000.0,
+      "durable": 19587.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10413.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 86.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 715.8325982669999,
+      "published": 30000.0,
+      "durable": 19587.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10413.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 86.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 716.7475826479999,
+      "published": 30000.0,
+      "durable": 19587.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10413.0,
+      "host_cpu_percent": 8.2,
+      "host_memory_percent": 86.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 717.6666299379999,
+      "published": 30000.0,
+      "durable": 19587.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10413.0,
+      "host_cpu_percent": 8.4,
+      "host_memory_percent": 85.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 718.549537357,
+      "published": 30000.0,
+      "durable": 19651.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10349.0,
+      "host_cpu_percent": 8.2,
+      "host_memory_percent": 88.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 719.5235745800001,
+      "published": 30000.0,
+      "durable": 19651.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10349.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 85.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 720.4236169619999,
+      "published": 30000.0,
+      "durable": 19651.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10349.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 86.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 721.3245402499999,
+      "published": 30000.0,
+      "durable": 19651.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10349.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 86.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 722.2226304149999,
+      "published": 30000.0,
+      "durable": 19715.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10285.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 86.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 723.197604299,
+      "published": 30000.0,
+      "durable": 19715.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10285.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 85.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 724.1405480230001,
+      "published": 30000.0,
+      "durable": 19715.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10285.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 87.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 725.041517222,
+      "published": 30000.0,
+      "durable": 19715.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10285.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 85.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 725.941590572,
+      "published": 30000.0,
+      "durable": 19715.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10285.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 84.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 726.92669628,
+      "published": 30000.0,
+      "durable": 19779.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10221.0,
+      "host_cpu_percent": 9.3,
+      "host_memory_percent": 85.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 727.835581025,
+      "published": 30000.0,
+      "durable": 19779.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10221.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 87.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 728.7335135379999,
+      "published": 30000.0,
+      "durable": 19779.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10221.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 85.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 729.627544981,
+      "published": 30000.0,
+      "durable": 19779.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10221.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 85.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 730.588673773,
+      "published": 30000.0,
+      "durable": 19843.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10157.0,
+      "host_cpu_percent": 8.7,
+      "host_memory_percent": 86.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 731.4985351,
+      "published": 30000.0,
+      "durable": 19843.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10157.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 88.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 732.396560615,
+      "published": 30000.0,
+      "durable": 19843.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10157.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 85.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 733.283511266,
+      "published": 30000.0,
+      "durable": 19843.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10157.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 85.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 734.256615641,
+      "published": 30000.0,
+      "durable": 19907.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10093.0,
+      "host_cpu_percent": 8.5,
+      "host_memory_percent": 86.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 735.1756814820001,
+      "published": 30000.0,
+      "durable": 19907.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10093.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 88.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 736.089577469,
+      "published": 30000.0,
+      "durable": 19907.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10093.0,
+      "host_cpu_percent": 8.6,
+      "host_memory_percent": 85.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 736.984562312,
+      "published": 30000.0,
+      "durable": 19907.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10093.0,
+      "host_cpu_percent": 7.4,
+      "host_memory_percent": 85.9,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 737.9645450329999,
+      "published": 30000.0,
+      "durable": 19971.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10029.0,
+      "host_cpu_percent": 8.9,
+      "host_memory_percent": 87.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 738.887570809,
+      "published": 30000.0,
+      "durable": 19971.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10029.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 88.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 739.7677063849999,
+      "published": 30000.0,
+      "durable": 19971.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10029.0,
+      "host_cpu_percent": 7.2,
+      "host_memory_percent": 86.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 740.6515224330001,
+      "published": 30000.0,
+      "durable": 19971.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 10029.0,
+      "host_cpu_percent": 7.3,
+      "host_memory_percent": 86.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 741.6276894279999,
+      "published": 30000.0,
+      "durable": 20035.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9965.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 86.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 742.533658371,
+      "published": 30000.0,
+      "durable": 20035.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9965.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 87.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 743.4145695279999,
+      "published": 30000.0,
+      "durable": 20035.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9965.0,
+      "host_cpu_percent": 8.2,
+      "host_memory_percent": 87.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 744.290653114,
+      "published": 30000.0,
+      "durable": 20035.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9965.0,
+      "host_cpu_percent": 7.0,
+      "host_memory_percent": 87.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 745.2565921180001,
+      "published": 30000.0,
+      "durable": 20099.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9901.0,
+      "host_cpu_percent": 8.4,
+      "host_memory_percent": 89.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 746.176595184,
+      "published": 30000.0,
+      "durable": 20099.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9901.0,
+      "host_cpu_percent": 8.5,
+      "host_memory_percent": 87.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 747.0526676,
+      "published": 30000.0,
+      "durable": 20099.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9901.0,
+      "host_cpu_percent": 7.2,
+      "host_memory_percent": 88.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 748.031679038,
+      "published": 30000.0,
+      "durable": 20099.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9901.0,
+      "host_cpu_percent": 8.3,
+      "host_memory_percent": 87.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 748.938597978,
+      "published": 30000.0,
+      "durable": 20163.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9837.0,
+      "host_cpu_percent": 7.2,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 749.8285968759999,
+      "published": 30000.0,
+      "durable": 20163.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9837.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 87.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 750.716772562,
+      "published": 30000.0,
+      "durable": 20163.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9837.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 87.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 751.685527932,
+      "published": 30000.0,
+      "durable": 20163.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9837.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 86.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 752.593639378,
+      "published": 30000.0,
+      "durable": 20163.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9837.0,
+      "host_cpu_percent": 7.2,
+      "host_memory_percent": 86.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 753.4985488299999,
+      "published": 30000.0,
+      "durable": 20227.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9773.0,
+      "host_cpu_percent": 8.7,
+      "host_memory_percent": 86.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 754.394552471,
+      "published": 30000.0,
+      "durable": 20227.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9773.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 87.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 755.3578378519999,
+      "published": 30000.0,
+      "durable": 20227.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9773.0,
+      "host_cpu_percent": 7.3,
+      "host_memory_percent": 86.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 756.2566817039999,
+      "published": 30000.0,
+      "durable": 20227.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9773.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 86.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 757.1706553239999,
+      "published": 30000.0,
+      "durable": 20291.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9709.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 86.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 758.177586953,
+      "published": 30000.0,
+      "durable": 20291.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9709.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 87.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 759.085569483,
+      "published": 30000.0,
+      "durable": 20291.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9709.0,
+      "host_cpu_percent": 7.1,
+      "host_memory_percent": 86.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 759.9765208409999,
+      "published": 30000.0,
+      "durable": 20291.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9709.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 86.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 760.8786683369999,
+      "published": 30000.0,
+      "durable": 20355.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9645.0,
+      "host_cpu_percent": 7.8,
+      "host_memory_percent": 88.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 761.854780057,
+      "published": 30000.0,
+      "durable": 20355.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9645.0,
+      "host_cpu_percent": 8.1,
+      "host_memory_percent": 85.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 762.7535381789999,
+      "published": 30000.0,
+      "durable": 20355.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9645.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 83.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 763.6365393859999,
+      "published": 30000.0,
+      "durable": 20355.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9645.0,
+      "host_cpu_percent": 7.2,
+      "host_memory_percent": 84.2,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 764.6106967149999,
+      "published": 30000.0,
+      "durable": 20419.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9581.0,
+      "host_cpu_percent": 7.3,
+      "host_memory_percent": 85.3,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 765.521572029,
+      "published": 30000.0,
+      "durable": 20419.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9581.0,
+      "host_cpu_percent": 9.2,
+      "host_memory_percent": 85.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 766.412584206,
+      "published": 30000.0,
+      "durable": 20419.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9581.0,
+      "host_cpu_percent": 8.7,
+      "host_memory_percent": 86.6,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 767.2895979299999,
+      "published": 30000.0,
+      "durable": 20419.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9581.0,
+      "host_cpu_percent": 7.0,
+      "host_memory_percent": 84.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 768.2685652989999,
+      "published": 30000.0,
+      "durable": 20419.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9581.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 84.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 769.178519752,
+      "published": 30000.0,
+      "durable": 20483.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9517.0,
+      "host_cpu_percent": 9.1,
+      "host_memory_percent": 85.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 770.068584097,
+      "published": 30000.0,
+      "durable": 20483.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9517.0,
+      "host_cpu_percent": 7.3,
+      "host_memory_percent": 86.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 771.042572223,
+      "published": 30000.0,
+      "durable": 20483.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9517.0,
+      "host_cpu_percent": 7.5,
+      "host_memory_percent": 84.0,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 771.946658521,
+      "published": 30000.0,
+      "durable": 20483.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9517.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 83.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 772.8396922699999,
+      "published": 30000.0,
+      "durable": 20547.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9453.0,
+      "host_cpu_percent": 8.6,
+      "host_memory_percent": 85.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 773.8265572810001,
+      "published": 30000.0,
+      "durable": 20547.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9453.0,
+      "host_cpu_percent": 7.7,
+      "host_memory_percent": 85.7,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 774.734535891,
+      "published": 30000.0,
+      "durable": 20547.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9453.0,
+      "host_cpu_percent": 7.1,
+      "host_memory_percent": 84.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 775.6345690139999,
+      "published": 30000.0,
+      "durable": 20547.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9453.0,
+      "host_cpu_percent": 8.0,
+      "host_memory_percent": 84.4,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 776.524570668,
+      "published": 30000.0,
+      "durable": 20611.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9389.0,
+      "host_cpu_percent": 9.0,
+      "host_memory_percent": 84.8,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 777.4996624139999,
+      "published": 30000.0,
+      "durable": 20611.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9389.0,
+      "host_cpu_percent": 7.9,
+      "host_memory_percent": 85.1,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 778.3845314739999,
+      "published": 30000.0,
+      "durable": 20611.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9389.0,
+      "host_cpu_percent": 7.6,
+      "host_memory_percent": 84.5,
+      "publishing": 0.0
+    },
+    {
+      "elapsed_seconds": 779.272576625,
+      "published": 30000.0,
+      "durable": 20611.0,
+      "flow_queue_depth": 0.0,
+      "detection_queue_depth": 9389.0,
+      "host_cpu_percent": 7.2,
+      "host_memory_percent": 84.9,
+      "publishing": 0.0
+    }
+  ],
+  "verdict": {
+    "sustainable": false,
+    "criteria": {
+      "input_rate_maintained": true,
+      "queue_depth_bounded": false,
+      "no_unexplained_loss": false,
+      "latency_within_budget": false,
+      "returned_to_steady_state": false
+    },
+    "failures": [
+      "durability mismatch (flows=20611, detections=20611, published=30000)",
+      "durable latency p95 322514.35 ms exceeds 5000.00 ms",
+      "pipeline did not return to steady state (flow_depth=0, detection_depth=9389)",
+      "detection queue depth 12205 exceeds budget 10000",
+      "detection queue grows 28.131 messages/s above tolerance 1.000"
+    ]
+  },
+  "machine": {
+    "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.36",
+    "python": "3.11.9",
+    "processor": "",
+    "logical_cpu_count": 20,
+    "memory_bytes": 2055270400
+  },
+  "limitations": [
+    "Synthetic metadata-only demo flows measure mechanics, not detection quality.",
+    "Durable latency is observed by polling committed flow/detection joins and therefore includes up to one sample interval of measurement delay.",
+    "Host CPU and memory percentages include unrelated local processes.",
+    "The result describes one local Compose host and is not a capacity promise."
+  ]
+}

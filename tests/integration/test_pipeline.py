@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import event
+from sqlalchemy import event, func, select
 
-from apps.api.database import Repository
+from apps.api.database import IncidentAlertRow, IncidentRow, Repository
 from packages.contracts import AnalystFeedback, FeedbackDisposition, Severity, Verdict
 from packages.detection import DetectionEngine
 from packages.incidents import DriftEvent, RuntimeDriftMonitor
@@ -90,6 +90,8 @@ def test_parent_rows_flush_before_foreign_key_dependants(
     assert inserts.index("sensors") < inserts.index("flows")
     assert inserts.index("flows") < inserts.index("detection_results")
     assert inserts.index("detection_results") < inserts.index("alerts")
+    assert inserts.index("alerts") < inserts.index("incidents")
+    assert inserts.index("incidents") < inserts.index("incident_alerts")
 
 
 def test_incidents_group_on_explainable_rules_and_return_timeline(
@@ -158,6 +160,18 @@ def test_incidents_group_on_explainable_rules_and_return_timeline(
         "10.0.0.102",
         "10.0.0.103",
     ]
+    with repository.session() as session:
+        stored = session.get(IncidentRow, summary["id"])
+        assert stored is not None
+        assert stored.alert_ids == []
+        assert stored.grouping_context is not None
+        assert len(stored.grouping_context["recent_risks"]) <= 2
+        membership_count = session.scalar(
+            select(func.count(IncidentAlertRow.alert_id)).where(
+                IncidentAlertRow.incident_id == summary["id"]
+            )
+        )
+        assert membership_count == 5
 
 
 def test_record_model_refreshes_loaded_manifest(tmp_path: Path) -> None:

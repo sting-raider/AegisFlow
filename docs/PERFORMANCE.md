@@ -46,6 +46,42 @@ The harness is an acceptance instrument, not evidence by itself. A rate is suppo
 only after a committed report records a passing verdict for the required duration and the
 failure/recovery scenarios have been exercised.
 
+### Ten-minute 50 flows/s result
+
+The 2026-08-13 local Windows/Docker Desktop run first produced a valid NO-GO. Incident
+membership was stored as a growing JSON alert-ID array; one row reached 17,922 IDs and
+about 717 KiB, so every alert rewrote an increasingly large row. Docker storage also
+filled during the run, causing Redis's RDB safety to stop writes visibly. The published
+30,000 messages were preserved and later reached exactly 30,000 flows and detections with
+zero duplicate flow IDs, but the original drain-window verdict remains a failure.
+
+Membership is now normalized in `incident_alerts`, grouping uses a compact aggregate
+context with only the two recent risk/severity values, and parent-before-membership flush
+order is regression-tested. Local Compose uses one durable Redis mechanism (AOF) and
+disables redundant automatic RDB snapshots; target deployments retain their own managed
+backup policy. Repeating the identical predeclared workload then passed:
+
+| Measure | Before normalization | After normalization |
+|---|---:|---:|
+| Published / durable flows / durable detections | 30,000 / 20,611 / 20,611 at timeout | 30,000 / 30,000 / 30,000 |
+| Achieved input rate | 50.0000 flows/s | 49.9999 flows/s |
+| End-to-end durable rate | 38.45 flows/s | 49.89 flows/s |
+| Durable P95 latency | 322.51 s | 2.002 s |
+| Maximum detection depth | 12,205 | 175 |
+| Second-half detection growth | 28.131/s | 0.002/s |
+| Final detection depth | 9,389 | 0 |
+| Drain time | Timed out at 180.25 s | 1.35 s |
+| Verdict | NO-GO | Pass |
+
+Exact reports are
+[`sustained-compose-windows-2026-08-13-50fps-10m.json`](benchmarks/sustained-compose-windows-2026-08-13-50fps-10m.json)
+and
+[`sustained-compose-windows-2026-08-13-50fps-10m-postfix.json`](benchmarks/sustained-compose-windows-2026-08-13-50fps-10m-postfix.json).
+The host-memory samples include an unrelated roughly 5 GiB process that ran intermittently;
+the passing result is therefore useful contended single-host evidence, not a clean-host or
+production capacity promise. The 30-minute, rate-ladder, multi-worker, and failure runs
+remain open.
+
 ## Redis-to-PostgreSQL pipeline
 
 `scripts/benchmark_pipeline.py` is restricted to localhost and the AegisFlow Compose

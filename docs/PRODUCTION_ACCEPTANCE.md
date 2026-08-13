@@ -17,7 +17,7 @@ production NIDS. Detection never authorizes automatic blocking.
 | Dataset-origin diagnostic | Balanced deduplicated source classification and ablation | Full Schema A blocked at 0.95416; categorical ablation clears at 0.68428 |
 | Challenger evidence | Registered baselines, costs, ablations, repeated held-family and cross-environment results | Complete for current family; cross-fitted calibration fails and records a development scientific NO-GO |
 | Final scientific gate | Candidate locked before exactly one frozen run; governed GO/NO-GO | No eligible candidate; frozen run not authorized and remains sealed |
-| Sustained capacity | 10/30-minute plus burst/failure tests with loss, lag, latency and resource budgets | Open |
+| Sustained capacity | 10/30-minute plus burst/failure tests with loss, lag, latency and resource budgets | 10-minute 50 flows/s local Compose point passes after incident-membership normalization; 30-minute, ladder, and failure matrix open ([evidence](benchmarks/sustained-compose-windows-2026-08-13-50fps-10m-postfix.json)) |
 | Multi-worker correctness | Partitioning, recovery, idempotency and shared state under sustained load | Open |
 | Real local OIDC | Local IdP, roles, token/JWKS lifecycle and abuse cases | Pass on disposable local Dex profile ([evidence](acceptance/oidc-ci-2026-08-13.json)); organizational IdP validation remains deployment-specific |
 | Local Kubernetes | Actual kind/k3d deployment, probes, policies, migration, rollout and failure drill | Open |
