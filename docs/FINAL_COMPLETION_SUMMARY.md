@@ -19,8 +19,10 @@ All four published real-data evaluations reject the current model, and no extern
 managed data service, multi-host cluster, restore drill, or representative target-capacity
 test has been supplied. The repository is a serious evaluation platform with guarded
 deployment templates; production acceptance remains environment- and model-specific. The
-live final status is in `docs/PROGRESS.md`; this file will be replaced by
-`docs/FINAL_ACCEPTANCE_REPORT.md` only after a governed GO/NO-GO decision.
+governed GO/NO-GO decision has now been made: the detector receives an explicit
+development scientific NO-GO and the platform's local acceptance mechanics are complete.
+See `docs/FINAL_ACCEPTANCE_REPORT.md` for the final verdict; this file is retained as
+historical engineering-baseline context.
 
 The live final phase has since frozen the four rejection reports behind an automated
 integrity guard, implemented shared portable/temporal research schemas, and admitted three

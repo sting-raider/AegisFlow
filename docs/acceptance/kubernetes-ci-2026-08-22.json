@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-22T11:11:26.472494+00:00",
+  "scope": "disposable local Kubernetes deployment mechanics",
+  "safety": {
+    "kind_cluster": "aegisflow-acceptance",
+    "preexisting_cluster_replaced": false,
+    "persistent_developer_data_touched": false,
+    "traffic_fixture": "synthetic demo metadata",
+    "packet_payloads_stored": false,
+    "external_traffic_targets": false
+  },
+  "completed_at": "2026-08-22T11:16:54.160598+00:00",
+  "versions": {
+    "kind_node_image": "kindest/node:v1.34.0@sha256:7416a61b42b1662ca6ca89f02028ac133a309a2a30ba309614e8ec94d976dc5a",
+    "ingress_nginx": "controller-v1.15.1",
+    "ingress_manifest_sha256": "2a3ae008c8786431115502644e77ab398fdebfb721a5d1195ed3089cde3299df",
+    "migration": "0003_incident_membership",
+    "model": "0.3.0"
+  },
+  "validation": {
+    "base_kustomize_deployed": true,
+    "local_postgres_and_redis_ready": true,
+    "migration_init_passed": true,
+    "api_replicas": 2,
+    "dashboard_replicas": 2,
+    "detector_replicas": 2,
+    "detector_scale_up_replicas": 3,
+    "probes_ready": true,
+    "resource_bounds_present": true,
+    "runtime_secret_present": true,
+    "tls_ingress_passed": true,
+    "network_policy_denied_unlabelled_redis_client": true,
+    "model_registry_mounted": true,
+    "retention_owner": null,
+    "initial_counts": {
+      "flows": 6,
+      "detections": 6,
+      "alerts": 5,
+      "incidents": 1
+    },
+    "final_counts_after_duplicate_replay": {
+      "flows": 6,
+      "detections": 6,
+      "alerts": 5,
+      "incidents": 1
+    },
+    "api_rolling_replacement_passed": true,
+    "detector_pod_replacement_passed": true,
+    "zero_silent_data_loss": true,
+    "zero_duplicate_rows": true,
+    "cleanup_passed": true
+  },
+  "timing_seconds": {
+    "api_rolling_replacement": 31.12023125600001,
+    "detector_pod_recovery": 31.82537122100001,
+    "total": 327.68811884999997
+  },
+  "verdict": {
+    "passed": true,
+    "failures": []
+  },
+  "limitations": [
+    "This validates disposable single-node kind deployment mechanics, not managed-cloud readiness.",
+    "The local profile uses demo identity, emptyDir data services, and a one-day test certificate.",
+    "Capacity, organizational identity, managed storage, and managed backup remain deployment-specific."
+  ]
+}

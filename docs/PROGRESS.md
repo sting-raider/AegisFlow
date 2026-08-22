@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-08-13.
+Last updated: 2026-08-22.
 
 ## Active final model and production-acceptance phase
 
@@ -75,6 +75,17 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Remaining repository work proceeds to sustained
   performance, local Kubernetes, rollback/failure, security, release evidence, and final
   GO/NO-GO evidence.
+- The final phase is closed. `docs/FINAL_ACCEPTANCE_REPORT.md` records the governed
+  verdict: the detector receives an explicit development scientific NO-GO (no candidate
+  was lockable, so the frozen matrix was never unsealed), while the engineering platform
+  completed every local production-acceptance exercise. Clean Linux-runner evidence now
+  includes the predeclared 30 flows/s / 30-minute sustained PASS (run `31695359714`,
+  exact 54,000-flow conservation, P95 3.336 s, max depth 75, zero final lag) and the
+  disposable kind Kubernetes acceptance PASS (run `32569606185`: migrations, two
+  replicas per service, TLS ingress, NetworkPolicy denial, idempotent replay,
+  API replacement in 31.1 s, detector recovery in 31.8 s; retained at
+  `docs/acceptance/kubernetes-ci-2026-08-22.json`). The final CI run on commit
+  `7f543e6` is green across all ten jobs.
 - Research Schema A now emits 24 portable features from exporter-independent counts,
   fractions, derived rates, log transforms, protocol categories, port ranges, service
   families, and explicit port missingness; it never exposes raw endpoint identity or a
