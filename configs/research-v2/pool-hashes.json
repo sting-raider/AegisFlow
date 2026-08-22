@@ -1,0 +1,32 @@
+﻿{
+    "CTU-IoT-Malware-Capture-8-1":  {
+                                        "pcap_sha256":  "80dcc2602519479ddcde889fa902fee19a76696630811452f8df38888af894f2",
+                                        "pcap_size_bytes":  2098362,
+                                        "labels_sha256":  "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a"
+                                    },
+    "CTU-IoT-Malware-Capture-42-1":  {
+                                         "pcap_sha256":  "7573797f17aae96e3804a3cfb22d531b74c17bbae740de1e14048f89130fba37",
+                                         "pcap_size_bytes":  2908160,
+                                         "labels_sha256":  "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa"
+                                     },
+    "CTU-Honeypot-Capture-4-1":  {
+                                     "pcap_sha256":  "3fb775c0391b6ad313a3f7845e634a277b07c3f6377346c2486ba63e1c22e90c",
+                                     "pcap_size_bytes":  4594492,
+                                     "labels_sha256":  "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e"
+                                 },
+    "CTU-Honeypot-Capture-5-1":  {
+                                     "pcap_sha256":  "f6c2a4808a3fc3d7c01ae7656f1b341a1c7338bcd4d5a371f96280035efcbf79",
+                                     "pcap_size_bytes":  381382656,
+                                     "labels_sha256":  "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262"
+                                 },
+    "CTU-IoT-Malware-Capture-34-1":  {
+                                         "pcap_sha256":  "92ec7e2f6658ee4b007d0b816986c46cc0338bc5e2bec6ceaaca566c695e4699",
+                                         "pcap_size_bytes":  126317980,
+                                         "labels_sha256":  "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e"
+                                     },
+    "CTU-IoT-Malware-Capture-20-1":  {
+                                         "pcap_sha256":  "4d0a00c33a4bf11228158baddd47c38f702731ea8d75ef1201061fc8bbd878b9",
+                                         "pcap_size_bytes":  4057401,
+                                         "labels_sha256":  "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711"
+                                     }
+}

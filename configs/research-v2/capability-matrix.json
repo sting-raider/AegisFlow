@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-22T00:00:00+00:00",
+  "contract": "packages/contracts/models.py FlowEvent schema 1.0.0",
+  "sequence_capacity": {
+    "max_first_packets": 20,
+    "fields": [
+      "first_packet_sizes (int bytes, >= 0)",
+      "first_packet_directions (semantic +1 initiator / -1 responder)",
+      "first_packet_interarrival_times (float ms, first entry 0.0)"
+    ]
+  },
+  "paths": {
+    "scapy_pcap": {
+      "sizes": true,
+      "directions": true,
+      "interarrival": true,
+      "tcp_flag_counts": true,
+      "source": "real per-packet observation",
+      "notes": "sizes/directions/IATs truncated to first 20; direction from SYN/service-port/first-packet basis recorded in protocol_metadata.direction_basis"
+    },
+    "nfstream_pcap_live": {
+      "sizes": true,
+      "directions": true,
+      "interarrival": true,
+      "tcp_flag_counts": true,
+      "source": "NFStream SPLT/PIAT with splt_analysis=20",
+      "notes": "src2dst orientation remapped to semantic direction; native engine Linux-only"
+    },
+    "suricata_eve": {
+      "sizes": "inherited",
+      "directions": "corrected",
+      "interarrival": "inherited",
+      "tcp_flag_counts": "inherited",
+      "notes": "EVE flow records orient/correct sensor flows; they never create flows or fabricate sequences"
+    },
+    "demo_sensor": {
+      "sizes": true,
+      "directions": true,
+      "interarrival": true,
+      "tcp_flag_counts": false,
+      "notes": "synthetic three-packet installation fixture only"
+    },
+    "csv_dataset_adapters": {
+      "sizes": false,
+      "directions": false,
+      "interarrival": false,
+      "tcp_flag_counts": "partial",
+      "notes": "CSV sources carry no packet-level evidence; sequence fields must never be invented for them"
+    }
+  },
+  "consequences": [
+    "Detector-v2 development data must be produced by replaying official PCAPs through the same adapters the runtime uses.",
+    "Sequence parity between training and inference is testable because both share the FlowEvent contract.",
+    "Aggregate CSV environments remain usable for aggregate-branch ablations but are excluded from sequence experiments."
+  ]
+}
