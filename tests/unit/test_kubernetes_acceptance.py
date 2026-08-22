@@ -1,6 +1,15 @@
 from pathlib import Path
 
-from scripts.accept_kubernetes import _safe_command, _uids_replaced, assess_counts
+import pytest
+
+from scripts.accept_kubernetes import (
+    OVERLAY_APPLY_ATTEMPTS,
+    KubernetesAcceptanceError,
+    _apply_overlay,
+    _safe_command,
+    _uids_replaced,
+    assess_counts,
+)
 
 
 def test_assess_counts_accepts_exact_demo_conservation() -> None:
@@ -49,3 +58,50 @@ def test_uid_replacement_requires_a_nonempty_disjoint_pod_set() -> None:
     assert not _uids_replaced(previous, [])
     assert not _uids_replaced(previous, [{"name": "terminating", "uid": "old-a"}])
     assert _uids_replaced(previous, [{"name": "ready", "uid": "new-a"}])
+
+
+def test_apply_overlay_retries_transient_webhook_refusal_then_succeeds(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("scripts.accept_kubernetes.time.sleep", lambda _seconds: None)
+    responses = iter(
+        [
+            (
+                1,
+                'Internal error occurred: failed calling webhook '
+                '"validate.nginx.ingress.kubernetes.io": dial tcp: connect: connection refused',
+            ),
+            (0, ""),
+        ]
+    )
+    calls: list[int] = []
+
+    def runner() -> tuple[int, str]:
+        calls.append(1)
+        return next(responses)
+
+    _apply_overlay(run_once=runner)
+    assert len(calls) == 2
+
+
+def test_apply_overlay_fails_fast_on_non_transient_errors() -> None:
+    def runner() -> tuple[int, str]:
+        return (1, "error: accumulation error: overlay file missing")
+
+    with pytest.raises(KubernetesAcceptanceError):
+        _apply_overlay(run_once=runner)
+
+
+def test_apply_overlay_exhausts_its_retry_budget_on_persistent_webhook_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("scripts.accept_kubernetes.time.sleep", lambda _seconds: None)
+    calls: list[int] = []
+
+    def runner() -> tuple[int, str]:
+        calls.append(1)
+        return (1, "failed calling webhook: connection refused")
+
+    with pytest.raises(KubernetesAcceptanceError):
+        _apply_overlay(run_once=runner)
+    assert len(calls) == OVERLAY_APPLY_ATTEMPTS

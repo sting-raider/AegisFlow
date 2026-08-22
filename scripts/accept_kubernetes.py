@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 import time
 import urllib.request
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
@@ -15,6 +16,12 @@ CLUSTER = "aegisflow-acceptance"
 NAMESPACE = "aegisflow"
 KIND_CONFIG = Path("infra/kubernetes/acceptance/kind.yaml")
 OVERLAY = Path("infra/kubernetes-local-acceptance")
+WEBHOOK_TRANSIENT_MARKERS = (
+    "failed calling webhook",
+    "connection refused",
+)
+OVERLAY_APPLY_ATTEMPTS = 6
+OVERLAY_APPLY_RETRY_SECONDS = 5.0
 INGRESS_URL = (
     "https://raw.githubusercontent.com/kubernetes/ingress-nginx/"
     "controller-v1.15.1/deploy/static/provider/kind/deploy.yaml"
@@ -103,6 +110,33 @@ def _download_ingress() -> str:
     if hashlib.sha256(payload).hexdigest() != INGRESS_SHA256:
         raise KubernetesAcceptanceError("pinned ingress manifest checksum mismatch")
     return payload.decode("utf-8")
+
+
+def _apply_overlay(run_once: Callable[[], tuple[int, str]] | None = None) -> None:
+    arguments = ["kubectl", "apply", "-k", str(OVERLAY)]
+
+    def default_runner() -> tuple[int, str]:
+        result = _run(arguments, timeout=120, check=False)
+        detail = (result.stderr or result.stdout).strip()
+        return result.returncode, detail
+
+    runner = run_once or default_runner
+    last_detail = ""
+    for attempt in range(OVERLAY_APPLY_ATTEMPTS):
+        returncode, last_detail = runner()
+        if returncode == 0:
+            if attempt:
+                print(
+                    f"overlay apply succeeded on attempt {attempt + 1}",
+                    flush=True,
+                )
+            return
+        if not any(marker in last_detail for marker in WEBHOOK_TRANSIENT_MARKERS):
+            break
+        time.sleep(OVERLAY_APPLY_RETRY_SECONDS)
+    raise KubernetesAcceptanceError(
+        f"command returned nonzero ({_safe_command(arguments)}): {last_detail[-800:]}"
+    )
 
 
 def _cluster_absent() -> None:
@@ -390,13 +424,29 @@ def run_acceptance(output: Path) -> dict[str, Any]:
             "wait",
             "-n",
             "ingress-nginx",
+            "--for=condition=complete",
+            "job/ingress-nginx-admission-create",
+            "--timeout=180s",
+        )
+        _kubectl(
+            "wait",
+            "-n",
+            "ingress-nginx",
+            "--for=condition=complete",
+            "job/ingress-nginx-admission-patch",
+            "--timeout=180s",
+        )
+        _kubectl(
+            "wait",
+            "-n",
+            "ingress-nginx",
             "--for=condition=ready",
             "pod",
             "-l",
             "app.kubernetes.io/component=controller",
             "--timeout=180s",
         )
-        _kubectl("apply", "-k", str(OVERLAY))
+        _apply_overlay()
         secret_manifest = _kubectl(
             "-n",
             NAMESPACE,

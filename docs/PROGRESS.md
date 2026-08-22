@@ -140,8 +140,17 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   for it. The second invocation completed the full workload and reconciliation but could
   not create the final report in a Linux bind-mounted directory owned by the runner. The
   harness now validates and pre-creates only the named JSON output with write permission
-  for the non-root benchmark container. Neither invalid invocation is a capacity pass or
-  NO-GO; the unchanged point is queued for one final rerun.
+   for the non-root benchmark container. Neither invalid invocation is a capacity pass or
+   NO-GO; the unchanged point is queued for one final rerun.
+- The predeclared clean Linux-runner sustained point completed successfully at 30 flows/s
+   for 30 minutes: exactly 54,000 flows published, persisted as flows, detections, and
+   durable latency samples; achieved publish rate 29.999999 flows/s; durable P95 latency
+   3.336 seconds within the 5-second budget; maximum detection depth 75 against the
+   10,000 bound; zero final pending/lag; a 3.9-second drain; and all six sustainable
+   criteria passed with no unexplained loss. Evidence is retained at
+   `docs/acceptance/sustained-compose-linux-ci-2026-08-13.json` (GitHub Actions run
+   `31695359714`). This closes the predeclared clean-host capacity point; it remains a
+   single-host synthetic measurement, not representative-traffic or multi-host evidence.
 - A repeatable two-API-worker drill now proves persistence partitioning and recovery under
   a paced 120-second, 50 flows/s workload. The acceptance-only replica durably persisted
   50 detections before a controlled SIGKILL while owning 25 pending messages; the primary
