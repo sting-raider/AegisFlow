@@ -1,0 +1,873 @@
+{
+  "batch_size": 256,
+  "experiment_id": "DEV2-SITE-001",
+  "generated_at": "2026-08-22T16:34:02.085511+00:00",
+  "learning_rate": 0.001,
+  "protocol_note": "Mode C uses ONLY approved benign target-site scores to place thresholds; no target attack rows participate in any selection decision. nominal_site_fpr holds on the calibration pool by construction; fresh site-benign validation and larger calibration pools remain required.",
+  "rotations": {
+    "R1_transfer_to_hakai": {
+      "aggregate_logreg_v1_style": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.00535,
+          "benign_rows": 187,
+          "macro_f1": 0.99854,
+          "malicious_recall": 1.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 1.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.0073,
+            "calibration_macro_f1": 0.41029,
+            "calibration_recall": 0.08824,
+            "threshold": 0.776514
+          },
+          "threshold": 0.776514
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.02973,
+          "pr_auc_attack_only": 1.0,
+          "roc_auc_pooled": 1.0
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 0.01679
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 0.090376
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 0.618507
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 0.682603
+          }
+        }
+      },
+      "fusion_mlp_seq_plus_aggregate": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.0107,
+          "benign_rows": 187,
+          "macro_f1": 0.07619,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.0073,
+            "calibration_macro_f1": 0.43798,
+            "calibration_recall": 0.11765,
+            "threshold": 0.784801
+          },
+          "threshold": 0.784801
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.00421,
+          "pr_auc_attack_only": 1.0,
+          "roc_auc_pooled": 0.98396
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 0.0
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 0.0
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 0.201097
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 0.999305
+          }
+        }
+      },
+      "rotation": "R1_transfer_to_hakai",
+      "sequence_cnn": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.0,
+          "benign_rows": 187,
+          "macro_f1": 0.07695,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.0073,
+            "calibration_macro_f1": 0.42889,
+            "calibration_recall": 0.10784,
+            "threshold": 0.752137
+          },
+          "threshold": 0.752137
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.02341,
+          "pr_auc_attack_only": 1.0,
+          "roc_auc_pooled": 0.97862
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 0.000366
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 0.002129
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00049,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.00049,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 0.242153
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00049,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.00049,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 0.409183
+          }
+        }
+      },
+      "sequence_mlp": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.0,
+          "benign_rows": 187,
+          "macro_f1": 0.07695,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.0073,
+            "calibration_macro_f1": 0.42889,
+            "calibration_recall": 0.10784,
+            "threshold": 0.780611
+          },
+          "threshold": 0.780611
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.00646,
+          "pr_auc_attack_only": 1.0,
+          "roc_auc_pooled": 0.98397
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 3e-06
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 1.0,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 1.0,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 1e-05
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00049,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.00049,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 0.123656
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 6,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00049,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.00049,
+                "rows": 2056
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 0.236431
+          }
+        }
+      }
+    },
+    "R2_transfer_to_mirai": {
+      "aggregate_logreg_v1_style": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.0,
+          "benign_rows": 227,
+          "macro_f1": 0.0728,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.0,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.0,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.0,
+            "calibration_macro_f1": 1.0,
+            "calibration_recall": 1.0,
+            "threshold": 0.998671
+          },
+          "threshold": 0.998671
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.00239,
+          "pr_auc_attack_only": 0.94422,
+          "roc_auc_pooled": 0.83736
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.86957,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.99737,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.99962,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.33333,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.5,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 6.9e-05
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.86957,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.99737,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.99962,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.33333,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.5,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 7e-05
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.86957,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.90728,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.90919,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.33333,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.5,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 0.001227
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.28261,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00075,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.0,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.33333,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 0.036364
+          }
+        }
+      },
+      "fusion_mlp_seq_plus_aggregate": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.0,
+          "benign_rows": 227,
+          "macro_f1": 0.0728,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.0,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.0,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.0,
+            "calibration_macro_f1": 1.0,
+            "calibration_recall": 1.0,
+            "threshold": 0.999999
+          },
+          "threshold": 0.999999
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.0,
+          "pr_auc_attack_only": 0.98282,
+          "roc_auc_pooled": 0.95706
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.17391,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.99437,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.99812,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 0.0
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.17391,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.99437,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.99812,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 0.0
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.17391,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.99399,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.99774,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 0.0
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.17391,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.9039,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.90731,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 1e-06
+          }
+        }
+      },
+      "rotation": "R2_transfer_to_mirai",
+      "sequence_cnn": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.04846,
+          "benign_rows": 227,
+          "macro_f1": 0.0711,
+          "malicious_recall": 0.0015,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.00038,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.33333,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.25,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.00361,
+            "calibration_macro_f1": 0.99823,
+            "calibration_recall": 1.0,
+            "threshold": 0.999982
+          },
+          "threshold": 0.999982
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.00239,
+          "pr_auc_attack_only": 0.9706,
+          "roc_auc_pooled": 0.87365
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.43478,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.90991,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.90957,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 1.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 1.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 0.0
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.43478,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.90991,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.90957,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 1.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 1.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 0.0
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.32609,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.90803,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.90806,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.83333,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 1.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 3.3e-05
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.32609,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00338,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.00038,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.83333,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.75,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 0.100148
+          }
+        }
+      },
+      "sequence_mlp": {
+        "global_threshold_mode_ab": {
+          "benign_fpr": 0.0,
+          "benign_rows": 227,
+          "macro_f1": 0.0728,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.0,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.0,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "selection": {
+            "budget_met": true,
+            "calibration_fpr": 0.0,
+            "calibration_macro_f1": 1.0,
+            "calibration_recall": 1.0,
+            "threshold": 0.99996
+          },
+          "threshold": 0.99996
+        },
+        "ranking_diagnostics": {
+          "ece_calibration_split": 0.00093,
+          "pr_auc_attack_only": 0.99084,
+          "roc_auc_pooled": 0.89033
+        },
+        "site_calibration_mode_c": {
+          "site_p900": {
+            "attack_env_incidental_benign_fpr": 0.28261,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.90953,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.90919,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 1.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 1.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.1,
+            "threshold": 0.000246
+          },
+          "site_p950": {
+            "attack_env_incidental_benign_fpr": 0.28261,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.90953,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.90919,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 1.0,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 1.0,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.05,
+            "threshold": 0.000425
+          },
+          "site_p990": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00263,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.00151,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.16667,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.5,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.01,
+            "threshold": 0.007087
+          },
+          "site_p995": {
+            "attack_env_incidental_benign_fpr": 0.0,
+            "attack_env_incidental_benign_rows": 46,
+            "degenerate_threshold": false,
+            "malicious_recall": 0.00113,
+            "malicious_recall_by_family": {
+              "c_and_c": {
+                "recall": 0.00038,
+                "rows": 2654
+              },
+              "ddos": {
+                "recall": 0.16667,
+                "rows": 6
+              },
+              "port_scan": {
+                "recall": 0.25,
+                "rows": 4
+              }
+            },
+            "nominal_site_fpr": 0.005,
+            "threshold": 0.051388
+          }
+        }
+      }
+    }
+  },
+  "schema_version": "1.0.0",
+  "seed": 20260822,
+  "site_percentiles": [
+    90.0,
+    95.0,
+    99.0,
+    99.5
+  ],
+  "status": "development_evidence_only_no_candidate_selected",
+  "training_epochs": 150
+}

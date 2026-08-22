@@ -33,3 +33,75 @@ the same adapters the runtime uses, guaranteeing training/inference parity for t
 sequence representation. The eight chosen IoT-23 scenarios have per-flow ground truth
 in their official Zeek `conn.log.labeled` files, enabling label joins without inventing
 labels.
+
+## MR2-001 — Packet-sequence baselines, cross-environment protocol
+
+Date: 2026-08-22
+
+Experiment: `DEV2-SEQ-001` (`docs/research-v2/experiments/dev2-sequence-crossenv-v1.json`)
+
+Status: complete; no candidate selected
+
+Setup: 6,671 deduplicated flow records from six IoT-23 PCAP environments (34-1 Mirai,
+8-1 Hakai, 42-1/20-1 benign-leaning, hp4/hp5 honeypots). Predeclared rotations:
+R1 fit {34-1 attacks + hp4 + 42-1 benign} -> test {8-1 Hakai C&C unseen-family,
+hp5 benign unseen-env}; R2 the mirrored hard direction. Models: v1-style aggregate
+logistic regression, sequence MLP (flattened masked), sequence CNN (masked temporal
+conv), fusion MLP. Untuned 0.5 plus a predeclared fit-side calibration rule
+(maximize calibration macro-F1 subject to benign FPR <= 1%).
+
+Two harness defects were found and fixed during this experiment and are recorded for
+honesty: (1) evaluation datasets were initially standardized with their own statistics
+instead of train-fit statistics; (2) the threshold selector used midpoint-prefix
+candidates that mis-scored tied probabilities, reporting wrong calibration F1. Both
+fixes are in the committed code; the retained report is from the corrected run.
+
+Findings:
+
+- Ranking transfers; absolute thresholds do not. In R2 every model achieves PR-AUC
+  0.85-0.98 on unseen Mirai families yet 0% recall at any global threshold: all Mirai
+  scores sit below 0.5 while ranking above most target-benign scores.
+- Difficulty is asymmetric and benign-pool dependent. R1's fit task is intrinsically
+  hard (best calibration macro-F1 ~0.44 at FPR <= 1%): Mirai C&C overlaps
+  honeypot/Torii "benign" noise (honeypots attract scan-like traffic). Yet R1's test
+  direction is trivial: aggregate logreg reaches recall 100% / FPR 0.5% / PR-AUC 1.0.
+- Sequence-only encoders rank competitively (PR-AUC up to 0.997 in R1) but their
+  probability heads are poorly calibrated across environments (ECE up to 0.92).
+- Exact-vector deduplication collapses repetitive families (34-1 ddos 211 -> 6 unique
+  vectors, port_scan 106 -> 4), gutting those families for evaluation.
+
+Disposition: proceed to site-relative calibration (the designed remedy for threshold
+non-transfer), embedding-space OOD scoring, and an origin diagnostic; treat ddos/
+port_scan family results as observability-limited.
+
+## MR2-002 — Site-percentile calibration versus global thresholds
+
+Date: 2026-08-22
+
+Experiment: `DEV2-SITE-001` (`docs/research-v2/experiments/dev2-site-calibration-v1.json`)
+
+Status: complete; strong directional evidence, not yet a locked candidate
+
+Mode C places thresholds at quantiles of APPROVED BENIGN scores from the held-out
+target environment only (observation-mode analogue). No attack rows participate.
+
+Findings:
+
+- Mode C recovers detection where global modes fail completely. R2 at nominal ~1%
+  site-FPR (p990): aggregate logreg recall 90.7%, sequence MLP 90.9%, CNN 90.8%
+  on unseen Mirai C&C - versus 0% for every model under global thresholds.
+- Score-inversion pathology: the sequence CNN assigns hp5 benign HIGHER scores than
+  Hakai attacks (pooled ROC-AUC 0.86 vs attack-only PR-AUC 1.0), so site quantiles
+  fail for it while ranking looks perfect inside one environment. Absolute-score
+  levels are environment-indexed for some models; OOD signals must not rely on raw
+  probability levels alone.
+- Environment-artifact risk is real: in R2 at p900, 87% of 34-1's own incidental
+  BENIGN flows score above the site threshold that 90% of hp4 benign score below -
+  scores partly track environment identity rather than maliciousness. This motivates
+  the domain-adversarial branch and the origin diagnostic before any GO claim.
+- Tiny calibration pools (181-227 rows) produce degenerate thresholds (0 or ~3e-06)
+  for some models; production site calibration needs larger approved benign samples.
+
+Disposition: Mode C is the first materially positive v2 result (Outcome-B trajectory).
+Next: Mahalanobis/embedding OOD scoring, origin diagnostic v2 comparing representations,
+domain-adversarial training, and held-family runs with observability tiers.
