@@ -424,22 +424,6 @@ def run_acceptance(output: Path) -> dict[str, Any]:
             "wait",
             "-n",
             "ingress-nginx",
-            "--for=condition=complete",
-            "job/ingress-nginx-admission-create",
-            "--timeout=180s",
-        )
-        _kubectl(
-            "wait",
-            "-n",
-            "ingress-nginx",
-            "--for=condition=complete",
-            "job/ingress-nginx-admission-patch",
-            "--timeout=180s",
-        )
-        _kubectl(
-            "wait",
-            "-n",
-            "ingress-nginx",
             "--for=condition=ready",
             "pod",
             "-l",

@@ -743,3 +743,16 @@ a file in the runner-owned directory. Treat that as another invalid evidence-ret
 attempt. Validate a basename-only JSON output and pre-create exactly that file with write
 permission before starting the container; do not run the benchmark as root, broaden the
 directory permissions, recover a verdict from incomplete logs, or alter the declared point.
+
+## D-053 - Treat ingress admission readiness as a retryable apply condition
+
+The pinned kind ingress manifest ships its two admission-certgen jobs with
+`ttlSecondsAfterFinished: 0`, so a completed job is garbage-collected almost
+immediately; `kubectl wait --for=condition=complete` therefore races TTL deletion and
+can fail with NotFound even when everything succeeded. The deterministic sequence is:
+apply the pinned manifest, wait for the controller pod readiness condition, then apply
+the AegisFlow overlay through a bounded retry that re-runs only on the transient
+"failed calling webhook"/"connection refused" class of errors, because server-side
+manifest application is declarative and converges on re-apply. Waiting for ephemeral
+job objects, deleting the webhook from the profile, or retrying every failure class
+unboundedly were rejected.
