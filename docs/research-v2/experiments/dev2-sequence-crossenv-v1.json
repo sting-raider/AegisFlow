@@ -1,0 +1,406 @@
+{
+  "batch_size": 256,
+  "epochs": 40,
+  "experiment_id": "DEV2-SEQ-001",
+  "generated_at": "2026-08-22T16:11:12.497534+00:00",
+  "per_class_cap": 1500,
+  "rotations": {
+    "R1_transfer_to_hakai": {
+      "aggregate_logreg_v1_style": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.00535,
+          "benign_rows": 187,
+          "ece_10bin": 0.01732,
+          "macro_f1": 0.99854,
+          "malicious_recall": 1.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 1.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "pr_auc": 1.0,
+          "rows": 2243,
+          "threshold": 0.776514
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.0073,
+          "calibration_macro_f1": 0.41029,
+          "calibration_recall": 0.08824,
+          "threshold": 0.776514
+        }
+      },
+      "fit_calibration_counts": {
+        "benign": 274,
+        "malicious": 306
+      },
+      "fit_train_counts": {
+        "benign": 1226,
+        "malicious": 1194
+      },
+      "fusion_mlp_seq_plus_aggregate": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.00535,
+          "benign_rows": 187,
+          "ece_10bin": 0.86877,
+          "macro_f1": 0.07657,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "pr_auc": 0.99071,
+          "rows": 2243,
+          "threshold": 0.779051
+        },
+        "test_at_untuned_0p5": {
+          "benign_fpr": 0.0107,
+          "benign_rows": 187,
+          "ece_10bin": 0.86877,
+          "macro_f1": 0.07619,
+          "malicious_recall": 0.0,
+          "malicious_rows": 2056,
+          "pr_auc": 0.99071,
+          "rows": 2243,
+          "threshold": 0.5
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.0073,
+          "calibration_macro_f1": 0.44099,
+          "calibration_recall": 0.12092,
+          "threshold": 0.779051
+        },
+        "train_in_sample_diagnostic": {
+          "benign_fpr": 0.26835,
+          "malicious_recall": 1.0
+        }
+      },
+      "protocol": "fit_side_calibration_threshold_fpr_budget_1pct",
+      "rotation": "R1_transfer_to_hakai",
+      "sequence_cnn": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.00535,
+          "benign_rows": 187,
+          "ece_10bin": 0.36203,
+          "macro_f1": 0.07657,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "pr_auc": 0.9965,
+          "rows": 2243,
+          "threshold": 0.777931
+        },
+        "test_at_untuned_0p5": {
+          "benign_fpr": 0.00535,
+          "benign_rows": 187,
+          "ece_10bin": 0.36203,
+          "macro_f1": 0.99854,
+          "malicious_recall": 1.0,
+          "malicious_rows": 2056,
+          "pr_auc": 0.9965,
+          "rows": 2243,
+          "threshold": 0.5
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.0073,
+          "calibration_macro_f1": 0.39759,
+          "calibration_recall": 0.07516,
+          "threshold": 0.777931
+        },
+        "train_in_sample_diagnostic": {
+          "benign_fpr": 0.27569,
+          "malicious_recall": 0.99832
+        }
+      },
+      "sequence_mlp": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.0,
+          "benign_rows": 187,
+          "ece_10bin": 0.91443,
+          "macro_f1": 0.07695,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2056
+            }
+          },
+          "malicious_rows": 2056,
+          "pr_auc": 0.97688,
+          "rows": 2243,
+          "threshold": 0.779663
+        },
+        "test_at_untuned_0p5": {
+          "benign_fpr": 0.0,
+          "benign_rows": 187,
+          "ece_10bin": 0.91443,
+          "macro_f1": 0.07747,
+          "malicious_recall": 0.00049,
+          "malicious_rows": 2056,
+          "pr_auc": 0.97688,
+          "rows": 2243,
+          "threshold": 0.5
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.00365,
+          "calibration_macro_f1": 0.41449,
+          "calibration_recall": 0.0915,
+          "threshold": 0.779663
+        },
+        "train_in_sample_diagnostic": {
+          "benign_fpr": 0.26998,
+          "malicious_recall": 0.99665
+        }
+      },
+      "test_counts_by_scenario": {
+        "CTU-Honeypot-Capture-5-1": 181,
+        "CTU-IoT-Malware-Capture-8-1": 2062
+      },
+      "test_environment_composition": {
+        "benign": {
+          "by_scenario": {
+            "CTU-Honeypot-Capture-5-1": 181,
+            "CTU-IoT-Malware-Capture-8-1": 6
+          },
+          "rows": 187
+        },
+        "malicious": {
+          "by_scenario": {
+            "CTU-Honeypot-Capture-5-1": 0,
+            "CTU-IoT-Malware-Capture-8-1": 2056
+          },
+          "rows": 2056
+        }
+      }
+    },
+    "R2_transfer_to_mirai": {
+      "aggregate_logreg_v1_style": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.0,
+          "benign_rows": 227,
+          "ece_10bin": 0.91906,
+          "macro_f1": 0.0728,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.0,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.0,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "pr_auc": 0.94158,
+          "rows": 2891,
+          "threshold": 0.998671
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.0,
+          "calibration_macro_f1": 1.0,
+          "calibration_recall": 1.0,
+          "threshold": 0.998671
+        }
+      },
+      "fit_calibration_counts": {
+        "benign": 277,
+        "malicious": 289
+      },
+      "fit_train_counts": {
+        "benign": 1223,
+        "malicious": 1211
+      },
+      "fusion_mlp_seq_plus_aggregate": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.0,
+          "benign_rows": 227,
+          "ece_10bin": 0.92271,
+          "macro_f1": 0.0728,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.0,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.0,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "pr_auc": 0.97465,
+          "rows": 2891,
+          "threshold": 0.99994
+        },
+        "test_at_untuned_0p5": {
+          "benign_fpr": 0.03524,
+          "benign_rows": 227,
+          "ece_10bin": 0.92271,
+          "macro_f1": 0.07042,
+          "malicious_recall": 0.0,
+          "malicious_rows": 2664,
+          "pr_auc": 0.97465,
+          "rows": 2891,
+          "threshold": 0.5
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.0,
+          "calibration_macro_f1": 1.0,
+          "calibration_recall": 1.0,
+          "threshold": 0.99994
+        },
+        "train_in_sample_diagnostic": {
+          "benign_fpr": 0.0,
+          "malicious_recall": 0.99917
+        }
+      },
+      "protocol": "fit_side_calibration_threshold_fpr_budget_1pct",
+      "rotation": "R2_transfer_to_mirai",
+      "sequence_cnn": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.04846,
+          "benign_rows": 227,
+          "ece_10bin": 0.92045,
+          "macro_f1": 0.06992,
+          "malicious_recall": 0.00038,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.00038,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.0,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.0,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "pr_auc": 0.96934,
+          "rows": 2891,
+          "threshold": 0.99923
+        },
+        "test_at_untuned_0p5": {
+          "benign_fpr": 0.05286,
+          "benign_rows": 227,
+          "ece_10bin": 0.92045,
+          "macro_f1": 0.06962,
+          "malicious_recall": 0.00038,
+          "malicious_rows": 2664,
+          "pr_auc": 0.96934,
+          "rows": 2891,
+          "threshold": 0.5
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.00361,
+          "calibration_macro_f1": 0.99823,
+          "calibration_recall": 1.0,
+          "threshold": 0.99923
+        },
+        "train_in_sample_diagnostic": {
+          "benign_fpr": 0.0,
+          "malicious_recall": 0.99917
+        }
+      },
+      "sequence_mlp": {
+        "test_at_calibrated_threshold": {
+          "benign_fpr": 0.0,
+          "benign_rows": 227,
+          "ece_10bin": 0.92043,
+          "macro_f1": 0.0728,
+          "malicious_recall": 0.0,
+          "malicious_recall_by_family": {
+            "c_and_c": {
+              "recall": 0.0,
+              "rows": 2654
+            },
+            "ddos": {
+              "recall": 0.0,
+              "rows": 6
+            },
+            "port_scan": {
+              "recall": 0.0,
+              "rows": 4
+            }
+          },
+          "malicious_rows": 2664,
+          "pr_auc": 0.93659,
+          "rows": 2891,
+          "threshold": 0.997976
+        },
+        "test_at_untuned_0p5": {
+          "benign_fpr": 0.00441,
+          "benign_rows": 227,
+          "ece_10bin": 0.92043,
+          "macro_f1": 0.07251,
+          "malicious_recall": 0.0,
+          "malicious_rows": 2664,
+          "pr_auc": 0.93659,
+          "rows": 2891,
+          "threshold": 0.5
+        },
+        "threshold_selection": {
+          "budget_met": true,
+          "calibration_fpr": 0.0,
+          "calibration_macro_f1": 1.0,
+          "calibration_recall": 1.0,
+          "threshold": 0.997976
+        },
+        "train_in_sample_diagnostic": {
+          "benign_fpr": 0.00164,
+          "malicious_recall": 0.99917
+        }
+      },
+      "test_counts_by_scenario": {
+        "CTU-Honeypot-Capture-4-1": 181,
+        "CTU-IoT-Malware-Capture-34-1": 2710
+      },
+      "test_environment_composition": {
+        "benign": {
+          "by_scenario": {
+            "CTU-Honeypot-Capture-4-1": 181,
+            "CTU-IoT-Malware-Capture-34-1": 46
+          },
+          "rows": 227
+        },
+        "malicious": {
+          "by_scenario": {
+            "CTU-Honeypot-Capture-4-1": 0,
+            "CTU-IoT-Malware-Capture-34-1": 2664
+          },
+          "rows": 2664
+        }
+      }
+    }
+  },
+  "schema_version": "1.0.0",
+  "seed": 20260822,
+  "status": "development_evidence_only_no_candidate_selected"
+}
