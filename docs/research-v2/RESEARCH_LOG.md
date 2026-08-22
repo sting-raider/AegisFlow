@@ -105,3 +105,79 @@ Findings:
 Disposition: Mode C is the first materially positive v2 result (Outcome-B trajectory).
 Next: Mahalanobis/embedding OOD scoring, origin diagnostic v2 comparing representations,
 domain-adversarial training, and held-family runs with observability tiers.
+
+## MR2-003 - Dataset-origin diagnostic v2
+
+Date: 2026-08-22
+
+Experiment: `DEV2-ORIGIN-001` (`docs/research-v2/experiments/dev2-origin-diagnostic-v1.json`)
+
+Status: complete; no representation blocked
+
+Six-way scenario classification (5-fold stratified CV, multinomial logreg) over the PCAP
+pool: v1 aggregate Schema A 0.779, packet sequence flattened 0.794, fused
+(aggregate+state+sequence) 0.797 - all below the 0.90 block threshold, unlike v1's
+blocked 0.954 full Schema A. Root cause of the improvement: PCAP-derived features carry
+real protocol/port/state information for every environment, eliminating the CSV
+missingness fingerprints that created v1's dataset-origin shortcuts.
+
+Notable: connection-state features alone leak almost no environment identity (origin
+balanced accuracy 0.349 versus 0.167 chance across six classes) while retaining binary
+task signal comparable to the full aggregate schema (0.856 versus 0.869). TCP state
+semantics are the most domain-neutral representation measured.
+
+## MR2-004 - Held-family open-set channels
+
+Date: 2026-08-22
+
+Experiment: `DEV2-FAMILY-001` (`docs/research-v2/experiments/dev2-held-family-v1.json`)
+
+Status: complete; asymmetric results recorded honestly
+
+Two-channel protocol (known channel = classifier score at target-site p99; OOD channel =
+Mahalanobis distance in fusion embedding at site p99; neither sees attack data):
+
+- HF2 (hold Mirai C&C): known-channel recall 90.9%; OOD channel additionally catches
+  100% of held DDoS and port-scan rows - structurally distinct families surface through
+  the unknown channel as designed.
+- HF1 (hold Hakai C&C): catastrophic collapse to 0.05% detection-or-review. Mirai-fit
+  fusion embeddings place Hakai flows inside the benign region.
+- HF3 (no C&C in fit at all, only 10 malicious rows): 0.09% - too little attack
+  diversity to learn transferable C&C semantics.
+- Degenerate thresholds from tiny calibration pools (181-227 rows; e.g. 2e-06)
+  inflate incidental-benign flagging up to 65%.
+
+Disposition: cross-environment unseen-family recovery exists but is direction- and
+architecture-dependent; a universal gate is not met.
+
+## MR2-005 - Domain-adversarial encoder and CPU cost
+
+Date: 2026-08-22
+
+Experiment: `DEV2-DANN-001` (`docs/research-v2/experiments/dev2-domain-adversarial-v1.json`)
+
+Status: complete; weak adversary dominates
+
+Gradient-reversal domain adversary over the fusion encoder in the hard direction
+(Hakai fit -> Mirai/hp4 test):
+
+| lambda | embedding origin BA | Mirai recall @site-p99 | incidental benign flagged | fit macro F1 |
+|---|---|---|---|---|
+| 0.0 | 0.944 | 91.07% | 28.26% | 0.768 |
+| 0.1 | 0.939 | 90.58% | 0.00% | 0.847 |
+| 1.0 | 0.940 | 90.58% | 0.00% | 0.705 |
+
+A weak adversarial coefficient eliminates the environment-artifact false positives
+(28% -> 0%) while preserving the recovered unseen-family recall (~91%) and improving
+fit-side F1. Linear separability of environments in embeddings barely moves (~0.94),
+but decision behavior on target-site benign traffic normalizes.
+
+CPU cost (recorded development host, PyTorch CPU): single-flow inference 0.066 ms
+(gate <= 10 ms); batched throughput ~749,000 flows/s (gate >= 500). The sequence
+encoder is negligible next to persistence costs.
+
+## MR2-006 - Verdict assembly
+
+See `docs/research-v2/FINAL_REPORT.md`. Outcome B: material improvement over v1 with
+documented remaining limitations; production gates not fully met; reserved final
+environment correctly left sealed because no challenger qualified for locking.

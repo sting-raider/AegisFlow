@@ -7,6 +7,8 @@ dataset-origin diagnostic.
 
 from __future__ import annotations
 
+from typing import Any
+
 import torch
 from torch import Tensor, nn
 
@@ -16,6 +18,24 @@ class MaskedFlatten(nn.Module):
         flat: Tensor = sequence * mask.unsqueeze(-1)
         output: Tensor = flat.reshape(flat.shape[0], -1)
         return output
+
+
+class GradientReversal(torch.autograd.Function):
+    """Identity forward, negated backward: the domain-adversarial core."""
+
+    @staticmethod
+    def forward(ctx: Any, x: Tensor, lambd: float) -> Tensor:
+        ctx.lambd = lambd
+        return x.clone()
+
+    @staticmethod
+    def backward(ctx: Any, grad_output: Tensor) -> tuple[Tensor, None]:
+        return -ctx.lambd * grad_output, None
+
+
+def gradient_reversal(embedding: Tensor, lambd: float) -> Tensor:
+    reversed_embedding: Tensor = GradientReversal.apply(embedding, lambd)  # type: ignore[no-untyped-call]
+    return reversed_embedding
 
 
 class SequenceMLP(nn.Module):

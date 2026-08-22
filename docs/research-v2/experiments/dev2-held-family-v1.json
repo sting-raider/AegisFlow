@@ -1,0 +1,145 @@
+{
+  "batch_size": 256,
+  "epochs": 150,
+  "experiment_id": "DEV2-FAMILY-001",
+  "generated_at": "2026-08-22T22:58:46.731079+00:00",
+  "learning_rate": 0.001,
+  "protocol_note": "Held families are absent from fitting. Both channels are calibrated only on approved target-site benign scores at the 99th percentile.",
+  "rotations": {
+    "HF1_hold_hakai_c_and_c": {
+      "fit_counts": {
+        "benign": 1500,
+        "fit_families": [
+          "benign",
+          "c_and_c",
+          "ddos",
+          "port_scan"
+        ],
+        "malicious": 1500
+      },
+      "held_family_channels": {
+        "c_and_c": {
+          "detection_or_review": 0.00049,
+          "known_channel_recall": 0.00049,
+          "low_observability_fraction": 0.0,
+          "ood_channel_recall": 0.0,
+          "rows": 2056
+        }
+      },
+      "held_scenarios": [
+        "CTU-IoT-Malware-Capture-8-1"
+      ],
+      "incidental_benign_in_held_envs": {
+        "known_channel_fpr": 0.0,
+        "ood_channel_fpr": 0.0,
+        "rows": 6
+      },
+      "rotation": "HF1_hold_hakai_c_and_c",
+      "site_benign_scenario": "CTU-Honeypot-Capture-5-1",
+      "thresholds": {
+        "known_channel_site_p99": 0.000153,
+        "ood_channel_site_p99": 32.16341
+      }
+    },
+    "HF2_hold_mirai_c_and_c": {
+      "fit_counts": {
+        "benign": 1500,
+        "fit_families": [
+          "benign",
+          "c_and_c"
+        ],
+        "malicious": 1500
+      },
+      "held_family_channels": {
+        "c_and_c": {
+          "detection_or_review": 0.91258,
+          "known_channel_recall": 0.90882,
+          "low_observability_fraction": 0.00038,
+          "ood_channel_recall": 0.00377,
+          "rows": 2654
+        },
+        "ddos": {
+          "detection_or_review": 1.0,
+          "known_channel_recall": 0.0,
+          "low_observability_fraction": 0.16667,
+          "ood_channel_recall": 1.0,
+          "rows": 6
+        },
+        "port_scan": {
+          "detection_or_review": 1.0,
+          "known_channel_recall": 0.25,
+          "low_observability_fraction": 0.25,
+          "ood_channel_recall": 1.0,
+          "rows": 4
+        }
+      },
+      "held_scenarios": [
+        "CTU-IoT-Malware-Capture-34-1"
+      ],
+      "incidental_benign_in_held_envs": {
+        "known_channel_fpr": 0.23913,
+        "ood_channel_fpr": 0.65217,
+        "rows": 46
+      },
+      "rotation": "HF2_hold_mirai_c_and_c",
+      "site_benign_scenario": "CTU-Honeypot-Capture-4-1",
+      "thresholds": {
+        "known_channel_site_p99": 2e-06,
+        "ood_channel_site_p99": 30.94046
+      }
+    },
+    "HF3_hold_all_c_and_c": {
+      "fit_counts": {
+        "benign": 1500,
+        "fit_families": [
+          "benign",
+          "ddos",
+          "port_scan"
+        ],
+        "malicious": 10
+      },
+      "held_family_channels": {
+        "c_and_c": {
+          "detection_or_review": 0.00085,
+          "known_channel_recall": 0.00042,
+          "low_observability_fraction": 0.00021,
+          "ood_channel_recall": 0.00064,
+          "rows": 4710
+        },
+        "ddos": {
+          "detection_or_review": 1.0,
+          "known_channel_recall": 1.0,
+          "low_observability_fraction": 0.16667,
+          "ood_channel_recall": 1.0,
+          "rows": 6
+        },
+        "port_scan": {
+          "detection_or_review": 1.0,
+          "known_channel_recall": 1.0,
+          "low_observability_fraction": 0.25,
+          "ood_channel_recall": 1.0,
+          "rows": 4
+        }
+      },
+      "held_scenarios": [
+        "CTU-IoT-Malware-Capture-34-1",
+        "CTU-IoT-Malware-Capture-8-1"
+      ],
+      "incidental_benign_in_held_envs": {
+        "known_channel_fpr": 0.03846,
+        "ood_channel_fpr": 0.0,
+        "rows": 52
+      },
+      "rotation": "HF3_hold_all_c_and_c",
+      "site_benign_scenario": "CTU-Honeypot-Capture-5-1",
+      "thresholds": {
+        "known_channel_site_p99": 0.000656,
+        "ood_channel_site_p99": 38.05749
+      }
+    }
+  },
+  "schema_version": "1.0.0",
+  "seed": 20260822,
+  "site_percentile": 0.99,
+  "status": "development_evidence_only_no_candidate_selected"
+}

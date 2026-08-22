@@ -149,7 +149,9 @@ def torch_fit(
     use_aggregate: bool,
     center: np.ndarray | None = None,
     scale: np.ndarray | None = None,
+    epochs: int | None = None,
 ) -> None:
+    training_epochs = epochs if epochs is not None else EPOCHS
     generator = torch.Generator().manual_seed(SEED)
     benign_count = float((dataset.binary_label == 0).sum())
     malicious_count = max(float((dataset.binary_label == 1).sum()), 1.0)
@@ -169,7 +171,7 @@ def torch_fit(
     loader = DataLoader(tensor_dataset, batch_size=BATCH_SIZE, shuffle=True, generator=generator)
     call = cast(Callable[..., Tensor], model)
     model.train()
-    for _epoch in range(EPOCHS):
+    for _epoch in range(training_epochs):
         for batch in loader:
             optimizer.zero_grad()
             logits: Tensor

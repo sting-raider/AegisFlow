@@ -1,0 +1,29 @@
+{
+  "coefficients": {
+    "lambda_0.0": {
+      "embedding_origin_balanced_accuracy": 0.94378,
+      "fit_split_macro_f1_at_same_threshold": 0.7676,
+      "incidental_benign_flagged_rate": 0.28261,
+      "mirai_known_channel_recall_at_site_p99": 0.91066
+    },
+    "lambda_0.1": {
+      "embedding_origin_balanced_accuracy": 0.93874,
+      "fit_split_macro_f1_at_same_threshold": 0.84732,
+      "incidental_benign_flagged_rate": 0.0,
+      "mirai_known_channel_recall_at_site_p99": 0.90578
+    },
+    "lambda_1.0": {
+      "embedding_origin_balanced_accuracy": 0.93981,
+      "fit_split_macro_f1_at_same_threshold": 0.70532,
+      "incidental_benign_flagged_rate": 0.0,
+      "mirai_known_channel_recall_at_site_p99": 0.90578
+    }
+  },
+  "epochs": 150,
+  "experiment_id": "DEV2-DANN-001",
+  "generated_at": "2026-08-22T23:04:48.061997+00:00",
+  "rotation": "R2_transfer_to_mirai_hard_direction",
+  "schema_version": "1.0.0",
+  "seed": 20260822,
+  "status": "development_evidence_only_no_candidate_selected"
+}

@@ -2,6 +2,21 @@
 
 Last updated: 2026-08-22.
 
+## Detector-v2 research phase (branch codex/detector-v2)
+
+A second research phase is underway on `codex/detector-v2` under
+`docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in
+`docs/research-v2/RESEARCH_LOG.md`). Packet-sequence representation shipped in
+`packages/detection_v2/sequences.py` with parity tests; six official IoT-23 PCAP
+environments were acquired checksum-pinned and replayed through the runtime adapter.
+Development evidence so far: absolute thresholds fail cross-environment even when
+ranking transfers; approved-site percentile calibration recovers ~91% unseen-family
+recall at nominal 1% site FPR where global thresholds give 0%; a weak domain-adversarial
+coefficient eliminates environment-artifact false positives (28% -> 0%) without losing
+that recovery; no representation crosses the 0.90 origin-leakage block threshold.
+Outcome-B trajectory (material improvement, gates not fully met); see
+`docs/research-v2/FINAL_REPORT.md`. The v1 verdict below is unchanged.
+
 ## Active final model and production-acceptance phase
 
 The engineering/evaluation platform is demoable, but the project is **not complete under
