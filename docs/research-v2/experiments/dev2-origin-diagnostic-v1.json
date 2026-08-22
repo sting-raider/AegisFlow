@@ -1,0 +1,41 @@
+{
+  "block_threshold": 0.9,
+  "experiment_id": "DEV2-ORIGIN-001",
+  "generated_at": "2026-08-22T16:40:21.469055+00:00",
+  "max_sequence_length": 20,
+  "records": 6671,
+  "representations": {
+    "aggregate_plus_state_plus_sequence": {
+      "balanced_accuracy_mean": 0.79737,
+      "balanced_accuracy_std": 0.03896,
+      "binary_task_balanced_accuracy": 0.87587,
+      "blocks_challenger_selection": false,
+      "feature_dimension": 112
+    },
+    "connection_state_only": {
+      "balanced_accuracy_mean": 0.34925,
+      "balanced_accuracy_std": 0.01237,
+      "binary_task_balanced_accuracy": 0.85637,
+      "blocks_challenger_selection": false,
+      "feature_dimension": 8
+    },
+    "packet_sequence_flat": {
+      "balanced_accuracy_mean": 0.79381,
+      "balanced_accuracy_std": 0.04012,
+      "binary_task_balanced_accuracy": 0.87525,
+      "blocks_challenger_selection": false,
+      "feature_dimension": 80
+    },
+    "v1_aggregate_schema_a": {
+      "balanced_accuracy_mean": 0.77943,
+      "balanced_accuracy_std": 0.04057,
+      "binary_task_balanced_accuracy": 0.86905,
+      "blocks_challenger_selection": false,
+      "feature_dimension": 24
+    }
+  },
+  "schema_version": "1.0.0",
+  "seed": 20260822,
+  "status": "development_diagnostic_no_candidate_selected",
+  "task": "six-way scenario classification, 5-fold stratified CV, multinomial logreg"
+}
