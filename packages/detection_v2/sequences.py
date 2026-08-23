@@ -14,16 +14,8 @@ import numpy as np
 
 from packages.contracts import FlowEvent
 
-SEQUENCE_SCHEMA_VERSION = "3.0.0-research-seq"
 SEQUENCE_MAX_LENGTH = 20
 SEQUENCE_FEATURES_PER_PACKET = 4
-
-SEQUENCE_FEATURE_NAMES = (
-    "signed_log1p_size",
-    "log1p_iat_ms",
-    "direction_responder",
-    "relative_position",
-)
 
 CONNECTION_STATE_FEATURE_NAMES = (
     "state_syn_observed",
@@ -35,8 +27,6 @@ CONNECTION_STATE_FEATURE_NAMES = (
     "state_midstream_capture",
     "state_data_exchange",
 )
-
-OBSERVABILITY_TIERS = ("LOW", "MEDIUM", "HIGH")
 
 
 @dataclass(frozen=True)

@@ -110,7 +110,6 @@ class RuntimeDriftMonitor:
             )
             for signal, threshold in thresholds.items()
         }
-        self.model_version = model_version
         self.seen_capacity = seen_capacity
         self._seen: OrderedDict[UUID, None] = OrderedDict()
         self._flow_times: deque[datetime] = deque(maxlen=256)

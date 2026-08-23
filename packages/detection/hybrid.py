@@ -20,7 +20,6 @@ class HybridBatchResult:
     known_probabilities: np.ndarray
     known_labels: tuple[str | None, ...]
     confidences: np.ndarray
-    isolation_scores: np.ndarray
     reconstruction_errors: np.ndarray
     reconstruction_scores: np.ndarray
     anomaly_scores: np.ndarray
@@ -155,7 +154,6 @@ class HybridPredictor:
             known_probabilities,
             known_labels,
             confidences,
-            isolation_scores,
             np.asarray(raw_reconstruction_errors, dtype=np.float64),
             reconstruction_scores,
             anomaly_scores,

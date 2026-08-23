@@ -206,7 +206,6 @@ textarea { min-height: 86px; resize: vertical; }
 .host-card { position: relative; overflow: hidden; cursor: pointer; }
 .host-card__pulse { position: absolute; top: 18px; right: 18px; width: 11px; height: 11px; border: 1px solid var(--signal); border-radius: 50%; }
 .host-card__pulse.is-alerting { background: var(--danger); border-color: var(--danger); box-shadow: 0 0 0 7px var(--danger-soft); }
-.search { max-width: 480px; margin-bottom: 15px; }
 .registry-row { padding: 12px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
 .registry-row div { display: grid; }
 .registry-row small { color: var(--signal); }

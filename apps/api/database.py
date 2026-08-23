@@ -1228,10 +1228,6 @@ class Repository:
                 for row in rows
             ]
 
-    def detection_exists(self, event_id: str) -> bool:
-        with self.session() as session:
-            return session.get(DetectionRow, event_id) is not None
-
     def record_drift_event(self, event: DriftEvent) -> bool:
         event_id = str(event.event_id)
         with self.session() as session:

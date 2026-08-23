@@ -18,19 +18,6 @@ from urllib.parse import urlsplit, urlunsplit
 
 import httpx
 
-ALLOWED_FIELDS: Final = {
-    "verdict",
-    "severity",
-    "reason_codes",
-    "aggregated_features",
-    "known_attack_probability",
-    "anomaly_score",
-    "signature_score",
-    "contextual_score",
-    "final_risk_score",
-    "timeline",
-    "signature_names",
-}
 _TEXT_FIELDS: Final = {"verdict", "severity"}
 _TEXT_LIST_FIELDS: Final = {"reason_codes", "signature_names"}
 _SCORE_FIELDS: Final = {

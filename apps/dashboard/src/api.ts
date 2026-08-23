@@ -33,7 +33,6 @@ async function get<T>(path: string): Promise<T> {
 
 export const api = {
   alerts: (query = "") => get<Page<Alert>>(`/api/v1/alerts${query}`),
-  alert: (id: string) => get<Alert>(`/api/v1/alerts/${id}`),
   incidents: () => get<Page<Incident>>("/api/v1/incidents"),
   incident: (id: string) => get<Incident>(`/api/v1/incidents/${id}`),
   incidentExplanation: (id: string) =>

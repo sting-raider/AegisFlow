@@ -38,7 +38,6 @@ class EveMetadataEvent:
 
 @dataclass(frozen=True)
 class EveProcessingError:
-    line_hash: str
     error: str
 
 
@@ -51,11 +50,9 @@ class EveReadBatch:
 
 @dataclass(frozen=True)
 class EveReaderHealth:
-    ready: bool
     parsed_events: int
     malformed_events: int
     duplicate_events: int
-    last_event_at: datetime | None
 
 
 def _timestamp(value: Any) -> datetime:
@@ -376,15 +373,13 @@ class EveJsonReader:
         self._parsed_events = 0
         self._malformed_events = 0
         self._duplicate_events = 0
-        self._last_event_at: datetime | None = None
 
     def feed(self, chunk: bytes, *, final: bool = False) -> EveReadBatch:
         self._buffer += chunk
         if len(self._buffer) > MAX_EVE_LINE_BYTES and b"\n" not in self._buffer:
-            line_hash = hashlib.sha256(self._buffer).hexdigest()
             self._buffer = b""
             self._malformed_events += 1
-            return EveReadBatch((), (EveProcessingError(line_hash, "EVE line exceeds 1 MiB"),))
+            return EveReadBatch((), (EveProcessingError("EVE line exceeds 1 MiB"),))
         lines = self._buffer.split(b"\n")
         self._buffer = b"" if final else lines.pop()
         events: list[SignatureEvent | EveMetadataEvent] = []
@@ -396,7 +391,7 @@ class EveJsonReader:
             try:
                 event = parse_eve_line(raw)
             except EveParseError as exc:
-                errors.append(EveProcessingError(hashlib.sha256(raw).hexdigest(), str(exc)))
+                errors.append(EveProcessingError(str(exc)))
                 self._malformed_events += 1
                 continue
             if event is None:
@@ -407,15 +402,12 @@ class EveJsonReader:
                 continue
             events.append(event)
             self._parsed_events += 1
-            self._last_event_at = event.timestamp
         return EveReadBatch(tuple(events), tuple(errors), duplicates)
 
     @property
     def health(self) -> EveReaderHealth:
         return EveReaderHealth(
-            ready=True,
             parsed_events=self._parsed_events,
             malformed_events=self._malformed_events,
             duplicate_events=self._duplicate_events,
-            last_event_at=self._last_event_at,
         )
