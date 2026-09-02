@@ -181,3 +181,30 @@ encoder is negligible next to persistence costs.
 See `docs/research-v2/FINAL_REPORT.md`. Outcome B: material improvement over v1 with
 documented remaining limitations; production gates not fully met; reserved final
 environment correctly left sealed because no challenger qualified for locking.
+
+## MR2-007 - Audit correction and executable evidence safeguards
+
+Date: 2026-09-02. Status: research validation incomplete; no candidate selected.
+
+The earlier MR2-005/MR2-006 interpretation is superseded, not erased. HF1/HF2 allow
+C&C in fit; FAMILY/DANN reuse calibration captures in fitting; HF3 evaluates other
+families alongside its nominal holdout. DANN learned-embedding origin BA exceeds
+0.90 despite the earlier summary's contrary raw-feature comparison. Actual execution
+commit, prepared-data/split fingerprints and machine-readable performance are missing.
+No historical metric is promoted to scientific acceptance by rehashing it.
+
+The retrospective archive guard now distinguishes publication from execution provenance,
+binds five JSON reports and six row-level embedding archives, and normalizes only CRLF
+to LF for text hashes. A regression reproduced failures in both checkout formats before
+the fix; 21 focused archive checks passed afterward. Original report/NPZ bytes remain
+unchanged. The frozen-v1 guard still verifies four reports and eight source fingerprints.
+
+Added strict-family/partition assertions reject C&C-in-fit, reused calibration scenarios,
+duplicate observations/IDs and non-benign calibration. FAMILY now defines three whole-
+label-family rotations with a separate honeypot benign-test environment. DANN removes
+hp4 from fitting and from testing when it serves as site calibration. Torch initialization
+is seeded before model creation. Invalid labels no longer silently map to benign tensors.
+Corrected FAMILY/DANN outputs are exclusive-create local diagnostics under ignored
+`data/research_v2_corrected/`; they have not been executed or admitted for selection.
+Next: register full corrected-run provenance, verify deterministic costs and metrics,
+then evaluate. Deployed site-baseline and acceptance-drill gaps remain separate work.

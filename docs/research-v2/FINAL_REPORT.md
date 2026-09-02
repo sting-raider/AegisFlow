@@ -1,5 +1,11 @@
 # Detector v2 final report
 
+Audit correction, 2026-09-02: **historical and scientifically unvalidated**. The earlier
+Outcome-B conclusion and presentation claims are superseded. FAMILY/DANN contain
+fit/calibration overlap; HF1/HF2 are not whole-family holdouts; actual execution
+provenance and performance artifacts are incomplete. See `../REQUIREMENTS_AUDIT.md`.
+The original JSON/NPZ bytes are retained, not silently replaced by corrected runs.
+
 Date: 2026-08-22. Branch `codex/detector-v2`. Development evidence only; the v1 frozen
 reports were never queried and remain sealed.
 
@@ -18,7 +24,8 @@ environment change better than aggregate-flow statistics (predeclared in
 
 ## 3. Dataset provenance
 
-Eight official Stratosphere IoT-23 scenario PCAPs plus their Zeek per-flow ground truth
+Eight official Stratosphere IoT-23 scenarios were declared, six acquired/prepared with
+their Zeek per-flow ground truth
 (`docs/research-v2/DATASETS.md`), replayed through AegisFlow's own PcapAdapter so
 training shares the runtime feature contract. Six scenarios prepared into 6,671
 deduplicated labeled flow records spanning three attack families (C&C, DDoS, port scan)
@@ -27,11 +34,11 @@ and five benign-leaning environments. Raw data stays outside Git; hashes pinned 
 
 ## 4. Leakage controls
 
-- Environments partitioned fit/test by capture, never by rows.
+- Intended capture isolation was violated in FAMILY/DANN by reusing site captures in fit.
 - Exact-vector deduplication across the whole pool.
-- Fit-side calibration splits for all threshold selection; target attack data never
-  touches any selection decision; Mode C uses only approved benign target scores.
-- Fail-closed origin diagnostic with a predeclared 0.90 block threshold.
+- Historical fit-side calibration and site-score quantiles exist, but do not prove
+  independent benign validation. They are not a deployed human-approved baseline workflow.
+- The 0.90 origin threshold was exceeded by learned embeddings (0.93874--0.94378).
 - The reserved final environment (CTU-13 scenario 8) was never touched.
 
 ## 5. Sequence representation
@@ -44,33 +51,39 @@ identity independence). Payload contents are never read.
 ## 6. Model architecture
 
 Fusion of masked sequence encoder (MLP or temporal CNN) + portable Schema-A aggregate
-branch + TCP connection-state vector -> compact embedding -> known-attack head;
+branch -> compact embedding -> known-attack head. TCP state exists as a separate
+diagnostic tensor, but is not concatenated into `FusionNet`;
 Mahalanobis OOD channel in embedding space; site-percentile calibration for both
 channels; transparent reason-code fusion. No LLM anywhere in detection.
 
 ## 7. Domain-invariance method
 
-Gradient-reversal domain adversary on the fusion encoder. Weak coefficient (lambda=0.1)
-is optimal: environment-artifact false positives on target-site incidental benign drop
-from 28.26% to 0.00% while unseen-family recall is preserved (91.07% -> 90.58%).
+Gradient-reversal domain adversary on the fusion encoder. The historical lambda=0.1
+run reports incidental-benign flags falling from 28.26% to 0.00%, and cross-capture
+C&C recall 91.07% -> 90.58%. This is exploratory, not an optimal-coefficient or
+unseen-family result; fitting reused site-calibration data and model initialization
+was not globally seeded. All learned-embedding origin scores still exceed 0.90.
 
 ## 8. Site-calibration protocol
 
 Observation-mode analogue: thresholds placed at quantiles of APPROVED BENIGN scores
-from the target environment only; operator approval and rollback inherited from the
-v1 governance design. Nominal site FPR holds by construction on the calibration pool;
-fresh same-environment benign validation remains required at deployment.
+from the target environment only. The deployed observation/approval/activation/rollback
+workflow remains unimplemented. Nominal calibration FPR is not an independent FPR test;
+ties can also exceed the nominal percentile budget with `>=` decision semantics.
 
 ## 9. OOD methodology
 
 Mahalanobis distance in the fusion embedding, fit on training-benign embeddings,
-calibrated at the target-site p99. Catches structurally distinct held families
-(DDoS/port-scan: 100% each) but not cross-family C&C variants.
+calibrated at the target-site p99. The old report flags six DDoS and four port-scan rows,
+but those families were allowed in HF2 fitting configuration. This is not proof of
+strict-family novelty detection; actual fit-family membership and corrected splits
+must be checked in each run.
 
 ## 10. Held-family results
 
-See `RESULTS.md`: HF2 recovers 91.26% detection-or-review for held Mirai C&C; HF1 and
-HF3 collapse (<0.1%) - transfer is direction- and diversity-dependent.
+See `RESULTS.md` for historical metrics. HF1/HF2 retain C&C in fit and therefore test
+cross-capture transfer. HF3 excludes C&C but reuses calibration data in fit and includes
+other families in its test partition. Strict-family results remain pending.
 
 ## 11. Cross-environment results
 
@@ -95,8 +108,9 @@ families collapse under exact deduplication (DDoS 211->6 unique vectors); honeyp
 
 ## 14. Performance
 
-Single-flow inference 0.066 ms; batched ~749k flows/s on CPU (gates: <=10 ms, >=500/s).
-Training runs complete in minutes on CPU.
+Not verified. The earlier 0.066 ms and ~749k flows/s prose figures have no retained
+machine-readable benchmark, so they do not establish either CPU gate. Corrected runs
+must retain latency distributions, batching conditions, memory and environment metadata.
 
 ## 15. Limitations
 
@@ -106,38 +120,24 @@ no Suricata/DNS/TLS semantics evaluated; single-host CPU measurements only.
 
 ## 16. Final verdict
 
-**Outcome B — strong material improvement, production gates not fully met.**
+**Incomplete research validation; no production candidate.** The archived runs cannot
+support a v1-to-v2 improvement claim under a common valid protocol. Raw-feature origin
+BA below 0.90 does not clear learned-embedding origin BA above 0.90. Cross-capture C&C
+recall is not whole-family unknown recall. Corrected partitioning, deterministic model
+initialization, full run provenance and independent benign metrics are required.
 
-Material improvements over Detector v1:
-
-- Cross-environment unseen-family detection: v1 best direct unknown recall was 6.28%
-  (mean) with universal collapse; v2 site-calibrated detection reaches 90.6-90.9% in
-  the tested hard direction.
-- Dataset-origin leakage: blocked at 0.954 (v1) -> maximum 0.797 across all v2
-  representations; connection-state semantics measure 0.349.
-- Environment-artifact false positives: eliminated (28% -> 0%) by the weak domain
-  adversary without sacrificing recall.
-- Unknown-channel behavior: structurally distinct held families surface through the
-  Mahalanobis channel at 100%.
-
-Not met: universal held-environment stability (collapse persists in one direction),
-ECE <= 0.10 for probability heads, and a mean >=50% unknown-recall gate across all
-held families. Because no challenger satisfies every predeclared gate, **no candidate
-is locked**, the reserved final environment stays sealed, and Detector v2 is not a
-production candidate.
+No candidate is locked, final data stays sealed, and the v1 model rejection stands.
+This does not yet satisfy the full final-phase brief's Outcome-B stop condition.
 
 ## 17. Claims safe for faculty/project presentation
 
 1. AegisFlow's runtime contract already carries first-20-packet sequences end to end;
    training and inference share one tested implementation.
-2. Packet-sequence + connection-state representations rank unseen-family attacks well
-   across environments where aggregate-flow ranking already worked, and add an OOD
-   channel that surfaces structurally novel families at 100% in our tests.
-3. Absolute decision thresholds do not transfer between environments; operator-approved
-   site-benign percentile calibration converts non-transferring rankings into ~91%
-   detection at nominal 1% site-FPR in the tested hard direction.
-4. A weak domain-adversarial objective removes residual environment-artifact false
-   positives without losing that recovery.
-5. All of this runs at 0.066 ms/flow on CPU inside the existing platform contract.
+2. V2 contains experimental sequence/fusion, site-relative quantile and domain-adversarial
+   implementations. Historical metrics are provisional because the audit found defects.
+3. The research distinguishes classification and embedding-distance channels; their
+   benefit under strict family isolation and independent FPR testing is not established.
+4. The archive guard detects byte/content-boundary changes, not scientific validity.
+5. V2 CPU performance has not been verified with retained benchmark evidence.
 6. Detector v2 is research evidence, not a validated production detector; the v1 NO-GO
    stands and the reserved final evaluation remains unused.

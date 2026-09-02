@@ -1,28 +1,52 @@
 # Progress
 
-Last updated: 2026-08-22.
+Last updated: 2026-09-02 (local correction checks; historical acceptance through 2026-08-23).
 
-## Detector-v2 research phase (branch codex/detector-v2)
+## Final status (authoritative)
 
-A second research phase is underway on `codex/detector-v2` under
+The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
+sections and identifies research partition/provenance, deployed site-baseline, and
+rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
+Public commit `88ea3801886fd3b27563aab5f52a52d1272e2d80` passed ten CI jobs in
+`32635976457`; that run predates the newly added v2 archive verifier. Frozen data stays
+sealed. The previous goal turn made progress (implementation and 238 passing tests),
+but its completion claims were premature and are superseded by the current audit.
+
+The working tree also contains four pre-existing, uncommitted smoke-model registry edits
+and local demo launch files. They are intentionally preserved and are not part of the
+committed acceptance evidence; the model's scientific status does not change.
+
+## Detector-v2 research phase (validity corrections required)
+
+2026-09-02 correction milestone: reproduced the v2 text-hash failure in LF and CRLF
+checkouts, fixed normalized hashing, and verified 21 archive boundary cases. The archive
+now discloses retrospective registration and incomplete execution provenance. Added
+strict family/partition assertions, independent benign testing, deterministic Torch
+initialization, and rejection of invalid training labels. FAMILY/DANN no longer reuse
+site rows in fitting. Corrected diagnostic outputs cannot overwrite historical reports;
+full registered experiments have not yet run. The backend suite passed 272 tests with
+84% coverage before adding two archive-overwrite entry-point regressions; all 39 focused
+archive/partition/seed/overwrite tests then passed. Ruff passed, MyPy passed 105 sources,
+and the frozen-v1/v1-research/v2-archive guards passed. Public CI for this milestone is
+pending; none of these checks grants scientific acceptance.
+
+A second research phase produced historical results on `codex/detector-v2` under
 `docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in
 `docs/research-v2/RESEARCH_LOG.md`). Packet-sequence representation shipped in
 `packages/detection_v2/sequences.py` with parity tests; six official IoT-23 PCAP
 environments were acquired checksum-pinned and replayed through the runtime adapter.
-Development evidence so far: absolute thresholds fail cross-environment even when
-ranking transfers; approved-site percentile calibration recovers ~91% unseen-family
-recall at nominal 1% site FPR where global thresholds give 0%; a weak domain-adversarial
-coefficient eliminates environment-artifact false positives (28% -> 0%) without losing
-that recovery; no representation crosses the 0.90 origin-leakage block threshold.
-Outcome-B trajectory (material improvement, gates not fully met); see
-`docs/research-v2/FINAL_REPORT.md`. The v1 verdict below is unchanged.
+Historical results include ~91% cross-capture C&C recall after site calibration. This
+does not establish whole-family unknown recall: C&C is present in HF1/HF2 fitting,
+site data overlaps fitting in FAMILY/DANN, and DANN embeddings exceed 0.90 origin
+accuracy. Corrected partition/provenance evidence is required. See the audit notice in
+`docs/research-v2/FINAL_REPORT.md`; the v1 development rejection remains unchanged.
 
-## Active final model and production-acceptance phase
+## Final model and production-acceptance record
 
-The engineering/evaluation platform is demoable, but the project is **not complete under
-the final acceptance brief**. The currently deployed smoke model is rejected by all four
-frozen public-data evaluations and must not be described as a production detector. Work
-now follows the model-research and production-acceptance phases in `docs/MASTER_PLAN.md`.
+The engineering baseline is complete; the final acceptance brief remains open. The
+currently deployed smoke model is rejected by all four frozen public-data evaluations and
+must not be described as a production detector. The governed scientific and operational
+boundary is recorded in `docs/FINAL_ACCEPTANCE_REPORT.md` and `docs/PRODUCTION_ACCEPTANCE.md`.
 
 - The four legacy public-data reports are frozen as final rejection evidence in
   `configs/evaluation/frozen-evidence-v1.json`. The manifest records exact report,
@@ -87,20 +111,17 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   4.10% port-scan detection-or-review, 0% worst direct unknown recall, and 1.09% worst
   benign FPR. The current challenger family receives a development scientific NO-GO. No
   candidate is locked and the frozen final matrix remains sealed.
-- Remaining repository work proceeds to sustained
-  performance, local Kubernetes, rollback/failure, security, release evidence, and final
-  GO/NO-GO evidence.
-- The final phase is closed. `docs/FINAL_ACCEPTANCE_REPORT.md` records the governed
-  verdict: the detector receives an explicit development scientific NO-GO (no candidate
-  was lockable, so the frozen matrix was never unsealed), while the engineering platform
-  completed every local production-acceptance exercise. Clean Linux-runner evidence now
+- The final phase is open under `docs/REQUIREMENTS_AUDIT.md`. Missing site-baseline
+  activation, research corrections, and specific failure drills remain repository work.
+  The historical verdict in `docs/FINAL_ACCEPTANCE_REPORT.md` is superseded by that audit.
+  No candidate was locked, so the frozen matrix was never unsealed. Clean Linux evidence
   includes the predeclared 30 flows/s / 30-minute sustained PASS (run `31695359714`,
   exact 54,000-flow conservation, P95 3.336 s, max depth 75, zero final lag) and the
   disposable kind Kubernetes acceptance PASS (run `32569606185`: migrations, two
   replicas per service, TLS ingress, NetworkPolicy denial, idempotent replay,
   API replacement in 31.1 s, detector recovery in 31.8 s; retained at
   `docs/acceptance/kubernetes-ci-2026-08-22.json`). The final CI run on commit
-  `7f543e6` is green across all ten jobs.
+  `88ea380` is green across all ten jobs (`32635976457`).
 - Research Schema A now emits 24 portable features from exporter-independent counts,
   fractions, derived rates, log transforms, protocol categories, port ranges, service
   families, and explicit port missingness; it never exposes raw endpoint identity or a
@@ -110,8 +131,9 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   and late events. Dataset adapters call the same vectorizer/state machine and decline
   Schema B when any row lacks a valid timestamp or endpoint.
 - Train-fit preprocessing clips only at training-derived quantiles, robust-scales
-  continuous features, and preserves declared categorical/binary geometry. No candidate
-  has been trained or selected yet; origin-classifier and fresh-data evidence remain open.
+  continuous features, and preserves declared categorical/binary geometry. Candidates
+  were trained and evaluated in both research phases, but none met the selection gates;
+  v2 origin/split/provenance evidence requires correction and no model is promoted.
 
 ## Verified
 
@@ -125,8 +147,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
 - Clean Compose replay persisted 6 flows, produced 5 alerts, and grouped 1 incident.
 - PostgreSQL flush-order integration failure reproduced, fixed, and covered by a
   statement-order regression test.
-- Python: 200 tests pass, Ruff passes across the repository, strict MyPy passes across
-  92 source files, and measured backend coverage is 84%.
+- Initial local v2-guard validation: 238 tests pass, Ruff passes across the repository,
+  strict MyPy passes across 104 source files, and backend coverage is 84%.
 - Dashboard: ESLint, TypeScript/Vite build, Vitest, Playwright Chrome E2E, and
   `npm audit --audit-level=high` pass.
 - Docker images build and run non-root; PostgreSQL/Redis stay internal to the Compose
@@ -157,8 +179,9 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   growth +2.538 messages/s. The API was killed once without a Docker OOM flag, restarted
   automatically, reclaimed its backlog, and eventually drained it. That is useful restart
   recovery evidence but cannot turn the failed latency/depth/growth gates into a pass.
-  The lower-rate ladder and remaining controlled failure matrix remain open.
-  A clean Linux-runner 30-minute point at 30 flows/s is predeclared with the unchanged
+  The lower-rate point is recorded below. Required during-load failure and rollback
+  scenarios still need explicit coverage in the requirement audit.
+  A clean Linux-runner 30-minute point at 30 flows/s was predeclared with the unchanged
   98% ingress, exact-conservation, 5-second P95, 10,000-depth, second-half-growth, and
   zero-final-lag gates. Its first clean-runner invocation aborted before measurement
   because Compose container start raced the API migration and the `flows` table did not
@@ -233,8 +256,8 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   NetworkPolicies, and external retention ownership. Its fail-closed harness adds safe
   synthetic sensor replay, exact durable conservation, unlabelled-client denial, API
   rolling replacement, detector scale/restart, duplicate-replay idempotency, measured
-  recovery, and exact-cluster cleanup. Clean Linux runner evidence remains pending and no
-  managed-cloud claim is made.
+  recovery, and exact-cluster cleanup. Clean Linux-runner evidence passed in the retained
+  acceptance artifact; no managed-cloud claim is made.
 - The operator package now has practical installation, deployment, configuration,
   authentication, sensor, model-governance, backup/restore, incident-response,
   troubleshooting, upgrade, rollback, performance, capacity-planning, and security
@@ -447,21 +470,25 @@ now follows the model-research and production-acceptance phases in `docs/MASTER_
   GitHub Actions run `31683196334` passed all Python, dashboard, security, Compose,
   integration/E2E, and real local OIDC jobs.
 
-## Hard blockers and fallbacks
+## Remaining external validation and fallbacks
 
-- Production-readiness is not yet proven. Official split, held-family, chronological,
-  and true cross-dataset evidence all reject the current model for different reasons;
-  tuning against those final reports would be test leakage. Windows cannot validate
-  authorized live capture, so isolated Linux-container evidence remains required for
-  that path.
+- Universal production-readiness is intentionally not claimed. Official split, held-family,
+  chronological, and true cross-dataset evidence reject the current model for different
+  reasons; tuning against those final reports would be test leakage. Windows cannot
+  validate authorized live capture, so isolated Linux-container evidence remains the
+  bounded proof for that path.
 - Runtime mechanics are materially stronger, but representative sustained traffic,
   Redis/PostgreSQL server tracing, multi-host orchestration, and deployment-specific
-  capacity validation remain open. The 78.78 flows/s Compose result is database-bound
-  and must not be generalized beyond the recorded host and synthetic workload.
+  capacity validation remain external follow-up. The 30 flows/s Compose result is
+  database-bound and must not be generalized beyond the recorded host and synthetic
+  workload.
 - The repository implements the identity, governance, and deployment control planes, but
   has not been connected to a real organizational IdP or deployed to an external cluster.
 
-## Highest-priority required backlog
+## Active research and acceptance backlog
+
+- First close the research partition/provenance corrections, deployed site-baseline
+  workflow, and explicit failure/rollback requirements in `docs/REQUIREMENTS_AUDIT.md`.
 
 - Build a feature-compatible multi-source challenger with fresh fit/calibration evidence
   and governed review; keep all published public reports frozen as final tests.

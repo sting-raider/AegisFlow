@@ -20,6 +20,7 @@ import torch
 from torch import Tensor
 
 from training.v2.models import FusionNet
+from training.v2.partitions import assert_strict_family_rotation
 from training.v2.run_cross_environment import (
     BATCH_SIZE,
     LEARNING_RATE,
@@ -87,8 +88,10 @@ def run_rotation(
     name: str,
     fit_scenarios: set[str],
     fit_families: set[str] | None,
+    held_family: str,
     held_scenarios: set[str],
     site_benign_scenario: str,
+    benign_test_scenario: str,
     records: Sequence[SequenceRecord],
 ) -> dict[str, object]:
     fit_records = select_fit(
@@ -98,15 +101,36 @@ def run_rotation(
         per_class_cap=1500,
         seed=SEED,
     )
-    held_records = [r for r in records if r["scenario"] in held_scenarios]
-    site_records = [r for r in records if r["scenario"] == site_benign_scenario]
-    if not fit_records or not held_records or not site_records:
-        raise ValueError(f"rotation {name} has empty partitions")
+    held_records = [
+        r
+        for r in records
+        if r["scenario"] in held_scenarios
+        and r["binary_label"] == "malicious"
+        and r["family"] == held_family
+    ]
+    site_records = [
+        r
+        for r in records
+        if r["scenario"] == site_benign_scenario and r["binary_label"] == "benign"
+    ]
+    benign_test_records = [
+        r
+        for r in records
+        if r["scenario"] == benign_test_scenario and r["binary_label"] == "benign"
+    ]
+    assert_strict_family_rotation(
+        fit=fit_records,
+        site_calibration=site_records,
+        held_attack=held_records,
+        benign_test=benign_test_records,
+        held_family=held_family,
+    )
 
     fit_dataset = build_dataset(fit_records)
-    held_dataset = build_dataset(held_records)
+    held_dataset = build_dataset(held_records + benign_test_records)
     site_dataset = build_dataset(site_records)
 
+    torch.manual_seed(SEED)
     model = FusionNet(
         max_length=20,
         features_per_packet=4,
@@ -190,7 +214,9 @@ def run_rotation(
     return {
         "rotation": name,
         "held_scenarios": sorted(held_scenarios),
+        "held_family": held_family,
         "site_benign_scenario": site_benign_scenario,
+        "benign_test_scenario": benign_test_scenario,
         "fit_counts": {
             "benign": int((fit_dataset.binary_label == 0).sum()),
             "malicious": int((fit_dataset.binary_label == 1).sum()),
@@ -201,7 +227,7 @@ def run_rotation(
             "ood_channel_site_p99": round(threshold_ood, 5),
         },
         "held_family_channels": by_family,
-        "incidental_benign_in_held_envs": {
+        "independent_benign_test": {
             "rows": int(benign_mask.sum()),
             "known_channel_fpr": round(
                 float((held_scores[benign_mask] >= threshold_score).mean()), 5
@@ -213,13 +239,22 @@ def run_rotation(
             )
             if benign_mask.any()
             else 0.0,
+            "combined_channel_fpr": float(
+                ((held_scores[benign_mask] >= threshold_score)
+                 | (held_ood[benign_mask] >= threshold_ood)).mean()
+            ),
         },
     }
 
 
 def main() -> None:
     sequence_dir = Path("data/sequences_v2")
-    output_dir = Path("docs/research-v2/experiments")
+    # Corrected runs stay local until full run provenance has been reviewed and
+    # registered. Never overwrite the retained historical DEV2-FAMILY-001 record.
+    output_dir = Path("data/research_v2_corrected")
+    report_path = output_dir / "dev2-strict-held-family-v2.json"
+    if report_path.exists():
+        raise ValueError(f"refusing to overwrite experiment evidence: {report_path}")
     paths = sorted(sequence_dir.glob("*.jsonl"))
     records = deduplicate_records(load_records(paths))
 
@@ -230,29 +265,35 @@ def main() -> None:
     torii_benign = "CTU-IoT-Malware-Capture-42-1"
 
     rotations = {
-        "HF1_hold_hakai_c_and_c": {
-            "fit_scenarios": {s_mirai, hp4, hp5, torii_benign},
-            "fit_families": {"c_and_c", "ddos", "port_scan", "benign"},
-            "held_scenarios": {s_hakai},
-            "site_benign_scenario": hp5,
+        "HF1_hold_all_c_and_c": {
+            "fit_scenarios": {s_mirai, torii_benign},
+            "fit_families": {"ddos", "port_scan", "benign"},
+            "held_family": "c_and_c",
+            "held_scenarios": {s_mirai, s_hakai},
+            "site_benign_scenario": hp4,
+            "benign_test_scenario": hp5,
         },
-        "HF2_hold_mirai_c_and_c": {
-            "fit_scenarios": {s_hakai, hp4, hp5, torii_benign},
-            "fit_families": {"c_and_c", "ddos", "port_scan", "benign"},
+        "HF2_hold_all_ddos": {
+            "fit_scenarios": {s_mirai, s_hakai, torii_benign},
+            "fit_families": {"c_and_c", "port_scan", "benign"},
+            "held_family": "ddos",
             "held_scenarios": {s_mirai},
             "site_benign_scenario": hp4,
+            "benign_test_scenario": hp5,
         },
-        "HF3_hold_all_c_and_c": {
-            "fit_scenarios": {s_mirai, hp4, hp5, torii_benign},
-            "fit_families": {"ddos", "port_scan", "benign"},
-            "held_scenarios": {s_mirai, s_hakai},
-            "site_benign_scenario": hp5,
+        "HF3_hold_all_port_scan": {
+            "fit_scenarios": {s_mirai, s_hakai, torii_benign},
+            "fit_families": {"c_and_c", "ddos", "benign"},
+            "held_family": "port_scan",
+            "held_scenarios": {s_mirai},
+            "site_benign_scenario": hp4,
+            "benign_test_scenario": hp5,
         },
     }
 
     report = {
         "schema_version": "1.0.0",
-        "experiment_id": "DEV2-FAMILY-001",
+        "experiment_id": "DEV2-FAMILY-002",
         "generated_at": datetime.now(UTC).isoformat(),
         "seed": SEED,
         "epochs": 150,
@@ -264,6 +305,7 @@ def main() -> None:
             "on approved target-site benign scores at the 99th percentile."
         ),
         "status": "development_evidence_only_no_candidate_selected",
+        "registration_status": "unregistered_diagnostic_not_selection_evidence",
     }
     rotation_results: dict[str, object] = {}
     for name, config in rotations.items():
@@ -272,14 +314,17 @@ def main() -> None:
             name,
             set(config["fit_scenarios"]),
             set(config["fit_families"]),
+            str(config["held_family"]),
             set(config["held_scenarios"]),
             str(config["site_benign_scenario"]),
+            str(config["benign_test_scenario"]),
             records,
         )
         print(json.dumps(rotation_results[name], indent=2, sort_keys=True), flush=True)
     report["rotations"] = rotation_results
-    report_path = output_dir / "dev2-held-family-v1.json"
-    report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    with report_path.open("x", encoding="utf-8") as stream:
+        stream.write(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print(f"wrote {report_path}")
 
 

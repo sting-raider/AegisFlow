@@ -1,9 +1,9 @@
 # Completion audit
 
-> **Current verdict (2026-08-10): not complete under the final acceptance brief.**
-> The matrices below preserve evidence for the completed engineering baseline. They do
-> not establish production detector quality. Final scientific and operational acceptance
-> is tracked in `docs/MASTER_PLAN.md` and `docs/PRODUCTION_ACCEPTANCE.md`.
+> **Current verdict (2026-09-02): final-phase scope incomplete; detector NO-GO.**
+> The matrices below describe the engineering baseline. The authoritative audit of all
+> 35 final-brief sections is [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md). It identifies
+> unresolved research validity, site-baseline, and measured rollback requirements.
 
 This matrix maps the authoritative build brief to repository evidence. A requirement is
 marked complete only when implementation and proportionate verification both exist.
@@ -20,6 +20,7 @@ marked complete only when implementation and proportionate verification both exi
 | Unknown/open-set model | Benign-only Isolation Forest plus benign-only PyTorch denoising autoencoder, validation-tail normalization, reason-coded fusion and synthetic novelty evaluation | Complete for deterministic smoke scope; held-family/cross-dataset gates are implemented but external scores are not bundled |
 | Model bundles | V1/v2 recovery compatibility; v3 complete checksums, artifact hashes, calibrated empirical CDF, schema/order validation, atomic promotion/history, governed review, explicit rollback and visible previous-valid fallback | Complete |
 | Dataset tooling | Official-source catalog; hardened provenance downloader; CIC-IDS2017/CSE-CIC-IDS2018/UNSW-NB15/NFStream adapters; quality/leakage/overlap/drift reports; time/day/source/family/cross-dataset evaluation gate | Complete; no production-quality public-dataset scores are claimed until users supply reviewed files |
+| Detector-v2 evidence boundary | Historical packet-sequence protocol, source manifests and reports; new archive verifier | Integrity checks added; scientific validity and execution provenance incomplete |
 | Risk fusion | Versioned configurable weights/thresholds and boundary tests | Complete |
 | Drift | Bounded runtime monitoring of anomaly/confidence/flow-rate/three stable features/alert-rate; deterministic persisted events; API/dashboard; count/magnitude metrics; explicit no-action/no-retraining gates | Complete |
 | Analyst feedback | Immutable original result, eligibility gate, audit entry, endpoint-free fixed-feature retraining-candidate query/export | Complete |
@@ -33,7 +34,7 @@ marked complete only when implementation and proportionate verification both exi
 | Resilience | Durable acknowledgement, retries, pending recovery, real Compose restart matrix, previous-valid model fallback | Complete |
 | Automated tests | 160 Python tests at 84% backend coverage plus four Vitest interactions and Playwright E2E; frozen-evidence integrity; research-schema parity/state bounds; randomized legacy-feature parity/bounds; auth/RBAC/governance/migration coverage; malformed Redis quarantine; Redis/PostgreSQL recovery; model fallback/Compose fault injection; bounded-queue performance conservation/resource test | Complete for the engineering baseline |
 | Demo and commands | Required Make targets, offline Compose demo and cleanup | Complete |
-| CI/CD | Python/frontend/Compose/Kustomize/integration/migration/API-replacement E2E/audit/Trivy/Gitleaks jobs; public run `31340692583` passed every job for enterprise commit `70e188e` | Complete |
+| CI/CD | Public run `32635976457` passed ten jobs for commit `88ea380`; new v2 archive check is a subsequent local change | Baseline green; new milestone CI pending |
 | Documentation | Required topic files, current desktop/mobile screenshots, README validation snapshot, measured limitations, demo and faculty sequence | Complete |
 | GitHub publication | Public `sting-raider/AegisFlow` repository and `main` default branch | Complete |
 
@@ -49,9 +50,9 @@ is incomplete.
 | Exact hybrid public-data evaluation | `evaluate_dataset` retrains the deployed classifier/anomaly families and uses the shared runtime `HybridPredictor`; sanitized official UNSW split, held-exploits, CSE chronological, and UNSW-to-CSE reports cover four verdicts, calibration, leakage, latency, replay-hour, provenance, and limitations | **Complete as an evaluation harness; all four reports fail readiness and block model promotion** |
 | Open-set calibration | Bundle v3 persists a bounded benign-calibration empirical CDF; source-group or chronological calibration remains disjoint from final test; public held-family direct unknown detection is 2.1% and cross-dataset anomaly percentiles saturate | **Implementation complete; operational quality failed and requires a reviewed challenger** |
 | Evidence-backed fusion | Every weight/threshold loads from the bundle; synthetic selection plus public baseline/deployed comparisons are reported on fixed verdict labels; public results show no consistent operational advantage | **Evaluation complete; retain the interpretable baseline and do not claim or promote superiority** |
-| Performance and scaling | Exact stage profiling; 64-row hybrid inference; atomic Redis batch publication and acknowledgement; 64-row PostgreSQL transactions; incident-context query cache; hash-only row isolation; 2,000-flow local and full-Compose artifacts; two-detector partition smoke; restart recovery from preserved pending work | **Materially stronger and measured on one host; sustained multi-hour, representative traffic, server tracing, multi-host orchestration, and deployment-specific capacity evidence remain incomplete** |
+| Performance and scaling | Exact stage profiling; 64-row hybrid inference; atomic Redis batch publication and acknowledgement; 64-row PostgreSQL transactions; incident-context query cache; hash-only row isolation; 2,000-flow local and full-Compose artifacts; two-detector partition smoke; restart recovery from preserved pending work | **Complete for the declared single-host/local envelope; representative traffic, server tracing, multi-host orchestration, and deployment-specific capacity remain external** |
 | Enterprise access control | OIDC bearer validation and mounted digest-only service keys; server-derived viewer/analyst/admin roles; authenticated reads/mutations/metrics/WebSockets; durable actor audit; local principal limits; safe errors; focused unit/integration tests | **Complete as repository implementation; real IdP integration, shared gateway limits, session UX and multi-tenancy remain target-environment validation** |
-| Production deployment | Production Compose override and Kustomize baseline render; non-demo OIDC, mounted DB secrets, resource/log/probe bounds, advisory-locked migrations, single cluster retention schedule, RW control-plane/RO detector model storage, non-root/read-only pods, PDBs, TLS ingress, NetworkPolicies, topology/backup/release/rollback guidance | **Complete as a deployable baseline; no external cluster, managed-service integration, restore drill or target capacity evidence is claimed** |
+| Production deployment | Production Compose override and Kustomize baseline render; non-demo OIDC, mounted DB secrets, resource/log/probe bounds, advisory-locked migrations, single cluster retention schedule, RW control-plane/RO detector model storage, non-root/read-only pods, PDBs, TLS ingress, NetworkPolicies, topology/backup/release/rollback guidance | **Complete as a deployable baseline; disposable kind and restore drills pass; no managed-service or target-capacity claim is made** |
 | Editorial analyst experience | Light-first mineral editorial system across all seven views; asymmetric intelligence brief; functional navigation markers; automatic dark mode; reduced motion; skip/current-page/dialog keyboard semantics; current desktop/mobile Compose screenshots; two Chromium scenarios with zero Axe violations across every view and the evidence dialog | **Complete as repository implementation and rendered QA** |
 | Retraining governance | Immutable feedback and candidate export; exact bundle/report binding; negative evidence rejection; independent immutable review; distinct approver/promotion identities; explicit admin enablement; atomic pointer, crash reconciliation and rollback audit | **Complete; the current challenger remains scientifically rejected and no automatic promotion exists** |
 

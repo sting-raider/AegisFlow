@@ -14,11 +14,10 @@ It does not guarantee zero-day detection, inspect payloads by default, or block
 traffic. The detector and offline demo require no LLM, API key, GPU, or internet
 connection after dependencies and images are installed.
 
-> **Project status:** the engineering platform and local demo are complete and public,
-> but final model and production acceptance is still in progress. All four frozen
-> real-data evaluations reject the current smoke model, so this repository must not yet
-> be represented as a production-ready detector. See
-> [`docs/PRODUCTION_ACCEPTANCE.md`](docs/PRODUCTION_ACCEPTANCE.md).
+> **Project status:** the engineering platform is public and demoable. The full final
+> research/acceptance phase remains incomplete: the model is rejected for production,
+> v2 research claims need corrected partition evidence, and specific acceptance drills
+> remain. See the [requirements audit](docs/REQUIREMENTS_AUDIT.md).
 
 ## Architecture
 
@@ -82,6 +81,7 @@ make lint
 make typecheck
 make test
 make frozen-evidence-check
+make research-v2-check
 make train-smoke
 make replay PCAP=/absolute/path/capture.pcap
 make live INTERFACE=eth0
@@ -96,10 +96,10 @@ make reset
 
 ## Verified status
 
-The latest local validation on 2026-08-10 passed:
+The current public validation baseline is commit `88ea380` (GitHub Actions run
+`32635976457`), which passed all ten jobs:
 
-- Ruff and strict MyPy across 70 Python source files, including migrations;
-- 160 Python tests with 84% backend coverage;
+- Ruff, strict MyPy, and the Python test suite;
 - dashboard ESLint, production build, 4 component interaction tests, and 2 Chromium E2E
   scenarios including zero Axe violations across all seven views and the evidence dialog;
 - `npm audit --audit-level=high` with no reported vulnerabilities;
@@ -107,7 +107,7 @@ The latest local validation on 2026-08-10 passed:
   REST/auth checks, and independent Redis/PostgreSQL restart recovery;
 - base, demo, live, Suricata, and production Compose validation plus a rendered Kustomize
   baseline;
-- public GitHub Actions run `31340692583` passed Python, dashboard, deployment-render,
+- frozen-v1 integrity checks, Python/dashboard/deployment checks,
   live-loopback, API-replacement E2E, Gitleaks, and Trivy jobs;
 - exact runtime batching and a local Redis-to-PostgreSQL Compose benchmark. The recorded
   2,000-flow detector comparison improved from 153.50 to 3,496.81 flows/s, while the
@@ -117,6 +117,11 @@ See [`docs/PROGRESS.md`](docs/PROGRESS.md),
 [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md), and
 [`docs/PRODUCTION_ACCEPTANCE.md`](docs/PRODUCTION_ACCEPTANCE.md) for the measured
 evidence, current completion boundary, limitations, and acceptance work.
+
+The latest local pass ran 238 tests with 84% backend coverage and MyPy across 104
+sources. The new `make research-v2-check` command verifies retained artifact integrity;
+it was added after the historical CI run above. Research validity issues and remaining
+work are tracked in the [requirements audit](docs/REQUIREMENTS_AUDIT.md).
 
 `make live` is Linux-only, requires an explicit interface, and prints an authorization
 warning. It builds a dedicated non-root NFStream sensor target with only `NET_RAW`;
@@ -188,6 +193,9 @@ guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Follow the practical
 ## Known limitations
 
 - The bundled model is synthetic smoke data, not a production model.
+- Detector-v2's historical ~91% result concerns cross-capture C&C transfer. It does not
+  prove whole-family unknown detection; fitting/calibration overlap and incomplete
+  provenance require corrected experiments before stronger claims.
 - The real-data evaluation matrix is complete enough to reject the current model, not to
   approve it. UNSW official-split FPR is 64.4%; held-family direct unknown detection is
   2.1%; UNSW-to-CSE benign FPR is 100%; and the CSE chronological test misses essentially
@@ -216,9 +224,8 @@ guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Follow the practical
   managed backup/service integration, or representative target capacity validation is
   claimed.
 
-The active production-readiness expansion and unresolved evidence requirements are
-tracked in [`docs/COMPLETION_AUDIT.md`](docs/COMPLETION_AUDIT.md). The completed offline
-demo should not be described as enterprise production-ready until that matrix closes.
+The final-phase work remains open in [`docs/REQUIREMENTS_AUDIT.md`](docs/REQUIREMENTS_AUDIT.md).
+Organizational deployment validation is separate from the remaining repository work.
 
 ## Upstream and license
 

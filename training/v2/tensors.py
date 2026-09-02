@@ -105,6 +105,21 @@ def load_records(paths: Iterable[Path]) -> list[SequenceRecord]:
     return records
 
 
+def record_fingerprint(record: SequenceRecord) -> tuple[object, ...]:
+    """Return the label-independent observation fingerprint used for deduplication."""
+
+    return (
+        tuple(record["seq_sizes"]),
+        tuple(record["seq_directions"]),
+        tuple(record["seq_iats_ms"]),
+        record["total_packets"],
+        record["duration_ms"],
+        record["bytes_forward"],
+        record["bytes_reverse"],
+        record["protocol"],
+    )
+
+
 def deduplicate_records(records: Sequence[SequenceRecord]) -> list[SequenceRecord]:
     """Exact-vector deduplication across scenarios to prevent near-identical reuse."""
 
@@ -112,16 +127,7 @@ def deduplicate_records(records: Sequence[SequenceRecord]) -> list[SequenceRecor
     unique: list[SequenceRecord] = []
     duplicates = 0
     for record in records:
-        fingerprint: tuple[object, ...] = (
-            tuple(record["seq_sizes"]),
-            tuple(record["seq_directions"]),
-            tuple(record["seq_iats_ms"]),
-            record["total_packets"],
-            record["duration_ms"],
-            record["bytes_forward"],
-            record["bytes_reverse"],
-            record["protocol"],
-        )
+        fingerprint = record_fingerprint(record)
         if fingerprint in seen:
             duplicates += 1
             continue
@@ -161,6 +167,12 @@ def build_dataset(
     tiers: list[str] = []
     event_ids: list[str] = []
     for index, record in enumerate(records):
+        label = str(record["binary_label"])
+        family = str(record["family"])
+        if label not in {"benign", "malicious"}:
+            raise ValueError(f"invalid binary label for event {record['event_id']}: {label}")
+        if (label == "benign") != (family == "benign"):
+            raise ValueError(f"family/label mismatch for event {record['event_id']}")
         tensor, row_mask = sequence_arrays(
             list(record["seq_sizes"]),
             list(record["seq_directions"]),
@@ -180,8 +192,8 @@ def build_dataset(
             bytes_forward=int(record["bytes_forward"]),
             bytes_reverse=int(record["bytes_reverse"]),
         )
-        labels.append(1.0 if record["binary_label"] == "malicious" else 0.0)
-        families.append(str(record["family"]))
+        labels.append(1.0 if label == "malicious" else 0.0)
+        families.append(family)
         scenarios.append(str(record["scenario"]))
         tiers.append(str(record["observability"]))
         event_ids.append(str(record["event_id"]))

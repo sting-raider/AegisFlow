@@ -125,7 +125,7 @@ class AggregateEncoder(nn.Module):
 
 
 class FusionNet(nn.Module):
-    """Sequence + aggregate + connection-state fusion."""
+    """Sequence + portable aggregate fusion (state is a separate diagnostic)."""
 
     def __init__(
         self,

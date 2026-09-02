@@ -3,7 +3,7 @@
 Predeclared rotations (docs/research-v2/MASTER_PLAN.md):
 
 - R1 ``transfer_to_hakai``: fit {34-1 attacks, hp4+42-1 benign} -> test
-  {8-1 Hakai C&C (family unseen), hp5 benign (environment unseen)}.
+  {8-1 Hakai C&C (capture unseen, label family seen), hp5 benign (environment unseen)}.
 - R2 ``transfer_to_mirai``: fit {8-1 C&C, hp5+42-1 benign} -> test
   {34-1 Mirai C&C/DDoS/port-scan, hp4 benign (environment unseen)}.
 
@@ -274,6 +274,7 @@ def run_rotation(
     calibration_dataset = build_dataset(calibration_records)
     test_dataset = build_dataset(test_records)
 
+    torch.manual_seed(SEED)
     models: dict[str, torch.nn.Module] = {
         "sequence_mlp": SequenceMLP(max_length=20, features_per_packet=4),
         "sequence_cnn": SequenceCNN(features_per_packet=4),
@@ -419,6 +420,8 @@ def run_rotation(
 def main() -> None:
     sequence_dir = Path("data/sequences_v2")
     output_dir = Path("docs/research-v2/experiments")
+    if (output_dir / "dev2-sequence-crossenv-v1.json").exists():
+        raise ValueError("historical sequence evidence exists; register a new experiment instead")
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = sorted(path for path in sequence_dir.glob("*.jsonl"))
     if not paths:

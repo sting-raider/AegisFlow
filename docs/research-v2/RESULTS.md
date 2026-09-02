@@ -1,5 +1,10 @@
 # Detector v2 results
 
+Audit correction, 2026-09-02: the tables below are historical observations, not accepted
+scientific results. HF1/HF2 retain C&C in fitting; FAMILY/DANN overlap fitting and site
+calibration. Corrected strict-family, independent benign validation and run provenance
+remain pending. Do not use these tables to claim a validated improvement over v1.
+
 All evidence is development-only unless marked otherwise. Machine-readable artifacts
 live in `docs/research-v2/experiments/`.
 
@@ -29,10 +34,11 @@ score inversion across environments and fail there (CNN pooled ROC-AUC 0.86).
 | Packet sequence flat | 0.794 | 0.875 |
 | Fused (all) | 0.797 | 0.876 |
 
-None crosses the 0.90 block threshold (v1's full Schema A measured 0.954 on CSV pools).
-Connection-state semantics are near-environment-blind while retaining task signal.
+These raw-feature views do not cross 0.90. However, DANN learned-embedding origin BA is
+0.93874--0.94378 and exceeds that threshold. The claim that no representation exceeds
+the gate is withdrawn; raw and learned representations are distinct diagnostics.
 
-## Held-family open-set channels (DEV2-FAMILY-001)
+## Historical cross-capture channels (mislabelled DEV2-FAMILY-001)
 
 | Rotation | Held family | Known channel | OOD channel | Detection-or-review |
 |---|---|---:|---:|---:|
@@ -43,23 +49,24 @@ Connection-state semantics are near-environment-blind while retaining task signa
 
 ## Domain adversary (DEV2-DANN-001)
 
-lambda=0.1 removes environment-artifact false positives entirely (28.26% -> 0.00%)
-while preserving unseen-family recall (91.07% -> 90.58%).
+The lambda=0.1 run records 28.26% -> 0.00% incidental-benign flags and 91.07% -> 90.58%
+cross-capture C&C recall. It does not prove optimality or unseen-family generalization;
+its site calibration overlaps fit and initialization was not globally seeded.
 
 ## Performance (CPU, PyTorch, recorded dev host)
 
-Single-flow latency 0.066 ms; batched throughput ~749,000 flows/s.
+Unverified: the previous prose figures have no retained machine-readable benchmark.
 
 ## Objective scorecard (predeclared in MASTER_PLAN.md)
 
 | Objective | Result |
 |---|---|
 | Benign FPR <= 1% every held env | Partial: nominal on site pool; incidental benign 28% without adversary, 0% with (46-row sample); HF1/HF3 collapse unrelated to FPR |
-| Unseen-family direct unknown recall >= 50% mean | Not met as a mean: 91% one direction, 0.05% the other |
-| Unknown detection-or-review >= 80% | Met only in HF2 direction |
+| Unseen-family direct unknown recall >= 50% mean | Not established: HF1/HF2 are not strict-family holdouts |
+| Unknown detection-or-review >= 80% | Not established by the cross-capture HF2 score |
 | Known recall >= 90% (HIGH/MEDIUM observability) | Met per-direction where ranking transfers |
 | ECE <= 0.10 | Not met for raw probability heads (up to 0.92); ranking unaffected |
 | No catastrophic collapse | **Failed** (HF1, HF3) |
-| CPU latency <= 10ms single, >= 500 flows/s batch | **Passed** by wide margins |
+| CPU latency <= 10ms single, >= 500 flows/s batch | Unverified; benchmark artifact missing |
 
-Verdict: Outcome B. See `docs/research-v2/FINAL_REPORT.md`.
+Verdict: incomplete validation, no eligible candidate. See `docs/research-v2/FINAL_REPORT.md`.

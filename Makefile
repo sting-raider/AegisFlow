@@ -12,7 +12,7 @@ RESTORE_OUTPUT ?= docs/acceptance/restore-local.json
 KUBERNETES_OUTPUT ?= docs/acceptance/kubernetes-local.json
 SECURITY_OUTPUT ?= docs/acceptance/security-local.json
 
-.PHONY: install lint typecheck test frozen-evidence-check research-evidence-check train-smoke demo demo-stop replay \
+.PHONY: install lint typecheck test frozen-evidence-check research-evidence-check research-v2-check train-smoke demo demo-stop replay \
 	live live-stop suricata-replay benchmark benchmark-sustained multiworker-acceptance restore-acceptance kubernetes-acceptance security-acceptance production-check oidc-prepare oidc-acceptance oidc-stop \
 	retention-cleanup reset
 
@@ -37,6 +37,9 @@ frozen-evidence-check:
 
 research-evidence-check:
 	$(UV) run python -m scripts.verify_research_experiments
+
+research-v2-check:
+	$(UV) run python -m scripts.verify_research_v2
 
 train-smoke:
 	$(UV) run python -m training.cli.train_smoke

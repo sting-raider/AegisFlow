@@ -22,6 +22,7 @@ from torch import Tensor
 from torch.utils.data import DataLoader, TensorDataset
 
 from training.v2.models import FusionNet, gradient_reversal
+from training.v2.partitions import assert_disjoint_partitions
 from training.v2.run_cross_environment import (
     BATCH_SIZE,
     LEARNING_RATE,
@@ -47,6 +48,7 @@ def train_adversarial(
     scenario_labels: np.ndarray,
     lambd: float,
 ) -> FusionNet:
+    torch.manual_seed(SEED)
     model = FusionNet(
         max_length=20,
         features_per_packet=4,
@@ -121,7 +123,10 @@ def _domain_loss_for_encoder(
 
 def main() -> None:
     sequence_dir = Path("data/sequences_v2")
-    output_dir = Path("docs/research-v2/experiments")
+    output_dir = Path("data/research_v2_corrected")
+    report_path = output_dir / "dev2-domain-adversarial-v2.json"
+    if report_path.exists():
+        raise ValueError(f"refusing to overwrite experiment evidence: {report_path}")
     records = deduplicate_records(load_records(sorted(sequence_dir.glob("*.jsonl"))))
     s_mirai = "CTU-IoT-Malware-Capture-34-1"
     s_hakai = "CTU-IoT-Malware-Capture-8-1"
@@ -129,29 +134,40 @@ def main() -> None:
     hp5 = "CTU-Honeypot-Capture-5-1"
     torii_benign = "CTU-IoT-Malware-Capture-42-1"
 
-    # Hard direction R2/HF2: fit on Hakai (+ benign envs), test on Mirai + hp4 site.
+    # Cross-capture C&C, not a held-family test. hp4 is calibration-only.
     fit_records = class_capped_subset(
         records,
-        scenarios={s_hakai, hp4, hp5, torii_benign},
+        scenarios={s_hakai, hp5, torii_benign},
         per_class_cap=1500,
         seed=SEED,
     )
     train_records, calibration_records = split_fit(fit_records)
-    test_records = [r for r in records if r["scenario"] in {s_mirai, hp4}]
+    test_records = [r for r in records if r["scenario"] == s_mirai]
+    site_records = [r for r in records if r["scenario"] == hp4]
+    if any(r["binary_label"] != "benign" or r["family"] != "benign" for r in site_records):
+        raise ValueError("site calibration must be approved benign-only")
+    assert_disjoint_partitions({
+        "fit": train_records,
+        "source_calibration": calibration_records,
+        "test": test_records,
+        "site_calibration": site_records,
+    })
     train_dataset = build_dataset(train_records)
     test_dataset = build_dataset(test_records)
+    site_dataset = build_dataset(site_records)
     scenario_labels = np.asarray([r["scenario"] for r in train_records])
 
     folds = StratifiedKFold(n_splits=3, shuffle=True, random_state=SEED)
     report: dict[str, object] = {
         "schema_version": "1.0.0",
-        "experiment_id": "DEV2-DANN-001",
+        "experiment_id": "DEV2-DANN-002",
         "generated_at": datetime.now(UTC).isoformat(),
         "seed": SEED,
         "epochs": EPOCHS,
         "rotation": "R2_transfer_to_mirai_hard_direction",
         "coefficients": {},
         "status": "development_evidence_only_no_candidate_selected",
+        "registration_status": "unregistered_diagnostic_not_selection_evidence",
     }
     coefficient_results: dict[str, object] = {}
     for lambd in ADVERSARIAL_COEFFICIENTS:
@@ -197,8 +213,7 @@ def main() -> None:
                 )
                 return probabilities
 
-        site_indices = [i for i, r in enumerate(test_records) if r["scenario"] == hp4]
-        site_scores = scores_of(test_dataset)[site_indices]
+        site_scores = scores_of(site_dataset)
         threshold = float(np.quantile(site_scores, 0.99))
         test_scores = scores_of(test_dataset)
         test_predictions = (test_scores >= threshold).astype(int)
@@ -224,8 +239,9 @@ def main() -> None:
         print(f"lambda={lambd}", coefficient_results[f"lambda_{lambd}"], flush=True)
 
     report["coefficients"] = coefficient_results
-    report_path = output_dir / "dev2-domain-adversarial-v1.json"
-    report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    with report_path.open("x", encoding="utf-8") as stream:
+        stream.write(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print(f"wrote {report_path}")
 
 

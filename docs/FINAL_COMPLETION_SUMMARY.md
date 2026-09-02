@@ -1,41 +1,27 @@
-# Engineering baseline completion summary
+# AegisFlow completion summary
 
-Date: 2026-08-10
+Date: 2026-09-02 (evidence through 2026-08-23)
 
-## Superseded completion verdict
+## Current completion boundary
 
-This document records completion of the earlier engineering-platform brief. A final
-model-research and production-acceptance brief accepted on 2026-08-10 supersedes that
-stop condition, so **the entire project is not complete**. AegisFlow satisfies the earlier
-repository implementation brief: the major flow
-correctness and interoperability defects are resolved, the exact hybrid detector has
-reviewed public-data evidence, the measured runtime and recovery story is materially
-stronger, enterprise access/governance/deployment controls exist, and the seven-view
-analyst experience now has the requested editorial intelligence character with executable
-accessibility and browser evidence.
+The engineering platform is demoable, but the full final-phase scope is **incomplete**.
+The 2026-09-02 [requirements audit](REQUIREMENTS_AUDIT.md) found research partition and
+provenance gaps, missing deployed site-baseline activation, and unverified bad-image /
+failed-migration drills. Earlier Outcome-B closure claims are superseded. No model is
+approved for production.
 
-This is not a claim that the current model or an arbitrary deployment is production-ready.
-All four published real-data evaluations reject the current model, and no external IdP,
-managed data service, multi-host cluster, restore drill, or representative target-capacity
-test has been supplied. The repository is a serious evaluation platform with guarded
-deployment templates; production acceptance remains environment- and model-specific. The
-governed GO/NO-GO decision has now been made: the detector receives an explicit
-development scientific NO-GO and the platform's local acceptance mechanics are complete.
-See `docs/FINAL_ACCEPTANCE_REPORT.md` for the final verdict; this file is retained as
-historical engineering-baseline context.
+This is not a claim of universal production readiness. Organizational IdP, managed data
+services, multi-host/target-cluster capacity, registry signing, penetration testing, and
+future model qualification remain deployment-owner or research work. See
+`docs/FINAL_ACCEPTANCE_REPORT.md` for the authoritative 23-part evidence record and
+`docs/research-v2/FINAL_REPORT.md` for the follow-on research result.
 
-The live final phase has since frozen the four rejection reports behind an automated
-integrity guard, implemented shared portable/temporal research schemas, and admitted three
-checksum-reviewed fresh development environments. Six IoT-23 captures provide 43,009
-full Schema B rows. The origin diagnostic blocks the full portable schema at 0.95416
-balanced accuracy while its numerical-core ablation clears the 0.90 shortcut threshold at
-0.68428. The first four supervised and five benign-only anomaly model families all fail
-cross-environment development objectives. A subsequent nine-view hybrid/temporal study
-also fails repeated held-family objectives and exposes strong benign-device calibration
-sensitivity. Cross-fitted benign-device calibration also fails, so the current challenger
-family receives a development scientific NO-GO and no candidate is selected. The frozen
-final matrix remains sealed because no model is eligible to cross that boundary.
-Operational acceptance remains open.
+The final phase froze the four rejection reports behind automated integrity guards,
+implemented shared portable/temporal and packet-sequence research schemas, admitted
+checksum-reviewed development environments, and completed the local OIDC, Kubernetes,
+restore, security, and sustained-capacity exercises. Specific rollback drills remain
+open in the audit. The frozen final matrix
+remains sealed because no model was eligible to cross that boundary.
 
 ## What was implemented
 
@@ -65,11 +51,11 @@ Operational acceptance remains open.
   Hosts, Models, and System Health, with automatic dark mode, responsive layouts, current
   screenshots, keyboard workflows, and zero Axe violations in the browser acceptance gate.
 
-## Evidence used for completeness
+## Retained engineering evidence (not full completion)
 
 | Evidence | Result |
 |---|---|
-| Python quality gate | Ruff and strict MyPy across 78 sources; 169 tests; 84% measured backend coverage |
+| Local correction gate, 2026-09-02 | Ruff passed; strict MyPy across 105 sources; 272-test full suite plus 39 focused tests including two added overwrite regressions; 84% measured backend coverage; current CI pending |
 | Dashboard quality gate | ESLint, TypeScript/Vite production build, 4 component tests, 2 Chromium scenarios, zero Axe violations across all seven views and the evidence dialog |
 | Dependency/security gate | Dashboard audit reports zero vulnerabilities; Gitleaks and Trivy passed the published enterprise milestone |
 | Runtime evidence | 2,000-flow exact detector batching improved from 153.50 to 3,496.81 flows/s on the recorded host; the durable Compose path completed at 78.78 flows/s with zero final queue lag |
@@ -77,7 +63,7 @@ Operational acceptance remains open.
 | Sensor interoperability | NFStream isolated PCAP/live-loopback evidence and exact Scapy/Suricata Community ID agreement for the bundled replay |
 | Deployment evidence | Base/demo/live/Suricata/production Compose render; Kustomize render; PostgreSQL migration through a mounted secret; API-only replacement with dashboard recovery |
 | Public-data evidence | Official UNSW split, held-exploits, CSE chronological, and UNSW-to-CSE exact-hybrid reports are committed and all fail promotion gates |
-| Published CI baseline | Enterprise commit `70e188e` passed every GitHub Actions job in run `31340692583`; the live badge is the durable publication status for later commits |
+| Published CI baseline | Public `main` commit `88ea380` passed ten jobs in run `32635976457`; this predates the new Detector-v2 integrity check |
 
 Exact artifacts and caveats are in `PROGRESS.md`, `COMPLETION_AUDIT.md`,
 `PERFORMANCE.md`, `DATASETS.md`, and `UNKNOWN_THREAT_EVALUATION.md`.
@@ -89,8 +75,9 @@ Exact artifacts and caveats are in `PROGRESS.md`, `COMPLETION_AUDIT.md`,
   detection is 2.1%; UNSW-to-CSE produces 100% benign false positives; and the CSE
   chronological split has essentially zero later-infiltration recall. These results block
   promotion and invalidate any current production-detection claim.
-- Performance measurements are synthetic, single-host, and short-lived. The durable
-  78.78 flows/s Compose result is database-bound and is not a sizing promise.
+- Performance measurements are synthetic and single-host, including a 30 flows/s,
+  30-minute sustainable point and a failed 50 flows/s, 30-minute point. The earlier
+  burst measurements are not a sizing promise.
 - OIDC, Kubernetes, managed PostgreSQL/Redis, gateway limits, backup restoration, network
   policy, tenancy, and capacity behavior need validation in the actual target environment.
 - Windows cannot validate authorized native live capture. The bounded Linux-container

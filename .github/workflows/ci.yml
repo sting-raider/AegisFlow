@@ -24,6 +24,7 @@ jobs:
       - run: uv run mypy packages services apps/api training scripts migrations
       - run: uv run python -m scripts.verify_frozen_evidence
       - run: uv run python -m scripts.verify_research_experiments
+      - run: uv run python -m scripts.verify_research_v2
       - run: uv run pytest --cov=packages --cov=services --cov=apps.api
       - name: Production preflight rejects checked-in defaults
         run: |

@@ -140,6 +140,7 @@ def run(
     attack_dataset = build_dataset(test_attack_records)
     site_dataset = build_dataset(site_benign_records)
 
+    torch.manual_seed(SEED)
     models: dict[str, torch.nn.Module] = {
         "sequence_mlp": SequenceMLP(max_length=20, features_per_packet=4),
         "sequence_cnn": SequenceCNN(features_per_packet=4),
@@ -243,6 +244,8 @@ def run(
 def main() -> None:
     sequence_dir = Path("data/sequences_v2")
     output_dir = Path("docs/research-v2/experiments")
+    if (output_dir / "dev2-site-calibration-v1.json").exists():
+        raise ValueError("historical site evidence exists; register a new experiment instead")
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = sorted(sequence_dir.glob("*.jsonl"))
     records = deduplicate_records(load_records(paths))

@@ -1,19 +1,24 @@
 # Final acceptance report
 
-Date: 2026-08-22.
+Date: 2026-09-02 (evidence through 2026-08-23).
 
-This report closes the final model-research and production-acceptance phase. It is
-assembled only from retained repository evidence: `docs/MODEL_RESEARCH_LOG.md`,
+Status: **incomplete**. The 2026-09-02 audit supersedes the earlier closure verdict.
+See `docs/REQUIREMENTS_AUDIT.md` for research-validity and acceptance gaps. This draft
+assembles historical repository evidence: `docs/MODEL_RESEARCH_LOG.md`,
 `docs/research/`, `docs/acceptance/`, `docs/benchmarks/`, `docs/error_analysis/`,
-`docs/evaluation/`, and the frozen-evidence manifest
+`docs/evaluation/`, `docs/research-v2/`, and the frozen-evidence manifest
 `configs/evaluation/frozen-evidence-v1.json`.
 
 ## 1. Exact repository commit
 
-`7f543e6fd6c2e32272d96c54e0067b2bcaacd984` (public `main`, GitHub Actions run
-`32569606185`: all ten jobs green, including Python, Compose, integration,
+`88ea3801886fd3b27563aab5f52a52d1272e2d80` (public `main`, GitHub Actions run
+`32635976457`: all ten jobs green, including Python, Compose, integration,
 OIDC-integration, restore, release-evidence, security, security-acceptance,
-dashboard, and kubernetes-integration).
+dashboard, and kubernetes-integration). That run predates the new v2 archive verifier.
+Detector-v2 artifacts were published by commit
+`85a20367250475abe70da1da28b6ff672b7e8e59`; their actual execution commits are not
+established by the reports. Four local smoke-model registry files are intentionally
+uncommitted and are excluded from this acceptance commit.
 
 ## 2. Experiment protocol
 
@@ -27,10 +32,18 @@ The protocol is predeclared in `docs/MODEL_RESEARCH_LOG.md` and enforced by CI:
 - A challenger must be selected on development evidence alone, then locked (code,
   configuration, thresholds, schema), before a single run against the frozen matrix is
   authorized. At most one final run per locked candidate.
-- Every experiment records code commit, dataset fingerprints, splits/groups, seeds,
+- The v1 experiment harness records code commit, dataset fingerprints, splits/groups, seeds,
   preprocessing fit scope, estimator parameters, calibration scope, thresholds, and
   aggregate-only metrics with visible failures (`DEV-SUP-001`, `DEV-ANO-001`,
   `DEV-HYB-001`, `DEV-ERR-001`, `DEV-CAL-001`; research entries MR-000 through MR-008).
+
+Detector-v2 has a historical Markdown plan and a retrospective archive policy recorded
+on 2026-09-02 in `configs/research-v2/protocol.json`. The latter is not a pre-experiment
+registration. `make research-v2-check` binds six prepared source records, five aggregate
+JSON reports and six row-level embedding archives, using LF-normalized UTF-8 hashes
+for JSON and byte hashes for NPZ. It checks archive boundaries, not scientific validity.
+The newly configured CI step still requires a green milestone run. Corrected experiments
+must record actual execution commit, data/splits/configuration and measured costs.
 
 ## 3. Development datasets
 
@@ -45,6 +58,14 @@ quality reports in `docs/development/`):
 
 Raw files stay outside Git; only provenance, schemas, reports, and preparation tooling
 are committed.
+
+Detector-v2 independently declared eight official Stratosphere IoT-23 scenarios and
+prepared six checksum-pinned captures (6,671 deduplicated labeled flows) for development:
+34-1 Mirai, 8-1 Hakai, 42-1 and 20-1 benign-leaning captures, and honeypots 4-1 and 5-1.
+The two additional declared real-device captures remain unprepared, and the separate
+CTU-13 scenario-8 (rbot) environment is reserved for a single locked-candidate run but
+was never acquired, queried, or used for selection. See
+`docs/research-v2/DATASETS.md` and `configs/research-v2/pool-hashes.json`.
 
 ## 4. Frozen datasets
 
@@ -63,6 +84,10 @@ They reject the deployed smoke model (benign FPR approximately 64.4% official sp
 essentially zero chronological later-infiltration recall). They were never used to
 develop or select the challenger family.
 
+The v2 pool is development-only and has no source-hash intersection with this frozen
+manifest. Its reservation and sealed status are checked by
+`configs/research-v2/evidence-manifest.json`.
+
 ## 5. Final feature schema
 
 No challenger schema was promoted. The research outcome:
@@ -76,6 +101,10 @@ No challenger schema was promoted. The research outcome:
   runtime state machine over 10/60-second sensor+source windows, with parity tests,
   expiry, duplicate handling, and explicit unavailability when timestamps or endpoints
   are missing.
+- The v2 packet-sequence contract carries signed log1p packet sizes, log1p inter-arrival
+  times, semantic direction, normalized position, and an explicit padding mask for the
+  first 20 observed packets, plus bounded TCP connection-state features. Payload contents
+  and endpoint identity are never model features.
 - Train-fit preprocessing clips at training-derived quantiles and robust-scales
   continuous features; ports are range/service categories, never magnitudes.
 
@@ -100,6 +129,11 @@ Development evidence only (`docs/research/experiments/`):
   mean direct unknown recall 6.28% (one-class SVM) with near-zero worst rotations;
   strongest mean detection-or-review 15.81% (robust covariance) with 10.85% worst FPR.
 
+Detector-v2 evidence (`docs/research-v2/experiments/`) adds masked sequence MLP/CNN and
+aggregate+connection-state fusion models. Site-relative calibration and a weak domain
+adversary are evaluated as separate, transparent ablations; no v2 configuration is a
+production selection.
+
 ## 8. Held-family results
 
 `DEV-HYB-001` and `DEV-CAL-001` held out whole IoT-23 attack families (command-and-
@@ -115,10 +149,24 @@ control, DDoS, port scan) from supervised fitting and tested them on separate ca
 All fail the development objectives (unknown detection-or-review >= 80%, benign FPR
 <= 1%, known recall >= 90%).
 
+The historical v2 HF1/HF2 results are cross-capture C&C tests, not strict held-family
+evidence: C&C was allowed in fit. HF3 excludes C&C but reuses site-calibration data in
+fitting and includes non-held families in evaluation. None supports a strict-family
+acceptance claim. Corrected runners enforce row/observation isolation, label-family
+exclusion and independent benign testing; their registered measured results are pending.
+
 ## 9. Cross-dataset results
 
-- Development: every experiment above is leave-one-environment-out or three-way
-  disjoint fit/calibration/test; adding sources did not produce stable transfer.
+- v1 development experiments use leave-environment-out or disjoint calibration designs;
+  the audit found fit/calibration overlap in v2 FAMILY/DANN, so the same statement
+  cannot be extended to all v2 experiments.
+- Detector-v2 global thresholds produce 0% recall in the hard fit-Hakai/test-Mirai
+  direction despite PR-AUC 0.85--0.98; approved target-site p990 calibration recovers
+  90.6--90.9% recall at nominal 1% site FPR. The mirrored direction is materially easier,
+  demonstrating asymmetric environment transfer rather than a universal result.
+- Raw-feature v2 origin BA reaches 0.797, but DANN learned embeddings reach
+  0.93874--0.94378, exceeding the 0.90 threshold. The raw-feature result cannot establish
+  domain-invariant learned embeddings. Neither is a frozen-final score.
 - Historical frozen cross-dataset evidence (UNSW→CSE) rejects the deployed smoke model
   with 100% benign FPR and saturated anomaly percentiles; it was not rerun for the
   challenger because no challenger qualified to cross that boundary.
@@ -136,6 +184,9 @@ bundle only.
 identifies: device-calibration orientation swings (DDoS direct detection 0.00035 vs
 0.99152 under HUE/Echo reversal), concentrated TCP/web high-packet benign error buckets,
 and late-event misses; removing port context worsens worst-case FPR rather than fixing it.
+The v2 aggregate-only error analysis adds score inversion across sites, tiny benign
+calibration pools, repetitive-family deduplication, and honeypot benign noise as the
+dominant causes of the asymmetric HF1/HF3 result.
 
 ## 12. Unknown-detection analysis
 
@@ -144,7 +195,9 @@ tested family; detection-or-review never exceeds 15.81% mean (anomaly-only) or 5
 mean / 0.067% worst (hybrid). Root causes are flow-level observability limits
 (zero/one-packet, zero-duration flows carrying too little behaviour) plus device-specific
 benign baselines, not threshold placement. Classifier uncertainty and out-of-distribution
-evidence remain separate signals in the runtime contract.
+evidence remain separate signals in the runtime contract. In v2, Mahalanobis OOD catches
+structurally distinct DDoS/port-scan rows at 100% in HF2, but not C&C variants; the known
+and OOD channels remain explicitly separate.
 
 ## 13. Ablation results
 
@@ -153,7 +206,10 @@ full hybrid, no-temporal, no-port-context): temporal context helps selected rota
 is highly calibration-sensitive (context-only transfers with up to 38.90% benign FPR);
 no-temporal is restrained (0.63% mean FPR) but worst detection-or-review falls to 9.02%.
 No ablation meets objectives; signatures-only was marked not evaluable rather than
-fabricated for the development pool.
+fabricated for the development pool. V2 compares aggregate-only, sequence-only, fused,
+site-calibrated, and domain-adversarial modes; lambda=0.1 reduces incidental benign flags
+from 28.26% to 0% while preserving hard-direction recall (91.07% to 90.58%), but cannot
+remove the HF1/HF3 collapse or unmet calibration gates.
 
 ## 14. Performance envelope
 
@@ -175,13 +231,16 @@ Local synthetic measurements, exact-conservation gated (`docs/benchmarks/`,
   sustainable criteria true (GitHub Actions run `31695359714`).
 - Two-API-worker persistence partitioning/recovery drill: all 6,000 flows/detections
   durable, zero duplicates, every published event reconciled to a latency sample.
+- Detector-v2 latency/throughput: not verified. The earlier prose figures lack a retained
+  machine-readable benchmark and cannot establish a performance gate.
 
 ## 15. Capacity limitations
 
 The sustained points are single-host, synthetic-paced workloads. Representative traffic,
 multi-host orchestration, database/Redis server tracing, and deployment-specific capacity
-validation remain open. The 30 flows/s point defines the validated local envelope;
-higher rates were not sustainable on the recorded host at 30 minutes.
+validation remain external follow-up. The 30 flows/s point defines the validated local
+envelope; higher rates were not sustainable on the recorded host at 30 minutes. V2 CPU
+cost must be measured reproducibly before any performance or candidate claim.
 
 ## 16. OIDC acceptance result
 
@@ -220,6 +279,9 @@ off-host durability, encryption, RPO/RTO remain external.
 
 ## 19. Failure/rollback results
 
+Partial. Bad API-image rollback, bad detector-image rollback, and failed migration
+simulation still need dedicated measured drills. Pod replacement is not image rollback.
+
 Redis/PostgreSQL recovery matrix passes (abandoned work reclaimed, backlog drains,
 restarts preserve pending events, replay adds no duplicates); queue lag/pending exposed
 via Prometheus/API/dashboard; corrupt-model fallback to previous valid bundle verified;
@@ -246,24 +308,20 @@ Organizational IdP validation; managed PostgreSQL/Redis; real target-cluster dep
 with representative capacity; registry digests/signing for releases; organizational
 penetration test; representative sustained traffic; off-host managed backup/RPO-RTO
 validation; and — decisive — a detector model that passes governed acceptance gates.
+Organizational services require external coordination. Corrected model research,
+site-baseline activation, and the missing acceptance drills remain repository work;
+they are not external dependencies or waived requirements.
 
 ## 22. GO / NO-GO verdict
 
-**Detector: NO-GO.** The challenger program receives a documented development scientific
-NO-GO (`docs/research/conclusion.md`): no representation/model/calibration configuration
-met the predeclared development objectives, so no candidate could be locked and the
-frozen final matrix remains sealed. Root cause is attributed to flow-level observability
-limits and environment-specific benign baselines under the current portable feature
-contract — not to a single threshold, architecture, or implementation defect. The
-deployed smoke bundle stays rejected and blocked from promotion by governance.
+**Detector: NO-GO; full final-phase scope: incomplete.** V1 development rejection stands.
+V2 has known methodological defects and insufficient provenance; corrected experiments
+are required. No challenger is eligible for promotion or a frozen-final run. These facts
+do not establish the full brief's Outcome B stop condition.
 
-**Platform: complete engineering/evaluation platform with validated local deployment
-mechanics.** All production-acceptance exercises defined for the local envelope pass:
-sustained conservation-gated throughput, OIDC contract, Kubernetes deployment mechanics,
-restore drill, failure/rollback drills, security acceptance, release evidence with SBOM
-and manifest, production-check fail-closed gate, and operator documentation. Under the
-plan's stop conditions this is Outcome B: the engineering platform is complete while the
-detector receives an explicit NO-GO. AegisFlow must not be called a production detector.
+The engineering baseline is demoable, with retained local OIDC, restore, kind and capacity
+evidence. Deployed approved-site baseline activation, named rollback/failure drills,
+partitioning acceptance and research corrections remain open in `REQUIREMENTS_AUDIT.md`.
 
 ## 23. Exact claims that may safely be made about AegisFlow
 
@@ -274,19 +332,22 @@ detector receives an explicit NO-GO. AegisFlow must not be called a production d
    identities, and a seven-view analyst dashboard.
 2. Its current bundled model is rejected by four frozen public-data evaluations and is
    installation evidence only.
-3. Its challenger family failed predeclared development objectives across supervised,
-   anomaly, hybrid, temporal, and site-calibrated configurations; the strongest next
-   research direction is richer observable semantics (packet-sequence summaries,
-   connection-state transitions, privacy-reviewed DNS/TLS metadata) plus independently
-   reviewed environments with full temporal prerequisites, before any new candidate.
+3. Its v1 challenger family failed predeclared development objectives across supervised,
+   anomaly, hybrid, temporal, and site-calibrated configurations. Detector-v2 implements
+   sequence and connection-state research representations; its historical performance
+   claims need corrected partitioning and provenance before scientific comparison.
 4. Within its tested local envelope (single host, synthetic paced load up to 30 durable
    flows/s over 30 minutes on a clean Linux runner), it conserves every event, bounds
    queues, returns to steady state, survives component restarts, restores databases
    exactly, and fails closed on unsafe configuration.
-5. Deployment mechanics (Compose, Kustomize-on-kind, OIDC contract, backup/restore,
-   rollback drills, security controls) are validated locally; managed-cloud,
+5. Recorded deployment mechanics (Compose, Kustomize-on-kind, OIDC contract, backup/restore,
+   selected recovery tests, security controls) were exercised locally; remaining rollback
+   drills are open. Managed-cloud,
    multi-host, organizational-identity, and representative-capacity claims require
    target-environment evidence.
 6. Detection never triggers automatic blocking; payloads are never stored; suspicious
    traffic never enters a benign baseline automatically; AI explanations cannot affect
    detection.
+7. Detector-v2's five aggregate JSON reports and six row-level embedding archives have
+   a retrospective integrity guard. Integrity is not scientific validation. No v2 model
+   is deployed or eligible for production promotion.

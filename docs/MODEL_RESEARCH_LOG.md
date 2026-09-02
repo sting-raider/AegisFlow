@@ -287,3 +287,14 @@ development scientific NO-GO for a universal detector under the current flow-lev
 contract, not a universal impossibility claim. Evidence is in
 `docs/research/experiments/dev-site-calibration-v1.json`; its SHA-256 is
 `076f2ab08abc48deb9fc0d144219ac4875c69f978819b96de74874529b6fc3a4`.
+
+## MR-009 - Detector-v2 evidence audit and correction boundary
+
+2026-09-02. The v1 development NO-GO and frozen-final boundary are unchanged. The v2
+audit found mislabelled whole-family tests, fit/site overlap, high learned-embedding
+origin predictability, and incomplete execution/cost provenance. See MR2-007 in
+`docs/research-v2/RESEARCH_LOG.md` and `docs/REQUIREMENTS_AUDIT.md`. The new archive
+verifier establishes historical integrity only. Strict partition checks and seeded
+corrected diagnostic runners are implemented; no corrected experiment is registered,
+no model selected, and no final dataset unsealed. The broader final-phase goal remains
+incomplete, including deployed approved-site baselines and specific failure drills.

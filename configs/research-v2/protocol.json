@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "detector-v2",
+  "recorded_at": "2026-09-02",
+  "registration_kind": "retrospective_archive_policy",
+  "permitted_use": "development_only",
+  "seed": 20260822,
+  "development_scenarios": [
+    "CTU-IoT-Malware-Capture-34-1",
+    "CTU-IoT-Malware-Capture-8-1",
+    "CTU-IoT-Malware-Capture-42-1",
+    "CTU-IoT-Malware-Capture-20-1",
+    "CTU-Honeypot-Capture-4-1",
+    "CTU-Honeypot-Capture-5-1",
+    "CTU-IoT-Malware-Capture-35-1",
+    "CTU-IoT-Malware-Capture-43-1"
+  ],
+  "prepared_scenarios": [
+    "CTU-IoT-Malware-Capture-34-1",
+    "CTU-IoT-Malware-Capture-8-1",
+    "CTU-IoT-Malware-Capture-42-1",
+    "CTU-IoT-Malware-Capture-20-1",
+    "CTU-Honeypot-Capture-4-1",
+    "CTU-Honeypot-Capture-5-1"
+  ],
+  "experiment_ids": [
+    "DEV2-SEQ-001",
+    "DEV2-SITE-001",
+    "DEV2-ORIGIN-001",
+    "DEV2-FAMILY-001",
+    "DEV2-DANN-001"
+  ],
+  "reserved_final_environment": {
+    "scenario": "CTU-13 scenario 8",
+    "family": "rbot",
+    "status": "sealed",
+    "maximum_runs_per_locked_candidate": 1
+  },
+  "frozen_manifest": "configs/evaluation/frozen-evidence-v1.json",
+  "origin_diagnostic": {
+    "block_threshold": 0.9,
+    "requires_deduplication": true,
+    "requires_train_fit_only": true
+  },
+  "site_calibration": {
+    "approved_benign_only": true,
+    "attack_rows_allowed": false,
+    "human_approval_required": true,
+    "rollback_required": true
+  },
+  "sequence": {
+    "max_first_packets": 20,
+    "features": [
+      "signed_log1p_size",
+      "log1p_iat_ms",
+      "semantic_direction",
+      "normalized_position",
+      "padding_mask"
+    ],
+    "payloads_read": false,
+    "endpoint_identity_in_features": false
+  },
+  "objectives": {
+    "benign_fpr_max": 0.01,
+    "preferred_benign_fpr_max": 0.005,
+    "unseen_family_direct_recall_min": 0.5,
+    "unknown_detection_or_review_min": 0.8,
+    "known_recall_min": 0.9,
+    "ece_max": 0.1,
+    "catastrophic_environment_fpr_max": 0.05,
+    "single_flow_latency_ms_max": 10.0,
+    "batch_throughput_flows_per_second_min": 500.0
+  }
+}

@@ -756,3 +756,38 @@ the AegisFlow overlay through a bounded retry that re-runs only on the transient
 manifest application is declarative and converges on re-apply. Waiting for ephemeral
 job objects, deleting the webhook from the profile, or retrying every failure class
 unboundedly were rejected.
+
+## D-054 - Separate archive integrity from scientific and project acceptance
+
+The 2026-09-02 audit rejects the earlier blanket closure claim. HF1/HF2 retain C&C in
+fit, FAMILY/DANN share site captures with fitting, learned embeddings exceed the 0.90
+origin threshold, and per-run v2 provenance is incomplete. Preserve the old artifacts as
+historical observations and require corrected experiments before scientific acceptance.
+The final brief also requires deployed site-baseline activation and specific rollback
+drills. Track those as repository work in `docs/REQUIREMENTS_AUDIT.md`.
+
+Bind the v2 record with `configs/research-v2/protocol.json` and
+`configs/research-v2/evidence-manifest.json`; enforce the boundary through
+`scripts/verify_research_v2.py`, `make research-v2-check`, and the Python CI job. The
+manifest records publication provenance, six source hashes, five aggregate reports,
+and six row-level embedding archives. It is an integrity guard, not proof that the
+experiments obeyed their protocol. Text digests normalize only CRLF to LF so Windows
+and Linux verify the same Git content. Reconstructed policy metadata is dated when
+created; it must not imply a pre-experiment registration that did not exist. Preserve
+the user's pre-existing model-registry edits and all original report bytes.
+
+## D-055 - Enforce whole-label-family and calibration isolation before training
+
+HF1/HF2's historical malware-capture transfers are not held-family experiments. Corrected
+FAMILY rotations hold out each of C&C, DDoS and port scan, calibrate on hp4 benign rows,
+and use hp5 only for independent benign testing. The guard rejects held-family fitting,
+site-capture reuse, duplicated event IDs/observations, empty partitions and non-benign
+calibration. It allows other attack families from the same malware capture in fit:
+that is whole-family evaluation, not a claim of whole-environment exclusion.
+
+DANN's hp4 site pool is removed from fitting and testing; Mirai incidental benign
+performance is reported separately from site calibration. Seed Torch before construction,
+not just its data loader. Unknown binary labels must raise rather than become benign.
+FAMILY/DANN corrected diagnostics go to ignored, exclusive-create local files and remain
+unregistered until actual commit/data/split/configuration/cost provenance is supplied.
+No old metrics are reinterpreted as new results; final evaluations stay sealed.

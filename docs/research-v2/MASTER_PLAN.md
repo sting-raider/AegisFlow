@@ -2,6 +2,13 @@
 
 Date started: 2026-08-22.
 
+Audit correction (2026-09-02): this historical plan did not have an implemented v2
+archive verifier when its original experiments were published. The verifier and JSON
+archive policy were added retrospectively. Their presence does not prove pre-run
+registration or repair the partition/provenance defects in `../REQUIREMENTS_AUDIT.md`.
+The full 35-section final-phase brief remains authoritative; its scope and stop
+conditions are not narrowed by this research plan.
+
 ## Research question
 
 Can packet-sequence representations, protocol/connection-state semantics,

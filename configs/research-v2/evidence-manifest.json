@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "permitted_use": "development_only",
+  "publication_commit": "85a20367250475abe70da1da28b6ff672b7e8e59",
+  "scientific_status": "historical_unvalidated",
+  "run_provenance": "incomplete",
+  "text_hash_format": "sha256-utf8-lf",
+  "protocol": {
+    "path": "configs/research-v2/protocol.json",
+    "sha256": "d4fbe2bf65734127b43f75db219e9f51ac845c24cb892b17d31bc7df670b9ab0"
+  },
+  "pool_manifest": {
+    "path": "configs/research-v2/pool-hashes.json",
+    "sha256": "e830e477214afc51118ab24a80c4753aa528c3833345bbb5ed617a6cf59923ad"
+  },
+  "frozen_manifest": "configs/evaluation/frozen-evidence-v1.json",
+  "reserved_final_environment": "CTU-13 scenario 8",
+  "experiments": [
+    {
+      "experiment_id": "DEV2-SEQ-001",
+      "report_path": "docs/research-v2/experiments/dev2-sequence-crossenv-v1.json",
+      "report_sha256": "963a51ed36f2f5529eb545f79dfcef1772e801a632b7c838c16f61e7f88113ab",
+      "artifacts": [
+        {
+          "path": "docs/research-v2/experiments/R1_transfer_to_hakai-fusion_mlp_seq_plus_aggregate-embeddings.npz",
+          "sha256": "919b9252c2ec7b8735030ce5824bfa80679aa8c64bf1569dd135841c75b21b80"
+        },
+        {
+          "path": "docs/research-v2/experiments/R2_transfer_to_mirai-fusion_mlp_seq_plus_aggregate-embeddings.npz",
+          "sha256": "9199dfa27e43d60200b90a8bf50b70fb2a2b5cb2066deac9f5db0a5ff4137d45"
+        },
+        {
+          "path": "docs/research-v2/experiments/R1_transfer_to_hakai-sequence_cnn-embeddings.npz",
+          "sha256": "f36657bb35efb1183c7632a0e63d592f4b56457122ef4105d9a9833327a50be0"
+        },
+        {
+          "path": "docs/research-v2/experiments/R1_transfer_to_hakai-sequence_mlp-embeddings.npz",
+          "sha256": "bba0bd8dfc18520bc36f30ed30734d68edab3852fd374a1cf1ae200357f4b38c"
+        },
+        {
+          "path": "docs/research-v2/experiments/R2_transfer_to_mirai-sequence_cnn-embeddings.npz",
+          "sha256": "42b21bdfca90695b07067e67973d52e4e53406c1241259b7455927453e00fe07"
+        },
+        {
+          "path": "docs/research-v2/experiments/R2_transfer_to_mirai-sequence_mlp-embeddings.npz",
+          "sha256": "2ba0a8741737c5e3ba6b6384ebcc188113aa8fa25abf5d3e7083d3fef9cfb4a6"
+        }
+      ]
+    },
+    {
+      "experiment_id": "DEV2-SITE-001",
+      "report_path": "docs/research-v2/experiments/dev2-site-calibration-v1.json",
+      "report_sha256": "930c9a553747d7f4e8a5d5c327ef37531c4e0546a6c6abe5b5e4a9b20016c313",
+      "artifacts": []
+    },
+    {
+      "experiment_id": "DEV2-ORIGIN-001",
+      "report_path": "docs/research-v2/experiments/dev2-origin-diagnostic-v1.json",
+      "report_sha256": "b00d8c24273139fa36a81d5eb06639a698f58badc8dcdb51a9a2e88ea6af525f",
+      "artifacts": []
+    },
+    {
+      "experiment_id": "DEV2-FAMILY-001",
+      "report_path": "docs/research-v2/experiments/dev2-held-family-v1.json",
+      "report_sha256": "4994acbd1d2ef4e03d4794523422a6d6fde2ace9127a5dc1e03a4aef8dd0ce40",
+      "artifacts": []
+    },
+    {
+      "experiment_id": "DEV2-DANN-001",
+      "report_path": "docs/research-v2/experiments/dev2-domain-adversarial-v1.json",
+      "report_sha256": "72e0cb2ee4ae7d622844a7210f79d787cb32cff927ff636ca79ffe424a54bee9",
+      "artifacts": []
+    }
+  ]
+}
