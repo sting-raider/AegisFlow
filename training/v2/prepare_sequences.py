@@ -2,8 +2,9 @@
 
 Replays each official scenario capture through the same PcapAdapter the runtime uses,
 joins flows to the scenario's Zeek conn.log.labeled ground truth by unordered endpoint
-pair plus time overlap, and emits one JSONL record per labeled flow. No payload bytes
-are ever read; only sizes, directions, timings, and flag counts are retained.
+pair plus time overlap, and emits one JSONL record per unambiguously labeled flow.
+The packet parser reads captures; only sizes, directions, timings, and flag counts
+are retained in the prepared records, never packet payload contents.
 """
 
 from __future__ import annotations
@@ -31,6 +32,10 @@ OBSERVABILITY_PACKET_FLOOR = 2
 
 
 FlowJoinKey = tuple[tuple[str, int], tuple[str, int], str]
+
+
+class AmbiguousFlowLabel(ValueError):
+    """A coalesced flow overlaps incompatible ground-truth labels."""
 
 
 def endpoint_key(ip: str, port: int) -> tuple[str, int]:
@@ -104,6 +109,7 @@ def match_row(
 ) -> dict[str, Any] | None:
     best: dict[str, Any] | None = None
     best_gap: float | None = None
+    nearest: set[tuple[str, str]] = set()
     for candidate in index.get(key, ()):
         candidate_start = candidate["ts"]
         candidate_end = candidate_start + max(candidate["duration_s"], 0.0)
@@ -111,6 +117,11 @@ def match_row(
         if gap <= 1.0 and (best_gap is None or gap < best_gap):
             best = candidate
             best_gap = gap
+            nearest = {(str(candidate["label"]), str(candidate["family"]))}
+        elif gap <= 1.0 and gap == best_gap:
+            nearest.add((str(candidate["label"]), str(candidate["family"])))
+    if len(nearest) > 1:
+        raise AmbiguousFlowLabel("ambiguous ground-truth labels for coalesced flow")
     return best
 
 
@@ -160,6 +171,8 @@ def observability_tier(record: dict[str, Any]) -> str:
 
 
 def prepare_scenario(scenario: str, directory: Path, output_path: Path) -> dict[str, Any]:
+    if output_path.exists():
+        raise FileExistsError(f"refusing to overwrite prepared evidence: {output_path}")
     manifest = json.loads((directory / f"{scenario}.manifest.json").read_text(encoding="utf-8"))
     pcap_path = directory / str(manifest["pcap_filename"])
     labels_path = directory / f"{scenario}.conn.log.labeled"
@@ -167,11 +180,11 @@ def prepare_scenario(scenario: str, directory: Path, output_path: Path) -> dict[
         raise FileNotFoundError(f"scenario {scenario} is missing its pcap or labels")
     _, label_index = parse_zeek_labels(labels_path)
     adapter = PcapAdapter(pcap_path, sensor_id=f"v2-{scenario}")
-    matched = unmatched = unlabeled = 0
+    matched = unmatched = unlabeled = ambiguous = 0
     label_counts: Counter[str] = Counter()
     family_counts: Counter[str] = Counter()
     observability_counts: Counter[str] = Counter()
-    with output_path.open("w", encoding="utf-8") as output:
+    with output_path.open("x", encoding="utf-8", newline="\n") as output:
         for flow in adapter.flows():
             protocol = PROTOCOL_ALIASES.get(flow.protocol.upper())
             if protocol is None:
@@ -185,7 +198,11 @@ def prepare_scenario(scenario: str, directory: Path, output_path: Path) -> dict[
             )
             start = flow.timestamp_start.timestamp()
             end = max(flow.timestamp_end.timestamp(), start)
-            row = match_row(label_index, key, start, end)
+            try:
+                row = match_row(label_index, key, start, end)
+            except AmbiguousFlowLabel:
+                ambiguous += 1
+                continue
             if row is None:
                 if label_index.get(key):
                     unmatched += 1
@@ -205,6 +222,7 @@ def prepare_scenario(scenario: str, directory: Path, output_path: Path) -> dict[
         "records": matched,
         "matched_unlabeled_flows": unmatched,
         "flows_without_label_candidate": unlabeled,
+        "ambiguous_label_flows": ambiguous,
         "labels": dict(sorted(label_counts.items())),
         "families": dict(sorted(family_counts.items())),
         "observability": dict(sorted(observability_counts.items())),

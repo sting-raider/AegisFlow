@@ -7,10 +7,9 @@ Last updated: 2026-09-02 (local correction checks; historical acceptance through
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public commit `88ea3801886fd3b27563aab5f52a52d1272e2d80` passed ten CI jobs in
-`32635976457`; that run predates the newly added v2 archive verifier. Frozen data stays
-sealed. The previous goal turn made progress (implementation and 238 passing tests),
-but its completion claims were premature and are superseded by the current audit.
+Public correction commit `42ebfa63f9e31fb89f9f5c716117eea0453ae814` passed all ten
+CI jobs in `33656146066`, including the v2 archive verifier on Linux. Frozen data stays
+sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
 and local demo launch files. They are intentionally preserved and are not part of the
@@ -27,8 +26,19 @@ site rows in fitting. Corrected diagnostic outputs cannot overwrite historical r
 full registered experiments have not yet run. The backend suite passed 272 tests with
 84% coverage before adding two archive-overwrite entry-point regressions; all 39 focused
 archive/partition/seed/overwrite tests then passed. Ruff passed, MyPy passed 105 sources,
-and the frozen-v1/v1-research/v2-archive guards passed. Public CI for this milestone is
-pending; none of these checks grants scientific acceptance.
+and the frozen-v1/v1-research/v2-archive guards passed. Public CI for this milestone
+passed all ten jobs (`33656146066`); none of these checks grants scientific acceptance.
+
+The next correction adds clean-code preparation provenance. All six raw capture/label
+pairs verified against the committed source pins (521,359,051 PCAP bytes), with no
+frozen-source overlap. The legacy preparation summary listed only three captures.
+Synthetic regression also proved that conflicting interval-overlap labels selected the
+first candidate, possibly benign. Such joins now become counted ambiguous exclusions;
+preparation refuses existing outputs and emits stable LF files. A new verified pool
+must be regenerated before any corrected model run; old records/reports remain intact.
+Preparation milestone local verification: 287 tests passed in 111.90 seconds with
+84% backend coverage, Ruff passed, and strict MyPy passed 106 source files. The clean
+preparation run is pending; these tests do not establish model quality.
 
 A second research phase produced historical results on `codex/detector-v2` under
 `docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in

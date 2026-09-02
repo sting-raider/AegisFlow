@@ -791,3 +791,19 @@ not just its data loader. Unknown binary labels must raise rather than become be
 FAMILY/DANN corrected diagnostics go to ignored, exclusive-create local files and remain
 unregistered until actual commit/data/split/configuration/cost provenance is supplied.
 No old metrics are reinterpreted as new results; final evaluations stay sealed.
+
+## D-056 - Bind preparation to executed clean code and reject ambiguous labels
+
+The historical summary covers only three of the six prepared scenarios. Do not infer
+the preparation commit from a publication commit or merely stamp the existing rows.
+Regenerate into a new ignored evidence directory from an isolated clean Git worktree,
+verify every PCAP/label pair against the pinned pool before and after replay, record
+the executed commit and environment, and bind every output file and count. This keeps
+the user's uncommitted model/demo files untouched without weakening the clean-code gate.
+
+A synthetic regression shows the old interval join chooses the first label when a
+coalesced five-tuple spans contradictory ground truth. Reject and count such ambiguous
+joins instead of choosing benign or a convenient family. Same-label overlap is retained;
+this is still a coalesced-flow research representation, not per-Zeek-connection parity.
+Use exclusive creation for prepared evidence. Incompatible JSONL rows must be visible
+errors, not silently skipped. No final acceptance data enters this preparation.

@@ -11,7 +11,7 @@ import json
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import numpy as np
 
@@ -97,11 +97,19 @@ class SequenceRecord(TypedDict):
 def load_records(paths: Iterable[Path]) -> list[SequenceRecord]:
     records: list[SequenceRecord] = []
     for path in paths:
-        for line in path.read_text(encoding="utf-8").splitlines():
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             if line.strip():
                 record = json.loads(line)
-                if isinstance(record, dict):
-                    records.append(record)  # type: ignore[arg-type]
+                if (
+                    not isinstance(record, dict)
+                    or set(record) != set(SequenceRecord.__annotations__)
+                ):
+                    raise ValueError(f"incompatible prepared row schema: {path.name}:{number}")
+                if record["binary_label"] not in {"benign", "malicious"}:
+                    raise ValueError(f"unreviewed prepared row label: {path.name}:{number}")
+                if (record["binary_label"] == "benign") != (record["family"] == "benign"):
+                    raise ValueError(f"inconsistent prepared family/label: {path.name}:{number}")
+                records.append(cast(SequenceRecord, record))
     return records
 
 

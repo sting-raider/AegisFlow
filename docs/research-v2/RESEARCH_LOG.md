@@ -208,3 +208,25 @@ Corrected FAMILY/DANN outputs are exclusive-create local diagnostics under ignor
 `data/research_v2_corrected/`; they have not been executed or admitted for selection.
 Next: register full corrected-run provenance, verify deterministic costs and metrics,
 then evaluate. Deployed site-baseline and acceptance-drill gaps remain separate work.
+
+## MR2-008 - Reproducible preparation and ambiguous ground truth
+
+Date: 2026-09-02. Status: implementation verified; clean replay pending.
+
+The published integrity correction (`42ebfa6`) passed all ten CI jobs in run
+`33656146066`. The next provenance audit found the historical preparation summary
+covered only three of the six local JSONL files. All six raw PCAP/label pairs match
+the committed source pins (521,359,051 PCAP bytes), and none matches frozen sources.
+
+Synthetic regression reproduced first-candidate selection when a coalesced flow spans
+conflicting benign/attack labels. The join now rejects and counts ambiguity; same-label
+overlap remains supported. Prepared files use exclusive creation and stable LF output.
+The new preparation command verifies source bytes before/after replay and records the
+clean execution commit, environment, all six file hashes, and aggregate exclusion counts.
+Its loader rejects incomplete manifests, changed files, undeclared sources and malformed
+rows. Partition provenance hashes ordered IDs/content without publishing per-row IDs.
+
+Local verification: 287 backend tests passed, 84% coverage, Ruff passed and MyPy passed
+106 source files. Fresh preparation will run from a detached clean worktree so the user's
+local model/demo changes do not enter its execution provenance. No model experiment or
+frozen-final test has been run in this correction.
