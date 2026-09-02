@@ -33,6 +33,9 @@ def flatten_sequence(sequence: np.ndarray, mask: np.ndarray) -> np.ndarray:
 def main() -> None:
     sequence_dir = Path("data/sequences_v2")
     output_dir = Path("docs/research-v2/experiments")
+    report_path = output_dir / "dev2-origin-diagnostic-v1.json"
+    if report_path.exists():
+        raise ValueError("historical origin evidence exists; use a new registered experiment")
     records = deduplicate_records(load_records(sorted(sequence_dir.glob("*.jsonl"))))
     dataset = build_dataset(records)
     scenarios = np.asarray(dataset.scenario)
@@ -90,8 +93,8 @@ def main() -> None:
         representation_results[name] = entry
         print(name, entry, flush=True)
 
-    report_path = output_dir / "dev2-origin-diagnostic-v1.json"
-    report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    with report_path.open("x", encoding="utf-8") as stream:
+        stream.write(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print(f"wrote {report_path}")
 
 

@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV2-ORIGIN-002",
+  "registered_date": "2026-09-02",
+  "status": "registered_not_run",
+  "permitted_use": "development_only",
+  "candidate_promotion_authorized": false,
+  "protocol": {"path": "docs/research-v2/ORIGIN_002_PROTOCOL.md", "sha256": "cd09e87d54c1bd8004bae740057d47cb4b76f5277bafcce1f2ab54b2d7231efc"},
+  "preparation": {
+    "path": "docs/research-v2/preparation/prepared-pool-cba2329.json",
+    "sha256": "332939033261e67a41dd15f8c95edf54e4dd4fd1723e636c9e3c53f93c71f86a"
+  },
+  "encoder_report": {
+    "path": "docs/research-v2/registered-results/DEV2-FAMILY-002.json",
+    "sha256": "6c1e2d5a576cb7c7afde9968151665f2e3afb64e0d7a737da17cb332dcadde73",
+    "execution_commit": "365903128b0db36128e0846960a89b72fe8a7a74",
+    "artifacts": ["c_and_c_site_1.npz", "ddos_site_1.npz", "port_scan_site_1.npz"]
+  },
+  "input": {
+    "benign_only": true,
+    "require_encoder_fit_disjoint": true,
+    "scenarios": ["CTU-Honeypot-Capture-4-1", "CTU-Honeypot-Capture-5-1", "CTU-IoT-Malware-Capture-20-1"],
+    "expected_counts": [181, 181, 30],
+    "deduplication": "shared_sequence_mask_aggregate_then_group_each_evaluated_view"
+  },
+  "views": ["aggregate", "numerical_core", "sequence_mask", "sequence_aggregate", "missingness_only", "embedding_c_and_c", "embedding_ddos", "embedding_port_scan"],
+  "transforms": ["standard", "robust", "clip_robust", "quantile_normal"],
+  "transformation": {"clip_quantiles": [0.01, 0.99], "quantile_count": 100, "scale_floor": 1e-9, "fit_only": true, "preserve_categorical_binary": true},
+  "probe": {"class": "LogisticRegression", "C": 1.0, "class_weight": "balanced", "solver": "lbfgs", "max_iter": 3000},
+  "validation": {"folds": 5, "splitter": "StratifiedGroupKFold", "shuffle": true, "grouping": "exact_float64_view_bytes", "require_all_origins_each_partition": true, "reject_transformed_overlap": true, "ineligible_action": "report_not_change_split", "block_threshold": 0.90},
+  "execution": {"seed": 20260902, "torch_threads": 1, "require_clean_worktree": true},
+  "measurement": {"scope": "prebuilt_view_transform_and_origin_probe_predict", "batch_sizes": [1, 128], "warmups": 10, "repetitions": 100, "rss_sampling_ms": 10},
+  "forbidden_uses": ["detector_training", "candidate_selection", "production_promotion", "frozen_evaluation", "per_row_export"]
+}

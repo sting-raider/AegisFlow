@@ -836,3 +836,18 @@ rerun to find a favorable seed, or treat this development rejection as the brief
 Outcome B. Next research must address benign-site diversity, effective held-family sample
 support, learned-embedding origin leakage and the remaining representation ablations.
 The deployed approved-baseline and specific failure-drill requirements remain open.
+
+## D-059 - Audit origin on benign captures excluded from encoder fitting
+
+Preregister `DEV2-ORIGIN-002` against the immutable FAMILY-002 artifacts. Use only benign
+hp4/hp5/20-1 rows (181/181/30), none present in encoder fitting. This controls attack
+prevalence and encoder exposure while testing the observed site sensitivity. Compare
+eight declared raw/ablated/frozen-embedding views and four train-fold-only numeric
+transforms. Group exact evaluated vectors so repeats never cross probe folds; preserve
+cross-origin ambiguity, and report infeasible grouped folds instead of changing the split.
+All transformations preserve binary/categorical dimensions. No detector is retrained or
+candidate selected, and this narrow origin probe cannot prove cross-domain detection.
+
+During this audit, a regression showed the legacy origin CLI could reach data loading
+before noticing an existing historical report. Add early refusal and exclusive creation,
+as for the other archived entry points. Preserve the old report bytes.

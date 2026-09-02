@@ -73,6 +73,11 @@ Ruff and strict MyPy (109 sources) passed, all historical/frozen guards passed, 
 new registered-report guard verified all six local numeric model artifacts. The public
 report contains aggregate evidence only; raw rows and model weights remain ignored.
 
+Next registered study: `DEV2-ORIGIN-002` fixes three encoder-independent benign captures
+(392 rows), eight representation views, four train-fold transformations, and five-fold
+exact-vector-grouped origin probes. Registration precedes execution; results are pending.
+The legacy origin CLI's missing archive-overwrite guard is reproduced and corrected.
+
 A second research phase produced historical results on `codex/detector-v2` under
 `docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in
 `docs/research-v2/RESEARCH_LOG.md`). Packet-sequence representation shipped in

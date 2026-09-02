@@ -31,3 +31,24 @@ def test_corrected_family_registration_binds_protocol_preparation_and_six_rotati
     manifest = json.loads((root / registration["prepared_manifest"]["path"]).read_text())
     assert len(manifest["scenarios"]) == 6
     assert sum(scenario["records"] for scenario in manifest["scenarios"]) == 7145
+
+
+def test_origin_registration_binds_fixed_models_independent_sites_and_complete_matrix() -> None:
+    root = Path(__file__).resolve().parents[2]
+    config = json.loads(
+        (root / "configs/research-v2/registered/DEV2-ORIGIN-002.json").read_text(encoding="utf-8")
+    )
+    for name in ("protocol", "preparation", "encoder_report"):
+        binding = config[name]
+        content = (root / binding["path"]).read_bytes().replace(b"\r\n", b"\n")
+        assert hashlib.sha256(content).hexdigest() == binding["sha256"]
+    assert sum(config["input"]["expected_counts"]) == 392
+    assert len(config["views"]) == 8
+    assert len(config["transforms"]) == 4
+    assert config["validation"]["folds"] == 5
+    assert config["validation"]["block_threshold"] == 0.90
+    report = json.loads((root / config["encoder_report"]["path"]).read_text())
+    for rotation in report["rotations"]:
+        assert not set(config["input"]["scenarios"]) & set(
+            rotation["partition_provenance"]["fit"]["scenarios"]
+        )
