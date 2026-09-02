@@ -6,6 +6,12 @@ fit/calibration overlap; HF1/HF2 are not whole-family holdouts; actual execution
 provenance and performance artifacts are incomplete. See `../REQUIREMENTS_AUDIT.md`.
 The original JSON/NPZ bytes are retained, not silently replaced by corrected runs.
 
+Corrected evidence is now separate: [DEV2-FAMILY-002](registered-results/DEV2-FAMILY-002.md)
+completed six preregistered strict-family/site rotations from clean code `3659031`.
+It remains a development NO-GO (zero C&C/DDoS detection-or-review, worst independent
+benign FPR 47.51%). This does not rehabilitate the historical experiments below or
+establish the full final-phase stop condition.
+
 Date: 2026-08-22. Branch `codex/detector-v2`. Development evidence only; the v1 frozen
 reports were never queried and remain sealed.
 

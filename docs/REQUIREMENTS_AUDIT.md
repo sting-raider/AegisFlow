@@ -45,7 +45,9 @@ validity or full-project completion.
    three distinct inputs. Exact sequence/mask/aggregate deduplication is now regression
    tested (6,674 unique inputs). Percentile cuts also violated budgets with tied scores;
    exact tie-aware cuts are tested. Fresh clean-code preparation is complete and bound
-   in `DEV2-FAMILY-002`; its registered six-rotation execution is still pending.
+   in `DEV2-FAMILY-002`; its registered six-rotation execution completed from clean
+   code `3659031`. All six outcomes are preserved as a development NO-GO; none authorizes
+   final evaluation or model promotion. See `research-v2/registered-results/`.
 
 ## Requirement-by-requirement status
 
@@ -56,19 +58,19 @@ validity or full-project completion.
 |---|---|---|
 | 1. Autonomous execution | Progress, decisions, research logs; committed milestones | Ongoing; keep incomplete work explicit |
 | 2. Frozen boundary | Frozen manifest, `verify_frozen_evidence`, tests | Verified for four retained reports; no new final run authorized |
-| 3. New development pool | v1 pool/provenance; v2 PCAP hashes/preparation | Partial: v2 per-run prepared-data/split provenance must be bound |
+| 3. New development pool | v1 pool/provenance; v2 PCAP hashes/preparation | Clean v2 preparation and FAMILY-002 splits bound; tiny deduplicated DDoS/scan support remains a limitation |
 | 4. Two feature schemas | `packages/features/research.py`, parity/state tests | Shared A/B implementation present; runtime activation depends on selection (§18) |
 | 5. Numeric representation | Research transforms and origin diagnostics | Partial: v2 learned-embedding leakage must be included; comparison coverage to audit |
 | 6. Baselines | DEV-SUP/ANO reports, model configs | v1 comparisons retained; v2 reproducibility/cost evidence incomplete |
-| 7. Open-set representation | v2 fusion embeddings/Mahalanobis | Implemented experimentally; rerun under corrected partition protocol |
+| 7. Open-set representation | v2 fusion embeddings/Mahalanobis | Corrected FAMILY-002 fails; learned-origin/representation comparisons remain incomplete |
 | 8. Unknown vs uncertainty | Runtime fusion/reason codes, separate v2 channels | Runtime baseline tested; v2 claims require corrected evidence |
 | 9. Site baseline workflow | Research quantiles; existing model governance | Incomplete deployed observation/approval/activation/rollback workflow |
-| 10. Operational budgets | Threshold curves and workload fields in v1 reports | Partial; independent v2 benign validation and union-of-channels FPR needed |
+| 10. Operational budgets | v1 curves; v2 exact union budgets and independent benign results | FAMILY-002 measured: worst independent FPR 47.51%; objectives fail, no deployment claim |
 | 11. Development error analysis | `docs/error_analysis/`, DEV-ERR | v1 retained; v2 scientific/provenance audit requires correction |
 | 12. Ablations | DEV-HYB and v2 comparison reports | Partial; strict-family and no-domain-leakage comparisons unresolved |
-| 13. Whole-family holdouts | v1 held-family harness; v2 HF1/HF2/HF3 | v2 HF1/HF2 mislabelled; enforce family and row disjointness |
+| 13. Whole-family holdouts | v1 harness; corrected FAMILY-002 six rotations | Corrected exclusion/row checks executed; 4,710 C&C, 7 DDoS, 4 scan inputs; negative and sample-limited |
 | 14. Cross-environment evaluation | v1 rotations; v2 cross-capture results | Partial; site overlap and raw-vs-embedding diagnostics must be explicit |
-| 15. Strict experiment registry | v1 experiment registry; new v2 integrity manifest | Partial; v2 publication hashes do not reconstruct missing run metadata |
+| 15. Strict experiment registry | v1 registry; historical v2 archive; corrected FAMILY-002 | FAMILY-002 has actual clean code/data/split/config/cost/artifact provenance; other historical v2 runs remain incomplete |
 | 16. Final frozen acceptance | Four historical smoke rejection reports | Conditional: no eligible locked challenger, no new final test |
 | 17. Acceptance decision | v1 development NO-GO | Development rejection valid; final brief stop condition not yet proved |
 | 18. Selected-model runtime integration | Shared representations | Conditional on selecting a challenger; none selected |
@@ -92,10 +94,12 @@ validity or full-project completion.
 
 ## Next implementation order
 
-1. Make the v2 archive guard portable, distinguish archive integrity from validity, and
-   add executable split/whole-family checks before generating replacement experiments.
-2. Register corrected runs with actual code/data/split/configuration fingerprints and
-   measured costs; preserve all historical negatives and keep final data sealed.
+1. Complete the remaining learned-embedding origin diagnostic, numeric/missingness and
+   representation ablations, and registered cross-environment comparisons. FAMILY-002
+   has corrected provenance but fails development gates and has tiny effective samples
+   for two families; do not reuse the old unvalidated results as replacement evidence.
+2. Use those development results to choose a defensible next representation/data study.
+   Preserve all negatives and keep final data sealed until an eligible challenger is locked.
 3. Implement approved site-baseline activation and complete the specific failure/rollback
    and partitioning drills. Reconcile this matrix against their actual outputs.
 4. Publish a green milestone, then issue a final verdict only when the brief's complete

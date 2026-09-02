@@ -822,3 +822,17 @@ Actual sequence/mask/aggregate deduplication yields 6,674 inputs with no contrad
 labels, versus 6,671 from the old fingerprint. Reject true identical-input conflicts.
 Register the exact protocol and clean preparation manifest before corrected execution;
 do not reinterpret legacy diagnostics as registered runs. Models stay local and unpromoted.
+
+## D-058 - Preserve the corrected strict-family negative result without retuning
+
+`DEV2-FAMILY-002` ran all six preregistered rotations from clean code `3659031`.
+C&C and DDoS have zero detection/review; worst independent benign FPR is 47.51%.
+Port-scan results involve only four distinct inputs, with known-channel detections
+separated from direct unknown recall. Same-family artifacts are identical across site
+orientations, isolating calibration-site sensitivity from model reinitialization noise.
+
+Preserve the full report and numeric artifact hashes. Do not alter the declared budgets,
+rerun to find a favorable seed, or treat this development rejection as the brief's final
+Outcome B. Next research must address benign-site diversity, effective held-family sample
+support, learned-embedding origin leakage and the remaining representation ablations.
+The deployed approved-baseline and specific failure-drill requirements remain open.

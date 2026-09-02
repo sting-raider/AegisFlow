@@ -324,3 +324,23 @@ aware float32 isolation before any model run. Actual held counts are 4,710 C&C, 
 and 4 port scan; site calibration and independent benign tests each contain 181 rows.
 The driver, not the registration file, records subsequent execution status separately.
 See `docs/research-v2/REGISTERED_RUNNER.md`. Clean model execution remains pending.
+
+## MR-011 - Corrected strict-family matrix completed: development NO-GO
+
+2026-09-02, clean execution `365903128b0db36128e0846960a89b72fe8a7a74`, 51.472 seconds.
+All six fixed rotations completed. C&C and DDoS detection/review are zero; port-scan
+direct unknown recall is 0/4 or 2/4 depending on site orientation (all four detected).
+Independent benign FPR ranges 0–47.51% over 181 inputs per site. Counts, uncertainty,
+exact thresholds, four-verdict outputs, config/data/split provenance, measured latency,
+sampled RSS and local numeric artifact hashes are retained in
+`docs/research-v2/registered-results/DEV2-FAMILY-002.json`; SHA-256 (UTF-8 LF)
+`6c1e2d5a576cb7c7afde9968151665f2e3afb64e0d7a737da17cb332dcadde73`.
+No site row entered fitting, all post-preprocessing inputs are disjoint, and duplicate
+same-family fits have identical model artifact hashes. See the development-only error
+analysis `docs/error_analysis/dev2-family-002.md`. No new final evaluation, model lock,
+promotion, or blanket project-completion claim is supported.
+
+Publication verification: 325 tests passed in 50.68 seconds, 84% backend coverage,
+Ruff passed, MyPy passed 109 sources, and all four evidence guards passed, including
+local numeric model arrays/hash checks. Runner commit CI `33661356302` passed ten jobs;
+CI for the subsequent aggregate publication will be recorded after it actually finishes.

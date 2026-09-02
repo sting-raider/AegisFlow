@@ -7,8 +7,8 @@ Last updated: 2026-09-02 (local correction checks; historical acceptance through
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public preregistration commit `9be53062a87e96bc60201beb0e78fbb4c6419244` passed
-CI in `33660136484`, including the v2 archive verifier on Linux. Frozen data stays
+Public runner commit `365903128b0db36128e0846960a89b72fe8a7a74` passed all ten
+CI jobs in `33661356302`, including the v2 archive verifier on Linux. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
@@ -23,7 +23,7 @@ now discloses retrospective registration and incomplete execution provenance. Ad
 strict family/partition assertions, independent benign testing, deterministic Torch
 initialization, and rejection of invalid training labels. FAMILY/DANN no longer reuse
 site rows in fitting. Corrected diagnostic outputs cannot overwrite historical reports;
-full registered experiments have not yet run. The backend suite passed 272 tests with
+full registered experiments had not yet run at that milestone. The backend suite passed 272 tests with
 84% coverage before adding two archive-overwrite entry-point regressions; all 39 focused
 archive/partition/seed/overwrite tests then passed. Ruff passed, MyPy passed 105 sources,
 and the frozen-v1/v1-research/v2-archive guards passed. Public CI for this milestone
@@ -59,7 +59,19 @@ All six real-data partitions pass both raw-input and preprocessed-float32 isolat
 held attack counts are 4,710 C&C, 7 DDoS and 4 port scan, with 181 rows per independent
 benign site. The small counts remain a research limitation. Local verification passed
 317 tests in 87.73 seconds, 84% backend coverage, Ruff, and MyPy over 108 sources.
-Clean registered execution and measured results are pending. No model is selected.
+Clean execution then completed all six registered rotations from `3659031` in 51.472
+seconds. C&C and DDoS direct detection/review are zero in both site orientations; port
+scan is detected but has only four distinct inputs. Worst independent benign FPR is
+47.51%; direct unknown recall is zero in five rotations and 50% (2/4) in one. The result
+is a development NO-GO, not final acceptance. Aggregate report and reproducible table:
+`docs/research-v2/registered-results/DEV2-FAMILY-002.{json,md}`; analysis:
+`docs/error_analysis/dev2-family-002.md`. All model artifacts remain local, checked by
+hash/size/numeric arrays; same-family seeded model hashes match across site orientations.
+No model is selected. Learned-embedding origin/ablation work and operational gaps remain.
+Publication verification: 325 tests passed in 50.68 seconds with 84% backend coverage,
+Ruff and strict MyPy (109 sources) passed, all historical/frozen guards passed, and the
+new registered-report guard verified all six local numeric model artifacts. The public
+report contains aggregate evidence only; raw rows and model weights remain ignored.
 
 A second research phase produced historical results on `codex/detector-v2` under
 `docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in

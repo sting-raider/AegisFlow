@@ -11,8 +11,10 @@ failed-migration drills. Earlier Outcome-B closure claims are superseded. No mod
 approved for production.
 
 The 2026-09-02 preparation correction now has clean-code evidence for all six captures
-and a preregistered strict-family matrix. Corrected model execution is still pending;
-passing regression tests and registered plans do not close the final acceptance scope.
+and a completed preregistered six-rotation strict-family matrix. The corrected experiment
+still fails development objectives: zero C&C/DDoS detection-or-review and worst independent
+benign FPR 47.51%. This is not the final frozen acceptance matrix and does not close the
+remaining research, approved-site workflow, or failure/partitioning acceptance scope.
 
 This is not a claim of universal production readiness. Organizational IdP, managed data
 services, multi-host/target-cluster capacity, registry signing, penetration testing, and

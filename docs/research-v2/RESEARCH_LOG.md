@@ -230,3 +230,21 @@ Local verification: 287 backend tests passed, 84% coverage, Ruff passed and MyPy
 106 source files. Fresh preparation will run from a detached clean worktree so the user's
 local model/demo changes do not enter its execution provenance. No model experiment or
 frozen-final test has been run in this correction.
+
+## MR2-009 - Corrected registered family experiment completed
+
+2026-09-02. Clean preparation `cba2329` completed six captures in 335.003 seconds,
+producing 7,145 rows (6,674 exact sequence/mask/aggregate inputs), with zero ambiguous
+joins. The immutable registration was published as `9be5306`; the actual runner
+executed from clean commit `3659031` and completed six rotations in 51.472 seconds.
+All source/prepared/config checks passed before/after execution; all partitions also
+passed actual preprocessed-float32 isolation. Same-family model hashes match across sites.
+
+Outcome: development NO-GO. C&C (4,710) and DDoS (7) have zero detection/review in both
+orientations. Port scan (4) has 100% detection but direct unknown recall of 0% or 50%.
+Worst independent benign FPR is 47.51% (181 test rows per site). See
+`registered-results/DEV2-FAMILY-002.{json,md}` and `../error_analysis/dev2-family-002.md`.
+Costs, four-verdict counts, exact cuts, uncertainty, split digests, environment and
+numeric artifact hashes are retained. This is not a final locked-candidate rejection;
+the original brief's complete stop condition, origin/ablation work and operational
+acceptance remain open. No thresholds changed, model promoted, or final dataset queried.
