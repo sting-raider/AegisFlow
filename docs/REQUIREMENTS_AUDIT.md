@@ -41,6 +41,11 @@ validity or full-project completion.
 8. `FusionNet` combines sequence and portable aggregate tensors, not the separate TCP
    connection-state tensor. Earlier architecture prose overstated the trained model's
    inputs. Corrected experiment metadata must record the exact representation used.
+9. The old deduplication fingerprint omitted aggregate service features and collapsed
+   three distinct inputs. Exact sequence/mask/aggregate deduplication is now regression
+   tested (6,674 unique inputs). Percentile cuts also violated budgets with tied scores;
+   exact tie-aware cuts are tested. Fresh clean-code preparation is complete and bound
+   in `DEV2-FAMILY-002`; its registered six-rotation execution is still pending.
 
 ## Requirement-by-requirement status
 

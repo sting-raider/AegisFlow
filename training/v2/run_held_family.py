@@ -19,6 +19,7 @@ import numpy as np
 import torch
 from torch import Tensor
 
+from training.v2.calibration import threshold_for_fpr
 from training.v2.models import FusionNet
 from training.v2.partitions import assert_strict_family_rotation
 from training.v2.run_cross_environment import (
@@ -177,8 +178,8 @@ def run_rotation(
     site_ood = mahalanobis_distances(
         embeddings_of(site_dataset), ood_center, ood_inverse
     )
-    threshold_score = float(np.quantile(site_scores, SITE_PERCENTILE))
-    threshold_ood = float(np.quantile(site_ood, SITE_PERCENTILE))
+    threshold_score = threshold_for_fpr(site_scores, round(1.0 - SITE_PERCENTILE, 5))
+    threshold_ood = threshold_for_fpr(site_ood, round(1.0 - SITE_PERCENTILE, 5))
 
     held_scores = scores_of(held_dataset)
     held_labels = held_dataset.binary_label
@@ -223,8 +224,8 @@ def run_rotation(
             "fit_families": sorted({str(f) for f in fit_dataset.family}),
         },
         "thresholds": {
-            "known_channel_site_p99": round(threshold_score, 6),
-            "ood_channel_site_p99": round(threshold_ood, 5),
+            "known_channel_site_p99": threshold_score,
+            "ood_channel_site_p99": threshold_ood,
         },
         "held_family_channels": by_family,
         "independent_benign_test": {

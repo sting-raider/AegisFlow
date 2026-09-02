@@ -1,0 +1,182 @@
+{
+  "completed_at": "2026-09-02T16:58:22.894766+00:00",
+  "elapsed_seconds": 335.0030894000083,
+  "environment": {
+    "machine": "AMD64",
+    "platform": "Windows",
+    "python": "3.12.9",
+    "scapy": "2.6.1"
+  },
+  "join_policy": "unordered_endpoints_protocol_interval_gap_le_1s_reject_conflicting_ties",
+  "limitations": [
+    "PCAP adapter coalesces each canonical five-tuple over the capture.",
+    "Unmatched and ambiguously labelled flows are excluded and counted.",
+    "Public ground-truth labels are research labels, not site operator approval.",
+    "Only derived metadata is emitted; payload contents and addresses are not stored."
+  ],
+  "permitted_use": "development_only",
+  "preparation_code_commit": "cba2329f512f694e067b9d47c7c0e1a5ffb48366",
+  "scenarios": [
+    {
+      "ambiguous_label_flows": 0,
+      "families": {
+        "benign": 193
+      },
+      "flows_without_label_candidate": 245,
+      "labels": {
+        "benign": 193
+      },
+      "labels_sha256": "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e",
+      "labels_size_bytes": 61653,
+      "matched_unlabeled_flows": 0,
+      "observability": {
+        "HIGH": 89,
+        "LOW": 1,
+        "MEDIUM": 103
+      },
+      "output_sha256": "5604c804d083d253a35fa63a98336b57c138be952f3311f8e67bab12f4d8c5a9",
+      "pcap_sha256": "3fb775c0391b6ad313a3f7845e634a277b07c3f6377346c2486ba63e1c22e90c",
+      "pcap_size_bytes": 4594492,
+      "prepared_file": "CTU-Honeypot-Capture-4-1.jsonl",
+      "prepared_size_bytes": 118685,
+      "records": 193,
+      "scenario": "CTU-Honeypot-Capture-4-1"
+    },
+    {
+      "ambiguous_label_flows": 0,
+      "families": {
+        "benign": 273
+      },
+      "flows_without_label_candidate": 532,
+      "labels": {
+        "benign": 273
+      },
+      "labels_sha256": "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262",
+      "labels_size_bytes": 182147,
+      "matched_unlabeled_flows": 0,
+      "observability": {
+        "HIGH": 146,
+        "LOW": 93,
+        "MEDIUM": 34
+      },
+      "output_sha256": "28f7d06d40fe51f733c2568eda739e4c4c908cd5f28ed9ba58cd3ce886d28f8f",
+      "pcap_sha256": "f6c2a4808a3fc3d7c01ae7656f1b341a1c7338bcd4d5a371f96280035efcbf79",
+      "pcap_size_bytes": 381382656,
+      "prepared_file": "CTU-Honeypot-Capture-5-1.jsonl",
+      "prepared_size_bytes": 176721,
+      "records": 273,
+      "scenario": "CTU-Honeypot-Capture-5-1"
+    },
+    {
+      "ambiguous_label_flows": 0,
+      "families": {
+        "benign": 37,
+        "other_attack": 7
+      },
+      "flows_without_label_candidate": 586,
+      "labels": {
+        "benign": 37,
+        "malicious": 7
+      },
+      "labels_sha256": "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711",
+      "labels_size_bytes": 419604,
+      "matched_unlabeled_flows": 0,
+      "observability": {
+        "HIGH": 29,
+        "LOW": 8,
+        "MEDIUM": 7
+      },
+      "output_sha256": "0f8267437fd2a36de34c531eebe4d65a9c7cb9d4ddee6ad70f9e6f65fade06da",
+      "pcap_sha256": "4d0a00c33a4bf11228158baddd47c38f702731ea8d75ef1201061fc8bbd878b9",
+      "pcap_size_bytes": 4057401,
+      "prepared_file": "CTU-IoT-Malware-Capture-20-1.jsonl",
+      "prepared_size_bytes": 31216,
+      "records": 44,
+      "scenario": "CTU-IoT-Malware-Capture-20-1"
+    },
+    {
+      "ambiguous_label_flows": 0,
+      "families": {
+        "benign": 92,
+        "c_and_c": 2655,
+        "ddos": 211,
+        "port_scan": 106
+      },
+      "flows_without_label_candidate": 1598,
+      "labels": {
+        "benign": 92,
+        "malicious": 2972
+      },
+      "labels_sha256": "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e",
+      "labels_size_bytes": 2926718,
+      "matched_unlabeled_flows": 0,
+      "observability": {
+        "HIGH": 2695,
+        "LOW": 357,
+        "MEDIUM": 12
+      },
+      "output_sha256": "4fe3d73ef1d33c6aea6eb342e2de032dfbf12f8b0267feaa3c97e053dcb5ad70",
+      "pcap_sha256": "92ec7e2f6658ee4b007d0b816986c46cc0338bc5e2bec6ceaaca566c695e4699",
+      "pcap_size_bytes": 126317980,
+      "prepared_file": "CTU-IoT-Malware-Capture-34-1.jsonl",
+      "prepared_size_bytes": 1957960,
+      "records": 3064,
+      "scenario": "CTU-IoT-Malware-Capture-34-1"
+    },
+    {
+      "ambiguous_label_flows": 0,
+      "families": {
+        "benign": 1507
+      },
+      "flows_without_label_candidate": 1665,
+      "labels": {
+        "benign": 1507
+      },
+      "labels_sha256": "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa",
+      "labels_size_bytes": 585829,
+      "matched_unlabeled_flows": 0,
+      "observability": {
+        "HIGH": 1496,
+        "LOW": 7,
+        "MEDIUM": 4
+      },
+      "output_sha256": "e5c69536562382339b795cb65e57ac6b3dfad6ee36f06d3394a5e9a617354c3c",
+      "pcap_sha256": "7573797f17aae96e3804a3cfb22d531b74c17bbae740de1e14048f89130fba37",
+      "pcap_size_bytes": 2908160,
+      "prepared_file": "CTU-IoT-Malware-Capture-42-1.jsonl",
+      "prepared_size_bytes": 1116448,
+      "records": 1507,
+      "scenario": "CTU-IoT-Malware-Capture-42-1"
+    },
+    {
+      "ambiguous_label_flows": 0,
+      "families": {
+        "benign": 8,
+        "c_and_c": 2056
+      },
+      "flows_without_label_candidate": 0,
+      "labels": {
+        "benign": 8,
+        "malicious": 2056
+      },
+      "labels_sha256": "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a",
+      "labels_size_bytes": 1431000,
+      "matched_unlabeled_flows": 0,
+      "observability": {
+        "HIGH": 2062,
+        "LOW": 2
+      },
+      "output_sha256": "7ed23ba996a7d9461198da856495f9976351ac976e8d9d2058b6bafa629628f8",
+      "pcap_sha256": "80dcc2602519479ddcde889fa902fee19a76696630811452f8df38888af894f2",
+      "pcap_size_bytes": 2098362,
+      "prepared_file": "CTU-IoT-Malware-Capture-8-1.jsonl",
+      "prepared_size_bytes": 1370376,
+      "records": 2064,
+      "scenario": "CTU-IoT-Malware-Capture-8-1"
+    }
+  ],
+  "schema_version": "2.0.0",
+  "sequence_capacity": 20,
+  "source_pool_sha256_canonical": "d60187e74964e0666c876faafc3a908e6e1048b67ec97779eed2ef092623e74e",
+  "started_at": "2026-09-02T16:52:47.893210+00:00"
+}

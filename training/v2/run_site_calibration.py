@@ -27,6 +27,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 from torch import Tensor
 
+from training.v2.calibration import threshold_for_fpr
 from training.v2.models import FusionNet, SequenceCNN, SequenceMLP
 from training.v2.run_cross_environment import (
     BATCH_SIZE,
@@ -69,7 +70,7 @@ def evaluate_at_threshold(
             "recall": round(float(predictions[rows].mean()), 5) if rows.any() else 0.0,
         }
     return {
-        "threshold": round(float(threshold), 6),
+        "threshold": float(threshold),
         "benign_fpr": round(float(predictions[benign].mean()), 5) if benign.any() else 0.0,
         "malicious_recall": round(float(predictions[malicious].mean()), 5)
         if malicious.any()
@@ -89,8 +90,9 @@ def site_recall_curve(
 ) -> dict[str, float | int | object]:
     """Recall when the threshold is a quantile of target-site approved benign scores.
 
-    Reporting contract: ``nominal_site_fpr`` is the false-positive rate on the site
-    calibration pool BY CONSTRUCTION (1 - percentile). The separately reported
+    Reporting contract: ``nominal_site_fpr`` is a budget, not the measured rate.
+    Tied score groups are excluded whole to meet the calibration budget; the exact
+    unrounded cut and measured ``calibration_fpr`` are retained. The separately reported
     ``attack_env_incidental_benign_fpr`` measures the same threshold against benign
     rows that happen to exist inside the attack capture - a different environment,
     small sample, never a substitute for fresh site-benign validation.
@@ -99,18 +101,20 @@ def site_recall_curve(
     curve: dict[str, float | int | object] = {}
 
     def evaluate_percentile(percentile: float, key: str) -> None:
-        threshold = float(np.quantile(site_benign_scores, percentile))
+        budget = round(1.0 - percentile, 5)
+        threshold = threshold_for_fpr(site_benign_scores, budget)
         result = evaluate_at_threshold(
             probabilities, labels, families, threshold=threshold
         )
         curve[key] = {
-            "nominal_site_fpr": round(1.0 - percentile, 5),
+            "nominal_site_fpr": budget,
+            "calibration_fpr": float((site_benign_scores >= threshold).mean()),
             "threshold": result["threshold"],
             "malicious_recall": result["malicious_recall"],
             "malicious_recall_by_family": result["malicious_recall_by_family"],
             "attack_env_incidental_benign_rows": result["benign_rows"],
             "attack_env_incidental_benign_fpr": result["benign_fpr"],
-            "degenerate_threshold": bool(threshold <= 0.0),
+            "degenerate_reference": bool(np.unique(site_benign_scores).size == 1),
         }
 
     for percentile in SITE_PERCENTILES:

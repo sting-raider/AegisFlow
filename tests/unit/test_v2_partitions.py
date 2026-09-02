@@ -26,6 +26,9 @@ def _record(index: int, scenario: str, family: str) -> SequenceRecord:
         "bytes_forward": index,
         "bytes_reverse": 0,
         "protocol": "TCP",
+        "packets_forward": 1,
+        "packets_reverse": 0,
+        "dst_port": 80,
     })
 
 

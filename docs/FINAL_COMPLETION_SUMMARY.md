@@ -10,6 +10,10 @@ provenance gaps, missing deployed site-baseline activation, and unverified bad-i
 failed-migration drills. Earlier Outcome-B closure claims are superseded. No model is
 approved for production.
 
+The 2026-09-02 preparation correction now has clean-code evidence for all six captures
+and a preregistered strict-family matrix. Corrected model execution is still pending;
+passing regression tests and registered plans do not close the final acceptance scope.
+
 This is not a claim of universal production readiness. Organizational IdP, managed data
 services, multi-host/target-cluster capacity, registry signing, penetration testing, and
 future model qualification remain deployment-owner or research work. See

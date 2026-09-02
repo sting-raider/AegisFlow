@@ -807,3 +807,18 @@ joins instead of choosing benign or a convenient family. Same-label overlap is r
 this is still a coalesced-flow research representation, not per-Zeek-connection parity.
 Use exclusive creation for prepared evidence. Incompatible JSONL rows must be visible
 errors, not silently skipped. No final acceptance data enters this preparation.
+
+## D-057 - Budget tied groups and deduplicate the evaluated representation
+
+A constant benign score at its percentile cut causes every row to be flagged with `>=`.
+Use the next representable value above the first excluded score group, preserving exact
+cuts in reports. Split the registered direct budget across known/OOD channels (0.5% each)
+and the review-inclusive budget (2.5% each). Reference-budget control is not an independent
+benign FPR guarantee; measure both site orientations without threshold retuning.
+
+The old raw-field fingerprint omitted service inputs. A read-only comparison found a
+249-row old-fingerprint group spanning three labels, but its actual model tensors differ.
+Actual sequence/mask/aggregate deduplication yields 6,674 inputs with no contradictory
+labels, versus 6,671 from the old fingerprint. Reject true identical-input conflicts.
+Register the exact protocol and clean preparation manifest before corrected execution;
+do not reinterpret legacy diagnostics as registered runs. Models stay local and unpromoted.

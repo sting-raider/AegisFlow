@@ -21,6 +21,7 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score
 from torch import Tensor
 from torch.utils.data import DataLoader, TensorDataset
 
+from training.v2.calibration import threshold_for_fpr
 from training.v2.models import FusionNet, gradient_reversal
 from training.v2.partitions import assert_disjoint_partitions
 from training.v2.run_cross_environment import (
@@ -214,7 +215,7 @@ def main() -> None:
                 return probabilities
 
         site_scores = scores_of(site_dataset)
-        threshold = float(np.quantile(site_scores, 0.99))
+        threshold = threshold_for_fpr(site_scores, 0.01)
         test_scores = scores_of(test_dataset)
         test_predictions = (test_scores >= threshold).astype(int)
         mirai_mask = np.asarray([r["scenario"] == s_mirai for r in test_records])

@@ -7,8 +7,8 @@ Last updated: 2026-09-02 (local correction checks; historical acceptance through
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public correction commit `42ebfa63f9e31fb89f9f5c716117eea0453ae814` passed all ten
-CI jobs in `33656146066`, including the v2 archive verifier on Linux. Frozen data stays
+Public preparation commit `cba2329f512f694e067b9d47c7c0e1a5ffb48366` passed all ten
+CI jobs in `33657593024`, including the v2 archive verifier on Linux. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
@@ -38,7 +38,21 @@ preparation refuses existing outputs and emits stable LF files. A new verified p
 must be regenerated before any corrected model run; old records/reports remain intact.
 Preparation milestone local verification: 287 tests passed in 111.90 seconds with
 84% backend coverage, Ruff passed, and strict MyPy passed 106 source files. The clean
-preparation run is pending; these tests do not establish model quality.
+preparation run subsequently completed from clean commit `cba2329` in 335.003 seconds:
+six captures, 7,145 prepared rows, zero ambiguous joins, and all source hashes checked
+before and after replay. The aggregate manifest is retained under
+`docs/research-v2/preparation/prepared-pool-cba2329.json`. These records have the same
+semantic content as legacy preparation; the synthetic ambiguity defect does not explain
+historical model results.
+
+The next verified correction uses actual sequence/mask/aggregate inputs for deduplication,
+retaining 6,674 distinct inputs instead of 6,671 from the incomplete raw-field fingerprint.
+No identical-input label conflicts occur in this pool. Tie-aware thresholds now respect
+empirical calibration budgets with exact `>=` semantics and no threshold rounding.
+Local verification passed 307 tests (51.87 seconds), 84% backend coverage, Ruff, and
+strict MyPy over 107 sources. `DEV2-FAMILY-002` is registered before execution: three
+whole-family exclusions, both independent site orientations, and explicit union budgets.
+Its dedicated runner and measured results are still pending. No model is selected.
 
 A second research phase produced historical results on `codex/detector-v2` under
 `docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in

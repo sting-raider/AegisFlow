@@ -11,7 +11,7 @@ specific bad-image/failed-migration drills require work. See
 
 | Acceptance area | Required evidence | Current status |
 |---|---|---|
-| Frozen-evidence integrity | Exact report/config/source hashes; final-only policy; CI guard | v1 passes; new v2 archive check added locally, subsequent CI pending |
+| Frozen-evidence integrity | Exact report/config/source hashes; final-only policy; CI guard | v1/v2 guards pass on public commit `cba2329`, CI `33657593024`; corrected scientific reruns still pending |
 | Portable representation | Universal schema, explicit missingness, robust transforms, parity | Complete for the implemented schemas; v1 origin gate blocks the current portable candidate |
 | Temporal representation | Bounded shared training/runtime semantics and parity | Complete for research: 43,009 Schema-B rows plus six packet-sequence environments; no candidate selected |
 | Fresh development corpus | Reviewed provenance/licensing/hashes and non-frozen boundary | Pass: three v1 environments and six checksum-pinned IoT-23 sequence environments |

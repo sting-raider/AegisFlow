@@ -298,3 +298,20 @@ verifier establishes historical integrity only. Strict partition checks and seed
 corrected diagnostic runners are implemented; no corrected experiment is registered,
 no model selected, and no final dataset unsealed. The broader final-phase goal remains
 incomplete, including deployed approved-site baselines and specific failure drills.
+
+## MR-010 - Verified preparation and corrected family preregistration
+
+2026-09-02. All six captures replayed from clean code `cba2329` in 335.003 seconds,
+producing 7,145 records with zero ambiguous joins. Source fingerprints were checked
+before and after; no frozen-source overlap occurred. Aggregate preparation manifest:
+`docs/research-v2/preparation/prepared-pool-cba2329.json`, SHA-256 (UTF-8 LF)
+`332939033261e67a41dd15f8c95edf54e4dd4fd1723e636c9e3c53f93c71f86a`.
+Actual sequence/mask/aggregate deduplication retains 6,674 inputs, no label conflicts.
+The old raw-field fingerprint discarded three distinct service-feature inputs.
+
+`configs/research-v2/registered/DEV2-FAMILY-002.json` binds the protocol, prepared data,
+three whole-family exclusions, both independent site orientations, fixed training,
+tie-aware channel budgets, four-verdict semantics, and resource measurements before
+execution. The dedicated runner and results are pending; registration is not a result.
+307 tests, lint, type checking, and all three evidence guards pass locally. Preparation
+commit CI `33657593024` is successful. No model selected or final data accessed.

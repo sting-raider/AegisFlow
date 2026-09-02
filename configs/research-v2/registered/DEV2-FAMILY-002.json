@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV2-FAMILY-002",
+  "registered_date": "2026-09-02",
+  "status": "registered_not_run",
+  "permitted_use": "development_only",
+  "candidate_promotion_authorized": false,
+  "text_hash_format": "sha256-utf8-lf",
+  "protocol": {
+    "path": "docs/research-v2/CORRECTED_PROTOCOL.md",
+    "sha256": "c639f4c56598844e80059008bcc4897fb8297507d90d4ab8dc84069b13916e12"
+  },
+  "prepared_manifest": {
+    "path": "docs/research-v2/preparation/prepared-pool-cba2329.json",
+    "sha256": "332939033261e67a41dd15f8c95edf54e4dd4fd1723e636c9e3c53f93c71f86a",
+    "preparation_code_commit": "cba2329f512f694e067b9d47c7c0e1a5ffb48366",
+    "expected_rows": 7145,
+    "expected_unique_model_inputs": 6674
+  },
+  "execution": {
+    "require_clean_worktree": true,
+    "record_actual_execution_commit": true,
+    "torch_threads": 1,
+    "seed": 20260822
+  },
+  "representation": {
+    "feature_schema_version": "2.0.0-research-v2-seq-aggregate",
+    "sequence_implementation": "packages.detection_v2.sequences.sequence_arrays",
+    "sequence_max_length": 20,
+    "sequence_channels": [
+      "signed_log1p_size", "log1p_iat_ms", "reverse_direction_indicator",
+      "normalized_position"
+    ],
+    "explicit_padding_mask": true,
+    "aggregate_implementation": "training.v2.tensors.aggregate_matrix",
+    "aggregate_features": [
+      "duration_log1p_ms", "packets_total_log1p", "packets_forward_fraction",
+      "bytes_total_log1p", "bytes_forward_fraction", "packet_rate_log1p_derived",
+      "byte_rate_log1p_derived", "packet_length_mean_log1p_derived",
+      "forward_reverse_byte_log_ratio", "protocol_tcp", "protocol_udp", "protocol_icmp",
+      "protocol_other", "destination_port_missing", "port_well_known", "port_registered",
+      "port_dynamic", "service_dns", "service_web", "service_mail", "service_remote_access",
+      "service_file_transfer", "service_database", "service_other"
+    ],
+    "connection_state_consumed": false,
+    "deduplication": "exact_sequence_mask_aggregate_tensors_reject_label_conflicts",
+    "preprocessing": "fit_only_mean_std_scale_floor_1e-9"
+  },
+  "model": {
+    "class": "training.v2.models.FusionNet",
+    "encoder": "mlp",
+    "sequence_embedding_dim": 32,
+    "aggregate_embedding_dim": 16,
+    "epochs": 150,
+    "batch_size": 256,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "positive_class_weight": "fit_benign_count_divided_by_fit_malicious_count",
+    "fit_per_binary_class_cap": 1500,
+    "ood": "mahalanobis_training_benign_embeddings",
+    "covariance_ridge": 0.000001
+  },
+  "splits": {
+    "fit_source_scenarios": [
+      "CTU-IoT-Malware-Capture-34-1", "CTU-IoT-Malware-Capture-8-1",
+      "CTU-IoT-Malware-Capture-42-1"
+    ],
+    "held_family_attack_scenarios": {
+      "c_and_c": ["CTU-IoT-Malware-Capture-34-1", "CTU-IoT-Malware-Capture-8-1"],
+      "ddos": ["CTU-IoT-Malware-Capture-34-1"],
+      "port_scan": ["CTU-IoT-Malware-Capture-34-1"]
+    },
+    "site_orientations": [
+      {"calibration": "CTU-Honeypot-Capture-4-1", "benign_test": "CTU-Honeypot-Capture-5-1"},
+      {"calibration": "CTU-Honeypot-Capture-5-1", "benign_test": "CTU-Honeypot-Capture-4-1"}
+    ],
+    "expected_rotations": 6,
+    "whole_family_excluded_before_fitting": true
+  },
+  "calibration": {
+    "benign_only": true,
+    "threshold_rule": "tie_aware_empirical_budget_ge_no_rounding",
+    "direct_fpr_budget_per_channel": 0.005,
+    "review_inclusive_budget_per_channel": 0.025,
+    "direct_union_budget": 0.01,
+    "review_inclusive_union_budget": 0.05
+  },
+  "fusion": {
+    "precedence": ["known_attack", "suspicious_unknown", "needs_review", "benign"],
+    "direct_unknown_requires_known_channel_absent": true,
+    "signatures_available": false,
+    "temporal_context_available": false,
+    "deployment_integration_authorized": false
+  },
+  "measurement": {
+    "inference_scope": "prepared_record_to_model_and_ood_scores",
+    "warmup_calls_per_batch_size": 10,
+    "measured_calls_per_batch_size": 100,
+    "batch_sizes": [1, 128],
+    "memory_scope": "process_rss_before_after_and_sampled_peak",
+    "metrics": [
+      "four_verdict_counts", "direct_suspicious_unknown_recall", "detection_or_review",
+      "independent_benign_union_fpr", "review_inclusive_rate", "false_alerts_per_10000_benign",
+      "binary_macro_f1", "binary_weighted_f1", "pr_auc", "brier", "ece",
+      "score_and_distance_quantiles", "binomial_intervals", "fit_wall_seconds",
+      "inference_latency_p50_p95_p99", "batch_throughput", "memory", "artifact_checksums"
+    ],
+    "false_alerts_per_hour": "unavailable_without_prepared_chronological_timestamps"
+  }
+}

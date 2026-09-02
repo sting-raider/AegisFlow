@@ -114,32 +114,34 @@ def load_records(paths: Iterable[Path]) -> list[SequenceRecord]:
 
 
 def record_fingerprint(record: SequenceRecord) -> tuple[object, ...]:
-    """Return the label-independent observation fingerprint used for deduplication."""
+    """Fingerprint exactly the sequence/mask/aggregate inputs consumed by FusionNet.
 
-    return (
-        tuple(record["seq_sizes"]),
-        tuple(record["seq_directions"]),
-        tuple(record["seq_iats_ms"]),
-        record["total_packets"],
-        record["duration_ms"],
-        record["bytes_forward"],
-        record["bytes_reverse"],
-        record["protocol"],
+    A hand-picked subset of raw fields can merge distinct service features or miss
+    equal tensors after encoding. Other representation studies must deduplicate
+    their own evaluated input view instead of assuming this fingerprint fits all.
+    """
+    sequence, mask = sequence_arrays(
+        record["seq_sizes"], record["seq_directions"], record["seq_iats_ms"],
     )
+    aggregate = aggregate_matrix([record])
+    return sequence.tobytes(), mask.tobytes(), aggregate.tobytes()
 
 
 def deduplicate_records(records: Sequence[SequenceRecord]) -> list[SequenceRecord]:
-    """Exact-vector deduplication across scenarios to prevent near-identical reuse."""
+    """Deduplicate FusionNet inputs; never choose a label for contradictory evidence."""
 
-    seen: set[tuple[object, ...]] = set()
+    seen: dict[tuple[object, ...], tuple[str, str]] = {}
     unique: list[SequenceRecord] = []
     duplicates = 0
     for record in records:
         fingerprint = record_fingerprint(record)
+        label = (record["binary_label"], record["family"])
         if fingerprint in seen:
+            if seen[fingerprint] != label:
+                raise ValueError("conflicting labels on identical sequence/aggregate inputs")
             duplicates += 1
             continue
-        seen.add(fingerprint)
+        seen[fingerprint] = label
         unique.append(record)
     del duplicates
     return unique
