@@ -315,3 +315,12 @@ tie-aware channel budgets, four-verdict semantics, and resource measurements bef
 execution. The dedicated runner and results are pending; registration is not a result.
 307 tests, lint, type checking, and all three evidence guards pass locally. Preparation
 commit CI `33657593024` is successful. No model selected or final data accessed.
+
+Runner implementation: `training.v2.registered_family` consumes only the immutable
+registration (SHA-256 `442ea69203048d4e89e3689fe333cbcb5b3060201ba1dd86d5c7bc3f7bc47705`).
+The synthetic execution test covers training, metrics, latency, memory and numeric NPZ
+retention; 317 full-suite tests pass. The six real partitions also pass preprocessing-
+aware float32 isolation before any model run. Actual held counts are 4,710 C&C, 7 DDoS,
+and 4 port scan; site calibration and independent benign tests each contain 181 rows.
+The driver, not the registration file, records subsequent execution status separately.
+See `docs/research-v2/REGISTERED_RUNNER.md`. Clean model execution remains pending.

@@ -7,8 +7,8 @@ Last updated: 2026-09-02 (local correction checks; historical acceptance through
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public preparation commit `cba2329f512f694e067b9d47c7c0e1a5ffb48366` passed all ten
-CI jobs in `33657593024`, including the v2 archive verifier on Linux. Frozen data stays
+Public preregistration commit `9be53062a87e96bc60201beb0e78fbb4c6419244` passed
+CI in `33660136484`, including the v2 archive verifier on Linux. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
@@ -52,7 +52,14 @@ empirical calibration budgets with exact `>=` semantics and no threshold roundin
 Local verification passed 307 tests (51.87 seconds), 84% backend coverage, Ruff, and
 strict MyPy over 107 sources. `DEV2-FAMILY-002` is registered before execution: three
 whole-family exclusions, both independent site orientations, and explicit union budgets.
-Its dedicated runner and measured results are still pending. No model is selected.
+Its dedicated runner now implements the hash-bound matrix, clean code/data checks,
+four-verdict evaluation, Wilson intervals, deterministic CPU benchmarks, sampled RSS,
+and numeric-only artifact retention. A synthetic training-to-artifact regression passes.
+All six real-data partitions pass both raw-input and preprocessed-float32 isolation;
+held attack counts are 4,710 C&C, 7 DDoS and 4 port scan, with 181 rows per independent
+benign site. The small counts remain a research limitation. Local verification passed
+317 tests in 87.73 seconds, 84% backend coverage, Ruff, and MyPy over 108 sources.
+Clean registered execution and measured results are pending. No model is selected.
 
 A second research phase produced historical results on `codex/detector-v2` under
 `docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in
