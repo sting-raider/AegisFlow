@@ -894,3 +894,14 @@ content, not a way to resolve labels. The 6,195 retained rows omit 284 cross-cap
 some optional packet variation; results cannot be generalized to unfiltered traffic.
 The protocol and these limitations must precede any model outcome. No final-data access
 or candidate selection is authorized. Clean registered execution remains pending.
+
+## D-063 - Account for scientific failures without accepting incomplete execution
+
+The MISSINGNESS-001 runner distinguishes 108 planned model entries from actual linear
+fit attempts and accepted models. Check transformed-input aliases across all four roles
+before fitting; preserve those and convergence/covariance failures with costs rather
+than inventing scores. Both site orientations reuse one model and its independently
+reloaded numeric parameters. Scoring or artifact-integrity errors are fatal to the
+attempt, not scientific zero scores. No final report may survive failed end-of-run
+code/data/configuration checks. Source-addition deltas require all three matching
+single/combined entries on identical evaluation rows; missing comparisons stay explicit.

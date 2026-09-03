@@ -426,3 +426,22 @@ Local verification: 452 tests pass in 50.46 seconds (84% backend coverage), incl
 80 new missingness/cohort/registration cases; Ruff and strict MyPy over 114 sources
 pass. No model performance, artifact cost or clean experiment execution is inferred
 from the structural diagnostic or synthetic verification.
+
+## MR-016 - Registered missingness execution driver implemented
+
+The driver now executes the immutable source/target/view/transform matrix, enforces
+single-thread numerical pools, records fit/RSS/inference costs and separates planned
+entries, actual fit attempts, accepted models and site coverage. Numeric-only LR,
+preprocessing and covariance parameters must safely reconstruct identical partition
+scores. Transformed aliases and fitting failures remain explicit; integrity/scoring
+errors prevent a complete report. Paired source-addition deltas require all three cases.
+
+The synthetic mini-matrix completes, and an otherwise identical controlled attempt
+rejects changed prepared inputs at the final check without producing a completion
+report. All 91 focused missingness tests pass; registration CI `33714322097` is green.
+Real clean-code execution remains pending; these tests are not detector-quality evidence.
+
+Full runner verification passes 463 tests in 126.51 seconds (84% backend coverage),
+Ruff, strict MyPy over 116 sources and all five existing historical/registered evidence
+guards. The preregistration and its protocol are unchanged. Execute only after this
+driver is committed, then retain the actual execution commit and measured outputs.

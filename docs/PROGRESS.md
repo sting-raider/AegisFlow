@@ -7,9 +7,9 @@ Last updated: 2026-09-03 (registered research corrections; historical acceptance
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public sequence-safety commit `1032f35c03792f5efe5f148cd93b90fdfe1e72eb` passed all ten
-CI jobs in `33713525244`, including the registered origin-evidence guard;
-the preceding origin publication passed `33712407348`. Frozen data stays
+Public missingness-registration commit `addee31088d2fa4d6b66074abba7a958bc0a61b1`
+passed CI `33714322097`; sequence-safety CI `33713525244` passed all ten jobs.
+The preceding origin publication passed `33712407348`. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
@@ -26,13 +26,20 @@ four transforms and nine source/target choices fix 108 linear/raw-distance fits 
 rows and explicitly counts 284 cross-capture, 249 family-ambiguous and 417 duplicate
 exclusions. No detector scores were generated. This filtered cohort may be easier than
 unfiltered traffic; the protocol forbids operational generalization from its results.
-Next: implement the hash-bound execution/report runner, run from clean committed code,
-retain failed entries and measured costs, then publish actual paired results. Broader
+The hash-bound runner is now implemented with numeric model reconstruction, measured
+failure accounting, separate target/site metrics and paired source-addition comparisons.
+Synthetic end-to-end execution and end-of-run input-change rejection pass. Next: run
+from clean committed code and publish actual paired results. Broader
 learned-detector ablations and operational gaps remain required.
 Component/registration verification: 452 tests pass in 50.46 seconds with 84% backend
 coverage; Ruff and strict MyPy over 114 source files pass. These include 80 synthetic
 missingness, cohort, split and registration checks. Its publication CI is distinct
 from the already-green sequence-safety milestone.
+Registration commit `addee31` passed CI `33714322097`; 91 focused missingness component
+and runner tests pass. No real detector outcome is yet claimed.
+Runner verification: 463 tests pass in 126.51 seconds with 84% backend coverage,
+Ruff and strict MyPy over 116 sources pass, and all five existing evidence guards
+pass. Real-data execution must use the subsequent clean runner commit.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.

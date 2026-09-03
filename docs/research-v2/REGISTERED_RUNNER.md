@@ -71,8 +71,26 @@ four numeric transforms and safe numeric reconstruction. `training.v2.transfer_s
 binds registration/protocol/preparation, admits the same core-distinct cohort across
 views and constructs capture-disjoint fitting/calibration/test roles.
 
-The experiment execution/report CLI is **not yet implemented**. Do not infer results
-from the input-component tests or treat the registration as a completed run. The next
-driver must account for all 108 planned fits and 216 site evaluations, retain failed
-entries/costs, verify model artifact round trips, repeat code/data checks and publish
-only aggregate outputs. No historical or final report is an input to model selection.
+The execution/report CLI is `training.v2.registered_missingness`:
+
+```text
+python -m training.v2.registered_missingness --prepared-manifest /path/to/preparation-manifest.json --pcap-dir /path/to/pcap_v2 --output-dir /path/to/new-ignored-missingness-run
+```
+
+Run from clean committed code with a new output directory. The driver accounts for all
+108 planned model entries and 216 site evaluations. A post-transform alias or failed
+linear/covariance fit remains explicit coverage loss with elapsed cost and sampled RSS;
+the report distinguishes planned entries, attempted linear fits and accepted models.
+Scoring, integrity and artifact errors stop the attempt; partial files are retained and
+no complete report is emitted. Every accepted numeric artifact is safely reloaded and
+must reproduce exact scores on each partition. Both site orientations use that same
+model. Target incidental benign and independent-site metrics remain separate.
+
+The final report also compares adding the second source only where both single-source
+cases and their union all complete on identical evaluation rows. Missing comparisons
+remain explicit. Model costs start at preprocessing fit (feature construction is timed
+separately); inference benchmarks include record feature construction through supervised
+and distance scores, not fusion or streaming. Threadpool limits are enforced and checked.
+Source, prepared-data, configuration, code and artifact checks run again before completion.
+Do not infer real-data results from synthetic tests. No historical or final report is
+an input to model selection; no result automatically promotes a candidate.
