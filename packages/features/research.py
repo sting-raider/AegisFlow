@@ -125,6 +125,24 @@ class FlowObservation:
             bytes_reverse=flow.bytes_reverse,
         )
 
+    @classmethod
+    def from_completed_flow(cls, flow: FlowEvent) -> FlowObservation:
+        """Observation timestamped at flow completion for causal replay.
+
+        Live sensors observe a flow when it completes, but whole-capture
+        five-tuple merging puts ``timestamp_end`` far after ``timestamp_start``.
+        Replaying merged flows with start timestamps would misorder history and
+        trip late/too-late exclusion, silently discarding most history. This
+        constructor keeps every field identical to :meth:`from_flow_event`
+        except the observation instant, which is the completion instant
+        (``max(timestamp_end, timestamp_start)``). ``from_flow_event`` remains
+        the live-path constructor; this one exists only for causal
+        context-preparation replays (see D-066).
+        """
+        observation = cls.from_flow_event(flow)
+        completed = max(flow.timestamp_end, flow.timestamp_start)
+        return cls(**{**asdict(observation), "timestamp": completed})
+
     def validate(self) -> None:
         if not self.event_id or not self.sensor_id:
             raise ValueError("research observation requires event_id and sensor_id")

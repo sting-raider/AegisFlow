@@ -25,9 +25,13 @@ warm features and never populated its own source state. Cache keys now include s
 ID; duplicate idempotency and clear/restart behavior are regression tested. This does
 not change historical datasets or constitute a distributed partitioning drill. The v2
 prepared rows still lack timestamps/context; a causal context-preparation and ablation
-path remains necessary. Final-source verification passes 501 tests in 201.77 seconds
+path remains necessary. The fused design is recorded in D-066 (end-timestamped sidecar
+replay, all-flow ephemeral history, four paired views, preregistered NULL rule) and
+registers as `DEV2-CONTEXT-001` before execution. Final-source verification passes
+501 tests in 201.77 seconds
 (84% backend coverage; 91% in the shared research-feature module), Ruff, strict MyPy
-over 117 sources and all six evidence guards. The cache-fix publication CI is separate
+over 117 sources and all six evidence guards. The cache-fix commit CI
+(`2a8a303`, run `33746904474`) is completed with conclusion `success`, separate
 from the green missingness-result milestone.
 
 `DEV2-MISSINGNESS-001` completed from clean code `b83f184` in 633.044 seconds.

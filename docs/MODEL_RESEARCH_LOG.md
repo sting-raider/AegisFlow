@@ -504,3 +504,29 @@ coalesces a canonical five-tuple over a capture. The next context study must exp
 address that observation/ordering limitation rather than assigning invented temporal
 features to already-filtered records. A new dataset/protocol and runtime-parity evidence
 remain required; this bug fix alone does not fulfill the context ablations.
+
+## MR-019 - Causal context replay primitive and study protocol draft
+
+2026-09-03. Three independent designs for the causal temporal-context study were
+fused (decision D-066): end-timestamped sidecar replay, all-flow ephemeral
+history, four paired views (causal / shuffled control / no-context /
+non-deployable non-causal reference), preregistered NULL rule. The
+`DEV2-CONTEXT-001` registration, runner, guard, and clean execution remain
+pending; this entry covers design plus the offline primitive only.
+
+`FlowObservation.from_completed_flow` timestamps the observation at the flow
+completion instant (`max(timestamp_end, timestamp_start)`); `from_flow_event`
+is unchanged as the live-path constructor and `TemporalFeatureState` is
+untouched. `training/v2/causal_context.py` buffers a scenario, sorts by
+`(timestamp_end, timestamp_start, event_id)`, feeds every flow once through a
+fresh state, and builds an identifier-free sidecar payload for emitted rows;
+duplicate `event_id` within a replay fails closed. Protocol draft:
+`docs/research-v2/CONTEXT_001_PROTOCOL.md`. Eleven synthetic unit tests cover
+completion timestamping, deterministic ordering, prefix causality,
+future independence, duplicate refusal, direct state-machine parity,
+unmatched-history sensitivity, and the identifier/timestamp leakage scan.
+No capture, development-row, or frozen data enters these tests. Full local
+verification passes 512 tests (84% backend coverage), Ruff across the
+repository, strict MyPy over 118 sources, and all six evidence guards. No
+model is fit, no candidate is selected, and no historical result is
+reinterpreted.

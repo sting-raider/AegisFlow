@@ -924,6 +924,26 @@ report bytes unchanged; no production artifact, threshold or final-data boundary
 Broader learned/context/signature ablations and improved effective source diversity
 remain necessary before a development-selected challenger can be locked.
 
+## D-066 - Causal context study uses end-timestamped sidecar replay with all-flow history
+
+Three independent designs for the causal temporal-context study were fused. Adopted:
+end-timestamped observations via a new `from_completed_flow` constructor
+(`TemporalFeatureState` untouched, contract version bumped), because start-timestamped
+observations fed in completion order would trip late/too-late exclusion on
+whole-capture-merged flows and silently gut the history, producing an artifactual NULL.
+A per-scenario sidecar maps `event_id` to the 16-vector plus audit fields, so sealed
+`SequenceRecord` rows and the `cba2329` preparation hashes stay byte-identical. Every
+adapter flow, including unmatched and ambiguous-label flows, enters the ephemeral replay
+history exactly once in `(timestamp_end, timestamp_start, event_id)` order; only
+unambiguously matched flows emit sidecar entries, and context-only flows never enter
+cohorts. Four views run on identical rows with paired statistics: causal, shuffled
+negative control, no-context cold sentinel, and a labeled-non-deployable non-causal
+reference that quantifies the leakage being removed. A preregistered NULL rule blocks
+promotion when causal matches the controls. Rejected: additive row fields (would break
+sealed hashes), match-gated history (repeats label-dependent censorship), and
+start-timestamped replay (invalid on merged flows). Study registers as
+`DEV2-CONTEXT-001` before any execution; frozen data stays sealed.
+
 ## D-065 - Scope temporal duplicate replay to the sensor, like source state
 
 A focused synthetic regression showed that the duplicate cache, keyed only by event ID,
