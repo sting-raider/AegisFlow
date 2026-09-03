@@ -7,9 +7,9 @@ Last updated: 2026-09-03 (registered research corrections; historical acceptance
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public origin-publication commit `b9d58aff29610a46f4003aed03f1d70025d2f026` passed all ten
-CI jobs in `33712407348`, including the registered origin-evidence guard;
-the preceding FAMILY-002 publication passed `33662571272`. Frozen data stays
+Public sequence-safety commit `1032f35c03792f5efe5f148cd93b90fdfe1e72eb` passed all ten
+CI jobs in `33713525244`, including the registered origin-evidence guard;
+the preceding origin publication passed `33712407348`. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
@@ -17,6 +17,22 @@ and local demo launch files. They are intentionally preserved and are not part o
 committed acceptance evidence; the model's scientific status does not change.
 
 ## Detector-v2 research phase (validity corrections required)
+
+Next study `DEV2-MISSINGNESS-001` is preregistered but **not executed**. Its shared
+feature/imputation component, numeric-only reconstruction, common-support admission
+and capture-disjoint split helpers are implemented. Three views (9/69/89 dimensions),
+four transforms and nine source/target choices fix 108 linear/raw-distance fits and
+216 site evaluations. A pre-registration structural audit binds 6,195 common-support
+rows and explicitly counts 284 cross-capture, 249 family-ambiguous and 417 duplicate
+exclusions. No detector scores were generated. This filtered cohort may be easier than
+unfiltered traffic; the protocol forbids operational generalization from its results.
+Next: implement the hash-bound execution/report runner, run from clean committed code,
+retain failed entries and measured costs, then publish actual paired results. Broader
+learned-detector ablations and operational gaps remain required.
+Component/registration verification: 452 tests pass in 50.46 seconds with 84% backend
+coverage; Ruff and strict MyPy over 114 source files pass. These include 80 synthetic
+missingness, cohort, split and registration checks. Its publication CI is distinct
+from the already-green sequence-safety milestone.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.
@@ -26,7 +42,8 @@ Valid incomplete arrays still use their common observed prefix. A differential c
 against the pre-fix encoder verifies identical tensors and masks on all 7,145 bound
 prepared rows. No historical model result is rerun or reinterpreted. Verification:
 372 tests pass in 47.69 seconds (84% coverage), Ruff and strict MyPy over 112 sources
-pass. Remaining missingness/ablation/cross-environment experiments are still required.
+pass. Public safety commit `1032f35` passed CI `33713525244`. Remaining
+missingness/ablation/cross-environment experiments are still required.
 
 2026-09-02 correction milestone: reproduced the v2 text-hash failure in LF and CRLF
 checkouts, fixed normalized hashing, and verified 21 archive boundary cases. The archive

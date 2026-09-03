@@ -873,3 +873,24 @@ the existing detector processing-error path, not converted to a benign flow.
 All 7,145 checksum-bound development rows produce byte-equivalent arrays against the
 pre-fix encoder. This defect therefore does not explain or invalidate their retained
 negative research results. No frozen source or model threshold is changed.
+
+## D-062 - Pair explicit packet-availability treatments before complex detector changes
+
+Preregister `DEV2-MISSINGNESS-001`: nine portable aggregate features versus adding
+60 optional packet channels with imputation, versus adding 20 fixed availability
+indicators. Omit the positional channel so the indicator ablation does not receive an
+explicit padding pattern through position. Numeric medians/binary modes use observed
+fitting values only; all-empty columns retain a documented zero fallback and dimension.
+Compare four fixed train-only transforms and a linear supervised/raw-feature-distance
+baseline across three attack captures, each other source alone and their union. Keep
+both independent benign-site orientations. This does not replace learned-model studies.
+
+Structural inspection before model fitting found source aliases and a within-capture
+family-ambiguous core group. Use one common core-distinct cohort for paired comparisons:
+exclude all shared-source groups and all within-source conflicting binary/family groups,
+then keep the smallest event ID per remaining group. Exclusions are mandatory report
+content, not a way to resolve labels. The 6,195 retained rows omit 284 cross-capture,
+249 family-ambiguous and 417 duplicate rows. This can remove hard examples and discards
+some optional packet variation; results cannot be generalized to unfiltered traffic.
+The protocol and these limitations must precede any model outcome. No final-data access
+or candidate selection is authorized. Clean registered execution remains pending.

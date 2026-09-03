@@ -403,3 +403,26 @@ All 7,145 verified development records match the pre-fix encoder's tensor/mask b
 372 full tests pass in 47.69 seconds with 84% backend coverage, Ruff and strict MyPy
 over 112 sources. This is input-integrity evidence, not a new model result; imputation,
 detector ablations and cross-environment attack studies remain open.
+
+## MR-015 - Register packet-availability and source-addition comparisons
+
+2026-09-03. `DEV2-MISSINGNESS-001` registration SHA-256 (UTF-8 LF):
+`b60ebf4873582e6507d7fa36f8eba8cea615f7af978b647f3bc40b78ce974ef4`;
+protocol SHA-256 `5c76a99dd5c67a12ec9300706661761615b516f620618a29f0c1b0e66707ebd9`.
+The pre-registration structural audit fixes 6,195 common-support rows and records why
+950 input rows are omitted (284 cross-capture, 249 family-ambiguous, 417 duplicates).
+Labels remain public development ground truth, not operator-approved site traffic.
+
+Implemented train-only median/mode imputation, optional fixed missingness indicators,
+four numeric transforms with binary passthrough, numeric-array restoration, paired
+cohort admission and capture-disjoint splits. Synthetic tests cover malformed input,
+empty-column fallback, train-only parameters, scalar/batch parity, serialization,
+source aliases, label ambiguity and configuration binding. No registered model has
+been fit. The 108-fit/216-site-evaluation matrix still requires its execution/report
+driver and a clean run. Safety-fix CI `33713525244` passed; this registration/component
+milestone's CI must be recorded independently after publication.
+
+Local verification: 452 tests pass in 50.46 seconds (84% backend coverage), including
+80 new missingness/cohort/registration cases; Ruff and strict MyPy over 114 sources
+pass. No model performance, artifact cost or clean experiment execution is inferred
+from the structural diagnostic or synthetic verification.

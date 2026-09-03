@@ -270,3 +270,17 @@ declared transform (0.93908 C&C, 0.90594 DDoS, 0.91344 scan). Full aggregate als
 Fifteen fits fail convergence and two alias after transformation; no score is fabricated
 for those cases. This narrows the earlier raw-versus-learned diagnostic error but does
 not replace cross-environment attack tests, detector ablations, or operational acceptance.
+
+## MR2-011 - Preregister missingness/source-addition matrix; components implemented
+
+2026-09-03. `DEV2-MISSINGNESS-001` fixes three packet-availability treatments, four
+train-only transforms, three attack targets with single/combined source comparisons,
+and both independent benign-site orientations. Before detector fitting, structural
+admission identified 6,195 paired rows plus explicit cross-source, within-source
+family-ambiguity and duplicate exclusions. No performance metric has been produced.
+
+The input, imputation/scaling, numeric restoration, cohort and split helpers are tested.
+The common encoder's malformed-metadata filtering defect was separately reproduced and
+fixed in `1032f35` (CI `33713525244` passed); all 7,145 valid prepared tensors are unchanged.
+The new registered detector runner and actual experiment remain pending. The study is a
+linear/raw-distance diagnostic and does not waive learned-detector or operational work.

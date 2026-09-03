@@ -24,6 +24,10 @@ rejects malformed sequence metadata and nonfinite timings instead of silently fi
 them; valid tensors remain identical on all 7,145 prepared rows. This closes an input
 integrity defect, not the remaining scientific or operational acceptance requirements.
 
+The next missingness/source-addition study is registered with tested preprocessing,
+numeric artifact reconstruction and independent split components. Its detector matrix
+has not run. The project remains incomplete; no model or deployment claim changes.
+
 This is not a claim of universal production readiness. Organizational IdP, managed data
 services, multi-host/target-cluster capacity, registry signing, penetration testing, and
 future model qualification remain deployment-owner or research work. See

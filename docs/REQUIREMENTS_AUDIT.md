@@ -105,7 +105,10 @@ validity or full-project completion.
 ## Next implementation order
 
 1. Complete the remaining imputation/missingness comparisons, detector representation
-   ablations, and registered cross-environment attack comparisons. FAMILY-002
+   ablations, and registered cross-environment attack comparisons. MISSINGNESS-001 is
+   registered with tested input/preprocessing/split components; its execution driver
+   and clean detector run are next. Its common-support exclusions are a limitation,
+   not proof of full-capture generalization. FAMILY-002
    has corrected provenance but fails development gates and has tiny effective samples
    for two families; do not reuse the old unvalidated results as replacement evidence.
 2. Use those development results to choose a defensible next representation/data study.

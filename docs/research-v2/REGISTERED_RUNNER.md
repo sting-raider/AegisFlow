@@ -60,3 +60,19 @@ only aggregate reports may be published after review. Ineligible grouping or tra
 input overlap is explicit coverage loss, never a zero or chance-level invented score.
 Every view is accounted for before a final report is written, and all input/output
 artifact and clean-code checks are repeated. Origin accuracy is not attack detection.
+
+## Packet availability and cross-capture source addition
+
+`DEV2-MISSINGNESS-001` is registered in
+`configs/research-v2/registered/DEV2-MISSINGNESS-001.json`; the exact design and known
+cohort exclusions are in `MISSINGNESS_001_PROTOCOL.md`. `training.v2.missingness`
+implements fixed 9/69/89-dimensional views, observed-fit median/mode replacement,
+four numeric transforms and safe numeric reconstruction. `training.v2.transfer_support`
+binds registration/protocol/preparation, admits the same core-distinct cohort across
+views and constructs capture-disjoint fitting/calibration/test roles.
+
+The experiment execution/report CLI is **not yet implemented**. Do not infer results
+from the input-component tests or treat the registration as a completed run. The next
+driver must account for all 108 planned fits and 216 site evaluations, retain failed
+entries/costs, verify model artifact round trips, repeat code/data checks and publish
+only aggregate outputs. No historical or final report is an input to model selection.

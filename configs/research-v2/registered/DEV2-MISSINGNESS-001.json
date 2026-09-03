@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV2-MISSINGNESS-001",
+  "registered_date": "2026-09-03",
+  "status": "registered_not_run",
+  "permitted_use": "development_only",
+  "candidate_promotion_authorized": false,
+  "text_hash_format": "sha256-utf8-lf",
+  "protocol": {
+    "path": "docs/research-v2/MISSINGNESS_001_PROTOCOL.md",
+    "sha256": "5c76a99dd5c67a12ec9300706661761615b516f620618a29f0c1b0e66707ebd9"
+  },
+  "prepared_manifest": {
+    "path": "docs/research-v2/preparation/prepared-pool-cba2329.json",
+    "sha256": "332939033261e67a41dd15f8c95edf54e4dd4fd1723e636c9e3c53f93c71f86a",
+    "expected_rows": 7145
+  },
+  "cohort": {
+    "implementation": "training.v2.transfer_support.common_support",
+    "core_groups": 6273,
+    "cross_capture_groups": 77,
+    "cross_capture_excluded_rows": 284,
+    "within_capture_ambiguous_excluded_rows": 249,
+    "within_capture_duplicate_rows": 417,
+    "groups_with_optional_packet_variants": 334,
+    "retained_rows": 6195,
+    "retained_event_ids_sha256": "676e56084c7652fff30afa2791116b4d2b828a09e08fd7e9058897b618cb3918",
+    "retained_records_sha256": "79d131e27fe1f63cf43ec101c0b4b9e8fae3713bbb30f68cda0c977782bb3298",
+    "scope": "paired_portable_core_distinct_common_support_not_operational_prevalence"
+  },
+  "execution": {
+    "require_clean_worktree": true,
+    "record_actual_execution_commit": true,
+    "seed": 20260903,
+    "numerical_threads": 1
+  },
+  "representation": {
+    "feature_schema_version": "1.0.0-research-v2-missingness",
+    "implementation": "training.v2.missingness.observation_inputs",
+    "portable_core_features": [
+      "duration_log1p_ms", "packets_total_log1p", "packets_forward_fraction",
+      "bytes_total_log1p", "bytes_forward_fraction", "packet_rate_log1p_derived",
+      "byte_rate_log1p_derived", "packet_length_mean_log1p_derived",
+      "forward_reverse_byte_log_ratio"
+    ],
+    "views": ["portable_intersection", "imputation_only", "imputation_missingness"],
+    "dimensions": [9, 69, 89],
+    "sequence_max_length": 20,
+    "sequence_channels": ["signed_log1p_size", "log1p_iat_ms", "reverse_direction"],
+    "sequence_position_consumed": false,
+    "port_protocol_service_consumed": false,
+    "connection_state_consumed": false,
+    "temporal_host_context_consumed": false,
+    "value_dtype": "float64",
+    "transforms": ["standard", "robust", "clip_robust", "quantile_normal"],
+    "imputation": "fit_observed_continuous_median_binary_mode_tie_zero_empty_column_zero",
+    "scaling_fit": "fit_only_after_imputation_binary_passthrough",
+    "scale_floor": 0.000000001,
+    "clip_quantiles": [0.01, 0.99],
+    "quantile_max_count": 100,
+    "quantile_subsample": null,
+    "unobserved_indicator": "one_fixed_binary_flag_per_packet_slot_not_inferred_packet_loss"
+  },
+  "splits": {
+    "attack_environments": [
+      "CTU-IoT-Malware-Capture-20-1",
+      "CTU-IoT-Malware-Capture-34-1",
+      "CTU-IoT-Malware-Capture-8-1"
+    ],
+    "fit_choices_per_target": "each_other_source_alone_then_their_union",
+    "background_benign": "CTU-IoT-Malware-Capture-42-1",
+    "site_orientations": [
+      {"calibration": "CTU-Honeypot-Capture-4-1", "benign_test": "CTU-Honeypot-Capture-5-1"},
+      {"calibration": "CTU-Honeypot-Capture-5-1", "benign_test": "CTU-Honeypot-Capture-4-1"}
+    ],
+    "fit_per_binary_class_cap": 1500,
+    "fit_selection": "sorted_event_ids_seeded_permutation",
+    "target_includes_incidental_benign": true,
+    "expected_source_target_choices": 9,
+    "expected_model_fits": 108,
+    "expected_site_evaluations": 216,
+    "site_orientations_reuse_fitted_model": true,
+    "post_transform_alias_policy": "ineligible_without_changing_rows_or_seed"
+  },
+  "model": {
+    "class": "sklearn.linear_model.LogisticRegression",
+    "C": 1.0,
+    "solver": "lbfgs",
+    "tol": 0.0001,
+    "max_iter": 3000,
+    "fit_intercept": true,
+    "class_weight": "balanced",
+    "convergence_warning_policy": "ineligible_retain_elapsed_cost"
+  },
+  "ood": {
+    "method": "mahalanobis_fit_benign_preprocessed_input",
+    "learned_embedding": false,
+    "covariance_ridge": 0.000001
+  },
+  "calibration": {
+    "benign_only": true,
+    "threshold_rule": "tie_aware_empirical_budget_ge_no_rounding",
+    "direct_fpr_budget_per_channel": 0.005,
+    "review_inclusive_budget_per_channel": 0.025,
+    "direct_union_budget": 0.01,
+    "review_inclusive_union_budget": 0.05
+  },
+  "fusion": {
+    "precedence": ["known_attack", "suspicious_unknown", "needs_review", "benign"],
+    "direct_unknown_requires_known_channel_absent": true,
+    "signatures_available": false,
+    "deployment_integration_authorized": false
+  },
+  "measurement": {
+    "warmup_calls_per_batch_size": 10,
+    "measured_calls_per_batch_size": 100,
+    "batch_sizes": [1, 128],
+    "inference_scope": "prepared_records_feature_construction_imputation_scaling_LR_and_distance",
+    "memory_scope": "current_process_including_loaded_data_not_incremental_model_size",
+    "memory_sampling_interval_ms": 10,
+    "false_alerts_per_hour": "unavailable_without_prepared_chronological_timestamps",
+    "report_failed_and_unpaired_entries": true,
+    "record_actual_costs_for_failed_fits": true,
+    "publish_raw_rows_or_weights": false
+  }
+}

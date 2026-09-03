@@ -37,3 +37,8 @@ The subsequent shared-sequence safety patch rejects invalid packet metadata rath
 dropping and realigning entries. Nonfinite packet timings now reach worker quarantine;
 valid prepared tensors are unchanged on all 7,145 rows. Its 372-test local result is
 not an additional production acceptance drill or authorization to deploy a challenger.
+
+`DEV2-MISSINGNESS-001` now fixes the next imputation/intersection and cross-capture
+comparison. Preprocessing/split components are implemented; detector execution and
+results are pending. The filtered common-support cohort and small attack classes are
+explicit limitations. Registration and synthetic tests do not close the scientific gate.
