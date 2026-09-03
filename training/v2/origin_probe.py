@@ -311,7 +311,13 @@ def evaluate_view(
                     }
                 )
             except (IneligibleProbe, ConvergenceWarning) as error:
-                fold.update({"status": "ineligible", "reason": str(error)})
+                fold.update(
+                    {
+                        "status": "ineligible",
+                        "reason": str(error),
+                        "fit_seconds": perf_counter() - started,
+                    }
+                )
             finally:
                 fold["memory"] = sampler.finish()
             fold_results.append(fold)

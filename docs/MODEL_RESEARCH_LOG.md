@@ -360,3 +360,12 @@ costs and artifact retention. 342 full tests and 16 final focused origin tests p
 lint and strict types pass. A grouped stratifier is not assumed to guarantee all origins:
 one synthetic fold lacked an origin and is explicitly rejected. Clean execution is still
 pending. This is a diagnostic only, not a new detector or authorization to use final data.
+
+ORIGIN-002 first execution completed from `53a62eb` in 89.676 seconds: all eight views
+accounted for, 123 numeric probe artifacts, 15 convergence failures and two transformed
+aliasing exclusions; the missingness-only view cannot form valid grouped folds. Review
+found an instrumentation defect: failed folds lacked elapsed fit time. Preserve the
+first local report (SHA-256 `0f6f95b72f7b120c7f514a50b468112084df99bc2f63b664a24798067cc017c2`)
+as cost-incomplete. A controlled nonconverging regression reproduces the missing field.
+Repeat the exact registered study only after the timer fix is committed; no scientific
+configuration, solver limit, split, encoder, or cutoff changes are permitted.

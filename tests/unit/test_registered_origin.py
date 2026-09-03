@@ -128,3 +128,41 @@ def test_origin_views_preserve_declared_dimensions_and_categorical_columns(
     assert 3 not in views["sequence_mask"][1]  # position retains its bounded geometry
     assert len(views["sequence_aggregate"][1]) == 49
     assert timings["shared_tensor_build_seconds"] >= 0
+
+
+def test_failed_probe_fold_retains_elapsed_fit_cost(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from sklearn.exceptions import ConvergenceWarning
+
+    from training.v2 import origin_probe
+
+    class NonconvergingProbe:
+        def __init__(self, **kwargs: object) -> None:
+            pass
+
+        def fit(self, *args: object) -> None:
+            raise ConvergenceWarning("controlled nonconverging fixture")
+
+    monkeypatch.setattr(origin_probe, "LogisticRegression", NonconvergingProbe)
+    config = load_registration(ROOT)
+    config["transforms"] = ["standard"]
+    matrix = np.repeat(np.arange(30, dtype=float), 3).reshape(-1, 1)
+    labels = np.tile([0, 1, 2], 30)
+    records = [
+        cast(
+            SequenceRecord,
+            {
+                "event_id": f"fixture-{i}",
+                "scenario": f"s-{label}",
+                "family": "benign",
+                "binary_label": "benign",
+            },
+        )
+        for i, label in enumerate(labels.tolist())
+    ]
+    result = evaluate_view("fixture", matrix, [0], labels, records, config, tmp_path)
+    for fold in result["transforms"][0]["folds"]:
+        assert fold["status"] == "ineligible"
+        assert fold["fit_seconds"] > 0

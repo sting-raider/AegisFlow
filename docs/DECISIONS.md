@@ -851,3 +851,11 @@ candidate selected, and this narrow origin probe cannot prove cross-domain detec
 During this audit, a regression showed the legacy origin CLI could reach data loading
 before noticing an existing historical report. Add early refusal and exclusive creation,
 as for the other archived entry points. Preserve the old report bytes.
+
+## D-060 - Retain failed-fold costs without changing the registered scientific study
+
+The first ORIGIN-002 attempt correctly retained 17 failed probe folds but omitted their
+elapsed fit time. A synthetic nonconverging fixture reproduced the missing field. Add
+the elapsed timer to that exception path and repeat the immutable protocol from clean
+code. Preserve the original report/hash as cost-incomplete; do not fill times from
+guesses, change solver iterations, drop failures, or select a favorable repeated result.
