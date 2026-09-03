@@ -37,20 +37,14 @@ class SequenceRepresentation:
     observability: str
 
 
-def _sanitize_sizes(values: list[int] | list[float]) -> list[float]:
-    return [
-        float(value)
-        for value in values
-        if math.isfinite(float(value)) and float(value) >= 0
-    ]
-
-
-def _sanitize_iats(values: list[int] | list[float]) -> list[float]:
-    return [
-        float(value)
-        for value in values
-        if math.isfinite(float(value)) and float(value) >= 0
-    ]
+def _checked_nonnegative(values: list[float], field: str) -> list[float]:
+    try:
+        checked = [float(value) for value in values]
+    except (TypeError, ValueError, OverflowError) as error:
+        raise ValueError(f"packet {field} must contain finite nonnegative numbers") from error
+    if any(not math.isfinite(value) or value < 0 for value in checked):
+        raise ValueError(f"packet {field} must contain finite nonnegative numbers")
+    return checked
 
 
 def sequence_arrays(
@@ -62,16 +56,19 @@ def sequence_arrays(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Encode the first-N packet observation into (tensor, mask).
 
-    Padding is explicit: every unobserved slot is zero AND masked, so a missing packet
-    can never masquerade as a zero-sized packet. Lengths are truncated to their common
-    prefix because a packet without complete evidence is not observable.
+    Padding is explicit: every unobserved slot is zero AND masked, so an absent slot
+    cannot masquerade as a zero-sized packet. Valid but incomplete arrays use their
+    common prefix. Malformed entries are errors, never dropped independently: doing
+    that would align one packet's size with another packet's direction or timing.
     """
 
     if max_length < 1:
         raise ValueError("sequence length must be positive")
-    clean_sizes = _sanitize_sizes(list(sizes))
-    clean_directions = [int(value) for value in directions if int(value) in (-1, 1)]
-    clean_iats = _sanitize_iats(list(interarrival_ms))
+    clean_sizes = _checked_nonnegative(list(sizes), "sizes")
+    if any(isinstance(value, bool) or value not in (-1, 1) for value in directions):
+        raise ValueError("packet directions must be exactly -1 or 1")
+    clean_directions = [int(value) for value in directions]
+    clean_iats = _checked_nonnegative(list(interarrival_ms), "interarrival times")
     observed = min(len(clean_sizes), len(clean_directions), len(clean_iats), max_length)
     tensor = np.zeros((max_length, SEQUENCE_FEATURES_PER_PACKET), dtype=np.float32)
     mask = np.zeros(max_length, dtype=np.float32)

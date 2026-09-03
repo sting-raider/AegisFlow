@@ -19,6 +19,11 @@ The subsequent registered origin audit also finds benign-site information in all
 frozen encoders under at least one declared transform. Failed and unevaluable probes
 remain explicit; no detector was retrained or promoted by that diagnostic.
 
+Origin-publication CI `33712407348` passed all ten jobs. A subsequent safety correction
+rejects malformed sequence metadata and nonfinite timings instead of silently filtering
+them; valid tensors remain identical on all 7,145 prepared rows. This closes an input
+integrity defect, not the remaining scientific or operational acceptance requirements.
+
 This is not a claim of universal production readiness. Organizational IdP, managed data
 services, multi-host/target-cluster capacity, registry signing, penetration testing, and
 future model qualification remain deployment-owner or research work. See

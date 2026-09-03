@@ -54,6 +54,10 @@ validity or full-project completion.
     mask-only folds are unevaluable. Preserve 15 convergence and two transformed-alias
     failures. The first attempt's missing failed-fold times were reproduced and fixed;
     the unchanged-protocol repeat has identical scientific results and full cost evidence.
+11. Missingness-study preparation exposed independent invalid-entry filtering in the
+    shared sequence encoder. It now rejects malformed metadata and the FlowEvent contract
+    rejects nonfinite packet timings. Worker quarantine tests pass; differential checking
+    preserves exact tensors/masks on all 7,145 prepared rows. No prior result is rerun.
 
 ## Requirement-by-requirement status
 

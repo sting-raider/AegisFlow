@@ -7,9 +7,9 @@ Last updated: 2026-09-03 (registered research corrections; historical acceptance
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public timer-fix commit `825efd123b711334e17e5fdc738a50281f8d8f95` passed all ten
-CI jobs in `33711842752`; the preceding FAMILY-002 publication passed `33662571272`,
-including its registered evidence guard. Frozen data stays
+Public origin-publication commit `b9d58aff29610a46f4003aed03f1d70025d2f026` passed all ten
+CI jobs in `33712407348`, including the registered origin-evidence guard;
+the preceding FAMILY-002 publication passed `33662571272`. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
@@ -17,6 +17,16 @@ and local demo launch files. They are intentionally preserved and are not part o
 committed acceptance evidence; the model's scientific status does not change.
 
 ## Detector-v2 research phase (validity corrections required)
+
+2026-09-03 sequence safety correction: a synthetic regression reproduced independent
+filtering of invalid sizes/directions/timings, silently changing packet alignment.
+Reject malformed entries instead, including nonfinite timings at the flow-contract
+boundary; detector-worker regression confirms quarantine without poisoning valid rows.
+Valid incomplete arrays still use their common observed prefix. A differential check
+against the pre-fix encoder verifies identical tensors and masks on all 7,145 bound
+prepared rows. No historical model result is rerun or reinterpreted. Verification:
+372 tests pass in 47.69 seconds (84% coverage), Ruff and strict MyPy over 112 sources
+pass. Remaining missingness/ablation/cross-environment experiments are still required.
 
 2026-09-02 correction milestone: reproduced the v2 text-hash failure in LF and CRLF
 checkouts, fixed normalized hashing, and verified 21 archive boundary cases. The archive

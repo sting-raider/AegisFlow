@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from datetime import UTC, datetime
 from enum import StrEnum
 from ipaddress import IPv4Address, IPv6Address
@@ -118,8 +119,8 @@ class FlowEvent(ContractModel):
             raise ValueError("iat_min cannot exceed iat_max")
         if any(v < 0 for v in self.first_packet_sizes):
             raise ValueError("packet sizes cannot be negative")
-        if any(v < 0 for v in self.first_packet_interarrival_times):
-            raise ValueError("interarrival times cannot be negative")
+        if any(not math.isfinite(v) or v < 0 for v in self.first_packet_interarrival_times):
+            raise ValueError("interarrival times must be finite and nonnegative")
         return self
 
 

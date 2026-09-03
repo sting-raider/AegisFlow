@@ -11,7 +11,7 @@ specific bad-image/failed-migration drills require work. See
 
 | Acceptance area | Required evidence | Current status |
 |---|---|---|
-| Frozen-evidence integrity | Exact report/config/source hashes; final-only policy; CI guard | Historical and FAMILY-002 guards pass on public timer-fix commit `825efd1`, CI `33711842752`; ORIGIN-002 publication adds a separate bound guard with unchanged-repeat checks, its CI pending |
+| Frozen-evidence integrity | Exact report/config/source hashes; final-only policy; CI guard | All five historical/registered guards pass on public origin-publication commit `b9d58af`, CI `33712407348`; scientific validity and final acceptance remain separate gates |
 | Portable representation | Universal schema, explicit missingness, robust transforms, parity | Complete for the implemented schemas; v1 origin gate blocks the current portable candidate |
 | Temporal representation | Bounded shared training/runtime semantics and parity | Complete for research: 43,009 Schema-B rows plus six packet-sequence environments; no candidate selected |
 | Fresh development corpus | Reviewed provenance/licensing/hashes and non-frozen boundary | Pass: three v1 environments and six checksum-pinned IoT-23 sequence environments |
@@ -32,3 +32,8 @@ specific bad-image/failed-migration drills require work. See
 The detector remains a development NO-GO. The final brief has not reached a proven stop
 condition. Successful local exercises do not waive the remaining requirements in
 `docs/REQUIREMENTS_AUDIT.md`.
+
+The subsequent shared-sequence safety patch rejects invalid packet metadata rather than
+dropping and realigning entries. Nonfinite packet timings now reach worker quarantine;
+valid prepared tensors are unchanged on all 7,145 rows. Its 372-test local result is
+not an additional production acceptance drill or authorization to deploy a challenger.

@@ -37,12 +37,20 @@ def test_detector_worker_runs_one_hybrid_call_for_a_redis_batch(bundle: ModelBun
     bus.publish.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("packet_rate", -1),
+        ("first_packet_interarrival_times", [0.0, float("nan")]),
+        ("first_packet_interarrival_times", [0.0, float("inf")]),
+    ],
+)
 def test_detector_worker_quarantines_invalid_rows_without_poisoning_valid_batch(
-    bundle: ModelBundle,
+    bundle: ModelBundle, field: str, value: object,
 ) -> None:
     flow = next(iter(DemoAdapter().flows()))
     invalid = flow.model_dump(mode="json")
-    invalid["packet_rate"] = -1
+    invalid[field] = value
     messages = [
         ("invalid", {"flow": invalid, "signature": None}),
         ("valid", {"flow": flow.model_dump(mode="json"), "signature": None}),
@@ -63,7 +71,7 @@ def test_detector_worker_quarantines_invalid_rows_without_poisoning_valid_batch(
     )
     dead_letter = bus.publish.call_args_list[0].args
     assert dead_letter[0] == "aegisflow:dead-letter"
-    assert "packet_rate" not in str(dead_letter[1])
+    assert field not in str(dead_letter[1])
 
 
 def test_detector_worker_isolates_feature_registry_error_and_retries_remaining_rows(

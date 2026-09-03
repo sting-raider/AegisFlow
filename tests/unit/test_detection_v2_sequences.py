@@ -89,6 +89,35 @@ def test_truncates_to_common_prefix_when_evidence_incomplete() -> None:
     assert mask.sum() == 3
 
 
+@pytest.mark.parametrize("field", ["sizes", "directions", "interarrival_ms"])
+@pytest.mark.parametrize("invalid", [float("nan"), float("inf"), -2.0])
+def test_malformed_packet_metadata_is_not_dropped_or_realigned(
+    field: str, invalid: float,
+) -> None:
+    values = {"sizes": [10.0, 20.0, 30.0], "directions": [1, -1, 1],
+              "interarrival_ms": [0.0, 1.0, 2.0]}
+    values[field][1] = invalid
+    with pytest.raises(ValueError):
+        sequence_arrays(values["sizes"], values["directions"], values["interarrival_ms"])
+
+
+@pytest.mark.parametrize("invalid", [0, 1.5, -1.5, True])
+def test_direction_must_not_be_coerced_to_a_valid_packet(invalid: object) -> None:
+    with pytest.raises(ValueError, match="direction"):
+        sequence_arrays([10.0], [invalid], [0.0])
+
+
+def test_malformed_metadata_beyond_encoded_prefix_is_still_rejected() -> None:
+    with pytest.raises(ValueError):
+        sequence_arrays([10.0, float("nan")], [1, 1], [0.0, 1.0], max_length=1)
+
+
+@pytest.mark.parametrize("invalid", [float("nan"), float("inf")])
+def test_flow_contract_rejects_nonfinite_packet_timing(invalid: float) -> None:
+    with pytest.raises(ValueError, match="interarrival"):
+        _flow(first_packet_interarrival_times=[0.0, invalid])
+
+
 def test_position_feature_is_contract_normalized() -> None:
     tensor, _ = sequence_arrays(
         [10, 20, 30, 40], [1, 1, 1, 1], [0, 1, 2, 3], max_length=7

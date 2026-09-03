@@ -859,3 +859,17 @@ elapsed fit time. A synthetic nonconverging fixture reproduced the missing field
 the elapsed timer to that exception path and repeat the immutable protocol from clean
 code. Preserve the original report/hash as cost-incomplete; do not fill times from
 guesses, change solver iterations, drop failures, or select a favorable repeated result.
+
+## D-061 - Reject malformed packet metadata without changing valid sequence geometry
+
+While designing missingness comparisons, a controlled fixture showed the shared encoder
+independently removes invalid sizes, directions and timings. The resulting sequence can
+pair metadata from different packets; fractional direction values were also truncated.
+Reject malformed entries with ValueError, even beyond the encoded prefix. Keep the
+documented common-prefix rule for valid but incomplete arrays and explicit zero padding.
+Nonfinite per-packet timing now fails FlowEvent validation and is quarantined through
+the existing detector processing-error path, not converted to a benign flow.
+
+All 7,145 checksum-bound development rows produce byte-equivalent arrays against the
+pre-fix encoder. This defect therefore does not explain or invalidate their retained
+negative research results. No frozen source or model threshold is changed.

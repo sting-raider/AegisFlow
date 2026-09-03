@@ -391,3 +391,15 @@ Timer-fix CI `33711842752` also passed. Final local publication checks passed 35
 in 48.25 seconds (84% backend coverage), Ruff, MyPy over 112 sources, all five evidence
 guards, table regeneration and 123 local numeric probe artifacts. Frozen and historical
 FAMILY evidence remain unchanged. Aggregate-publication CI is not yet claimed complete.
+
+## MR-014 - Reject malformed sequence metadata before missingness research
+
+2026-09-03. Origin-publication CI `33712407348` at `b9d58af` completed all ten jobs.
+During the next representation study, 15 of 16 focused malformed-metadata cases failed
+before the fix: independent filtering could realign packets, fractional directions were
+coerced, and the flow contract accepted nonfinite packet timings. The fix rejects these
+inputs; worker tests retain visible quarantine and process the valid remainder.
+All 7,145 verified development records match the pre-fix encoder's tensor/mask bytes.
+372 full tests pass in 47.69 seconds with 84% backend coverage, Ruff and strict MyPy
+over 112 sources. This is input-integrity evidence, not a new model result; imputation,
+detector ablations and cross-environment attack studies remain open.
