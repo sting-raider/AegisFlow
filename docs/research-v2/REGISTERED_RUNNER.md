@@ -41,3 +41,22 @@ measure the known-score head, not a fabricated hybrid probability. Wilson interv
 describe row-level sampling uncertainty but do not remove same-capture correlation.
 Calibration labels are public research ground truth, not operator approval for a
 deployed baseline. No inference, artifact, or result promotes a production model.
+
+## Independent-benign origin audit
+
+`training.v2.registered_origin` implements the immutable `DEV2-ORIGIN-002` protocol
+registered in `df7df95`. It loads the verified local FAMILY-002 numeric artifacts into
+evaluation-only encoders, rechecks exact fit exclusion, and evaluates the eight declared
+views and four numeric transforms using grouped folds. It does not retrain a detector.
+
+```text
+python -m training.v2.registered_origin --prepared-manifest /path/to/preparation-manifest.json --pcap-dir /path/to/pcap_v2 --family-artifact-dir /path/to/FAMILY-002-run --output-dir /path/to/new-ignored-origin-run
+```
+
+Run from a clean committed checkout with absolute external evidence paths. All three
+selected encoder artifacts and the full family report must pass their original hashes.
+The output directory must not exist. Probe/transform numeric NPZ files stay local;
+only aggregate reports may be published after review. Ineligible grouping or transformed
+input overlap is explicit coverage loss, never a zero or chance-level invented score.
+Every view is accounted for before a final report is written, and all input/output
+artifact and clean-code checks are repeated. Origin accuracy is not attack detection.

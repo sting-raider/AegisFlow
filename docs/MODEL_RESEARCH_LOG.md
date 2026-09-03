@@ -344,3 +344,19 @@ Publication verification: 325 tests passed in 50.68 seconds, 84% backend coverag
 Ruff passed, MyPy passed 109 sources, and all four evidence guards passed, including
 local numeric model arrays/hash checks. Runner commit CI `33661356302` passed ten jobs;
 CI for the subsequent aggregate publication will be recorded after it actually finishes.
+
+## MR-012 - Preregistered independent-benign origin audit runner
+
+2026-09-03. FAMILY-002 publication CI `33662571272` and ORIGIN-002 registration CI
+`33663241779` both completed successfully. `DEV2-ORIGIN-002` was registered in `df7df95`
+before execution; it binds three fixed encoder artifacts and 392 benign rows from
+hp4/hp5/20-1, eight views, four numeric transforms, exact-vector-grouped five-fold origin
+probes and a fixed 0.90 warning threshold. All three captures are absent from encoder
+fitting, verified against exact reconstructed partition hashes and preprocessed inputs.
+
+The driver is implemented and synthetic regression covers transformations, disjoint
+groups, missing-origin fold rejection, frozen numeric model loading, view dimensions,
+costs and artifact retention. 342 full tests and 16 final focused origin tests pass;
+lint and strict types pass. A grouped stratifier is not assumed to guarantee all origins:
+one synthetic fold lacked an origin and is explicitly rejected. Clean execution is still
+pending. This is a diagnostic only, not a new detector or authorization to use final data.
