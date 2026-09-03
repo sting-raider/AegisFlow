@@ -905,3 +905,21 @@ reloaded numeric parameters. Scoring or artifact-integrity errors are fatal to t
 attempt, not scientific zero scores. No final report may survive failed end-of-run
 code/data/configuration checks. Source-addition deltas require all three matching
 single/combined entries on identical evaluation rows; missing comparisons stay explicit.
+
+## D-064 - Publish matched negative results without selecting a surviving subset
+
+MISSINGNESS-001 completed from `b83f184` with 84 models and 24 pre-fit transformed-alias
+failures. Publish all 108 entries, source-addition deltas only for 52 complete triples,
+and representation contrasts only for 44 complete triples. Paired row hashes and
+explicit failure coverage prevent missing entries from becoming synthetic zero effects.
+Do not interpret repeated site orientations as independent samples or compute an
+unqualified winner by averaging only favorable completed cases.
+
+The indicator ablation has mixed detection effects and raises independent benign FPR
+in more complete comparisons than it lowers it. Portable-to-imputed comparison also
+adds 60 packet features, so it cannot isolate imputation itself. These are observations
+on a deliberately filtered cohort, not proof that missingness causes domain leakage
+or that packet sequences cannot help. Keep the registered config/protocol and all
+report bytes unchanged; no production artifact, threshold or final-data boundary moves.
+Broader learned/context/signature ablations and improved effective source diversity
+remain necessary before a development-selected challenger can be locked.

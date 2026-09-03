@@ -16,7 +16,7 @@ specific bad-image/failed-migration drills require work. See
 | Temporal representation | Bounded shared training/runtime semantics and parity | Complete for research: 43,009 Schema-B rows plus six packet-sequence environments; no candidate selected |
 | Fresh development corpus | Reviewed provenance/licensing/hashes and non-frozen boundary | Pass: three v1 environments and six checksum-pinned IoT-23 sequence environments |
 | Dataset-origin diagnostic | Balanced deduplicated source classification and ablation | Full Schema A blocked at 0.95416; categorical ablation clears at 0.68428 |
-| Challenger evidence | Registered baselines, costs, ablations, repeated held-family and cross-environment results | FAMILY-002 fails six bound rotations; ORIGIN-002 confirms learned benign-site information with explicit failed probes; broader imputation/ablation/cross-environment work remains |
+| Challenger evidence | Registered baselines, costs, ablations, repeated held-family and cross-environment results | FAMILY-002 fails six bound rotations; ORIGIN-002 confirms learned benign-site information; MISSINGNESS-001 completes a mixed/negative matched linear transfer study; broader learned/context/signature work remains |
 | Final scientific gate | Candidate locked before exactly one frozen run; governed GO/NO-GO | No eligible candidate; frozen run not authorized and remains sealed |
 | Sustained capacity | 10/30-minute plus burst/failure tests with loss, lag, latency and resource budgets | Required clean-runner 30 flows/s × 30 minutes passes ([evidence](acceptance/sustained-compose-linux-ci-2026-08-13.json)); 50 flows/s × 30 minutes remains a recorded capacity NO-GO; representative target capacity is external |
 | Multi-worker correctness | Partitioning, recovery, idempotency and shared state under sustained load | Pass for local Compose persistence workers: controlled pending-work SIGKILL/reclaim/restart, 6,000/6,000 exact conservation, zero final depth ([evidence](acceptance/multiworker-compose-windows-2026-08-13.json)); multi-host scaling remains deployment-specific |
@@ -38,8 +38,14 @@ dropping and realigning entries. Nonfinite packet timings now reach worker quara
 valid prepared tensors are unchanged on all 7,145 rows. Its 372-test local result is
 not an additional production acceptance drill or authorization to deploy a challenger.
 
-`DEV2-MISSINGNESS-001` now fixes the next imputation/intersection and cross-capture
-comparison. Its preprocessing/split components and registered execution driver are
-implemented; real detector execution and results are pending. The filtered common-support
-cohort and small attack classes are
-explicit limitations. Registration and synthetic tests do not close the scientific gate.
+`DEV2-MISSINGNESS-001` completed from clean `b83f184` (633.044 seconds; runner CI
+`33715446245` passed). Of 108 planned entries, 84 models and 168 site evaluations
+complete; 24 transformed-input alias failures are retained. None reaches 50% target
+attack-mixture direct unknown recall; independent benign FPR spans 0–61.88%.
+Source-addition and indicator effects are mixed on paired comparisons. The filtered
+common-support cohort and small attack classes remain explicit limitations. This
+development result does not close the learned-model ablations, final scientific gate,
+deployed site-baseline workflow or failure/partitioning acceptance requirements.
+Local publication checks pass 499 tests (84% backend coverage), Ruff, strict MyPy over
+117 sources, all six evidence guards and the 84 retained numeric artifacts. This does
+not add an operational drill or waive any acceptance requirement.

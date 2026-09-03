@@ -94,3 +94,12 @@ and distance scores, not fusion or streaming. Threadpool limits are enforced and
 Source, prepared-data, configuration, code and artifact checks run again before completion.
 Do not infer real-data results from synthetic tests. No historical or final report is
 an input to model selection; no result automatically promotes a candidate.
+
+The registered run completed from `b83f184` in 633.044 seconds (84 evaluated models,
+24 transformed-alias entries, 168 evaluated sites). Aggregate-only JSON and tables are
+published under `registered-results/DEV2-MISSINGNESS-001.*`; local weights remain ignored.
+Validate using `python -m scripts.verify_registered_missingness`, optionally adding
+`--artifact-dir /path/to/completed-run` to verify the numeric artifacts. `--markdown`
+regenerates both full entry coverage and matched source/representation comparisons.
+The registration's `registered_not_run` status is an immutable pre-execution snapshot;
+the separate report, not an edit to that preregistration, records completion.

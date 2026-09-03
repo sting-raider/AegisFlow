@@ -70,7 +70,7 @@ validity or full-project completion.
 | 2. Frozen boundary | Frozen manifest, `verify_frozen_evidence`, tests | Verified for four retained reports; no new final run authorized |
 | 3. New development pool | v1 pool/provenance; v2 PCAP hashes/preparation | Clean v2 preparation and FAMILY-002 splits bound; tiny deduplicated DDoS/scan support remains a limitation |
 | 4. Two feature schemas | `packages/features/research.py`, parity/state tests | Shared A/B implementation present; runtime activation depends on selection (§18) |
-| 5. Numeric representation | Research transforms; corrected ORIGIN-002 raw/learned/grouped comparisons | Learned-origin warnings retained; broader imputation comparisons and robust-sequence convergence gaps remain |
+| 5. Numeric representation | ORIGIN-002 and completed MISSINGNESS-001 three-view/four-transform comparisons | Mixed paired results and 24 transformed-alias failures retained; learned robust-sequence and origin-remediation work remains |
 | 6. Baselines | DEV-SUP/ANO reports, model configs | v1 comparisons retained; v2 reproducibility/cost evidence incomplete |
 | 7. Open-set representation | v2 fusion embeddings/Mahalanobis | FAMILY-002 fails; ORIGIN-002 confirms retained benign-site information; detector representation/ablation work remains |
 | 8. Unknown vs uncertainty | Runtime fusion/reason codes, separate v2 channels | Runtime baseline tested; v2 claims require corrected evidence |
@@ -79,7 +79,7 @@ validity or full-project completion.
 | 11. Development error analysis | `docs/error_analysis/`, DEV-ERR | v1 retained; v2 scientific/provenance audit requires correction |
 | 12. Ablations | DEV-HYB and v2 comparison reports | Partial; strict-family and no-domain-leakage comparisons unresolved |
 | 13. Whole-family holdouts | v1 harness; corrected FAMILY-002 six rotations | Corrected exclusion/row checks executed; 4,710 C&C, 7 DDoS, 4 scan inputs; negative and sample-limited |
-| 14. Cross-environment evaluation | v1 rotations; v2 cross-capture results | Partial; site overlap and raw-vs-embedding diagnostics must be explicit |
+| 14. Cross-environment evaluation | v1 rotations; corrected MISSINGNESS-001 single/combined-source matrix | Narrow linear/raw-distance transfer completed with independent sites and 52/72 paired triples; learned/context/signature comparisons remain |
 | 15. Strict experiment registry | v1 registry; historical v2 archive; corrected FAMILY/ORIGIN-002 | Corrected studies bind executed clean code/data/splits/config/costs/artifacts and explicit failed coverage; historical v2 remains unvalidated |
 | 16. Final frozen acceptance | Four historical smoke rejection reports | Conditional: no eligible locked challenger, no new final test |
 | 17. Acceptance decision | v1 development NO-GO | Development rejection valid; final brief stop condition not yet proved |
@@ -104,10 +104,12 @@ validity or full-project completion.
 
 ## Next implementation order
 
-1. Complete the remaining imputation/missingness comparisons, detector representation
-   ablations, and registered cross-environment attack comparisons. MISSINGNESS-001 is
-   registered with tested input/preprocessing/split components and execution driver;
-   the clean detector run is next. Its common-support exclusions are a limitation,
+1. Complete the remaining learned detector/context/signature ablations and broaden
+   effective development support. MISSINGNESS-001 now has a completed clean run:
+   84 evaluated models, 24 transformed-alias entries and 168 site results; none reaches
+   50% direct unknown recall on its target attack mixture. Source addition and the
+   three representation treatments are compared on matched rows with missing pairs
+   explicit. Its common-support exclusions are a limitation,
    not proof of full-capture generalization. FAMILY-002
    has corrected provenance but fails development gates and has tiny effective samples
    for two families; do not reuse the old unvalidated results as replacement evidence.

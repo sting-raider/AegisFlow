@@ -445,3 +445,38 @@ Full runner verification passes 463 tests in 126.51 seconds (84% backend coverag
 Ruff, strict MyPy over 116 sources and all five existing historical/registered evidence
 guards. The preregistration and its protocol are unchanged. Execute only after this
 driver is committed, then retain the actual execution commit and measured outputs.
+
+## MR-017 - Missingness/source-addition execution and paired negative evidence
+
+2026-09-03. The registered run completed from clean `b83f184d583d5d1f719c1be4702968516c3fd5f9`
+in 633.044 seconds, with the unchanged 6,195-row common-support fingerprint and
+single-thread numerical pools. All 108 planned entries are retained: 84 actual linear
+fits, 84 accepted numeric artifacts and 168 site evaluations; 24 entries fail the
+pre-fit transformed-alias check (19 clip-robust and five quantile-normal). No solver
+failure or retry occurred. All numeric artifacts pass the publication integrity check.
+
+Report SHA-256 (UTF-8 LF):
+`c0d7685393ebd76abbdbb78a75ce3ed40a62a925ea5a9e6a8aa19fcca7966961`.
+Full aggregate report and deterministic tables: `research-v2/registered-results/DEV2-MISSINGNESS-001.*`.
+Analysis: `error_analysis/dev2-missingness-001.md`. The original local report is copied
+byte-for-byte; raw rows, packet captures and model weights remain ignored.
+
+No evaluated target-mixture/site entry reaches 50% direct unknown recall. Independent
+benign FPR is 0–61.88%, with 114/168 entries meeting 1% alone. Source-addition contrasts
+improve detection/review in 30, worsen it in 32 and tie in 42 of 104 contrasts across
+52 complete triples; 20 triples are unevaluable. Among 44 complete representation
+triples, indicators improve detection/review in nine, worsen it in 12 and tie in 23;
+benign FPR increases in 20 and decreases in six. These are correlated descriptive
+differences, not independent replicates. Adding packet features changes more than
+the imputation method. No single treatment universally fixes transfer.
+
+Runner CI `33715446245` passed. Publication checks add a sixth integrity guard,
+semantic mutation tests, checkout-independent text hashing and reproducible paired
+tables. An initial table test caught Windows stdout damage to em dashes; regeneration
+through ASCII-escaped JSON preserves Unicode exactly without touching any report bytes.
+Final local publication verification passes 499 tests in 81.52 seconds (84% backend
+coverage), Ruff, strict MyPy over 117 sources, all six evidence guards and all 84 local
+numeric artifacts. All 36 evidence regressions pass, including LF/CRLF normalized
+hashes and exact generated-table equality. Publication CI is still separate from the
+green runner milestone. No candidate selection, final-data access, deployment activation
+or completion claim is authorized.

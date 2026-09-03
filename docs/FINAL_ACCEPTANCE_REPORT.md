@@ -1,6 +1,6 @@
 # Final acceptance report
 
-Date: 2026-09-02 (evidence through 2026-08-23).
+Date: 2026-09-03 (corrected research; operational evidence through 2026-08-23).
 
 Status: **incomplete**. The 2026-09-02 audit supersedes the earlier closure verdict.
 See `docs/REQUIREMENTS_AUDIT.md` for research-validity and acceptance gaps. This draft
@@ -19,6 +19,13 @@ Detector-v2 artifacts were published by commit
 `85a20367250475abe70da1da28b6ff672b7e8e59`; their actual execution commits are not
 established by the reports. Four local smoke-model registry files are intentionally
 uncommitted and are excluded from this acceptance commit.
+
+Subsequent corrected research is separately bound to its actual clean execution commits.
+Latest: `DEV2-MISSINGNESS-001` executed from `b83f184d583d5d1f719c1be4702968516c3fd5f9`
+(runner CI `33715446245` passed), producing 84 evaluated models, 24 transformed-alias
+entries and 168 evaluated sites in 633.044 seconds. The paired negative/mixed results
+are in `docs/research-v2/registered-results/DEV2-MISSINGNESS-001.*`. This updates the
+development record, not the final acceptance verdict. The full brief remains incomplete.
 
 ## 2. Experiment protocol
 
@@ -153,7 +160,11 @@ The historical v2 HF1/HF2 results are cross-capture C&C tests, not strict held-f
 evidence: C&C was allowed in fit. HF3 excludes C&C but reuses site-calibration data in
 fitting and includes non-held families in evaluation. None supports a strict-family
 acceptance claim. Corrected runners enforce row/observation isolation, label-family
-exclusion and independent benign testing; their registered measured results are pending.
+exclusion and independent benign testing. FAMILY-002 completed all six corrected
+rotations; it fails development objectives, with zero C&C/DDoS detection-or-review and
+worst independent benign FPR 47.51%. MISSINGNESS-001 adds registered cross-capture
+comparisons, explicitly identifying which test families were present in fitting.
+Neither is the final frozen acceptance matrix.
 
 ## 9. Cross-dataset results
 

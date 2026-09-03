@@ -7,8 +7,9 @@ Last updated: 2026-09-03 (registered research corrections; historical acceptance
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public missingness-registration commit `addee31088d2fa4d6b66074abba7a958bc0a61b1`
-passed CI `33714322097`; sequence-safety CI `33713525244` passed all ten jobs.
+Public missingness-runner commit `b83f184d583d5d1f719c1be4702968516c3fd5f9`
+passed CI `33715446245`; registration CI `33714322097` and sequence-safety CI
+`33713525244` also passed. The subsequent result-publication gate is separate.
 The preceding origin publication passed `33712407348`. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
@@ -18,28 +19,35 @@ committed acceptance evidence; the model's scientific status does not change.
 
 ## Detector-v2 research phase (validity corrections required)
 
-Next study `DEV2-MISSINGNESS-001` is preregistered but **not executed**. Its shared
-feature/imputation component, numeric-only reconstruction, common-support admission
-and capture-disjoint split helpers are implemented. Three views (9/69/89 dimensions),
-four transforms and nine source/target choices fix 108 linear/raw-distance fits and
-216 site evaluations. A pre-registration structural audit binds 6,195 common-support
-rows and explicitly counts 284 cross-capture, 249 family-ambiguous and 417 duplicate
-exclusions. No detector scores were generated. This filtered cohort may be easier than
-unfiltered traffic; the protocol forbids operational generalization from its results.
-The hash-bound runner is now implemented with numeric model reconstruction, measured
-failure accounting, separate target/site metrics and paired source-addition comparisons.
-Synthetic end-to-end execution and end-of-run input-change rejection pass. Next: run
-from clean committed code and publish actual paired results. Broader
-learned-detector ablations and operational gaps remain required.
-Component/registration verification: 452 tests pass in 50.46 seconds with 84% backend
-coverage; Ruff and strict MyPy over 114 source files pass. These include 80 synthetic
-missingness, cohort, split and registration checks. Its publication CI is distinct
-from the already-green sequence-safety milestone.
-Registration commit `addee31` passed CI `33714322097`; 91 focused missingness component
-and runner tests pass. No real detector outcome is yet claimed.
-Runner verification: 463 tests pass in 126.51 seconds with 84% backend coverage,
-Ruff and strict MyPy over 116 sources pass, and all five existing evidence guards
-pass. Real-data execution must use the subsequent clean runner commit.
+`DEV2-MISSINGNESS-001` completed from clean code `b83f184` in 633.044 seconds.
+All 108 planned model entries are accounted for: 84 fits/models and 168 site evaluations;
+24 preprocessing entries are ineligible because transformed inputs alias across roles
+(19 clip-robust, five quantile-normal). No retries, altered seeds or invented scores.
+All 84 local numeric model artifacts pass hash/shape/reconstruction checks. The aggregate
+report and reproducible tables are in `research-v2/registered-results/`; report SHA-256
+(UTF-8 LF) is `c0d7685393ebd76abbdbb78a75ce3ed40a62a925ea5a9e6a8aa19fcca7966961`.
+
+The 6,195-row filtered common-support cohort is unchanged (284 cross-capture,
+249 family-ambiguous and 417 duplicate exclusions). None of the 168 evaluated site
+entries reaches 50% direct unknown recall on its target attack mixture. Independent
+benign FPR ranges from 0 to 61.88%; 114/168 entries meet the 1% FPR budget alone.
+Adding a source is not uniformly beneficial: 52/72 comparisons are paired, with
+detection/review increasing in 30 and decreasing in 32 of their 104 single-source
+contrasts. Only 44/72 representation triples complete all views; adding indicators
+increases benign FPR in 20, decreases it in six, and leaves it unchanged in 18.
+These correlated, cohort-filtered comparisons are not operational performance or a
+new strict-family matrix. No challenger is selected; final data stays sealed.
+
+Next: development-only learned/context/signature ablations and better effective
+attack/benign environment support, with origin diagnostics and independent calibration.
+The deployed approved-site baseline and specific failure/partitioning drills remain open.
+Runner verification retained: 463 tests (84% backend coverage), Ruff, MyPy over 116
+sources and five earlier evidence guards. Runner CI `33715446245` is green. Publication
+adds a sixth evidence guard plus semantic-tamper and reproducible-summary regressions.
+Final local publication checks pass: 499 tests in 81.52 seconds (84% backend coverage),
+Ruff, strict MyPy over 117 sources, all six evidence guards and all 84 local numeric
+artifacts. The 36 new evidence tests include LF/CRLF hashing and exact table regeneration.
+The subsequent publication CI result must be recorded independently after it finishes.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.

@@ -13,6 +13,11 @@ benign FPR 47.51%). This does not rehabilitate the historical experiments below 
 establish the full final-phase stop condition.
 The separate [ORIGIN-002 audit](registered-results/DEV2-ORIGIN-002.md) confirms retained
 benign-origin information in the corrected encoders; it is not a detector-quality result.
+The [MISSINGNESS-001 study](registered-results/DEV2-MISSINGNESS-001.md) completed from
+`b83f184`: 84 evaluated models, 24 alias-ineligible entries and 168 site evaluations.
+Its paired source/representation effects are mixed; no target-mixture site entry reaches
+50% direct unknown recall. This is a narrow linear/raw-distance study, not completion
+of the learned/context/signature ablations or authorization for frozen evaluation.
 
 Date: 2026-08-22. Branch `codex/detector-v2`. Development evidence only; the v1 frozen
 reports were never queried and remain sealed.
@@ -91,7 +96,8 @@ must be checked in each run.
 
 See `RESULTS.md` for historical metrics. HF1/HF2 retain C&C in fit and therefore test
 cross-capture transfer. HF3 excludes C&C but reuses calibration data in fit and includes
-other families in its test partition. Strict-family results remain pending.
+other families in its test partition. The separate corrected FAMILY-002 results linked
+above supersede these historical strict-family claims, not the original artifact bytes.
 
 ## 11. Cross-environment results
 

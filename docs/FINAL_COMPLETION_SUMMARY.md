@@ -24,10 +24,17 @@ rejects malformed sequence metadata and nonfinite timings instead of silently fi
 them; valid tensors remain identical on all 7,145 prepared rows. This closes an input
 integrity defect, not the remaining scientific or operational acceptance requirements.
 
-The next missingness/source-addition study is registered with tested preprocessing,
-numeric artifact reconstruction, independent splits and an end-to-end execution driver.
-Its real detector matrix has not run. The project remains incomplete; no model or
-deployment claim changes.
+The registered missingness/source-addition study completed from `b83f184` in 633.044
+seconds: 84 evaluated models/168 site entries; 24 transformed-alias entries remain
+ineligible. No capture-level site entry reaches 50% direct unknown recall; independent
+benign FPR ranges from 0 to 61.88%. Adding data or availability indicators is not
+uniformly beneficial. See the [paired tables](research-v2/registered-results/DEV2-MISSINGNESS-001.md)
+and [error analysis](error_analysis/dev2-missingness-001.md). Runner CI `33715446245`
+passed; result-publication verification is distinct. The project remains incomplete;
+no model is selected, no frozen evaluation is authorized and no deployment claim changes.
+Local publication verification passes 499 tests (84% backend coverage), Ruff, MyPy over
+117 sources, six evidence guards and 84 retained numeric artifact checks. These are
+evidence-integrity and regression results, not production detection acceptance.
 
 This is not a claim of universal production readiness. Organizational IdP, managed data
 services, multi-host/target-cluster capacity, registry signing, penetration testing, and
