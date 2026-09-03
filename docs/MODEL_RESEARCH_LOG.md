@@ -369,3 +369,25 @@ first local report (SHA-256 `0f6f95b72f7b120c7f514a50b468112084df99bc2f63b664a24
 as cost-incomplete. A controlled nonconverging regression reproduces the missing field.
 Repeat the exact registered study only after the timer fix is committed; no scientific
 configuration, solver limit, split, encoder, or cutoff changes are permitted.
+
+## MR-013 - Independent-benign origin audit completed with measured failures
+
+2026-09-03. Cost-complete execution `825efd123b711334e17e5fdc738a50281f8d8f95` took
+87.233 seconds. Its exact scientific projection (all input/fold hashes, metrics, statuses
+and 123 numeric probe-artifact hashes) matches the preserved cost-incomplete attempt.
+The three encoders exceed the fixed origin warning under at least one declared transform
+(C&C 0.93908, DDoS 0.90594, scan 0.91344). Full aggregate exceeds 0.90 across transforms;
+the numerical core remains near 0.89. Of 32 combinations, 24 are fully evaluable, four
+have incomplete folds, and the four mask-only combinations lack valid grouped folds.
+Fifteen probe folds fail convergence and two alias after transformation. None is hidden
+or assigned an invented score. See `docs/error_analysis/dev2-origin-002.md`.
+
+Complete report SHA-256 (UTF-8 LF):
+`cb1d6916868dfa57c685c6d9ec87dd1f0ca8b58845fb03ec087db60a6ea1914c`.
+The table regenerates from the report. No detector retraining, model selection, final
+evaluation or promotion occurred. Runner CI `33711233961` passed ten jobs; subsequent
+publication CI is distinct and must be recorded only after it finishes.
+Timer-fix CI `33711842752` also passed. Final local publication checks passed 354 tests
+in 48.25 seconds (84% backend coverage), Ruff, MyPy over 112 sources, all five evidence
+guards, table regeneration and 123 local numeric probe artifacts. Frozen and historical
+FAMILY evidence remain unchanged. Aggregate-publication CI is not yet claimed complete.

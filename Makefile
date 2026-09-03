@@ -41,6 +41,7 @@ research-evidence-check:
 research-v2-check:
 	$(UV) run python -m scripts.verify_research_v2
 	$(UV) run python -m scripts.verify_registered_research_v2
+	$(UV) run python -m scripts.verify_registered_origin
 
 train-smoke:
 	$(UV) run python -m training.cli.train_smoke

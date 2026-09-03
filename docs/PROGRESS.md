@@ -1,15 +1,15 @@
 # Progress
 
-Last updated: 2026-09-02 (local correction checks; historical acceptance through 2026-08-23).
+Last updated: 2026-09-03 (registered research corrections; historical acceptance through 2026-08-23).
 
 ## Final status (authoritative)
 
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public origin registration commit `df7df957fd208c81209fdaba47814d9088117a91` passed
-CI in `33663241779`; the preceding FAMILY-002 publication passed `33662571272`,
-including its new registered evidence guard. Frozen data stays
+Public timer-fix commit `825efd123b711334e17e5fdc738a50281f8d8f95` passed all ten
+CI jobs in `33711842752`; the preceding FAMILY-002 publication passed `33662571272`,
+including its registered evidence guard. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
@@ -83,7 +83,23 @@ fit hashes and float32 exclusion, preserves binary/categorical geometry, and ret
 grouped-fold failures explicitly. All 392 real input rows pass admission. Full local
 verification passed 342 tests in 56.33 seconds with 84% backend coverage, Ruff, and MyPy
 (111 sources); the final grouping-evidence regression then passed with all 16 focused
-origin tests. No origin score has been generated yet; clean execution is the next step.
+origin tests. The first clean run from `53a62eb` completed in 89.676 seconds. Every frozen
+embedding crosses the fixed 0.90 origin warning under at least one declared transform;
+15 probe folds fail convergence and two alias across transformed partitions. The mask-only
+view cannot form valid grouped folds. Review found missing elapsed costs for failed folds,
+reproduced with a synthetic regression. The first report is preserved as cost-incomplete;
+the unchanged-protocol repeat from timer-fix commit `825efd1` completed in 87.233 seconds.
+Every input/group/score/outcome and all 123 probe-artifact hashes match the first attempt;
+failed-fold costs are now measured. Both reports, a reproducible table and explicit
+coverage limitations are retained under `docs/research-v2/registered-results/` and
+`docs/error_analysis/dev2-origin-002.md`. A publication guard checks the full matrix,
+failed-fold accounting and unchanged scientific results. No detector is retrained or
+selected, and no final data is queried. The broader imputation, detector ablation,
+cross-environment and operational acceptance work remains open.
+Origin publication verification passed 354 tests in 48.25 seconds with 84% backend
+coverage, Ruff, strict MyPy over 112 sources, all five evidence guards and all 123
+local probe-artifact checks. The report table regenerates exactly; scientific outputs
+match the preserved first attempt. Publication CI remains distinct from runner CI.
 
 A second research phase produced historical results on `codex/detector-v2` under
 `docs/research-v2/` (protocol in `docs/research-v2/MASTER_PLAN.md`, log in

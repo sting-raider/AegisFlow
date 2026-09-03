@@ -48,6 +48,12 @@ validity or full-project completion.
    in `DEV2-FAMILY-002`; its registered six-rotation execution completed from clean
    code `3659031`. All six outcomes are preserved as a development NO-GO; none authorizes
    final evaluation or model promotion. See `research-v2/registered-results/`.
+10. Corrected `DEV2-ORIGIN-002` evaluates benign captures excluded from three frozen
+    encoders, with grouped folds and train-fold numeric transforms. Every encoder retains
+    an origin warning under at least one transform. Numeric-only input remains near 0.89;
+    mask-only folds are unevaluable. Preserve 15 convergence and two transformed-alias
+    failures. The first attempt's missing failed-fold times were reproduced and fixed;
+    the unchanged-protocol repeat has identical scientific results and full cost evidence.
 
 ## Requirement-by-requirement status
 
@@ -60,9 +66,9 @@ validity or full-project completion.
 | 2. Frozen boundary | Frozen manifest, `verify_frozen_evidence`, tests | Verified for four retained reports; no new final run authorized |
 | 3. New development pool | v1 pool/provenance; v2 PCAP hashes/preparation | Clean v2 preparation and FAMILY-002 splits bound; tiny deduplicated DDoS/scan support remains a limitation |
 | 4. Two feature schemas | `packages/features/research.py`, parity/state tests | Shared A/B implementation present; runtime activation depends on selection (§18) |
-| 5. Numeric representation | Research transforms and origin diagnostics | Partial: v2 learned-embedding leakage must be included; comparison coverage to audit |
+| 5. Numeric representation | Research transforms; corrected ORIGIN-002 raw/learned/grouped comparisons | Learned-origin warnings retained; broader imputation comparisons and robust-sequence convergence gaps remain |
 | 6. Baselines | DEV-SUP/ANO reports, model configs | v1 comparisons retained; v2 reproducibility/cost evidence incomplete |
-| 7. Open-set representation | v2 fusion embeddings/Mahalanobis | Corrected FAMILY-002 fails; learned-origin/representation comparisons remain incomplete |
+| 7. Open-set representation | v2 fusion embeddings/Mahalanobis | FAMILY-002 fails; ORIGIN-002 confirms retained benign-site information; detector representation/ablation work remains |
 | 8. Unknown vs uncertainty | Runtime fusion/reason codes, separate v2 channels | Runtime baseline tested; v2 claims require corrected evidence |
 | 9. Site baseline workflow | Research quantiles; existing model governance | Incomplete deployed observation/approval/activation/rollback workflow |
 | 10. Operational budgets | v1 curves; v2 exact union budgets and independent benign results | FAMILY-002 measured: worst independent FPR 47.51%; objectives fail, no deployment claim |
@@ -70,7 +76,7 @@ validity or full-project completion.
 | 12. Ablations | DEV-HYB and v2 comparison reports | Partial; strict-family and no-domain-leakage comparisons unresolved |
 | 13. Whole-family holdouts | v1 harness; corrected FAMILY-002 six rotations | Corrected exclusion/row checks executed; 4,710 C&C, 7 DDoS, 4 scan inputs; negative and sample-limited |
 | 14. Cross-environment evaluation | v1 rotations; v2 cross-capture results | Partial; site overlap and raw-vs-embedding diagnostics must be explicit |
-| 15. Strict experiment registry | v1 registry; historical v2 archive; corrected FAMILY-002 | FAMILY-002 has actual clean code/data/split/config/cost/artifact provenance; other historical v2 runs remain incomplete |
+| 15. Strict experiment registry | v1 registry; historical v2 archive; corrected FAMILY/ORIGIN-002 | Corrected studies bind executed clean code/data/splits/config/costs/artifacts and explicit failed coverage; historical v2 remains unvalidated |
 | 16. Final frozen acceptance | Four historical smoke rejection reports | Conditional: no eligible locked challenger, no new final test |
 | 17. Acceptance decision | v1 development NO-GO | Development rejection valid; final brief stop condition not yet proved |
 | 18. Selected-model runtime integration | Shared representations | Conditional on selecting a challenger; none selected |
@@ -94,8 +100,8 @@ validity or full-project completion.
 
 ## Next implementation order
 
-1. Complete the remaining learned-embedding origin diagnostic, numeric/missingness and
-   representation ablations, and registered cross-environment comparisons. FAMILY-002
+1. Complete the remaining imputation/missingness comparisons, detector representation
+   ablations, and registered cross-environment attack comparisons. FAMILY-002
    has corrected provenance but fails development gates and has tiny effective samples
    for two families; do not reuse the old unvalidated results as replacement evidence.
 2. Use those development results to choose a defensible next representation/data study.

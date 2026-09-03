@@ -1,6 +1,6 @@
 # AegisFlow completion summary
 
-Date: 2026-09-02 (evidence through 2026-08-23)
+Date: 2026-09-03 (registered research; operational evidence through 2026-08-23)
 
 ## Current completion boundary
 
@@ -15,6 +15,9 @@ and a completed preregistered six-rotation strict-family matrix. The corrected e
 still fails development objectives: zero C&C/DDoS detection-or-review and worst independent
 benign FPR 47.51%. This is not the final frozen acceptance matrix and does not close the
 remaining research, approved-site workflow, or failure/partitioning acceptance scope.
+The subsequent registered origin audit also finds benign-site information in all three
+frozen encoders under at least one declared transform. Failed and unevaluable probes
+remain explicit; no detector was retrained or promoted by that diagnostic.
 
 This is not a claim of universal production readiness. Organizational IdP, managed data
 services, multi-host/target-cluster capacity, registry signing, penetration testing, and

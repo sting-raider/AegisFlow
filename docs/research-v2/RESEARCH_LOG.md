@@ -248,3 +248,25 @@ Costs, four-verdict counts, exact cuts, uncertainty, split digests, environment 
 numeric artifact hashes are retained. This is not a final locked-candidate rejection;
 the original brief's complete stop condition, origin/ablation work and operational
 acceptance remain open. No thresholds changed, model promoted, or final dataset queried.
+
+## MR2-010 - Corrected independent-benign origin diagnostic
+
+2026-09-03. Protocol registered as `DEV2-ORIGIN-002` in `df7df95`. Three frozen FAMILY-002
+encoders are probed on 181 hp4, 181 hp5 and 30 capture-20 benign inputs absent from their
+fitting data. Eight views, four train-fold numeric transforms and grouped five-fold linear
+probes were fixed before execution. Source, prepared, code and numeric artifact checks
+pass; no detector is fitted during this diagnostic.
+
+The first attempt (`53a62eb`) completed in 89.676 seconds but omitted failed-fold times.
+A regression reproduced that instrumentation defect. The timer-only repeat (`825efd1`)
+completed in 87.233 seconds with identical inputs, groups, scores, statuses and all 123
+numeric artifact hashes. Both reports are retained; the first is explicitly cost-incomplete.
+The complete report is `registered-results/DEV2-ORIGIN-002.json`; its table is reproducible.
+
+All three learned embeddings exceed the fixed 0.90 origin warning under at least one
+declared transform (0.93908 C&C, 0.90594 DDoS, 0.91344 scan). Full aggregate also exceeds
+0.90; numerical-only aggregate remains near 0.89, not invariant. Of 32 combinations,
+24 complete all folds, four have incomplete folds, and the mask-only view is unevaluable.
+Fifteen fits fail convergence and two alias after transformation; no score is fabricated
+for those cases. This narrows the earlier raw-versus-learned diagnostic error but does
+not replace cross-environment attack tests, detector ablations, or operational acceptance.

@@ -11,6 +11,8 @@ completed six preregistered strict-family/site rotations from clean code `365903
 It remains a development NO-GO (zero C&C/DDoS detection-or-review, worst independent
 benign FPR 47.51%). This does not rehabilitate the historical experiments below or
 establish the full final-phase stop condition.
+The separate [ORIGIN-002 audit](registered-results/DEV2-ORIGIN-002.md) confirms retained
+benign-origin information in the corrected encoders; it is not a detector-quality result.
 
 Date: 2026-08-22. Branch `codex/detector-v2`. Development evidence only; the v1 frozen
 reports were never queried and remain sealed.
