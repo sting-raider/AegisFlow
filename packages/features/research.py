@@ -308,7 +308,7 @@ class TemporalFeatureState:
         self.duplicate_capacity = duplicate_capacity
         self._sources: OrderedDict[tuple[str, str], list[_TemporalRecord]] = OrderedDict()
         self._watermarks: dict[tuple[str, str], float] = {}
-        self._duplicates: OrderedDict[str, np.ndarray] = OrderedDict()
+        self._duplicates: OrderedDict[tuple[str, str], np.ndarray] = OrderedDict()
         self._lock = RLock()
 
     @property
@@ -328,9 +328,10 @@ class TemporalFeatureState:
     def observe_mapping(self, observation: FlowObservation) -> dict[str, float]:
         observation.validate()
         with self._lock:
-            cached = self._duplicates.get(observation.event_id)
+            duplicate_key = (observation.sensor_id, observation.event_id)
+            cached = self._duplicates.get(duplicate_key)
             if cached is not None:
-                self._duplicates.move_to_end(observation.event_id)
+                self._duplicates.move_to_end(duplicate_key)
                 return dict(zip(TEMPORAL_FEATURE_NAMES, cached.tolist(), strict=True))
 
             key = (observation.sensor_id, str(ip_address(observation.source_ip)))
@@ -378,7 +379,7 @@ class TemporalFeatureState:
             vector = np.asarray(
                 [values[name] for name in TEMPORAL_FEATURE_NAMES], dtype=np.float64
             )
-            self._duplicates[observation.event_id] = vector
+            self._duplicates[duplicate_key] = vector
             while len(self._duplicates) > self.duplicate_capacity:
                 self._duplicates.popitem(last=False)
             return values
@@ -498,6 +499,7 @@ def research_feature_schema() -> dict[str, object]:
                 "key": ["sensor_id", "source_ip"],
                 "windows_seconds": [10, 60],
                 "duplicate_policy": "return_cached_without_state_mutation",
+                "duplicate_key": ["sensor_id", "event_id"],
                 "late_event_policy": "flag_and_ignore_for_state_when_beyond_clock_skew",
                 "expiry": "bounded_window_plus_clock_skew",
             },

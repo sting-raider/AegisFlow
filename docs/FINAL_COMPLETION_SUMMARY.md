@@ -30,11 +30,17 @@ ineligible. No capture-level site entry reaches 50% direct unknown recall; indep
 benign FPR ranges from 0 to 61.88%. Adding data or availability indicators is not
 uniformly beneficial. See the [paired tables](research-v2/registered-results/DEV2-MISSINGNESS-001.md)
 and [error analysis](error_analysis/dev2-missingness-001.md). Runner CI `33715446245`
-passed; result-publication verification is distinct. The project remains incomplete;
+and all ten result-publication jobs in `33717028051` passed. The project remains incomplete;
 no model is selected, no frozen evaluation is authorized and no deployment claim changes.
 Local publication verification passes 499 tests (84% backend coverage), Ruff, MyPy over
 117 sources, six evidence guards and 84 retained numeric artifact checks. These are
 evidence-integrity and regression results, not production detection acceptance.
+
+The next context review also reproduced and fixed cross-sensor temporal duplicate-cache
+contamination. Shared cache entries now include sensor ID; this does not close the
+timestamp/context preparation, learned-model ablation or distributed routing requirements.
+Its final-source verification passes 501 tests (84% backend coverage), Ruff, strict
+MyPy over 117 sources and all six evidence guards. Separate cache-fix CI is pending.
 
 This is not a claim of universal production readiness. Organizational IdP, managed data
 services, multi-host/target-cluster capacity, registry signing, penetration testing, and

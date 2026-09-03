@@ -7,9 +7,9 @@ Last updated: 2026-09-03 (registered research corrections; historical acceptance
 The full final-phase scope is **incomplete**. `docs/REQUIREMENTS_AUDIT.md` maps all 35
 sections and identifies research partition/provenance, deployed site-baseline, and
 rollback gaps. The engineering baseline remains demoable and the detector remains NO-GO.
-Public missingness-runner commit `b83f184d583d5d1f719c1be4702968516c3fd5f9`
-passed CI `33715446245`; registration CI `33714322097` and sequence-safety CI
-`33713525244` also passed. The subsequent result-publication gate is separate.
+Public missingness-result commit `ae350e3ec57e3555da665e3205c894f1fc88a656`
+passed all ten jobs in CI `33717028051`; runner CI `33715446245`, registration CI
+`33714322097` and sequence-safety CI `33713525244` also passed.
 The preceding origin publication passed `33712407348`. Frozen data stays
 sealed. Earlier completion claims were premature and are superseded by the current audit.
 
@@ -18,6 +18,17 @@ and local demo launch files. They are intentionally preserved and are not part o
 committed acceptance evidence; the model's scientific status does not change.
 
 ## Detector-v2 research phase (validity corrections required)
+
+Temporal follow-up: a synthetic two-sensor/same-event-ID test reproduced a cache
+collision in `TemporalFeatureState`: the second sensor received the first sensor's
+warm features and never populated its own source state. Cache keys now include sensor
+ID; duplicate idempotency and clear/restart behavior are regression tested. This does
+not change historical datasets or constitute a distributed partitioning drill. The v2
+prepared rows still lack timestamps/context; a causal context-preparation and ablation
+path remains necessary. Final-source verification passes 501 tests in 201.77 seconds
+(84% backend coverage; 91% in the shared research-feature module), Ruff, strict MyPy
+over 117 sources and all six evidence guards. The cache-fix publication CI is separate
+from the green missingness-result milestone.
 
 `DEV2-MISSINGNESS-001` completed from clean code `b83f184` in 633.044 seconds.
 All 108 planned model entries are accounted for: 84 fits/models and 168 site evaluations;
@@ -47,7 +58,7 @@ adds a sixth evidence guard plus semantic-tamper and reproducible-summary regres
 Final local publication checks pass: 499 tests in 81.52 seconds (84% backend coverage),
 Ruff, strict MyPy over 117 sources, all six evidence guards and all 84 local numeric
 artifacts. The 36 new evidence tests include LF/CRLF hashing and exact table regeneration.
-The subsequent publication CI result must be recorded independently after it finishes.
+Publication CI `33717028051` subsequently passed all ten jobs on `ae350e3`.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.

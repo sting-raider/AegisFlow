@@ -129,6 +129,35 @@ def test_temporal_state_is_sensor_scoped_and_expires_old_events() -> None:
     assert state.event_count <= 3
 
 
+def test_temporal_duplicate_cache_is_sensor_scoped_even_when_event_ids_match() -> None:
+    state = TemporalFeatureState()
+    state.observe_mapping(_observation(0, event_id="warmup"))
+    # PCAP replay event IDs do not include the sensor identity.
+    first_sensor = _observation(1, event_id="same-observation")
+    second_sensor = _observation(1, event_id="same-observation", sensor_id="sensor-b")
+    warm = state.observe_mapping(first_sensor)
+    cold = state.observe_mapping(second_sensor)
+
+    assert warm["temporal_cold_start"] == 0.0
+    assert cold["temporal_cold_start"] == 1.0
+    assert cold["source_flows_60s_log1p"] == pytest.approx(np.log1p(1))
+    assert state.source_count == 2
+    assert state.event_count == 3
+    assert state.observe_mapping(first_sensor) == warm
+    assert state.observe_mapping(second_sensor) == cold
+    assert state.event_count == 3
+
+
+def test_temporal_clear_removes_sensor_scoped_duplicate_entries() -> None:
+    state = TemporalFeatureState()
+    state.observe_mapping(_observation(0, event_id="warmup"))
+    event = _observation(1, event_id="repeat-after-restart")
+    assert state.observe_mapping(event)["temporal_cold_start"] == 0.0
+    state.clear()
+    assert state.source_count == state.event_count == 0
+    assert state.observe_mapping(event)["temporal_cold_start"] == 1.0
+
+
 def test_reordered_and_too_late_events_are_visible_and_do_not_corrupt_state() -> None:
     state = TemporalFeatureState(max_clock_skew_seconds=2.0)
     state.observe_mapping(_observation(10))
@@ -149,6 +178,10 @@ def test_schema_metadata_binds_order_and_state_semantics() -> None:
         RUNTIME_ENRICHED_FEATURE_NAMES
     )
     assert len(TEMPORAL_FEATURE_NAMES) == 16
+    assert schema["schema_b"]["state"]["duplicate_key"] == [  # type: ignore[index]
+        "sensor_id",
+        "event_id",
+    ]
 
 
 def test_observation_rejects_mixed_ip_versions_and_nonfinite_values() -> None:

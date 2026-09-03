@@ -478,5 +478,29 @@ Final local publication verification passes 499 tests in 81.52 seconds (84% back
 coverage), Ruff, strict MyPy over 117 sources, all six evidence guards and all 84 local
 numeric artifacts. All 36 evidence regressions pass, including LF/CRLF normalized
 hashes and exact generated-table equality. Publication CI is still separate from the
-green runner milestone. No candidate selection, final-data access, deployment activation
+green runner milestone; it subsequently passed all ten jobs in `33717028051` at
+`ae350e3`. No candidate selection, final-data access, deployment activation
 or completion claim is authorized.
+
+## MR-018 - Repair shared temporal-state isolation before context preparation
+
+2026-09-03. MISSINGNESS-001 publication is `ae350e3ec57e3555da665e3205c894f1fc88a656`;
+its CI `33717028051` passed all ten jobs.
+During the next context-ablation review, a synthetic regression reproduces cross-sensor
+duplicate-cache contamination: warm sensor A and cold sensor B share a replay event ID,
+and B incorrectly receives A's cached vector. Shared source windows were sensor-scoped
+but the duplicate cache was not. Scope that cache to `(sensor_id, event_id)` and expose
+the key in feature-schema metadata. The collision and clear/restart tests pass alongside
+all prior focused temporal tests (10 total). Final-source verification passes 501 tests
+in 201.77 seconds (84% backend coverage; 91% in the research-feature module), Ruff,
+strict MyPy over 117 sources and all six evidence guards. Local JUnit evidence is
+retained under ignored `data/verification/temporal-cache-final.xml`. A prior verification
+handle disappeared; process inspection confirmed it was absent before this final run.
+No success was inferred from that missing handle. Cache-fix CI is not yet claimed.
+
+No model is retrained, no prepared data is overwritten and no historical report changes.
+The current v2 prepared contract does not retain timestamp/context, while PcapAdapter
+coalesces a canonical five-tuple over a capture. The next context study must explicitly
+address that observation/ordering limitation rather than assigning invented temporal
+features to already-filtered records. A new dataset/protocol and runtime-parity evidence
+remain required; this bug fix alone does not fulfill the context ablations.

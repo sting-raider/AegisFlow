@@ -923,3 +923,20 @@ or that packet sequences cannot help. Keep the registered config/protocol and al
 report bytes unchanged; no production artifact, threshold or final-data boundary moves.
 Broader learned/context/signature ablations and improved effective source diversity
 remain necessary before a development-selected challenger can be locked.
+
+## D-065 - Scope temporal duplicate replay to the sensor, like source state
+
+A focused synthetic regression showed that the duplicate cache, keyed only by event ID,
+returned one sensor's warm temporal features for a second sensor's first observation.
+PCAP event IDs intentionally do not contain the sensor ID, so assuming global sensor
+uniqueness is not valid for the shared feature API. Key cached vectors by
+`(sensor_id, event_id)`, consistent with the existing sensor-scoped source windows.
+Keep bounded LRU capacity, per-sensor duplicate idempotency and clear/restart behavior.
+Do not change global flow IDs, database deduplication semantics, feature order or values
+for ordinary non-colliding observations. Existing research artifacts remain immutable.
+
+This repairs a feature-state isolation defect, not distributed partition/resharding
+acceptance. Temporal v2 preparation must still replay the real observation history before
+label filtering and explicitly account for flow-completion order and capture-wide
+five-tuple coalescing; simply sorting the current timestamp-free prepared rows cannot
+supply causal context or a valid context ablation.

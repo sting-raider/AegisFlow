@@ -49,3 +49,11 @@ deployed site-baseline workflow or failure/partitioning acceptance requirements.
 Local publication checks pass 499 tests (84% backend coverage), Ruff, strict MyPy over
 117 sources, all six evidence guards and the 84 retained numeric artifacts. This does
 not add an operational drill or waive any acceptance requirement.
+Result-publication CI `33717028051` at `ae350e3` subsequently passed all ten jobs.
+
+A subsequent shared-temporal-state regression reproduces duplicate-cache contamination
+between sensors sharing an event ID. The cache now uses `(sensor_id, event_id)` and
+preserves per-sensor duplicate idempotency and clear/restart behavior. This is a local
+state-isolation fix, not proof of host routing, live runtime activation or safe resharding.
+Final-source checks pass 501 tests (84% backend coverage), Ruff, MyPy over 117 sources
+and all six evidence guards. The cache-fix CI must be recorded separately after publication.
