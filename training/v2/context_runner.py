@@ -20,7 +20,7 @@ from training.v2.context_model import (
     fit_context_predictor,
     load_context_predictor,
 )
-from training.v2.origin_probe import vector_keys
+from training.v2.origin_probe import IneligibleProbe, vector_keys
 from training.v2.provenance import canonical_digest, partition_provenance
 from training.v2.registered_context import ContextRow, context_views
 from training.v2.registered_family import (
@@ -322,7 +322,12 @@ def run_case(
         entry.update(
             {"status": "evaluated", "site_evaluations": sites, "artifact": metadata}
         )
-    except (ConvergenceWarning, np.linalg.LinAlgError, FloatingPointError) as error:
+    except (
+        IneligibleProbe,
+        ConvergenceWarning,
+        np.linalg.LinAlgError,
+        FloatingPointError,
+    ) as error:
         if phase in {"site_evaluation", "artifact_roundtrip"}:
             raise
         entry.setdefault("fit_seconds", perf_counter() - fit_started)

@@ -18,7 +18,7 @@ ENDPOINTS = (
 )
 
 
-def _choices(config: Mapping[str, Any]) -> list[tuple[str, list[str]]]:
+def matrix_choices(config: Mapping[str, Any]) -> list[tuple[str, list[str]]]:
     environments = config["splits"]["attack_environments"]
     choices: list[tuple[str, list[str]]] = []
     for target in environments:
@@ -88,7 +88,7 @@ def paired_analysis(
     executions: Sequence[CaseExecution], config: Mapping[str, Any]
 ) -> dict[str, Any]:
     """Apply the locked six-stratum paired bootstrap and benefit rule."""
-    choices = _choices(config)
+    choices = matrix_choices(config)
     expected = len(choices) * len(config["representation"]["views"])
     if len(executions) != expected:
         raise ValueError("context execution matrix is incomplete")
