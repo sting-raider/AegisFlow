@@ -13,9 +13,11 @@ never loaded here; the study registration binds the permitted sources.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from hashlib import sha256
+from pathlib import Path
 from typing import Any
 
 from packages.contracts import FlowEvent
@@ -25,6 +27,16 @@ from packages.features.research import (
     FlowObservation,
     TemporalFeatureState,
 )
+from services.sensor.adapters import PcapAdapter
+from training.v2.prepare_sequences import (
+    PROTOCOL_ALIASES,
+    AmbiguousFlowLabel,
+    flow_join_key,
+    match_row,
+    parse_zeek_labels,
+)
+from training.v2.provenance import sha256_file
+from training.v2.tensors import load_records
 
 CAUSAL_SIDECAR_SCHEMA_VERSION = "1.0.0"
 
@@ -140,6 +152,7 @@ def sidecar_payload(
         "scenario": scenario,
         "ledger_sha256": result.ledger_sha256,
         "history_flow_count": result.flow_count,
+        "emitted_count": len(selected),
         "entries": [
             {
                 "event_id": entry.event_id,
@@ -152,4 +165,123 @@ def sidecar_payload(
             }
             for entry in selected
         ],
+    }
+
+
+def build_scenario_sidecar(
+    scenario: str,
+    pcap_dir: Path,
+    sequences_path: Path,
+    output_path: Path,
+) -> dict[str, Any]:
+    """Replay one scenario capture and persist causal context for sealed rows.
+
+    Every adapter flow joins the ephemeral history; only `event_id` values
+    already present in the sealed `sequences_path` JSONL are emitted, so the
+    ablation views share identical rows with the frozen cohort. Sealed rows
+    absent from this replay fail closed: the replay disagrees with the sealed
+    preparation and must not produce a partial sidecar.
+    """
+    if output_path.exists():
+        raise FileExistsError(f"refusing to overwrite causal sidecar: {output_path}")
+    manifest_path = pcap_dir / f"{scenario}.manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    pcap_filename = manifest.get("pcap_filename")
+    if (
+        not isinstance(pcap_filename, str)
+        or not pcap_filename
+        or Path(pcap_filename).name != pcap_filename
+    ):
+        raise ValueError(f"scenario {scenario} has an unsafe PCAP filename")
+    if manifest.get("scenario", scenario) != scenario:
+        raise ValueError(f"scenario manifest mismatch: {scenario}")
+    pcap_path = pcap_dir / pcap_filename
+    labels_path = pcap_dir / f"{scenario}.conn.log.labeled"
+    if not pcap_path.exists() or not labels_path.exists():
+        raise FileNotFoundError(f"scenario {scenario} is missing its pcap or labels")
+    if not sequences_path.is_file():
+        raise FileNotFoundError(f"scenario {scenario} is missing sealed rows: {sequences_path}")
+    sealed_records = load_records([sequences_path])
+    if not sealed_records:
+        raise ValueError(f"scenario {scenario} has no sealed rows to contextualize")
+    if any(record["scenario"] != scenario for record in sealed_records):
+        raise ValueError(f"scenario {scenario} sealed rows contain another scenario")
+    sealed_event_ids = [str(record["event_id"]) for record in sealed_records]
+    sealed_ids = set(sealed_event_ids)
+    if len(sealed_ids) != len(sealed_event_ids):
+        raise ValueError(f"scenario {scenario} sealed rows contain duplicate event ids")
+    _, label_index = parse_zeek_labels(labels_path)
+    adapter = PcapAdapter(pcap_path, sensor_id=f"v2-{scenario}")
+    buffered: list[FlowEvent] = []
+    gated = ambiguous = unmatched = unlabeled = 0
+    matched_ids: set[str] = set()
+    for flow in adapter.flows():
+        buffered.append(flow)
+        if PROTOCOL_ALIASES.get(flow.protocol.upper()) is None:
+            gated += 1
+            continue
+        key = flow_join_key(
+            str(flow.src_ip),
+            int(flow.src_port),
+            str(flow.dst_ip),
+            int(flow.dst_port),
+            flow.protocol,
+        )
+        start = flow.timestamp_start.timestamp()
+        end = max(flow.timestamp_end.timestamp(), start)
+        try:
+            row = match_row(label_index, key, start, end)
+        except AmbiguousFlowLabel:
+            ambiguous += 1
+            continue
+        if row is None:
+            if label_index.get(key):
+                unmatched += 1
+            else:
+                unlabeled += 1
+            continue
+        matched_ids.add(str(flow.event_id))
+    missing_matches = sealed_ids - matched_ids
+    unexpected_matches = matched_ids - sealed_ids
+    if missing_matches or unexpected_matches:
+        raise ValueError(
+            f"scenario {scenario} label alignment differs from sealed rows: "
+            f"missing={sorted(missing_matches)[:5]}, "
+            f"unexpected={sorted(unexpected_matches)[:5]}"
+        )
+    result = replay_causal_context(buffered)
+    replayed_ids = {entry.event_id for entry in result.entries}
+    missing = sealed_ids - replayed_ids
+    if missing:
+        raise ValueError(
+            f"scenario {scenario} replay is missing sealed rows: {sorted(missing)[:5]}"
+        )
+    payload = sidecar_payload(result, scenario=scenario, emitted_ids=sealed_ids)
+    payload["source_hashes"] = {
+        "pcap_sha256": sha256_file(pcap_path),
+        "labels_sha256": sha256_file(labels_path),
+        "sealed_rows_sha256": sha256_file(sequences_path),
+    }
+    with output_path.open("x", encoding="utf-8", newline="\n") as output:
+        output.write(json.dumps(payload, sort_keys=True, indent=2) + "\n")
+    digest = sha256(output_path.read_bytes()).hexdigest()
+    return {
+        "scenario": scenario,
+        "adapter_flows": len(buffered),
+        "non_tcp_udp_icmp_flows": gated,
+        "ambiguous_label_flows": ambiguous,
+        "matched_unlabeled_flows": unmatched,
+        "flows_without_label_candidate": unlabeled,
+        "sealed_rows": len(sealed_ids),
+        "emitted_rows": len(sealed_ids),
+        "context_only_flows": len(buffered) - len(sealed_ids),
+        "cold_rows": sum(
+            1 for entry in result.entries if entry.event_id in sealed_ids and entry.cold_start
+        ),
+        "late_rows": sum(
+            1 for entry in result.entries if entry.event_id in sealed_ids and entry.late_event
+        ),
+        "ledger_sha256": result.ledger_sha256,
+        "source_hashes": payload["source_hashes"],
+        "output_sha256": digest,
     }

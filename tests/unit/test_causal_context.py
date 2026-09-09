@@ -2,7 +2,8 @@
 
 No capture, development-row, or frozen data enters these tests. Fixtures build
 synthetic FlowEvents from a single DemoAdapter template with controlled
-completion times.
+completion times, plus a synthetic two-flow PCAP scenario for the sidecar
+builder.
 """
 
 from __future__ import annotations
@@ -10,6 +11,7 @@ from __future__ import annotations
 import json
 import math
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -21,8 +23,10 @@ from packages.features.research import (
     TemporalFeatureState,
 )
 from services.sensor import DemoAdapter
+from services.sensor.adapters import PcapAdapter
 from training.v2.causal_context import (
     CAUSAL_SIDECAR_SCHEMA_VERSION,
+    build_scenario_sidecar,
     causal_completion_order,
     replay_causal_context,
     sidecar_payload,
@@ -211,3 +215,137 @@ def test_sidecar_selection_binds_emitted_rows() -> None:
     ]
     with pytest.raises(ValueError, match="unknown event ids"):
         sidecar_payload(result, scenario="synthetic", emitted_ids={"missing-id"})
+
+
+_SCENARIO = "synthetic-ctx"
+_BASE_TIME = 1_700_000_000.0
+
+
+def _write_scenario(tmp_path: Path) -> tuple[Path, Path, str, str]:
+    from scapy.all import IP, TCP, Ether, wrpcap
+
+    labeled_syn = (
+        Ether() / IP(src="10.0.0.9", dst="192.0.2.5") / TCP(sport=5000, dport=80, flags="S")
+    )
+    labeled_ack = (
+        Ether() / IP(src="10.0.0.9", dst="192.0.2.5") / TCP(sport=5000, dport=80, flags="A")
+    )
+    unlabeled_syn = (
+        Ether() / IP(src="10.0.0.9", dst="192.0.2.6") / TCP(sport=5001, dport=80, flags="S")
+    )
+    labeled_syn.time = _BASE_TIME
+    labeled_ack.time = _BASE_TIME + 0.5
+    unlabeled_syn.time = _BASE_TIME + 10.0
+    pcap_path = tmp_path / "synth.pcap"
+    wrpcap(str(pcap_path), [labeled_syn, labeled_ack, unlabeled_syn])
+    (tmp_path / f"{_SCENARIO}.manifest.json").write_text(
+        json.dumps({"scenario": _SCENARIO, "pcap_filename": "synth.pcap"}),
+        encoding="utf-8",
+    )
+    prefix = [
+        f"{_BASE_TIME}",
+        "C1",
+        "10.0.0.9",
+        "5000",
+        "192.0.2.5",
+        "80",
+        "tcp",
+        "0.5",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+    ]
+    (tmp_path / f"{_SCENARIO}.conn.log.labeled").write_text(
+        "\t".join(prefix) + "\t- benign -\n", encoding="utf-8"
+    )
+    flows = list(PcapAdapter(pcap_path, sensor_id=f"v2-{_SCENARIO}").flows())
+    assert len(flows) == 2
+    labeled = next(flow for flow in flows if flow.src_port == 5000)
+    unlabeled = next(flow for flow in flows if flow.src_port == 5001)
+    sealed_path = tmp_path / f"{_SCENARIO}.jsonl"
+    record = {
+        "event_id": str(labeled.event_id),
+        "scenario": _SCENARIO,
+        "family": "benign",
+        "detailed_label": "-",
+        "binary_label": "benign",
+        "seq_sizes": [54.0, 54.0],
+        "seq_directions": [1, 1],
+        "seq_iats_ms": [0.0, 500.0],
+        "total_packets": 2,
+        "duration_ms": 500.0,
+        "protocol": "TCP",
+        "tcp_syn_count": 1,
+        "tcp_ack_count": 1,
+        "tcp_fin_count": 0,
+        "tcp_rst_count": 0,
+        "tcp_psh_count": 0,
+        "bytes_forward": 108,
+        "bytes_reverse": 0,
+        "packets_forward": 2,
+        "packets_reverse": 0,
+        "src_port": 5000,
+        "dst_port": 80,
+        "ip_version": 4,
+        "observability": "MEDIUM",
+    }
+    sealed_path.write_text(json.dumps(record) + "\n")
+    return tmp_path, sealed_path, str(labeled.event_id), str(unlabeled.event_id)
+
+
+def test_scenario_sidecar_emits_sealed_rows_with_full_history(tmp_path: Path) -> None:
+    pcap_dir, sealed_path, labeled_id, _ = _write_scenario(tmp_path)
+    output_path = tmp_path / "sidecar.json"
+
+    report = build_scenario_sidecar(_SCENARIO, pcap_dir, sealed_path, output_path)
+
+    assert report["adapter_flows"] == 2
+    assert report["flows_without_label_candidate"] == 1
+    assert report["sealed_rows"] == 1
+    assert report["emitted_rows"] == 1
+    assert report["context_only_flows"] == 1
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["history_flow_count"] == 2
+    assert payload["emitted_count"] == 1
+    assert [item["event_id"] for item in payload["entries"]] == [labeled_id]
+    assert len(payload["entries"][0]["vector"]) == len(TEMPORAL_FEATURE_NAMES)
+    assert set(payload["source_hashes"]) == {
+        "pcap_sha256",
+        "labels_sha256",
+        "sealed_rows_sha256",
+    }
+    dumped = json.dumps(payload)
+    assert "10.0.0.9" not in dumped
+    assert "192.0.2." not in dumped
+
+
+def test_scenario_sidecar_refuses_overwrite_and_missing_sealed_rows(
+    tmp_path: Path,
+) -> None:
+    pcap_dir, sealed_path, _, unlabeled_id = _write_scenario(tmp_path)
+    output_path = tmp_path / "sidecar.json"
+    build_scenario_sidecar(_SCENARIO, pcap_dir, sealed_path, output_path)
+
+    with pytest.raises(FileExistsError):
+        build_scenario_sidecar(_SCENARIO, pcap_dir, sealed_path, tmp_path / "sidecar.json")
+
+    record = json.loads(sealed_path.read_text(encoding="utf-8"))
+    tampered = tmp_path / "tampered.jsonl"
+    tampered.write_text(json.dumps({**record, "event_id": unlabeled_id}) + "\n")
+    with pytest.raises(ValueError, match="label alignment differs"):
+        build_scenario_sidecar(_SCENARIO, pcap_dir, tampered, tmp_path / "other.json")
+
+    empty = tmp_path / "empty.jsonl"
+    empty.write_text("", encoding="utf-8")
+    with pytest.raises(ValueError, match="no sealed rows"):
+        build_scenario_sidecar(_SCENARIO, pcap_dir, empty, tmp_path / "empty-out.json")
+
+    duplicate = tmp_path / "duplicate.jsonl"
+    duplicate.write_text(json.dumps(record) + "\n" + json.dumps(record) + "\n")
+    with pytest.raises(ValueError, match="duplicate event ids"):
+        build_scenario_sidecar(_SCENARIO, pcap_dir, duplicate, tmp_path / "duplicate-out.json")

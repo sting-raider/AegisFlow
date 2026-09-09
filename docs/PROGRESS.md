@@ -107,6 +107,13 @@ Ruff, strict MyPy over 117 sources, all six evidence guards and all 84 local num
 artifacts. The 36 new evidence tests include LF/CRLF hashing and exact table regeneration.
 Publication CI `33717028051` subsequently passed all ten jobs on `ae350e3`.
 
+The causal sidecar builder now validates sealed row schemas and exact label alignment,
+refuses duplicate IDs and unsafe capture paths, and binds all three source hashes. A real
+development-only preparation check on capture 20 replayed 630 flows into 44 sealed and
+586 context-only rows without fitting a model or reading frozen evidence. Full six-capture
+sidecar preparation, immutable registration, four-view execution, and publication remain
+open.
+
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.
 Reject malformed entries instead, including nonfinite timings at the flow-contract

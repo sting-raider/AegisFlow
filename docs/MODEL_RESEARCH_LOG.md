@@ -512,7 +512,8 @@ fused (decision D-066): end-timestamped sidecar replay, all-flow ephemeral
 history, four paired views (causal / shuffled control / no-context /
 non-deployable non-causal reference), preregistered NULL rule. The
 `DEV2-CONTEXT-001` registration, runner, guard, and clean execution remain
-pending; this entry covers design plus the offline primitive only.
+pending; this entry covers design plus the offline primitive and verified sidecar
+preparation only.
 
 `FlowObservation.from_completed_flow` timestamps the observation at the flow
 completion instant (`max(timestamp_end, timestamp_start)`); `from_flow_event`
@@ -530,3 +531,12 @@ verification passes 512 tests (84% backend coverage), Ruff across the
 repository, strict MyPy over 118 sources, and all six evidence guards. No
 model is fit, no candidate is selected, and no historical result is
 reinterpreted.
+
+2026-09-09 preparation follow-up: the scenario builder now validates the complete sealed
+`SequenceRecord` schema, refuses duplicate IDs, requires the replay's unambiguous label
+joins to equal the sealed cohort exactly, rejects unsafe capture filenames, and binds the
+PCAP, label, and sealed-row hashes into each sidecar. A bounded implementation validation
+on `CTU-IoT-Malware-Capture-20-1` replayed 630 flows: all 44 sealed rows aligned, 586
+unlabeled flows contributed context only, and no late or ambiguous row was observed. This
+is preparation evidence, not a context result; no model was fit and frozen final evidence
+was not loaded.
