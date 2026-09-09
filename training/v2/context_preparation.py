@@ -12,7 +12,7 @@ from typing import Any
 
 from packages.features.research import TEMPORAL_FEATURE_NAMES, TEMPORAL_SCHEMA_VERSION
 from training.v2.causal_context import (
-    CAUSAL_SIDECAR_SCHEMA_VERSION,
+    MULTIVIEW_SIDECAR_SCHEMA_VERSION,
     build_scenario_sidecar,
 )
 from training.v2.provenance import (
@@ -122,7 +122,7 @@ def prepare_context_sidecars(
                 "records_canonical_sha256": prepared_digest,
                 "rows": len(prepared_records),
             },
-            "sidecar_schema_version": CAUSAL_SIDECAR_SCHEMA_VERSION,
+            "sidecar_schema_version": MULTIVIEW_SIDECAR_SCHEMA_VERSION,
             "temporal_schema_version": TEMPORAL_SCHEMA_VERSION,
             "temporal_feature_names": list(TEMPORAL_FEATURE_NAMES),
             "history_order": "timestamp_end_timestamp_start_event_id",
@@ -135,6 +135,12 @@ def prepare_context_sidecars(
                 ),
                 "cold_rows": sum(int(report["cold_rows"]) for report in reports),
                 "late_rows": sum(int(report["late_rows"]) for report in reports),
+                "non_causal_cold_rows": sum(
+                    int(report["non_causal_cold_rows"]) for report in reports
+                ),
+                "non_causal_late_rows": sum(
+                    int(report["non_causal_late_rows"]) for report in reports
+                ),
             },
             "environment": {
                 "python": platform.python_version(),

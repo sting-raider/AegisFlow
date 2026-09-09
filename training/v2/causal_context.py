@@ -39,6 +39,7 @@ from training.v2.provenance import sha256_file
 from training.v2.tensors import load_records
 
 CAUSAL_SIDECAR_SCHEMA_VERSION = "1.0.0"
+MULTIVIEW_SIDECAR_SCHEMA_VERSION = "1.1.0"
 
 
 def causal_completion_order(flows: Sequence[FlowEvent]) -> list[FlowEvent]:
@@ -79,6 +80,35 @@ class CausalReplayResult:
     late_count: int
 
 
+@dataclass(frozen=True)
+class TerminalContextEntry:
+    event_id: str
+    completion_index: int
+    cold_start: bool
+    late_event: bool
+    vector: tuple[float, ...]
+
+
+@dataclass(frozen=True)
+class TerminalReplayResult:
+    entries: tuple[TerminalContextEntry, ...]
+    ledger_sha256: str
+    flow_count: int
+    cold_count: int
+    late_count: int
+
+
+def _ordered_unique_flows(flows: Sequence[FlowEvent]) -> list[FlowEvent]:
+    ordered = causal_completion_order(list(flows))
+    seen: set[str] = set()
+    for flow in ordered:
+        event_id = str(flow.event_id)
+        if event_id in seen:
+            raise ValueError(f"duplicate event_id in context replay: {event_id}")
+        seen.add(event_id)
+    return ordered
+
+
 def replay_causal_context(flows: Sequence[FlowEvent]) -> CausalReplayResult:
     """Feed every flow through a fresh state in completion order.
 
@@ -87,13 +117,7 @@ def replay_causal_context(flows: Sequence[FlowEvent]) -> CausalReplayResult:
     oracle. Each ``event_id`` may appear exactly once; a repeat is a replay
     bug and fails closed instead of returning a cached vector.
     """
-    ordered = causal_completion_order(list(flows))
-    seen: set[str] = set()
-    for flow in ordered:
-        event_id = str(flow.event_id)
-        if event_id in seen:
-            raise ValueError(f"duplicate event_id in causal replay: {event_id}")
-        seen.add(event_id)
+    ordered = _ordered_unique_flows(flows)
     state = TemporalFeatureState()
     entries: list[CausalContextEntry] = []
     ledger = sha256()
@@ -124,8 +148,50 @@ def replay_causal_context(flows: Sequence[FlowEvent]) -> CausalReplayResult:
     )
 
 
+def replay_noncausal_terminal_context(
+    flows: Sequence[FlowEvent],
+) -> TerminalReplayResult:
+    """Query every flow against its source's completed full-capture state.
+
+    This is an intentionally future-leaking, non-deployable reference view.
+    The terminal snapshot query is read-only, so the result is independent of
+    query order and cannot contaminate causal replay or runtime state.
+    """
+    ordered = _ordered_unique_flows(flows)
+    state = TemporalFeatureState()
+    ledger = sha256()
+    for flow in ordered:
+        state.observe_mapping(FlowObservation.from_completed_flow(flow))
+        ledger.update(str(flow.event_id).encode("utf-8"))
+    entries: list[TerminalContextEntry] = []
+    for index, flow in enumerate(ordered):
+        mapping = state.noncausal_terminal_snapshot_mapping(
+            FlowObservation.from_completed_flow(flow)
+        )
+        entries.append(
+            TerminalContextEntry(
+                event_id=str(flow.event_id),
+                completion_index=index,
+                cold_start=mapping["temporal_cold_start"] == 1.0,
+                late_event=mapping["temporal_late_event"] == 1.0,
+                vector=tuple(float(mapping[name]) for name in TEMPORAL_FEATURE_NAMES),
+            )
+        )
+    return TerminalReplayResult(
+        entries=tuple(entries),
+        ledger_sha256=ledger.hexdigest(),
+        flow_count=len(entries),
+        cold_count=sum(1 for entry in entries if entry.cold_start),
+        late_count=sum(1 for entry in entries if entry.late_event),
+    )
+
+
 def sidecar_payload(
-    result: CausalReplayResult, *, scenario: str, emitted_ids: set[str] | None = None
+    result: CausalReplayResult,
+    *,
+    scenario: str,
+    emitted_ids: set[str] | None = None,
+    noncausal_result: TerminalReplayResult | None = None,
 ) -> dict[str, Any]:
     """Build the persistable aggregate sidecar for emitted rows only.
 
@@ -145,27 +211,60 @@ def sidecar_payload(
                 "sidecar selection references unknown event ids: "
                 f"{sorted(missing)[:5]}"
             )
-    return {
-        "schema_version": CAUSAL_SIDECAR_SCHEMA_VERSION,
+    terminal_by_id: dict[str, TerminalContextEntry] = {}
+    if noncausal_result is not None:
+        if (
+            noncausal_result.ledger_sha256 != result.ledger_sha256
+            or noncausal_result.flow_count != result.flow_count
+        ):
+            raise ValueError("causal and terminal context replays differ")
+        terminal_by_id = {entry.event_id: entry for entry in noncausal_result.entries}
+        if set(terminal_by_id) != {entry.event_id for entry in result.entries}:
+            raise ValueError("causal and terminal context event ids differ")
+    entries = []
+    for entry in selected:
+        item = {
+            "event_id": entry.event_id,
+            "completion_index": entry.completion_index,
+            "prior_completions": entry.prior_completions,
+            "coalesced_span_ms": entry.coalesced_span_ms,
+            "cold_start": entry.cold_start,
+            "late_event": entry.late_event,
+            "vector": list(entry.vector),
+        }
+        if noncausal_result is not None:
+            item["non_causal_terminal_vector"] = list(
+                terminal_by_id[entry.event_id].vector
+            )
+        entries.append(item)
+    payload = {
+        "schema_version": (
+            MULTIVIEW_SIDECAR_SCHEMA_VERSION
+            if noncausal_result is not None
+            else CAUSAL_SIDECAR_SCHEMA_VERSION
+        ),
         "temporal_schema_version": TEMPORAL_SCHEMA_VERSION,
         "temporal_feature_names": list(TEMPORAL_FEATURE_NAMES),
         "scenario": scenario,
         "ledger_sha256": result.ledger_sha256,
         "history_flow_count": result.flow_count,
         "emitted_count": len(selected),
-        "entries": [
-            {
-                "event_id": entry.event_id,
-                "completion_index": entry.completion_index,
-                "prior_completions": entry.prior_completions,
-                "coalesced_span_ms": entry.coalesced_span_ms,
-                "cold_start": entry.cold_start,
-                "late_event": entry.late_event,
-                "vector": list(entry.vector),
-            }
-            for entry in selected
-        ],
+        "entries": entries,
     }
+    if noncausal_result is not None:
+        payload["non_causal_reference"] = {
+            "kind": "read_only_terminal_retained_state",
+            "deployable": False,
+            "cold_count": sum(
+                1
+                for entry in selected
+                if terminal_by_id[entry.event_id].cold_start
+            ),
+            "late_count": sum(
+                1 for entry in selected if terminal_by_id[entry.event_id].late_event
+            ),
+        }
+    return payload
 
 
 def build_scenario_sidecar(
@@ -250,13 +349,19 @@ def build_scenario_sidecar(
             f"unexpected={sorted(unexpected_matches)[:5]}"
         )
     result = replay_causal_context(buffered)
+    noncausal_result = replay_noncausal_terminal_context(buffered)
     replayed_ids = {entry.event_id for entry in result.entries}
     missing = sealed_ids - replayed_ids
     if missing:
         raise ValueError(
             f"scenario {scenario} replay is missing sealed rows: {sorted(missing)[:5]}"
         )
-    payload = sidecar_payload(result, scenario=scenario, emitted_ids=sealed_ids)
+    payload = sidecar_payload(
+        result,
+        scenario=scenario,
+        emitted_ids=sealed_ids,
+        noncausal_result=noncausal_result,
+    )
     payload["source_hashes"] = {
         "pcap_sha256": sha256_file(pcap_path),
         "labels_sha256": sha256_file(labels_path),
@@ -280,6 +385,16 @@ def build_scenario_sidecar(
         ),
         "late_rows": sum(
             1 for entry in result.entries if entry.event_id in sealed_ids and entry.late_event
+        ),
+        "non_causal_cold_rows": sum(
+            1
+            for entry in noncausal_result.entries
+            if entry.event_id in sealed_ids and entry.cold_start
+        ),
+        "non_causal_late_rows": sum(
+            1
+            for entry in noncausal_result.entries
+            if entry.event_id in sealed_ids and entry.late_event
         ),
         "ledger_sha256": result.ledger_sha256,
         "source_hashes": payload["source_hashes"],

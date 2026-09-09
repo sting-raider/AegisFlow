@@ -54,13 +54,24 @@ persisted as clock time.
    within sensor-by-partition strata (marginals preserved, conditional
    information broken).
 3. `no_context` — cold-start sentinel (`temporal_cold_start=1`, else 0).
-4. `non_causal_reference` — vectors queried against full-capture terminal
-   state; labeled non-deployable; quantifies the leakage being removed.
+4. `non_causal_reference` — after the entire scenario has populated a fresh
+   state, each row is queried read-only against its source's terminal retained
+   state. The terminal watermark defines the existing 60 s and 10 s windows;
+   no query is inserted or cached, and all terminal active records are treated
+   as prior. This deliberately allows future completions (and the queried flow
+   itself when it remains in the terminal window), sets `temporal_late_event`
+   when the row precedes the terminal watermark, and is labeled non-deployable.
+   It quantifies the leakage that a full-capture feature pass could introduce;
+   it is neither an upper bound nor a candidate runtime feature path.
 
 Portable, sequence, and aggregate inputs are byte-identical across views, so
-deltas isolate context causality. The transfer matrix, budgets, seeds, and
-four-verdict semantics follow the `DEV2-MISSINGNESS-001` precedent; exact
-counts bind in the registration.
+deltas isolate context treatment. Causal and terminal vectors are materialized
+together from the same uniquely ordered flow replay and bound by one event
+ledger; the terminal query cannot mutate the populated state. Shuffling occurs
+separately inside each scenario and data-role stratum after splitting, so a
+vector never crosses fit, calibration, or test roles. The transfer matrix,
+budgets, seed, and four-verdict semantics follow the `DEV2-MISSINGNESS-001`
+precedent; exact counts bind in the registration.
 
 ## Decision rule
 

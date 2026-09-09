@@ -998,3 +998,21 @@ call as well. Do not copy system DLLs into the environment, patch NFStream, use 
 untrusted DLL path, or weaken the explicit-interface and non-promiscuous capture bounds.
 Offline PCAP processing is verified on Windows. Live Windows capture remains experimental
 until an isolated authorized-interface probe is recorded.
+
+## D-070 - Make the non-causal context reference a read-only terminal snapshot
+
+The fourth `DEV2-CONTEXT-001` view must measure a defined leakage mechanism rather than
+silently reuse cached causal vectors. Populate a fresh `TemporalFeatureState` with the
+complete scenario, then query each flow without insertion or duplicate-cache access
+against its source's terminal retained 60-second state. The terminal watermark owns the
+10-second and 60-second windows; all retained terminal records count as prior, including
+the queried flow when it remains retained. Rows before the terminal watermark are marked
+late. This intentionally consumes future information and is permanently non-deployable.
+
+Materialize causal and terminal vectors from the same completion-ordered flow set and
+bind them to the same event ledger. Keep the terminal API read-only and explicitly named
+`noncausal_terminal_snapshot_mapping`; it cannot affect detection unless separate future
+code violates the registered prohibition. Rejected: querying ordinary duplicate IDs
+after replay (returns cached causal vectors), inserting synthetic query IDs (mutates the
+terminal state and makes order matter), and an invented centered window (does not match
+the shipped state machine's retained terminal state).

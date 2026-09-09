@@ -26,9 +26,11 @@ from services.sensor import DemoAdapter
 from services.sensor.adapters import PcapAdapter
 from training.v2.causal_context import (
     CAUSAL_SIDECAR_SCHEMA_VERSION,
+    MULTIVIEW_SIDECAR_SCHEMA_VERSION,
     build_scenario_sidecar,
     causal_completion_order,
     replay_causal_context,
+    replay_noncausal_terminal_context,
     sidecar_payload,
 )
 
@@ -142,6 +144,9 @@ def test_duplicate_event_id_fails_closed() -> None:
     with pytest.raises(ValueError, match="duplicate event_id"):
         replay_causal_context(repeated)
 
+    with pytest.raises(ValueError, match="duplicate event_id"):
+        replay_noncausal_terminal_context(repeated)
+
 
 def test_replay_matches_direct_state_machine_sequence() -> None:
     flows = _series(5)
@@ -174,6 +179,51 @@ def test_unlabeled_interleaving_flow_contributes_to_history() -> None:
         ]
         == math.log1p(6)
     )
+
+
+def test_terminal_reference_is_future_informed_and_query_order_independent() -> None:
+    flows = _series(8, step_s=10.0)
+    causal = replay_causal_context(flows)
+    terminal = replay_noncausal_terminal_context(flows)
+    reversed_terminal = replay_noncausal_terminal_context(list(reversed(flows)))
+
+    assert terminal.ledger_sha256 == causal.ledger_sha256
+    assert [entry.event_id for entry in terminal.entries] == [
+        entry.event_id for entry in causal.entries
+    ]
+    assert [entry.vector for entry in terminal.entries] == [
+        entry.vector for entry in reversed_terminal.entries
+    ]
+    assert terminal.entries[0].vector != causal.entries[0].vector
+    assert terminal.entries[0].late_event is True
+    assert terminal.entries[-1].late_event is False
+
+
+def test_multiview_sidecar_binds_terminal_vectors_without_identifiers() -> None:
+    flows = _series(4)
+    causal = replay_causal_context(flows)
+    terminal = replay_noncausal_terminal_context(flows)
+    payload = sidecar_payload(
+        causal,
+        scenario="synthetic",
+        noncausal_result=terminal,
+    )
+
+    assert payload["schema_version"] == MULTIVIEW_SIDECAR_SCHEMA_VERSION
+    assert payload["non_causal_reference"] == {
+        "kind": "read_only_terminal_retained_state",
+        "deployable": False,
+        "cold_count": 0,
+        "late_count": 3,
+    }
+    assert all(
+        len(item["non_causal_terminal_vector"]) == len(TEMPORAL_FEATURE_NAMES)
+        for item in payload["entries"]
+    )
+    dumped = json.dumps(payload)
+    assert "10.0.0.1" not in dumped
+    assert "192.0.2." not in dumped
+    assert "v2-synthetic" not in dumped
 
 
 def test_sidecar_payload_carries_no_identifiers_or_timestamps() -> None:
@@ -310,10 +360,15 @@ def test_scenario_sidecar_emits_sealed_rows_with_full_history(tmp_path: Path) ->
     assert report["emitted_rows"] == 1
     assert report["context_only_flows"] == 1
     payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MULTIVIEW_SIDECAR_SCHEMA_VERSION
     assert payload["history_flow_count"] == 2
     assert payload["emitted_count"] == 1
     assert [item["event_id"] for item in payload["entries"]] == [labeled_id]
     assert len(payload["entries"][0]["vector"]) == len(TEMPORAL_FEATURE_NAMES)
+    assert len(payload["entries"][0]["non_causal_terminal_vector"]) == len(
+        TEMPORAL_FEATURE_NAMES
+    )
+    assert payload["non_causal_reference"]["deployable"] is False
     assert set(payload["source_hashes"]) == {
         "pcap_sha256",
         "labels_sha256",
