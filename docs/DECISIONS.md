@@ -1016,3 +1016,22 @@ code violates the registered prohibition. Rejected: querying ordinary duplicate 
 after replay (returns cached causal vectors), inserting synthetic query IDs (mutates the
 terminal state and makes order matter), and an invented centered window (does not match
 the shipped state machine's retained terminal state).
+
+## D-071 - Register the context study on paired portable-core common support
+
+Use the already bound 6,195-row common-support cohort and transfer matrix so the context
+treatment—not row admission, optional packet availability, or target selection—is the
+changed factor. Concatenate the nine portable numerical features with the 16 temporal
+values and fit the same transparent logistic/Mahalanobis detector under four context
+views. Do not consume sequence tensors, port/service categories, signatures, endpoint
+identity, or frozen evaluations. Nine source/target choices, four views, and two benign
+site orientations produce 36 fits and 72 site evaluations.
+
+Analyze causal-minus-shuffled and causal-minus-no-context on identical rows within each
+of six target-by-orientation strata. Average row verdict indicators across the three fit
+choices, then use 2,000 deterministic class-stratified paired bootstrap replicates. A
+benefit requires positive lower intervals for both attack endpoints in at least five
+strata against each control, coverage of all targets and orientations, and no independent
+benign direct-FPR upper delta above +0.005. Missing comparisons fail visibly. The terminal
+view is leakage diagnostic only. These intervals remain descriptive because captures and
+fit choices are correlated, and even a benefit cannot promote or deploy a candidate.

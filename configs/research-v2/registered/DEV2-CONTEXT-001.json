@@ -1,0 +1,203 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "DEV2-CONTEXT-001",
+  "registered_date": "2026-09-10",
+  "status": "registered_not_run",
+  "permitted_use": "development_only",
+  "candidate_promotion_authorized": false,
+  "text_hash_format": "sha256-utf8-lf",
+  "protocol": {
+    "path": "docs/research-v2/CONTEXT_001_PROTOCOL.md",
+    "sha256": "3d2cd115cf4a105254027d07c5f01a5c3961d88b33868ad4332f81da18316a2d"
+  },
+  "prepared_manifest": {
+    "path": "docs/research-v2/preparation/prepared-pool-cba2329.json",
+    "sha256": "332939033261e67a41dd15f8c95edf54e4dd4fd1723e636c9e3c53f93c71f86a",
+    "expected_rows": 7145
+  },
+  "context_manifest": {
+    "path": "docs/research-v2/preparation/context-multiview-d87559a.json",
+    "sha256": "3e300cade95b3b3d992e0640035afcadfdcdb14db04b3a3da41c5d63b6dba78f",
+    "expected_history_flows": 11771,
+    "expected_rows": 7145,
+    "sidecar_schema_version": "1.1.0",
+    "causal_cold_rows": 161,
+    "causal_late_rows": 0,
+    "non_causal_cold_rows": 0,
+    "non_causal_late_rows": 7133
+  },
+  "cohort": {
+    "implementation": "training.v2.transfer_support.common_support",
+    "core_groups": 6273,
+    "cross_capture_groups": 77,
+    "cross_capture_excluded_rows": 284,
+    "within_capture_ambiguous_excluded_rows": 249,
+    "within_capture_duplicate_rows": 417,
+    "groups_with_optional_packet_variants": 334,
+    "retained_rows": 6195,
+    "retained_event_ids_sha256": "676e56084c7652fff30afa2791116b4d2b828a09e08fd7e9058897b618cb3918",
+    "retained_records_sha256": "79d131e27fe1f63cf43ec101c0b4b9e8fae3713bbb30f68cda0c977782bb3298",
+    "scope": "paired_portable_core_distinct_common_support_not_operational_prevalence"
+  },
+  "execution": {
+    "require_clean_worktree": true,
+    "record_actual_execution_commit": true,
+    "seed": 20260910,
+    "numerical_threads": 1
+  },
+  "representation": {
+    "feature_schema_version": "1.0.0-research-v2-context",
+    "portable_input_implementation": "training.v2.missingness.observation_inputs_core9",
+    "context_input_implementation": "training.v2.registered_context.context_views",
+    "portable_core_features": [
+      "duration_log1p_ms",
+      "packets_total_log1p",
+      "packets_forward_fraction",
+      "bytes_total_log1p",
+      "bytes_forward_fraction",
+      "packet_rate_log1p_derived",
+      "byte_rate_log1p_derived",
+      "packet_length_mean_log1p_derived",
+      "forward_reverse_byte_log_ratio"
+    ],
+    "temporal_features": [
+      "source_flows_10s_log1p",
+      "source_flows_60s_log1p",
+      "unique_destinations_10s_log1p",
+      "unique_destinations_60s_log1p",
+      "unique_destination_ports_10s_log1p",
+      "unique_destination_ports_60s_log1p",
+      "destination_novelty_60s",
+      "service_port_rarity_60s",
+      "protocol_rarity_60s",
+      "destination_fanout_entropy_60s",
+      "connection_interval_mean_log1p_ms_60s",
+      "connection_interval_std_log1p_ms_60s",
+      "connection_burstiness_60s",
+      "short_lived_ratio_60s",
+      "temporal_cold_start",
+      "temporal_late_event"
+    ],
+    "views": [
+      "causal_context",
+      "shuffled_context",
+      "no_context",
+      "non_causal_reference"
+    ],
+    "dimension": 25,
+    "portable_dimension": 9,
+    "temporal_dimension": 16,
+    "value_dtype": "float64",
+    "transform": "standard_fit_only_all_25_dimensions",
+    "scale_floor": 1e-09,
+    "shuffle_scope": "scenario_and_partition_role",
+    "shuffle_method": "seeded_permutation_without_replacement",
+    "no_context_vector": "zeros_except_temporal_cold_start_one",
+    "non_causal_reference": "read_only_terminal_retained_state_non_deployable",
+    "sequence_consumed": false,
+    "packet_metadata_consumed": false,
+    "port_protocol_service_consumed": false,
+    "endpoint_identity_consumed": false,
+    "signatures_consumed": false
+  },
+  "splits": {
+    "attack_environments": [
+      "CTU-IoT-Malware-Capture-20-1",
+      "CTU-IoT-Malware-Capture-34-1",
+      "CTU-IoT-Malware-Capture-8-1"
+    ],
+    "fit_choices_per_target": "each_other_source_alone_then_their_union",
+    "background_benign": "CTU-IoT-Malware-Capture-42-1",
+    "site_orientations": [
+      {
+        "calibration": "CTU-Honeypot-Capture-4-1",
+        "benign_test": "CTU-Honeypot-Capture-5-1"
+      },
+      {
+        "calibration": "CTU-Honeypot-Capture-5-1",
+        "benign_test": "CTU-Honeypot-Capture-4-1"
+      }
+    ],
+    "fit_per_binary_class_cap": 1500,
+    "fit_selection": "sorted_event_ids_seeded_permutation",
+    "target_includes_incidental_benign": true,
+    "expected_source_target_choices": 9,
+    "expected_model_fits": 36,
+    "expected_site_evaluations": 72,
+    "site_orientations_reuse_fitted_model": true
+  },
+  "model": {
+    "class": "sklearn.linear_model.LogisticRegression",
+    "C": 1.0,
+    "solver": "lbfgs",
+    "tol": 0.0001,
+    "max_iter": 3000,
+    "fit_intercept": true,
+    "class_weight": "balanced",
+    "convergence_warning_policy": "ineligible_retain_elapsed_cost"
+  },
+  "ood": {
+    "method": "mahalanobis_fit_benign_preprocessed_input",
+    "learned_embedding": false,
+    "covariance_ridge": 0.000001
+  },
+  "calibration": {
+    "benign_only": true,
+    "threshold_rule": "tie_aware_empirical_budget_ge_no_rounding",
+    "direct_fpr_budget_per_channel": 0.005,
+    "review_inclusive_budget_per_channel": 0.025,
+    "direct_union_budget": 0.01,
+    "review_inclusive_union_budget": 0.05
+  },
+  "fusion": {
+    "precedence": [
+      "known_attack",
+      "suspicious_unknown",
+      "needs_review",
+      "benign"
+    ],
+    "direct_unknown_requires_known_channel_absent": true,
+    "signatures_available": false,
+    "deployment_integration_authorized": false
+  },
+  "paired_analysis": {
+    "comparisons": [
+      "causal_context_minus_shuffled_context",
+      "causal_context_minus_no_context"
+    ],
+    "terminal_reference_excluded_from_benefit_rule": true,
+    "strata": "target_capture_by_site_orientation",
+    "expected_strata": 6,
+    "fit_choice_aggregation": "per_row_mean_binary_indicator_across_three_choices",
+    "bootstrap_replicates": 2000,
+    "bootstrap_sampling": "paired_with_replacement_separately_within_binary_class",
+    "interval": "percentile_2.5_97.5",
+    "seed_rule": "execution_seed_plus_sha256_stratum_control_offset",
+    "primary_endpoints": [
+      "target_attack_direct_detection_rate",
+      "target_attack_detection_or_review_rate"
+    ],
+    "safety_endpoint": "independent_benign_direct_fpr",
+    "benefit_minimum_positive_strata_per_control": 5,
+    "benefit_requires_all_targets_and_orientations": true,
+    "benefit_max_safety_upper_delta": 0.005,
+    "missing_comparison_policy": "benefit_rule_fails_visibly",
+    "interpretation": "descriptive_correlated_capture_intervals_not_population_inference"
+  },
+  "measurement": {
+    "warmup_calls_per_batch_size": 10,
+    "measured_calls_per_batch_size": 100,
+    "batch_sizes": [
+      1,
+      128
+    ],
+    "inference_scope": "portable_core_context_join_scaling_LR_and_distance",
+    "memory_scope": "current_process_including_loaded_data_not_incremental_model_size",
+    "memory_sampling_interval_ms": 10,
+    "false_alerts_per_hour": "unavailable_without_prepared_chronological_timestamps",
+    "false_alerts_per_10000_benign": true,
+    "report_failed_and_unpaired_entries": true,
+    "record_actual_costs_for_failed_fits": true,
+    "publish_raw_rows_or_weights": false
+  }
+}

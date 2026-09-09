@@ -1,6 +1,6 @@
 # DEV2-CONTEXT-001 protocol — causal temporal-context ablation
 
-Status: draft for registration. No execution has occurred under this protocol.
+Status: registered, not run. No execution has occurred under this protocol.
 No model is selected, no candidate is locked, and frozen final evidence stays
 sealed. This study uses development captures only.
 
@@ -73,14 +73,58 @@ vector never crosses fit, calibration, or test roles. The transfer matrix,
 budgets, seed, and four-verdict semantics follow the `DEV2-MISSINGNESS-001`
 precedent; exact counts bind in the registration.
 
+## Fixed cohort, matrix, and learner
+
+Use the 6,195-row portable-core-distinct common-support cohort already bound by
+`DEV2-MISSINGNESS-001`: cross-capture aliases, within-capture label conflicts,
+and within-capture duplicate portable cores remain excluded with their original
+counts and hashes. Join both context vectors by unique `event_id`; missing,
+duplicate, extra, or scenario-mismatched joins fail the study.
+
+The three target attack environments are captures 20, 34, and 8. For each
+target, fit on each other attack source alone and their union, always with
+capture 42 as background benign. This yields nine source/target choices. Each
+choice fits four views once; the fitted model is calibrated/evaluated under
+both honeypot 4→5 and 5→4 benign-site orientations, for exactly 36 fits and 72
+site evaluations. Capture roles never overlap.
+
+Each view consumes the same nine portable numerical core features followed by
+the 16 temporal values (25 float64 inputs). Packet sequences, optional packet
+metadata, raw/categorical ports, protocol/service one-hots, signatures, and
+endpoint identity are not consumed. Fit-only standard scaling precedes a
+class-balanced logistic regression (`C=1`, `lbfgs`, tolerance `1e-4`, maximum
+3,000 iterations) and a benign-fit Mahalanobis distance with `1e-6` covariance
+ridge. Fit rows are deterministically capped at 1,500 per binary class. The
+existing tie-aware empirical site calibration and four-verdict fusion budgets
+are unchanged from `DEV2-MISSINGNESS-001`.
+
+## Fixed paired analysis
+
+Primary endpoints are target-attack direct detection and detection-or-review;
+the safety endpoint is direct FPR on the independent benign site. Comparisons
+are causal minus shuffled and causal minus no-context only. The terminal view
+is a leakage diagnostic and cannot satisfy a benefit rule.
+
+For each of the six target-by-site-orientation strata, preserve identical rows
+and average each row's binary verdict indicator over the three registered fit
+choices. Run 2,000 deterministic, class-stratified paired bootstrap replicates
+with replacement and report the 2.5/97.5 percentile interval for each endpoint
+delta. The seed is 20260910 plus a stable SHA-256-derived stratum/control
+offset. These intervals are descriptive because captures and fit choices are
+correlated; no independent-population inference is claimed.
+
 ## Decision rule
 
-Preregistered NULL: if causal minus shuffled and causal minus no-context
-paired intervals cover zero with no consistent direction across targets and
-site orientations, causal context adds nothing detectable here. Promotion is
-blocked, no deployment claim follows, and follow-ups require new
-registration, never post-hoc slicing. A NULL result does not prove context is
-useless: within-flow merging, window choice, and cohort limits stay open.
+Preregistered benefit requires, separately against both controls: the lower
+95% paired interval is above zero for both attack endpoints in at least five
+of six target-by-orientation strata; those five include all three targets and
+both orientations; and the independent-benign direct-FPR delta's upper interval
+is at most +0.005 in all six strata. Otherwise the result is NULL for detectable
+causal benefit here. Any stratum with an unavailable paired endpoint makes the
+benefit rule fail visibly. Promotion remains blocked regardless, no deployment
+claim follows, and follow-ups require new registration rather than post-hoc
+slicing. A NULL result does not prove context is useless: within-flow merging,
+window choice, and cohort limits stay open.
 
 ## Declared limitations
 
