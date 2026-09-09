@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,6 +13,7 @@ from sklearn.linear_model import LogisticRegression
 
 from training.v2.missingness_model import model_kwargs
 from training.v2.provenance import sha256_file
+from training.v2.registered_context import VIEWS
 from training.v2.run_held_family import mahalanobis_distances
 
 MODEL_ARRAYS = {
@@ -23,6 +25,7 @@ MODEL_ARRAYS = {
     "iterations",
     "ood_center",
     "ood_inverse",
+    "view_sha256",
 }
 
 
@@ -89,7 +92,9 @@ class ContextPredictor:
             raise FloatingPointError("invalid context-model probability or distance")
         return scores, distances
 
-    def save(self, path: Path) -> dict[str, Any]:
+    def save(self, path: Path, *, view: str) -> dict[str, Any]:
+        if view not in VIEWS:
+            raise ValueError("unknown registered context view")
         arrays: dict[str, Any] = {
             "mean": self.transform.mean,
             "scale": self.transform.scale,
@@ -99,6 +104,9 @@ class ContextPredictor:
             "iterations": np.asarray(self.model.n_iter_, dtype=np.int64),
             "ood_center": self.ood_center,
             "ood_inverse": self.ood_inverse,
+            "view_sha256": np.frombuffer(
+                hashlib.sha256(view.encode()).digest(), dtype=np.uint8
+            ).copy(),
         }
         if set(arrays) != MODEL_ARRAYS or any(
             not np.isfinite(value).all() for value in arrays.values()
@@ -116,6 +124,7 @@ class ContextPredictor:
             "sha256": sha256_file(path),
             "bytes": path.stat().st_size,
             "format": "numpy_numeric_arrays_no_pickle",
+            "view": view,
             "arrays": {
                 key: {"shape": list(value.shape), "dtype": str(value.dtype)}
                 for key, value in arrays.items()
@@ -151,7 +160,11 @@ def fit_context_predictor(
 
 
 def load_context_predictor(
-    path: Path, metadata: Mapping[str, Any], config: Mapping[str, Any]
+    path: Path,
+    metadata: Mapping[str, Any],
+    config: Mapping[str, Any],
+    *,
+    view: str,
 ) -> ContextPredictor:
     if (
         path.name != metadata["file"]
@@ -171,6 +184,7 @@ def load_context_predictor(
         "iterations": (1,),
         "ood_center": (width,),
         "ood_inverse": (width, width),
+        "view_sha256": (32,),
     }
     if (
         set(arrays) != MODEL_ARRAYS
@@ -180,6 +194,12 @@ def load_context_predictor(
         )
         or not np.array_equal(arrays["classes"], [0, 1])
         or arrays["iterations"].dtype.kind not in "iu"
+        or arrays["view_sha256"].dtype != np.uint8
+        or not np.array_equal(
+            arrays["view_sha256"],
+            np.frombuffer(hashlib.sha256(view.encode()).digest(), dtype=np.uint8),
+        )
+        or metadata.get("view") != view
         or not 1 <= int(arrays["iterations"][0]) <= config["model"]["max_iter"]
         or (arrays["scale"] <= 0).any()
     ):

@@ -41,8 +41,10 @@ def test_context_predictor_round_trip_preserves_exact_scores(tmp_path: Path) -> 
     before = predictor.score_matrix(values)
     path = tmp_path / "context-model.npz"
 
-    metadata = predictor.save(path)
-    restored = load_context_predictor(path, metadata, config)
+    metadata = predictor.save(path, view="causal_context")
+    restored = load_context_predictor(
+        path, metadata, config, view="causal_context"
+    )
     after = restored.score_matrix(values)
 
     for left, right in zip(before, after, strict=True):
@@ -62,8 +64,11 @@ def test_context_model_rejects_invalid_fit_and_artifact_mutation(tmp_path: Path)
 
     predictor = fit_context_predictor(values, labels, config)
     path = tmp_path / "context-model.npz"
-    metadata = predictor.save(path)
+    metadata = predictor.save(path, view="causal_context")
     mutated = dict(metadata)
     mutated["sha256"] = "0" * 64
     with pytest.raises(ValueError, match="hash/size mismatch"):
-        load_context_predictor(path, mutated, config)
+        load_context_predictor(path, mutated, config, view="causal_context")
+
+    with pytest.raises(ValueError, match="registered dimensions"):
+        load_context_predictor(path, metadata, config, view="shuffled_context")

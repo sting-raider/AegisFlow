@@ -305,8 +305,10 @@ def run_case(
                 {f"orientation_{index}_{role}": matrices[role] for role in matrices}
             )
         phase = "artifact_roundtrip"
-        metadata = predictor.save(output / f"{case_id}.npz")
-        restored = load_context_predictor(output / metadata["file"], metadata, config)
+        metadata = predictor.save(output / f"{case_id}.npz", view=view)
+        restored = load_context_predictor(
+            output / metadata["file"], metadata, config, view=view
+        )
         for matrix in verified_matrices.values():
             if not all(
                 np.array_equal(left, right)
@@ -345,4 +347,3 @@ def run_case(
         entry["memory"] = sampler.finish()
     entry["model_wall_seconds"] = perf_counter() - started
     return CaseExecution(entry, tuple(paired))
-
