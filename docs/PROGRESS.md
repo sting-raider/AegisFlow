@@ -111,8 +111,8 @@ The causal sidecar builder now validates sealed row schemas and exact label alig
 refuses duplicate IDs and unsafe capture paths, and binds all three source hashes. A real
 development-only preparation check on capture 20 replayed 630 flows into 44 sealed and
 586 context-only rows without fitting a model or reading frozen evidence. Full six-capture
-sidecar preparation, immutable registration, four-view execution, and publication remain
-open.
+sidecar preparation now has a clean-worktree CLI with before/after source and code guards;
+its execution, immutable registration, four-view study, and publication remain open.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.

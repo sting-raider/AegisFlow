@@ -539,4 +539,7 @@ PCAP, label, and sealed-row hashes into each sidecar. A bounded implementation v
 on `CTU-IoT-Malware-Capture-20-1` replayed 630 flows: all 44 sealed rows aligned, 586
 unlabeled flows contributed context only, and no late or ambiguous row was observed. This
 is preparation evidence, not a context result; no model was fit and frozen final evidence
-was not loaded.
+was not loaded. `training.v2.context_preparation` now provides the clean-worktree,
+all-scenario preparation command. It verifies the frozen-source exclusion, existing
+prepared rows, exact per-scenario accounting, and source stability before publishing a
+success manifest; partial attempts cannot masquerade as completion.
