@@ -2,14 +2,19 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+import hashlib
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from packages.features.research import TEMPORAL_FEATURE_NAMES
-from training.v2.missingness import CORE_DIM, INPUT_NAMES
-from training.v2.provenance import read_object
+from training.v2.missingness import CORE_DIM, INPUT_NAMES, observation_inputs
+from training.v2.provenance import read_object, sha256_file
 from training.v2.registered_family import text_digest
+from training.v2.tensors import SequenceRecord
 from training.v2.transfer_support import load_registration as load_missingness_registration
 
 REGISTRATION_PATH = "configs/research-v2/registered/DEV2-CONTEXT-001.json"
@@ -20,6 +25,136 @@ VIEWS = (
     "no_context",
     "non_causal_reference",
 )
+_SIDECAR_SCHEMA_VERSION = "1.1.0"
+_COLD_INDEX = TEMPORAL_FEATURE_NAMES.index("temporal_cold_start")
+
+
+@dataclass(frozen=True)
+class ContextRow:
+    scenario: str
+    causal: np.ndarray
+    terminal: np.ndarray
+
+
+def _vector(value: Any, name: str) -> np.ndarray:
+    array = np.asarray(value, dtype=np.float64)
+    if array.shape != (len(TEMPORAL_FEATURE_NAMES),) or not np.isfinite(array).all():
+        raise ValueError(f"invalid {name} context vector")
+    return array
+
+
+def load_context_rows(
+    sidecar_directory: Path, manifest: Mapping[str, Any]
+) -> dict[str, ContextRow]:
+    """Load exact registered sidecars and reject schema/cohort drift."""
+    declared = {report["sidecar_file"] for report in manifest["scenarios"]}
+    actual = {path.name for path in sidecar_directory.glob("*.context.json")}
+    if actual != declared:
+        raise ValueError("context sidecar file set differs from registered manifest")
+    rows: dict[str, ContextRow] = {}
+    for report in manifest["scenarios"]:
+        path = sidecar_directory / report["sidecar_file"]
+        if (
+            not path.is_file()
+            or path.stat().st_size != report["sidecar_size_bytes"]
+            or sha256_file(path) != report["output_sha256"]
+        ):
+            raise ValueError(f"context sidecar hash/size mismatch: {path.name}")
+        payload = read_object(path)
+        if (
+            payload["schema_version"] != _SIDECAR_SCHEMA_VERSION
+            or payload["scenario"] != report["scenario"]
+            or payload["temporal_feature_names"] != list(TEMPORAL_FEATURE_NAMES)
+            or payload["source_hashes"] != report["source_hashes"]
+            or payload["ledger_sha256"] != report["ledger_sha256"]
+            or payload["emitted_count"] != report["emitted_rows"]
+            or payload["non_causal_reference"]["deployable"] is not False
+        ):
+            raise ValueError(f"context sidecar contract mismatch: {path.name}")
+        entries = payload["entries"]
+        if not isinstance(entries, list) or len(entries) != report["emitted_rows"]:
+            raise ValueError(f"context sidecar row count mismatch: {path.name}")
+        for entry in entries:
+            event_id = entry.get("event_id") if isinstance(entry, dict) else None
+            if not isinstance(event_id, str) or not event_id or event_id in rows:
+                raise ValueError("context sidecars require globally unique event IDs")
+            rows[event_id] = ContextRow(
+                scenario=report["scenario"],
+                causal=_vector(entry.get("vector"), "causal"),
+                terminal=_vector(
+                    entry.get("non_causal_terminal_vector"), "terminal"
+                ),
+            )
+    if len(rows) != manifest["totals"]["emitted_rows"]:
+        raise ValueError("context sidecar total row count differs from manifest")
+    return rows
+
+
+def _stratum_seed(seed: int, role: str, scenario: str) -> int:
+    material = f"{seed}\0{role}\0{scenario}".encode()
+    return int.from_bytes(hashlib.sha256(material).digest()[:8], "little")
+
+
+def context_views(
+    records: Sequence[SequenceRecord],
+    context_rows: Mapping[str, ContextRow],
+    *,
+    role: str,
+    seed: int,
+) -> dict[str, np.ndarray]:
+    """Build registered paired inputs with role- and scenario-local shuffling."""
+    if not records:
+        raise ValueError("context view construction requires rows")
+    event_ids = [record["event_id"] for record in records]
+    if len(event_ids) != len(set(event_ids)):
+        raise ValueError("context view construction requires unique event IDs")
+    joined: list[ContextRow] = []
+    for record in records:
+        row = context_rows.get(record["event_id"])
+        if row is None:
+            raise ValueError(f"missing context row: {record['event_id']}")
+        if row.scenario != record["scenario"]:
+            raise ValueError(f"context scenario mismatch: {record['event_id']}")
+        joined.append(row)
+
+    portable = np.asarray(observation_inputs(records).values[:, :CORE_DIM], dtype=np.float64)
+    causal = np.stack([row.causal for row in joined])
+    terminal = np.stack([row.terminal for row in joined])
+    shuffled = np.empty_like(causal)
+    scenarios = sorted({record["scenario"] for record in records})
+    for scenario in scenarios:
+        indices = sorted(
+            (index for index, record in enumerate(records) if record["scenario"] == scenario),
+            key=lambda index: records[index]["event_id"],
+        )
+        permutation = np.random.default_rng(_stratum_seed(seed, role, scenario)).permutation(
+            len(indices)
+        )
+        for destination, source_position in zip(indices, permutation, strict=True):
+            shuffled[destination] = causal[indices[int(source_position)]]
+    no_context = np.zeros_like(causal)
+    no_context[:, _COLD_INDEX] = 1.0
+    contexts = {
+        "causal_context": causal,
+        "shuffled_context": shuffled,
+        "no_context": no_context,
+        "non_causal_reference": terminal,
+    }
+    matrices = {
+        view: np.concatenate((portable, contexts[view]), axis=1) for view in VIEWS
+    }
+    expected_shape = (len(records), CORE_DIM + len(TEMPORAL_FEATURE_NAMES))
+    if any(
+        matrix.shape != expected_shape or not np.isfinite(matrix).all()
+        for matrix in matrices.values()
+    ):
+        raise ValueError("context view matrix violates the registered contract")
+    if any(
+        not np.array_equal(matrix[:, :CORE_DIM], portable)
+        for matrix in matrices.values()
+    ):
+        raise RuntimeError("portable inputs changed across context views")
+    return matrices
 
 
 def validate_registration(root: Path, config: Mapping[str, Any]) -> None:
