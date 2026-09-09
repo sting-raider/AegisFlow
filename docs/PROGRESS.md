@@ -151,7 +151,9 @@ future-leaking terminal diagnostic has much higher attack detection but an unacc
 24.99% mean benign FPR and remains non-deployable. No candidate is selected; frozen final
 evidence and production pointers remain untouched. Full paired tables and analysis are in
 `docs/research-v2/registered-results/DEV2-CONTEXT-001.md` and
-`docs/error_analysis/dev2-context-001.md`. Publication CI is not yet claimed.
+`docs/error_analysis/dev2-context-001.md`. Result CI `34394099091`, summary CI
+`34394438891`, and analysis CI `34394769170` each passed all ten jobs on public
+`main`; the last run covers the complete published context milestone.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.

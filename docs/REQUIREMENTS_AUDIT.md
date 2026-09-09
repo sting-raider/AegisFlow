@@ -94,7 +94,7 @@ validity or full-project completion.
 | 26. Security validation | 74-test security acceptance report | Partial until each named attack is mapped to a test; no external attack authorized |
 | 27. Tenancy decision | D-050 and security/operator docs | Complete: one organization/security domain per deployment |
 | 28. Production validator | `production_check.py`, negative/positive tests | Implemented; current smoke/config intentionally NO-GO |
-| 29. Release provenance | Release manifest/SBOM job and retained aggregate report | Local build evidence present; registry signing external; current milestone CI pending |
+| 29. Release provenance | Release manifest/SBOM job and retained aggregate report | Context-study publication CI `34394769170` passed all ten jobs; registry signing remains external |
 | 30. Operator docs | All named runbooks present | Partial: add tested site-calibration and failure-drill procedures |
 | 31. Academic evidence | Research package and negative results | Partial: correct v2 claims, provenance, and reproducible performance tables |
 | 32. Scope restrictions | No automatic blocking; no LLM detector | Preserved; no dashboard redesign or frozen-data tuning |

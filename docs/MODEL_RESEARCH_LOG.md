@@ -606,5 +606,9 @@ rather than a usable model. See `docs/error_analysis/dev2-context-001.md`.
 Scientific status remains `development_only_no_candidate_selected`. No threshold,
 window, feature, or cohort is adjusted after observing this result; any follow-up requires
 new registration and evidence. Frozen final reports, production model pointers, and the
-user's local smoke-model edits remain untouched. Publication CI is pending and must not be
-claimed until GitHub completes it.
+user's local smoke-model edits remain untouched. Publication CI was left pending at
+publication time and was not claimed before GitHub completed it.
+
+GitHub subsequently completed result run `34394099091`, summary run `34394438891`,
+and analysis run `34394769170` successfully, with all ten jobs passing. The final run
+covers the complete public context-study evidence chain through commit `d35fabe`.
