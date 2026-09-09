@@ -43,6 +43,7 @@ research-v2-check:
 	$(UV) run python -m scripts.verify_registered_research_v2
 	$(UV) run python -m scripts.verify_registered_origin
 	$(UV) run python -m scripts.verify_registered_missingness
+	$(UV) run python -m scripts.verify_context_preparation
 
 train-smoke:
 	$(UV) run python -m training.cli.train_smoke

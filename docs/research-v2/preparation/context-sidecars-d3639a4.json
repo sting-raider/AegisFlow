@@ -1,0 +1,188 @@
+{
+  "completed_at": "2026-09-09T14:13:56.418306+00:00",
+  "elapsed_seconds": 179.200482500004,
+  "environment": {
+    "machine": "AMD64",
+    "platform": "Windows",
+    "python": "3.12.9",
+    "scapy": "2.6.1"
+  },
+  "history_order": "timestamp_end_timestamp_start_event_id",
+  "limitations": [
+    "PcapAdapter coalesces each canonical five-tuple over the capture.",
+    "Completion-ordered context cannot recover within-flow packet chronology.",
+    "Public labels are research labels, not deployed operator approval.",
+    "Only derived vectors, event IDs and aggregate audit fields are persisted.",
+    "No frozen-final source, model fitting or candidate selection is permitted."
+  ],
+  "permitted_use": "development_only",
+  "preparation_code_commit": "d3639a42071c1ef214d9c446f2ae2fe17605efff",
+  "scenarios": [
+    {
+      "adapter_flows": 438,
+      "ambiguous_label_flows": 0,
+      "cold_rows": 94,
+      "context_only_flows": 245,
+      "emitted_rows": 193,
+      "flows_without_label_candidate": 245,
+      "late_rows": 0,
+      "ledger_sha256": "41c82d9be6ea972465fe8c5e4c15b91650b0973548cca8785d2f295d0a2dbf60",
+      "matched_unlabeled_flows": 0,
+      "non_tcp_udp_icmp_flows": 0,
+      "output_sha256": "70018a44b97fb8879075bf88733559f5552ee603f499accbc59849f99f74de67",
+      "scenario": "CTU-Honeypot-Capture-4-1",
+      "sealed_rows": 193,
+      "sidecar_file": "CTU-Honeypot-Capture-4-1.context.json",
+      "sidecar_size_bytes": 111672,
+      "source_hashes": {
+        "labels_sha256": "aebe40ea0e03b120265a5c7bc140dd9b0d3fe2fce65559e84776b7dd5360e71e",
+        "pcap_sha256": "3fb775c0391b6ad313a3f7845e634a277b07c3f6377346c2486ba63e1c22e90c",
+        "sealed_rows_sha256": "5604c804d083d253a35fa63a98336b57c138be952f3311f8e67bab12f4d8c5a9"
+      }
+    },
+    {
+      "adapter_flows": 805,
+      "ambiguous_label_flows": 0,
+      "cold_rows": 31,
+      "context_only_flows": 532,
+      "emitted_rows": 273,
+      "flows_without_label_candidate": 532,
+      "late_rows": 0,
+      "ledger_sha256": "dcfe476a4fe791fe920e1974677f694a8be3534569f9072438df699772c0f81c",
+      "matched_unlabeled_flows": 0,
+      "non_tcp_udp_icmp_flows": 0,
+      "output_sha256": "f2850373cd27ef734af73123e43fc8cf188398d873f0f345a3df74bcc729115a",
+      "scenario": "CTU-Honeypot-Capture-5-1",
+      "sealed_rows": 273,
+      "sidecar_file": "CTU-Honeypot-Capture-5-1.context.json",
+      "sidecar_size_bytes": 166088,
+      "source_hashes": {
+        "labels_sha256": "f36db06e7d6ba7364e932a5b003f75835e004b320d70019e8a2f0ba8685d9262",
+        "pcap_sha256": "f6c2a4808a3fc3d7c01ae7656f1b341a1c7338bcd4d5a371f96280035efcbf79",
+        "sealed_rows_sha256": "28f7d06d40fe51f733c2568eda739e4c4c908cd5f28ed9ba58cd3ce886d28f8f"
+      }
+    },
+    {
+      "adapter_flows": 630,
+      "ambiguous_label_flows": 0,
+      "cold_rows": 9,
+      "context_only_flows": 586,
+      "emitted_rows": 44,
+      "flows_without_label_candidate": 586,
+      "late_rows": 0,
+      "ledger_sha256": "3d6215c0d6eb3592114c40267522c49594c5ce9e2ca4631767fa1e676c913879",
+      "matched_unlabeled_flows": 0,
+      "non_tcp_udp_icmp_flows": 0,
+      "output_sha256": "d60f13475d891db3cab728b7834c233a2259a51fa44d347f8ebdf82974f232ca",
+      "scenario": "CTU-IoT-Malware-Capture-20-1",
+      "sealed_rows": 44,
+      "sidecar_file": "CTU-IoT-Malware-Capture-20-1.context.json",
+      "sidecar_size_bytes": 27935,
+      "source_hashes": {
+        "labels_sha256": "ef48ad72f65efd13d517223e61e4d877ba53a082ddb8159324b18d3f310d0711",
+        "pcap_sha256": "4d0a00c33a4bf11228158baddd47c38f702731ea8d75ef1201061fc8bbd878b9",
+        "sealed_rows_sha256": "0f8267437fd2a36de34c531eebe4d65a9c7cb9d4ddee6ad70f9e6f65fade06da"
+      }
+    },
+    {
+      "adapter_flows": 4662,
+      "ambiguous_label_flows": 0,
+      "cold_rows": 17,
+      "context_only_flows": 1598,
+      "emitted_rows": 3064,
+      "flows_without_label_candidate": 1598,
+      "late_rows": 0,
+      "ledger_sha256": "d5ebafd4f6c781279d99ca78a57d9331163a712c2d905e27439942adb5d4caef",
+      "matched_unlabeled_flows": 0,
+      "non_tcp_udp_icmp_flows": 0,
+      "output_sha256": "18aeb5468b141f59e74aa72d43c8881802ca991ac2b194b0cd9619d41343757a",
+      "scenario": "CTU-IoT-Malware-Capture-34-1",
+      "sealed_rows": 3064,
+      "sidecar_file": "CTU-IoT-Malware-Capture-34-1.context.json",
+      "sidecar_size_bytes": 1861910,
+      "source_hashes": {
+        "labels_sha256": "d69e49b2aae8c1bd33286936531658202dec47d989f0439bad3f8be180467a6e",
+        "pcap_sha256": "92ec7e2f6658ee4b007d0b816986c46cc0338bc5e2bec6ceaaca566c695e4699",
+        "sealed_rows_sha256": "4fe3d73ef1d33c6aea6eb342e2de032dfbf12f8b0267feaa3c97e053dcb5ad70"
+      }
+    },
+    {
+      "adapter_flows": 3172,
+      "ambiguous_label_flows": 0,
+      "cold_rows": 7,
+      "context_only_flows": 1665,
+      "emitted_rows": 1507,
+      "flows_without_label_candidate": 1665,
+      "late_rows": 0,
+      "ledger_sha256": "709c1fc731377167d8055e200a4e66a691e7ae0f70b7febff1bcfc50dc4adefc",
+      "matched_unlabeled_flows": 0,
+      "non_tcp_udp_icmp_flows": 0,
+      "output_sha256": "100ec9fc242277cec139dd4660be3eeeca539bd26a91470b64014abe14943172",
+      "scenario": "CTU-IoT-Malware-Capture-42-1",
+      "sealed_rows": 1507,
+      "sidecar_file": "CTU-IoT-Malware-Capture-42-1.context.json",
+      "sidecar_size_bytes": 960772,
+      "source_hashes": {
+        "labels_sha256": "269fa1b22d9a37e159cf41b81a213a0032d21306f5d39b4c20cb0d211b04e8aa",
+        "pcap_sha256": "7573797f17aae96e3804a3cfb22d531b74c17bbae740de1e14048f89130fba37",
+        "sealed_rows_sha256": "e5c69536562382339b795cb65e57ac6b3dfad6ee36f06d3394a5e9a617354c3c"
+      }
+    },
+    {
+      "adapter_flows": 2064,
+      "ambiguous_label_flows": 0,
+      "cold_rows": 3,
+      "context_only_flows": 0,
+      "emitted_rows": 2064,
+      "flows_without_label_candidate": 0,
+      "late_rows": 0,
+      "ledger_sha256": "215f26c3c5d537ae7e879beb37cc763f8ad59f5dd022b8f5661b5e28ff29f11f",
+      "matched_unlabeled_flows": 0,
+      "non_tcp_udp_icmp_flows": 0,
+      "output_sha256": "39ead160650e9f2c9cc35b72ee50167200f39e7b458b2d0d13dd06a20fc8a31e",
+      "scenario": "CTU-IoT-Malware-Capture-8-1",
+      "sealed_rows": 2064,
+      "sidecar_file": "CTU-IoT-Malware-Capture-8-1.context.json",
+      "sidecar_size_bytes": 1184983,
+      "source_hashes": {
+        "labels_sha256": "4877ca8f0f01902fbd18d28b7d06cb3d0be082355b7f2c8862c9deef1782eb8a",
+        "pcap_sha256": "80dcc2602519479ddcde889fa902fee19a76696630811452f8df38888af894f2",
+        "sealed_rows_sha256": "7ed23ba996a7d9461198da856495f9976351ac976e8d9d2058b6bafa629628f8"
+      }
+    }
+  ],
+  "schema_version": "1.0.0",
+  "sidecar_schema_version": "1.0.0",
+  "source_preparation": {
+    "manifest_sha256": "332939033261e67a41dd15f8c95edf54e4dd4fd1723e636c9e3c53f93c71f86a",
+    "records_canonical_sha256": "d4f60f1e119924100d002fe977610e640314ea59c876b18b8de6201c47d486e5",
+    "rows": 7145
+  },
+  "started_at": "2026-09-09T14:10:57.217437+00:00",
+  "temporal_feature_names": [
+    "source_flows_10s_log1p",
+    "source_flows_60s_log1p",
+    "unique_destinations_10s_log1p",
+    "unique_destinations_60s_log1p",
+    "unique_destination_ports_10s_log1p",
+    "unique_destination_ports_60s_log1p",
+    "destination_novelty_60s",
+    "service_port_rarity_60s",
+    "protocol_rarity_60s",
+    "destination_fanout_entropy_60s",
+    "connection_interval_mean_log1p_ms_60s",
+    "connection_interval_std_log1p_ms_60s",
+    "connection_burstiness_60s",
+    "short_lived_ratio_60s",
+    "temporal_cold_start",
+    "temporal_late_event"
+  ],
+  "temporal_schema_version": "2.0.0-research-b",
+  "totals": {
+    "cold_rows": 161,
+    "context_only_flows": 4626,
+    "emitted_rows": 7145,
+    "history_flows": 11771,
+    "late_rows": 0
+  }
+}
