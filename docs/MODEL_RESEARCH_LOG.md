@@ -556,3 +556,15 @@ Commit `67a1729` adds a repository guard for the committed projection and option
 validation of the ignored 4.3 MB sidecars against their hashes, schema, ordering, source
 ledgers, and sealed event-ID sets. This remains preparation evidence, not model-quality
 evidence. Registration and all four preregistered comparisons are still pending.
+
+The defined non-causal control was then materialized from clean commit
+`d87559ace70138fe5c418ce02653230fb11d990d` in the same six development captures. The
+431.85-second run preserved causal counts and added one read-only terminal-state vector
+per sealed row. Zero terminal rows are cold and 7,133/7,145 are marked late relative to
+the source's terminal watermark, demonstrating future access rather than accidentally
+reusing the causal duplicate cache. The schema-1.1 manifest SHA-256 is
+`3e300cade95b3b3d992e0640035afcadfdcdb14db04b3a3da41c5d63b6dba78f` and is published
+with the extended verifier in `b2a0337`. Exact local validation passed for all 14,290
+vectors and six ignored sidecars, including source hashes, sealed IDs, ordering, audit
+totals, and recursive no-address checks. This remains preparation evidence only;
+`DEV2-CONTEXT-001` has not yet been registered or executed.

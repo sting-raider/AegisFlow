@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-09-09 (runtime refinement; historical acceptance through 2026-08-23).
+Last updated: 2026-09-10 (model-research continuation; historical acceptance through 2026-08-23).
 
 ## Final status (authoritative)
 
@@ -120,6 +120,17 @@ the ignored local sidecars byte-for-byte when their directory is supplied. This 
 preparation evidence only: no model was fit and frozen final evidence was not read.
 Immutable `DEV2-CONTEXT-001` registration, the four-view study, and its result publication
 remain open.
+
+The paired causal/terminal preparation then completed from clean commit `d87559a` in
+431.85 seconds without changing the sealed 7,145-row cohort or its causal vectors. Its
+schema-1.1 sidecars add the explicitly non-deployable terminal-state vector: zero rows
+are terminal-cold and 7,133/7,145 are visibly late relative to their source watermark,
+confirming that this control actually contains future information. Sanitized manifest
+SHA-256 `3e300cade95b3b3d992e0640035afcadfdcdb14db04b3a3da41c5d63b6dba78f`
+and the dual-generation artifact verifier are published in `b2a0337`. The verifier
+checks 14,290 finite vectors, exact ignored sidecar hashes and sizes, sealed event-ID
+equality, completion ordering, source ledgers, and recursive address exclusion. This
+still authorizes no fit, candidate selection, final-data access, or deployment.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.
