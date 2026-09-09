@@ -107,6 +107,13 @@ Ruff, strict MyPy over 117 sources, all six evidence guards and all 84 local num
 artifacts. The 36 new evidence tests include LF/CRLF hashing and exact table regeneration.
 Publication CI `33717028051` subsequently passed all ten jobs on `ae350e3`.
 
+The 2026-09-10 source-expansion review selects exact official CSE-CIC-IDS2018 February
+14 and February 21 daily CSVs to add brute-force and DDoS development support. It records
+their official byte sizes and multipart ETags without treating ETags as hashes. ToN-IoT,
+additional IoT-23 scenarios, and CIC-IDS2017 are deferred because their current official
+access or authorization paths are unresolved; no mirror is substituted. Acquisition,
+SHA-256 review, quality reports, and experiment registration remain pending.
+
 The causal sidecar builder now validates sealed row schemas and exact label alignment,
 refuses duplicate IDs and unsafe capture paths, and binds all three source hashes. The
 full six-capture development preparation completed from clean commit `d3639a4` in

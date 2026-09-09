@@ -1049,3 +1049,19 @@ benign FPR, confirming that future leakage is not a shortcut to readiness. A sub
 context study must receive a new registration and fresh development evidence, preferably
 with non-coalesced event-time observations and broader independent environments. Do not
 reinterpret this completed matrix as proof that every temporal representation is useless.
+
+## D-073 - Expand development families through exact official CSE daily objects
+
+Use the official anonymous CSE-CIC-IDS2018 S3 objects for 2018-02-14 (FTP/SSH brute
+force) and 2018-02-21 (LOIC-UDP/HOIC DDoS) as the next development intake. They are
+separate daily objects from both the existing 2018-02-28 development file and frozen
+2018-03-01 file. Record exact bytes and locally reviewed SHA-256 values before adapter
+admission. Multipart S3 ETags are not content hashes. This adds family support but not
+an independent collection environment, so origin controls and cross-environment tests
+remain mandatory.
+
+Defer ToN-IoT because the official folder requires institutional sign-in and its project
+page limits unapproved commercial use. Also defer further IoT-23 captures until the
+per-scenario authorization language is reconciled, and defer CIC-IDS2017 while its
+official request form is failing. Do not use unofficial mirrors to bypass these source
+or license constraints. See `docs/research-v2/SOURCE_EXPANSION.md`.
