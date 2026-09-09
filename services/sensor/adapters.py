@@ -37,6 +37,9 @@ def _prepare_nfstream_runtime() -> None:
                 "NFStream Windows worker bootstrap was not found: "
                 f"{_NFSTREAM_WINDOWS_BOOTSTRAP}"
             )
+        add_dll_directory = getattr(os, "add_dll_directory", None)
+        if not callable(add_dll_directory):
+            raise RuntimeError("this Python runtime cannot configure the Npcap DLL directory")
         # NFStream imports its native extension while Windows spawn is still
         # unpickling the worker target. The inherited PYTHONPATH makes Python load
         # our narrowly scoped sitecustomize hook before that import occurs.
@@ -55,7 +58,7 @@ def _prepare_nfstream_runtime() -> None:
                 if current_pythonpath
                 else bootstrap_dir
             )
-        _NPCAP_DLL_HANDLE = os.add_dll_directory(npcap_dir)
+        _NPCAP_DLL_HANDLE = add_dll_directory(npcap_dir)
 
 
 

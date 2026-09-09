@@ -24,6 +24,7 @@ def test_windows_npcap_bootstrap_is_inherited_by_nfstream_workers(
         adapters.os,
         "add_dll_directory",
         lambda path: added.append(path) or handle,
+        raising=False,
     )
     monkeypatch.setenv("PYTHONPATH", r"C:\Tools")
 

@@ -11,4 +11,6 @@ _NPCAP_DIR = r"C:\Windows\System32\Npcap"
 if os.name == "nt" and os.path.isdir(_NPCAP_DIR):
     # Retain the handle for the interpreter lifetime. Closing it removes the DLL
     # directory again before NFStream has loaded its native extension.
-    _NPCAP_DLL_HANDLE = os.add_dll_directory(_NPCAP_DIR)
+    _add_dll_directory = getattr(os, "add_dll_directory", None)
+    if callable(_add_dll_directory):
+        _NPCAP_DLL_HANDLE = _add_dll_directory(_NPCAP_DIR)
