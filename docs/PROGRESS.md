@@ -41,9 +41,10 @@ a measured startup cost rather than a hidden training job.
 A separate `make simulate-attack` command now creates a 24-flow, header-only TCP SYN-sweep
 PCAP using RFC documentation ranges, runs pinned Suricata with container networking
 disabled, requires signature `9000100`, and verifies AegisFlow correlation. Unit evidence
-confirms zero Scapy `Raw` layers and successful signature correlation; the Suricata Compose
-configuration renders. Full container execution is pending the host Docker-service restart
-above and is not claimed complete.
+confirms zero Scapy `Raw` layers and successful signature correlation. Clean Linux CI run
+`34356663553` executed the full Suricata command and all ten jobs passed on commit
+`c32bce9`. Repeating that container run on this Windows host remains pending the Docker
+service restart above; the cross-platform simulation implementation itself is verified.
 
 ## Detector-v2 research phase (validity corrections required)
 
