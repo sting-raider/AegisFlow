@@ -411,6 +411,36 @@ class TemporalFeatureState:
             (portable_feature_vector(observation), self.observe_vector(observation))
         )
 
+    def noncausal_terminal_snapshot_mapping(
+        self, observation: FlowObservation
+    ) -> dict[str, float]:
+        """Read features from the source's terminal retained state without mutation.
+
+        This deliberately future-leaking diagnostic exists only for the registered
+        context-ablation reference view. It must never be used for runtime detection:
+        the source watermark and retained records may occur after ``observation``.
+        Unlike :meth:`observe_mapping`, it neither inserts nor caches the query.
+        """
+        observation.validate()
+        with self._lock:
+            key = (observation.sensor_id, str(ip_address(observation.source_ip)))
+            watermark = self._watermarks.get(key)
+            if watermark is None:
+                return self._mapping(observation, [], [], [], False)
+            records = self._sources.get(key, [])
+            active = [
+                record
+                for record in records
+                if watermark - self.window_seconds <= record.timestamp <= watermark
+            ]
+            short = [
+                record
+                for record in active
+                if record.timestamp >= watermark - self.short_window_seconds
+            ]
+            late = observation.timestamp.timestamp() < watermark
+            return self._mapping(observation, active, active, short, late)
+
     @staticmethod
     def _mapping(
         observation: FlowObservation,

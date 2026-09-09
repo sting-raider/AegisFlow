@@ -170,6 +170,30 @@ def test_reordered_and_too_late_events_are_visible_and_do_not_corrupt_state() ->
     assert state.event_count == before + 1
 
 
+def test_noncausal_terminal_snapshot_is_future_leaking_and_read_only() -> None:
+    state = TemporalFeatureState()
+    first = _observation(0, destination_ip="192.0.2.10")
+    future = _observation(100, destination_ip="192.0.2.20")
+    causal_first = state.observe_mapping(first)
+    state.observe_mapping(future)
+    before = (state.source_count, state.event_count)
+
+    terminal = state.noncausal_terminal_snapshot_mapping(first)
+    unseen = state.noncausal_terminal_snapshot_mapping(
+        _observation(0, sensor_id="unseen-sensor")
+    )
+
+    assert causal_first["temporal_cold_start"] == 1.0
+    assert terminal["temporal_cold_start"] == 0.0
+    assert terminal["temporal_late_event"] == 1.0
+    assert terminal["source_flows_60s_log1p"] == pytest.approx(np.log1p(1))
+    assert terminal["destination_novelty_60s"] == 1.0
+    assert unseen["temporal_cold_start"] == 1.0
+    assert unseen["temporal_late_event"] == 0.0
+    assert (state.source_count, state.event_count) == before
+    assert state.observe_mapping(first) == causal_first
+
+
 def test_schema_metadata_binds_order_and_state_semantics() -> None:
     schema = research_feature_schema()
 
