@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { cloneElement, isValidElement, type ReactElement } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import { App } from "./App";
@@ -136,6 +136,7 @@ const flowFixture = {
     source: "fixture"
   }]
 };
+let holdModelsRequest = false;
 vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   const url = String(input);
   const isStatus = url.includes("/system/status");
@@ -145,6 +146,9 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   const isAlerts = url.includes("/api/v1/alerts?");
   const isFlowDetail = url.endsWith(`/api/v1/flows/${flowFixture.event_id}`);
   const isFlows = url.includes("/api/v1/flows?");
+  if (holdModelsRequest && url.endsWith("/api/v1/models")) {
+    await new Promise(() => undefined);
+  }
   return {
     ok: true,
     json: async () => isStatus
@@ -189,22 +193,23 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   };
 }));
 
-test("renders the operations dashboard and demo disclosure", async () => {
-  render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
-  expect(screen.getByRole("heading", { name: "Overview" })).toBeTruthy();
-  expect(await screen.findByText("Demo traffic")).toBeTruthy();
-  fireEvent.click(screen.getByRole("button", { name: /System health/ }));
-  expect(screen.getByText("Detection queue")).toBeTruthy();
-});
-
-test("does not label captured live traffic as demo traffic", async () => {
-  flowFixture.protocol_metadata.capture_mode = "live";
+test("renders the overview while one endpoint is still loading", async () => {
+  holdModelsRequest = true;
   try {
     render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
-    await waitFor(() => expect(screen.queryByText("Demo traffic")).toBeNull());
+    expect(await screen.findByText("Flow throughput")).toBeTruthy();
+    expect(screen.queryByText("Reading the event ledger…")).toBeNull();
   } finally {
-    delete flowFixture.protocol_metadata.capture_mode;
+    holdModelsRequest = false;
   }
+});
+
+test("renders the operations dashboard without synthetic-traffic labels", async () => {
+  render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
+  expect(screen.getByRole("heading", { name: "Overview" })).toBeTruthy();
+  expect(screen.queryByText("Demo traffic")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: /System health/ }));
+  expect(await screen.findByText("Detection queue")).toBeTruthy();
 });
 
 test("loads incident explanations on demand and labels AI-generated text", async () => {

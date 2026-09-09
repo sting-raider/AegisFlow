@@ -45,16 +45,40 @@ function useEscapeKey(active: boolean, close: () => void) {
   }, [active]);
 }
 
-function useOperationsData(paused: boolean) {
+function useOperationsData(paused: boolean, view: View) {
   const queryClient = useQueryClient();
   const pausedRef = useRef(paused);
   useEffect(() => { pausedRef.current = paused; }, [paused]);
-  const alerts = useQuery({ queryKey: ["alerts"], queryFn: () => api.alerts("?limit=200") });
-  const incidents = useQuery({ queryKey: ["incidents"], queryFn: api.incidents });
-  const flows = useQuery({ queryKey: ["flows"], queryFn: () => api.flows("?limit=200") });
-  const hosts = useQuery({ queryKey: ["hosts"], queryFn: api.hosts });
-  const models = useQuery({ queryKey: ["models"], queryFn: api.models });
-  const drift = useQuery({ queryKey: ["drift"], queryFn: api.drift });
+  const alerts = useQuery({
+    queryKey: ["alerts"],
+    queryFn: () => api.alerts("?limit=200"),
+    enabled: ["overview", "alerts", "hosts", "models"].includes(view)
+  });
+  const incidents = useQuery({
+    queryKey: ["incidents"],
+    queryFn: api.incidents,
+    enabled: view === "overview" || view === "incidents"
+  });
+  const flows = useQuery({
+    queryKey: ["flows"],
+    queryFn: () => api.flows("?limit=200"),
+    enabled: ["overview", "flows", "hosts", "system"].includes(view)
+  });
+  const hosts = useQuery({
+    queryKey: ["hosts"],
+    queryFn: api.hosts,
+    enabled: view === "hosts"
+  });
+  const models = useQuery({
+    queryKey: ["models"],
+    queryFn: api.models,
+    enabled: view === "overview" || view === "models"
+  });
+  const drift = useQuery({
+    queryKey: ["drift"],
+    queryFn: api.drift,
+    enabled: view === "overview" || view === "models"
+  });
   const status = useQuery({
     queryKey: ["status"],
     queryFn: api.status,
@@ -625,18 +649,13 @@ export function App() {
   const [view, setView] = useState<View>("overview");
   const [selected, setSelected] = useState<Alert | null>(null);
   const [paused, setPaused] = useState(false);
-  const data = useOperationsData(paused);
+  const data = useOperationsData(paused, view);
   const alerts = data.alerts.data?.items ?? [];
   const incidents = data.incidents.data?.items ?? [];
   const flows = data.flows.data?.items ?? [];
-  const hasLiveTraffic = flows.some(
-    (flow) => flow.protocol_metadata?.capture_mode === "live"
-  );
   const hosts = data.hosts.data?.items ?? [];
   const models = data.models.data?.items ?? [];
   const drift = data.drift.data?.items ?? [];
-  const loading = [data.alerts, data.incidents, data.flows, data.hosts, data.models].some((query) => query.isLoading);
-  const error = [data.alerts, data.incidents, data.flows, data.hosts, data.models].find((query) => query.error)?.error ?? null;
   const currentView = views.find((item) => item.id === view) ?? views[0];
 
   let content: React.ReactNode;
@@ -649,6 +668,21 @@ export function App() {
   else if (view === "system") content = <SystemHealth status={data.status.data} connected={data.connected} flows={flows} />;
   else content = null;
 
+  const primaryQuery = view === "alerts" ? data.alerts
+    : view === "incidents" ? data.incidents
+      : view === "flows" ? data.flows
+        : view === "hosts" ? data.hosts
+          : view === "models" ? data.models
+            : view === "system" ? data.status
+              : null;
+  const renderedContent = primaryQuery
+    ? <State
+        loading={primaryQuery.isLoading}
+        error={primaryQuery.error as Error | null}
+        empty={false}
+      >{content}</State>
+    : content;
+
   return (
     <div className="shell">
       <a className="skip-link" href="#main-content">Skip to intelligence brief</a>
@@ -658,10 +692,9 @@ export function App() {
         <div className="sidebar__foot"><span className={`connection ${data.connected ? "is-live" : ""}`} />{data.connected ? "Live stream linked" : "Reconnecting stream"}</div>
       </aside>
       <main id="main-content" tabIndex={-1}>
-        {data.status.data?.mode === "demo" && !hasLiveTraffic && <div className="demo-banner"><strong>Demo traffic</strong><span>Generated records are isolated and carry no real packet payloads.</span></div>}
         <div className="main-inner">
           <header className="page-header"><div><p className="eyebrow">AegisFlow intelligence / {currentView.mark}</p><h1>{currentView.label}</h1><p className="page-deck">{currentView.description}</p></div><div className="edition-meta"><span className={`edition-meta__status ${data.connected ? "is-live" : ""}`}>{data.connected ? "Live evidence" : "Link pending"}</span><span>UTC edition</span><strong>{new Date().toISOString().slice(11, 19)}</strong></div></header>
-          <State loading={loading} error={error as Error | null} empty={false}>{content}</State>
+          {renderedContent}
         </div>
       </main>
       {selected && <AlertDetail alert={selected} close={() => setSelected(null)} />}
