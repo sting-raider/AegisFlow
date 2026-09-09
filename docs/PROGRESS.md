@@ -56,6 +56,9 @@ loaded `_lib_engine`, and the real NFStream 6.6.0 adapter processed the bundled 
 two valid payload-free flows on Windows. The full Python suite passes. Windows live
 capture is enabled only for an explicit interface but remains unclaimed until a safe,
 isolated interface probe is run; no live capture was started during this validation.
+The portable follow-up commit `a885146` passed all ten jobs in GitHub Actions run
+`34359368507`, including Linux MyPy, NFStream PCAP/live-loopback, attack simulation,
+integration/E2E, dashboard, security, OIDC, restore, release, and Kubernetes evidence.
 
 ## Detector-v2 research phase (validity corrections required)
 
