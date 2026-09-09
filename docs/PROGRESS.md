@@ -118,8 +118,7 @@ Commit `67a1729` publishes that manifest plus an integrity guard that checks exa
 artifact, schema, cohort, ordering, and identifier-exclusion invariants; it also validates
 the ignored local sidecars byte-for-byte when their directory is supplied. This is data
 preparation evidence only: no model was fit and frozen final evidence was not read.
-Immutable `DEV2-CONTEXT-001` registration, the four-view study, and its result publication
-remain open.
+The four-view study execution and its result publication remain open.
 
 The paired causal/terminal preparation then completed from clean commit `d87559a` in
 431.85 seconds without changing the sealed 7,145-row cohort or its causal vectors. Its
@@ -131,6 +130,15 @@ and the dual-generation artifact verifier are published in `b2a0337`. The verifi
 checks 14,290 finite vectors, exact ignored sidecar hashes and sizes, sealed event-ID
 equality, completion ordering, source ledgers, and recursive address exclusion. This
 still authorizes no fit, candidate selection, final-data access, or deployment.
+
+`DEV2-CONTEXT-001` is now immutably registered in commit `8394b62`; registration
+SHA-256 (UTF-8 LF) is
+`9715c4acd1ae3aa03ff49f1d6404097d5873c51cff3e0a69ccdad8cba9fc7157` and protocol
+SHA-256 is `3d2cd115cf4a105254027d07c5f01a5c3961d88b33868ad4332f81da18316a2d`.
+The guard fixes the existing 6,195-row common-support cohort, nine source/target choices,
+four 25-dimensional context views, 36 model fits, 72 site evaluations, two benign-site
+orientations, and the paired bootstrap benefit rule. Status remains
+`registered_not_run`; the runner, clean execution, analysis, and publication are open.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.

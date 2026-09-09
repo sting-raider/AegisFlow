@@ -568,3 +568,19 @@ with the extended verifier in `b2a0337`. Exact local validation passed for all 1
 vectors and six ignored sidecars, including source hashes, sealed IDs, ordering, audit
 totals, and recursive no-address checks. This remains preparation evidence only;
 `DEV2-CONTEXT-001` has not yet been registered or executed.
+
+## MR-020 - Register causal-context ablation before model fitting
+
+2026-09-10. `DEV2-CONTEXT-001` registration SHA-256 (UTF-8 LF):
+`9715c4acd1ae3aa03ff49f1d6404097d5873c51cff3e0a69ccdad8cba9fc7157`;
+protocol SHA-256 `3d2cd115cf4a105254027d07c5f01a5c3961d88b33868ad4332f81da18316a2d`.
+Commit `8394b62` binds the prepared and multiview manifests, unchanged 6,195-row
+common-support cohort, nine transfer choices, four context treatments, two independent
+benign-site orientations, 36 fits, 72 evaluations, learner/calibration budgets, and the
+paired six-stratum decision rule. The terminal view is excluded from any benefit rule and
+remains non-deployable.
+
+Registration verification passes with all prior evidence guards. No model has been fit
+under this registration, no result or candidate exists, and frozen final evidence remains
+sealed. Next implement and synthetically verify the runner without changing registered
+bytes; execute only from a later clean commit.
