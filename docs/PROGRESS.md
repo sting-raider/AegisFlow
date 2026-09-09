@@ -96,7 +96,7 @@ increases benign FPR in 20, decreases it in six, and leaves it unchanged in 18.
 These correlated, cohort-filtered comparisons are not operational performance or a
 new strict-family matrix. No challenger is selected; final data stays sealed.
 
-Next: development-only learned/context/signature ablations and better effective
+Next: development-only learned/signature ablations and better effective
 attack/benign environment support, with origin diagnostics and independent calibration.
 The deployed approved-site baseline and specific failure/partitioning drills remain open.
 Runner verification retained: 463 tests (84% backend coverage), Ruff, MyPy over 116
@@ -139,6 +139,19 @@ The guard fixes the existing 6,195-row common-support cohort, nine source/target
 four 25-dimensional context views, 36 model fits, 72 site evaluations, two benign-site
 orientations, and the paired bootstrap benefit rule. Status remains
 `registered_not_run`; the runner, clean execution, analysis, and publication are open.
+
+The registered run then completed from clean commit `8071496` in 61.24 seconds with all
+36/36 models and 72/72 site evaluations accepted; no retry or configuration change
+occurred. Exact report SHA-256 is
+`e5bc778271823a5b2bc30d60bb7aa125212fad58863a73e6c81dbeb921540909` and publication
+commit is `31909ef`. The preregistered result is NULL: causal context qualifies in 1/6
+strata versus shuffled context and 0/6 versus no context, below the required 5/6 against
+each control. It helps capture 8 but is neutral or harmful on captures 20 and 34. The
+future-leaking terminal diagnostic has much higher attack detection but an unacceptable
+24.99% mean benign FPR and remains non-deployable. No candidate is selected; frozen final
+evidence and production pointers remain untouched. Full paired tables and analysis are in
+`docs/research-v2/registered-results/DEV2-CONTEXT-001.md` and
+`docs/error_analysis/dev2-context-001.md`. Publication CI is not yet claimed.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.

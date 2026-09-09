@@ -1035,3 +1035,17 @@ strata against each control, coverage of all targets and orientations, and no in
 benign direct-FPR upper delta above +0.005. Missing comparisons fail visibly. The terminal
 view is leakage diagnostic only. These intervals remain descriptive because captures and
 fit choices are correlated, and even a benefit cannot promote or deploy a candidate.
+
+## D-072 - Accept the registered context NULL and prohibit post-result tuning
+
+`DEV2-CONTEXT-001` completed every registered fit and site evaluation, but causal context
+qualified in only one of six strata against shuffled context and zero against no context;
+five against each control were required. Accept the registered NULL without changing
+windows, thresholds, cohort filters, views, or the paired rule. No candidate is selected,
+and production and frozen-final paths remain untouched.
+
+The terminal diagnostic's high attack detection accompanies 24.99% mean independent-
+benign FPR, confirming that future leakage is not a shortcut to readiness. A subsequent
+context study must receive a new registration and fresh development evidence, preferably
+with non-coalesced event-time observations and broader independent environments. Do not
+reinterpret this completed matrix as proof that every temporal representation is useless.

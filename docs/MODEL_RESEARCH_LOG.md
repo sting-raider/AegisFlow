@@ -584,3 +584,27 @@ Registration verification passes with all prior evidence guards. No model has be
 under this registration, no result or candidate exists, and frozen final evidence remains
 sealed. Next implement and synthetically verify the runner without changing registered
 bytes; execute only from a later clean commit.
+
+## MR-021 - Registered context execution returns NULL with no candidate
+
+2026-09-10. The exact registered matrix completed from clean code
+`8071496690ce9d3150cd1209d7035b29584502bd` in 61.24 seconds. All 36 fits, 36 numeric
+artifact round trips, and 72 site evaluations completed under one-thread numerical pools.
+The exact aggregate report SHA-256 is
+`e5bc778271823a5b2bc30d60bb7aa125212fad58863a73e6c81dbeb921540909`; commit `31909ef`
+publishes it with a structural/semantic guard. The 36 model artifacts remain ignored and
+are not published.
+
+The registered causal-benefit rule fails: 1/6 target-by-orientation strata qualifies
+against shuffled context and 0/6 against no context, versus a required 5/6 for each
+control. Causal context materially helps direct detection on capture 8, but the paired
+attack endpoints are neutral or worse on captures 20 and 34 and benign-FPR penalties
+appear in multiple comparisons. The non-causal terminal reference averages 71.43% direct
+attack detection but 24.99% independent-benign FPR, visibly illustrating future leakage
+rather than a usable model. See `docs/error_analysis/dev2-context-001.md`.
+
+Scientific status remains `development_only_no_candidate_selected`. No threshold,
+window, feature, or cohort is adjusted after observing this result; any follow-up requires
+new registration and evidence. Frozen final reports, production model pointers, and the
+user's local smoke-model edits remain untouched. Publication CI is pending and must not be
+claimed until GitHub completes it.
