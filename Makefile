@@ -45,6 +45,7 @@ research-v2-check:
 	$(UV) run python -m scripts.verify_registered_missingness
 	$(UV) run python -m scripts.verify_context_preparation
 	$(UV) run python -m scripts.verify_registered_context
+	$(UV) run python -m scripts.verify_registered_context_result
 
 train-smoke:
 	$(UV) run python -m training.cli.train_smoke
