@@ -9,13 +9,13 @@ services:
       - -l
       - /var/log/suricata
       - -S
-      - /etc/suricata/rules/aegisflow-demo.rules
+      - /etc/suricata/rules/aegisflow.rules
       - --set
       - outputs.1.eve-log.community-id=true
     volumes:
       - ${SURICATA_PCAP:?set SURICATA_PCAP explicitly}:/captures/input.pcap:ro
-      - ./configs/suricata/rules/aegisflow-demo.rules:/etc/suricata/rules/aegisflow-demo.rules:ro
-      - ./.runtime/suricata:/var/log/suricata
+      - ${SURICATA_RULES:-./configs/suricata/rules/aegisflow-demo.rules}:/etc/suricata/rules/aegisflow.rules:ro
+      - ${SURICATA_LOG_DIR:-./.runtime/suricata}:/var/log/suricata
     network_mode: none
     read_only: true
     tmpfs: ["/tmp"]

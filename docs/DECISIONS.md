@@ -960,3 +960,28 @@ acceptance. Temporal v2 preparation must still replay the real observation histo
 label filtering and explicitly account for flow-completion order and capture-wide
 five-tuple coalescing; simply sorting the current timestamp-free prepared rows cannot
 supply causal context or a valid context ablation.
+
+## D-067 - Fail model startup visibly and retry only transient dashboard readiness
+
+A missing, corrupt, or schema-incompatible model is an operational error, not permission
+to spend an unbounded interval training a replacement inside the API process. API startup
+therefore logs bounded phase durations and fails fast on `BundleError`. The old synthetic
+recovery path remains available only behind the explicit
+`AEGISFLOW_ALLOW_STARTUP_MODEL_TRAINING=1` switch; checked-in Compose images do not enable
+it because they already contain a checksum-verified bundle and use a read-only filesystem.
+
+The dashboard may start before the API during local development. Keep queries in their
+loading state for a bounded number of network, 502, 503, and 504 failures. Do not retry
+4xx or API 500 responses, because those are application/configuration failures that must
+remain visible. This separates normal cold-start waiting from real errors without claiming
+that UI retries make model initialization faster.
+
+## D-068 - Simulate attack shape only in an offline, networkless Suricata run
+
+The supported attack simulation is a generated PCAP containing only Ethernet, IP, and TCP
+SYN headers over RFC 5737 documentation addresses. It is never transmitted. A pinned
+Suricata container runs with `network_mode: none`, a local threshold rule emits signature
+`9000100`, and the verifier requires both the signature and AegisFlow flow correlation.
+Each run uses a new ignored output directory, so evidence is not confused with an older
+EVE file. Real exploits, payload fixtures, external targets, automatic blocking, and
+automatic baseline updates remain prohibited.

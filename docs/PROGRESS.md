@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-09-03 (registered research corrections; historical acceptance through 2026-08-23).
+Last updated: 2026-09-09 (runtime refinement; historical acceptance through 2026-08-23).
 
 ## Final status (authoritative)
 
@@ -16,6 +16,34 @@ sealed. Earlier completion claims were premature and are superseded by the curre
 The working tree also contains four pre-existing, uncommitted smoke-model registry edits
 and local demo launch files. They are intentionally preserved and are not part of the
 committed acceptance evidence; the model's scientific status does not change.
+
+## 2026-09-09 runtime refinement
+
+The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently
+fails before Compose starts because its privileged backend cannot rename the zero-byte
+`sailor-ingest.sock` runtime socket; the Linux-engine pipe is consequently absent. The
+Docker-owned UI/backend processes and WSL were stopped, but the still-running privileged
+service retained the socket and this non-elevated session could not restart that service.
+No factory reset, volume deletion, or repository-data deletion was attempted. A Docker
+service restart or Windows reboot remains required before full Compose timing can run.
+
+The repository-side slow failure path is corrected independently. API model-load errors
+now emit timed structured errors and fail fast by default instead of silently training a
+replacement model during startup. Explicit recovery remains available only through
+`AEGISFLOW_ALLOW_STARTUP_MODEL_TRAINING=1`; normal Compose already ships a validated
+bundle. Successful database, model, and total-ready phases also emit durations. Dashboard
+queries keep their loading state through bounded connection and 502/503/504 startup
+failures, while application 4xx/500 errors still fail immediately. The edited local 0.3.0
+bundle validates successfully; a cold Windows process took about 23.2 seconds for import
+plus bundle load and a warm process took about 4.5 seconds, so model initialization remains
+a measured startup cost rather than a hidden training job.
+
+A separate `make simulate-attack` command now creates a 24-flow, header-only TCP SYN-sweep
+PCAP using RFC documentation ranges, runs pinned Suricata with container networking
+disabled, requires signature `9000100`, and verifies AegisFlow correlation. Unit evidence
+confirms zero Scapy `Raw` layers and successful signature correlation; the Suricata Compose
+configuration renders. Full container execution is pending the host Docker-service restart
+above and is not claimed complete.
 
 ## Detector-v2 research phase (validity corrections required)
 

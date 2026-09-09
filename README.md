@@ -86,6 +86,7 @@ make train-smoke
 make replay PCAP=/absolute/path/capture.pcap
 make live INTERFACE=eth0
 make suricata-replay PCAP=/absolute/path/capture.pcap
+make simulate-attack
 make benchmark
 make production-check
 make benchmark-sustained SUSTAINED_DURATION=600 SUSTAINED_RATE=50
@@ -128,6 +129,12 @@ warning. It builds a dedicated non-root NFStream sensor target with only `NET_RA
 the API and detector continue to drop every capability. The Suricata replay profile
 has no network and accepts only an explicitly mounted PCAP. Never replay malicious
 traffic onto a real network.
+
+`make simulate-attack` generates a deterministic TCP SYN-sweep PCAP containing packet
+headers only, runs it through pinned Suricata with container networking disabled, and
+verifies that AegisFlow correlates signature `9000100` to the matching flow. It never
+transmits packets. The JSON proof and EVE output are retained under the ignored
+`.runtime/attack-simulation/` directory.
 
 ## Training and models
 

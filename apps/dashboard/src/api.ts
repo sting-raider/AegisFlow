@@ -14,6 +14,19 @@ import type {
 const API = import.meta.env.VITE_API_URL ?? "";
 let accessToken: string | undefined;
 
+export class ApiRequestError extends Error {
+  constructor(public readonly status: number, statusText: string) {
+    super(`${status} ${statusText}`);
+    this.name = "ApiRequestError";
+  }
+}
+
+export function retryStartupQuery(failureCount: number, error: Error): boolean {
+  if (failureCount >= 20) return false;
+  if (error instanceof ApiRequestError) return [502, 503, 504].includes(error.status);
+  return error instanceof TypeError;
+}
+
 export function setAccessToken(token: string | undefined): void {
   accessToken = token;
 }
@@ -27,7 +40,7 @@ function headers(contentType = false): HeadersInit {
 
 async function get<T>(path: string): Promise<T> {
   const response = await fetch(`${API}${path}`, { headers: headers() });
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  if (!response.ok) throw new ApiRequestError(response.status, response.statusText);
   return response.json() as Promise<T>;
 }
 

@@ -105,6 +105,7 @@ jobs:
           cache-dependency-path: apps/dashboard/package-lock.json
       - run: uv sync --locked --extra dev
       - run: uv run python -m training.cli.train_smoke
+      - run: make simulate-attack
       - run: docker compose -f compose.yml -f compose.demo.yml up --build -d
       - run: docker compose -f compose.yml -f compose.demo.yml run --rm sensor
       - run: |

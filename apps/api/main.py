@@ -12,6 +12,7 @@ from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from time import perf_counter
 from typing import Annotated, Any, Literal, cast
 from urllib.parse import urlsplit
 from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
@@ -72,6 +73,7 @@ from packages.incidents import (
 )
 from packages.model_bundle import (
     BundleError,
+    ModelBundle,
     assess_candidate,
     load_production_bundle,
     promote_bundle,
@@ -80,7 +82,6 @@ from packages.model_bundle import (
 )
 from packages.model_bundle.bundle import sha256_file
 from services.sensor import DemoAdapter
-from training.cli.train_smoke import train
 
 DETECTIONS = Counter("detections_total", "Detection results", ["verdict"])
 FLOWS_RECEIVED = Counter("flows_received_total", "Flow envelopes received")
@@ -215,23 +216,57 @@ def _seed_demo(
                 _record_drift_metric(event)
 
 
+def _load_runtime_bundle(registry: Path) -> ModelBundle:
+    """Load a validated bundle without hiding registry failures behind slow training."""
+
+    started = perf_counter()
+    try:
+        bundle = load_production_bundle(registry)
+    except BundleError as exc:
+        MODEL_LOAD_FAILURES.inc()
+        log_event(
+            LOGGER,
+            "model_load_failed",
+            level="error",
+            error_code=type(exc).__name__,
+            duration_ms=(perf_counter() - started) * 1000,
+        )
+        if os.getenv("AEGISFLOW_ALLOW_STARTUP_MODEL_TRAINING", "0") != "1":
+            raise
+
+        # This recovery path is deliberately explicit. Compose and production images
+        # ship a bundle and must fail fast if it is missing or incompatible.
+        log_event(LOGGER, "startup_model_training_enabled", level="warning")
+        from training.cli.train_smoke import train
+
+        train(registry)
+        bundle = load_production_bundle(registry)
+    log_event(
+        LOGGER,
+        "model_loaded",
+        model_version=str(bundle.manifest["version"]),
+        duration_ms=(perf_counter() - started) * 1000,
+    )
+    return bundle
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    startup_started = perf_counter()
     configure_json_logger("uvicorn.access", "api-access", replace_handlers=True)
     configure_json_logger("uvicorn.error", "api-runtime", replace_handlers=True)
     authenticator = Authenticator.from_env()
     rate_limiter = PrincipalRateLimiter.from_env()
     repository = Repository()
+    database_started = perf_counter()
     repository.create_schema()
+    log_event(
+        LOGGER,
+        "database_schema_ready",
+        duration_ms=(perf_counter() - database_started) * 1000,
+    )
     registry = Path(os.getenv("AEGISFLOW_MODEL_REGISTRY", "models/registry"))
-    try:
-        bundle = load_production_bundle(registry)
-    except BundleError:
-        MODEL_LOAD_FAILURES.inc()
-        if os.getenv("AEGISFLOW_DEMO", "1") != "1":
-            raise
-        train(registry)
-        bundle = load_production_bundle(registry)
+    bundle = _load_runtime_bundle(registry)
     engine = DetectionEngine(bundle)
     drift_monitor = RuntimeDriftMonitor(
         str(bundle.manifest["version"]),
@@ -266,6 +301,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         LOGGER,
         "api_ready",
         model_version=str(bundle.manifest["version"]),
+        duration_ms=(perf_counter() - startup_started) * 1000,
     )
     retention_worker = retention_worker_from_env(repository)
     app.state.retention_worker = retention_worker

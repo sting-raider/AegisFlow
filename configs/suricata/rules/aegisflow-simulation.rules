@@ -1,0 +1,1 @@
+alert tcp 192.0.2.0/24 any -> 198.51.100.0/24 any (msg:"AEGISFLOW SAFE SIMULATION TCP SYN sweep"; flags:S; flow:stateless; threshold:type threshold, track by_src, count 12, seconds 10; sid:9000100; rev:1;)

@@ -16,6 +16,13 @@ docker version
 docker compose version
 ```
 
+If Docker Desktop reports that the Linux engine pipe does not exist, inspect its backend
+log before troubleshooting the application. A stale locked socket under Docker's own
+runtime directory requires Docker Desktop and its privileged service to be restarted (or
+Windows to be rebooted); do not use a factory reset or delete volumes merely to clear a
+startup socket. AegisFlow cannot start until `docker version` reports both client and
+server sections.
+
 Do not place PCAPs, datasets, secrets, database dumps, or unreviewed model artifacts in
 the repository. Confirm the host has enough disk for the backend image and at least 4 GiB
 of memory available to Docker.
