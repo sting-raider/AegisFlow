@@ -543,3 +543,16 @@ was not loaded. `training.v2.context_preparation` now provides the clean-worktre
 all-scenario preparation command. It verifies the frozen-source exclusion, existing
 prepared rows, exact per-scenario accounting, and source stability before publishing a
 success manifest; partial attempts cannot masquerade as completion.
+
+The clean all-scenario preparation subsequently completed from
+`d3639a42071c1ef214d9c446f2ae2fe17605efff` in 179.20 seconds. Across six development
+captures, 11,771 flows entered replay history, 7,145 emitted the exact sealed cohort,
+4,626 contributed context only, 161 were cold starts, and no late or ambiguous rows were
+observed. Recursive inspection found no IP-address strings in any sidecar. The sanitized
+manifest is committed at `docs/research-v2/preparation/context-sidecars-d3639a4.json`;
+its SHA-256 is
+`31c52608689b46860a7c97c15847622c012084345c9178abe1c6169d07fe0f81`.
+Commit `67a1729` adds a repository guard for the committed projection and optional exact
+validation of the ignored 4.3 MB sidecars against their hashes, schema, ordering, source
+ledgers, and sealed event-ID sets. This remains preparation evidence, not model-quality
+evidence. Registration and all four preregistered comparisons are still pending.

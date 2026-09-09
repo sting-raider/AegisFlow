@@ -108,11 +108,18 @@ artifacts. The 36 new evidence tests include LF/CRLF hashing and exact table reg
 Publication CI `33717028051` subsequently passed all ten jobs on `ae350e3`.
 
 The causal sidecar builder now validates sealed row schemas and exact label alignment,
-refuses duplicate IDs and unsafe capture paths, and binds all three source hashes. A real
-development-only preparation check on capture 20 replayed 630 flows into 44 sealed and
-586 context-only rows without fitting a model or reading frozen evidence. Full six-capture
-sidecar preparation now has a clean-worktree CLI with before/after source and code guards;
-its execution, immutable registration, four-view study, and publication remain open.
+refuses duplicate IDs and unsafe capture paths, and binds all three source hashes. The
+full six-capture development preparation completed from clean commit `d3639a4` in
+179.20 seconds: 11,771 flows entered history, 7,145 sealed rows emitted sidecars, 4,626
+unlabeled flows contributed context only, 161 rows were cold starts, and zero rows were
+late or ambiguous. The sanitized preparation manifest SHA-256 is
+`31c52608689b46860a7c97c15847622c012084345c9178abe1c6169d07fe0f81`.
+Commit `67a1729` publishes that manifest plus an integrity guard that checks exact source,
+artifact, schema, cohort, ordering, and identifier-exclusion invariants; it also validates
+the ignored local sidecars byte-for-byte when their directory is supplied. This is data
+preparation evidence only: no model was fit and frozen final evidence was not read.
+Immutable `DEV2-CONTEXT-001` registration, the four-view study, and its result publication
+remain open.
 
 2026-09-03 sequence safety correction: a synthetic regression reproduced independent
 filtering of invalid sizes/directions/timings, silently changing packet alignment.
