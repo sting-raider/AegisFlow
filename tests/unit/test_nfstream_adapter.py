@@ -1,11 +1,40 @@
 from __future__ import annotations
 
+import os
 from types import SimpleNamespace
+
+import pytest
 
 from packages.common import community_id_v1
 from packages.contracts import CaptureMode
 from packages.features import flow_to_mapping
+from services.sensor import adapters
 from services.sensor.adapters import _convert_nfstream_flow
+
+
+def test_windows_npcap_bootstrap_is_inherited_by_nfstream_workers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handle = object()
+    added: list[str] = []
+    monkeypatch.setattr(adapters, "_NPCAP_DLL_HANDLE", None)
+    monkeypatch.setattr(adapters.platform, "system", lambda: "Windows")
+    monkeypatch.setattr(adapters.os.path, "isdir", lambda _path: True)
+    monkeypatch.setattr(
+        adapters.os,
+        "add_dll_directory",
+        lambda path: added.append(path) or handle,
+    )
+    monkeypatch.setenv("PYTHONPATH", r"C:\Tools")
+
+    adapters._prepare_nfstream_runtime()
+    adapters._prepare_nfstream_runtime()
+
+    assert os.environ["PYTHONPATH"].split(os.pathsep)[0] == str(
+        adapters._NFSTREAM_WINDOWS_BOOTSTRAP
+    )
+    assert added == [r"C:\Windows\System32\Npcap"]
+    assert adapters._NPCAP_DLL_HANDLE is handle
 
 
 def test_nfstream_flow_preserves_semantic_direction_and_is_payload_free() -> None:
@@ -61,6 +90,7 @@ def test_nfstream_flow_preserves_semantic_direction_and_is_payload_free() -> Non
     assert flow_to_mapping(event)["destination_port"] == 443
     assert event.community_flow_id == community_id_v1("10.0.0.2", 50_000, "10.0.0.1", 443, "TCP")
     assert event.protocol_metadata["direction_basis"] == "nfstream_first_packet_src2dst"
+    assert event.protocol_metadata["capture_mode"] == "pcap"
     assert event.source_adapter == "nfstream-6.6.0"
     assert "requested_server_name" not in event.protocol_metadata
 

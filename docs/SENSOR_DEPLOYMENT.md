@@ -1,7 +1,7 @@
 # Sensor deployment
 
 AegisFlow supports deterministic demo traffic, offline PCAP replay, Suricata EVE input,
-and explicit Linux live capture. Prefer offline replay during evaluation. No sensor is
+and explicit local live capture. Prefer offline replay during evaluation. No sensor is
 authorized to scan, inject, replay onto, or block an external system.
 
 ## PCAP replay
@@ -39,9 +39,17 @@ make live INTERFACE=eth0
 
 Use a SPAN/TAP interface where possible. The dedicated sensor image runs non-root with a
 read-only root filesystem and only `NET_RAW`; promiscuous mode is disabled. Do not grant
-`NET_ADMIN`, host networking, or access to unrelated interfaces for convenience. Windows
-live capture is unsupported. See [`LIVE_CAPTURE.md`](LIVE_CAPTURE.md) for the verified
-loopback probe.
+`NET_ADMIN`, host networking, or access to unrelated interfaces for convenience. See
+[`LIVE_CAPTURE.md`](LIVE_CAPTURE.md) for the verified Linux loopback probe.
+
+## Experimental Windows capture
+
+NFStream PCAP processing is verified on Windows with Npcap installed at its standard
+`C:\Windows\System32\Npcap` location. Native live capture accepts only an explicitly
+named local interface and retains the same non-promiscuous, payload-free flow boundary.
+It has not completed the isolated live-interface acceptance probe, so do not treat it as
+equivalent to the accepted Linux container path. Validate it first on a controlled local
+or lab interface; never use it to scan, inject, or replay traffic.
 
 ## Commissioning checklist
 

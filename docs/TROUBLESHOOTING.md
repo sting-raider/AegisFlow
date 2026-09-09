@@ -26,11 +26,15 @@
 - **PostgreSQL interruption:** restore database health and leave the API running. Failed
   transactions remain unacknowledged and are retried through pending-entry recovery;
   verify `database_errors_total` and that queue pending returns to zero.
-- **Live capture rejected:** use Linux, specify an authorized interface, and follow
-  `LIVE_CAPTURE.md`; confirm the selected interface exists and the dedicated sensor
-  image has `NET_RAW`. Demo/Scapy PCAP mode remains available.
-- **NFStream native import fails on Windows:** this is an expected platform fallback;
-  use `make replay PCAP=...` or run NFStream in the documented Linux container.
+- **Live capture rejected:** specify an explicitly authorized local interface. For the
+  accepted Linux container path, follow `LIVE_CAPTURE.md` and confirm the sensor has
+  only `NET_RAW`. Windows requires Npcap and remains an experimental native path.
+  Demo/Scapy PCAP mode remains available.
+- **NFStream native import fails on Windows:** confirm Npcap provides `wpcap.dll` under
+  `C:\Windows\System32\Npcap`, then rerun from the AegisFlow environment. AegisFlow
+  installs a child-process bootstrap because Python's normal `PATH` lookup is not
+  sufficient for NFStream's spawned workers. Use Scapy replay or the documented Linux
+  container if the host installation is unavailable.
 - **Suricata replay cannot read its config:** run through `compose.suricata.yml`, which
   grants only `DAC_OVERRIDE` for the pinned image's mode-0600 configuration. Do not
   restore access with a privileged container. Inspect `.runtime/suricata/suricata.log`

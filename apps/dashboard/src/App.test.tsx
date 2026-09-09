@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { cloneElement, isValidElement, type ReactElement } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import { App } from "./App";
@@ -125,7 +125,7 @@ const flowFixture = {
   direction: "outbound",
   source_adapter: "fixture",
   feature_extractor_version: "1.0.0",
-  protocol_metadata: {},
+  protocol_metadata: {} as Record<string, string | number | boolean>,
   detection: alertFixture.detection,
   alert_id: alertFixture.id,
   signatures: [{
@@ -195,6 +195,16 @@ test("renders the operations dashboard and demo disclosure", async () => {
   expect(await screen.findByText("Demo traffic")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: /System health/ }));
   expect(screen.getByText("Detection queue")).toBeTruthy();
+});
+
+test("does not label captured live traffic as demo traffic", async () => {
+  flowFixture.protocol_metadata.capture_mode = "live";
+  try {
+    render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
+    await waitFor(() => expect(screen.queryByText("Demo traffic")).toBeNull());
+  } finally {
+    delete flowFixture.protocol_metadata.capture_mode;
+  }
 });
 
 test("loads incident explanations on demand and labels AI-generated text", async () => {

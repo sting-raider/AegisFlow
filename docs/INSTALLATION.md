@@ -4,7 +4,10 @@
 
 Use Docker Desktop or Docker Engine with Compose for the reproducible demo. Python 3.11,
 Node 22, `uv`, GNU Make, and `kubectl` are required only for development and deployment
-validation. Windows supports demo and PCAP replay; live capture is Linux-only.
+validation. Windows NFStream requires Npcap in its standard
+`C:\Windows\System32\Npcap` location. PCAP processing is verified on Windows; native
+Windows live capture is available only with an explicitly authorized interface and is
+not part of the accepted Linux live-container path.
 
 Clone the public repository and verify the checkout before running code:
 

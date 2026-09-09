@@ -46,6 +46,17 @@ confirms zero Scapy `Raw` layers and successful signature correlation. Clean Lin
 `c32bce9`. Repeating that container run on this Windows host remains pending the Docker
 service restart above; the cross-platform simulation implementation itself is verified.
 
+NFStream's Windows failure was reproduced below the adapter: `_lib_engine.pyd` depends
+on `wpcap.dll`, and Windows spawn imports that extension before application code can call
+`os.add_dll_directory`. Prepending Npcap to `PATH` was experimentally rejected because
+modern Python does not use ordinary `PATH` for extension dependencies. A private,
+inherited `sitecustomize` bootstrap now adds only the standard Npcap DLL directory in
+NFStream meter children and retains the DLL handle for their lifetime. A fresh child
+loaded `_lib_engine`, and the real NFStream 6.6.0 adapter processed the bundled PCAP into
+two valid payload-free flows on Windows. The full Python suite passes. Windows live
+capture is enabled only for an explicit interface but remains unclaimed until a safe,
+isolated interface probe is run; no live capture was started during this validation.
+
 ## Detector-v2 research phase (validity corrections required)
 
 Temporal follow-up: a synthetic two-sensor/same-event-ID test reproduced a cache
@@ -467,7 +478,8 @@ boundary is recorded in `docs/FINAL_ACCEPTANCE_REPORT.md` and `docs/PRODUCTION_A
   container with networking disabled and all capabilities dropped. The dedicated live
   stage runs as UID 10001 and, with only `NET_RAW`, captured one repeated loopback-only
   UDP flow. The ordinary backend still executes with every capability dropped. Native
-  NFStream does not load on Windows, where Scapy remains the documented PCAP fallback.
+  At that milestone NFStream did not load on Windows and Scapy was the documented PCAP
+  fallback. D-069 and the 2026-09-09 runtime refinement supersede that Windows limitation.
 - Pinned Suricata 8.0.6 replayed the bundled three-packet fixture with no network and
   only `DAC_OVERRIDE`, loaded one safe rule, and emitted one alert, one DNS record, and two
   flow records. The incremental reader parsed all four with zero errors, hashed the DNS

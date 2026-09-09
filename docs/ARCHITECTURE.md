@@ -25,7 +25,9 @@ detection engine, and repository used by distributed mode, so it is useful in CI
 without pretending to validate infrastructure recovery.
 
 Scapy provides the deterministic, portable PCAP fallback. NFStream 6.6.0 is the
-completed-flow adapter for higher-fidelity PCAP and explicit Linux live capture.
+completed-flow adapter for higher-fidelity PCAP and explicit local live capture.
+Windows workers receive a narrowly scoped Npcap DLL bootstrap before importing
+NFStream's native engine; no system DLL is copied into the application environment.
 Suricata 8.0.6 runs independently for signature evidence; its allow-listed EVE output
 is correlated by community ID first, then normalized endpoints and bounded time.
 

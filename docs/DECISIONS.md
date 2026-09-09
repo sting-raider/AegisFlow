@@ -985,3 +985,16 @@ Suricata container runs with `network_mode: none`, a local threshold rule emits 
 Each run uses a new ignored output directory, so evidence is not confused with an older
 EVE file. Real exploits, payload fixtures, external targets, automatic blocking, and
 automatic baseline updates remain prohibited.
+
+## D-069 - Bootstrap only NFStream's spawned Windows workers for Npcap
+
+NFStream's Windows meter process imports `_lib_engine` during spawn target unpickling,
+before AegisFlow adapter code can call `os.add_dll_directory`. Ordinary `PATH` inheritance
+does not satisfy native-extension dependency lookup on modern Python and was rejected by
+a fresh-process reproduction. Prepend a private package directory to `PYTHONPATH` only
+when preparing NFStream on Windows; its `sitecustomize` hook adds the fixed standard
+Npcap directory and retains the handle before the worker import. Keep the parent-process
+call as well. Do not copy system DLLs into the environment, patch NFStream, use a dynamic
+untrusted DLL path, or weaken the explicit-interface and non-promiscuous capture bounds.
+Offline PCAP processing is verified on Windows. Live Windows capture remains experimental
+until an isolated authorized-interface probe is recorded.

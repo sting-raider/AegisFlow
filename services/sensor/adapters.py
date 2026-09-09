@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import platform
 from abc import ABC, abstractmethod
 from collections import defaultdict
@@ -20,6 +21,42 @@ Endpoint = tuple[str, int]
 PacketObservation = tuple[float, int, Endpoint, Endpoint, Any]
 WELL_KNOWN_PORT_MAX = 1_023
 EPHEMERAL_PORT_MIN = 49_152
+
+_NPCAP_DLL_HANDLE: Any | None = None
+_NFSTREAM_WINDOWS_BOOTSTRAP = Path(__file__).with_name("_windows_nfstream_bootstrap")
+
+
+def _prepare_nfstream_runtime() -> None:
+    global _NPCAP_DLL_HANDLE
+    if platform.system() == "Windows" and _NPCAP_DLL_HANDLE is None:
+        npcap_dir = r"C:\Windows\System32\Npcap"
+        if not os.path.isdir(npcap_dir):
+            raise RuntimeError(f"Npcap DLL directory was not found: {npcap_dir}")
+        if not _NFSTREAM_WINDOWS_BOOTSTRAP.is_dir():
+            raise RuntimeError(
+                "NFStream Windows worker bootstrap was not found: "
+                f"{_NFSTREAM_WINDOWS_BOOTSTRAP}"
+            )
+        # NFStream imports its native extension while Windows spawn is still
+        # unpickling the worker target. The inherited PYTHONPATH makes Python load
+        # our narrowly scoped sitecustomize hook before that import occurs.
+        bootstrap_dir = str(_NFSTREAM_WINDOWS_BOOTSTRAP)
+        current_pythonpath = os.environ.get("PYTHONPATH", "")
+        pythonpath_entries = [
+            entry for entry in current_pythonpath.split(os.pathsep) if entry
+        ]
+        normalized_bootstrap = os.path.normcase(os.path.normpath(bootstrap_dir))
+        if not any(
+            os.path.normcase(os.path.normpath(entry)) == normalized_bootstrap
+            for entry in pythonpath_entries
+        ):
+            os.environ["PYTHONPATH"] = (
+                f"{bootstrap_dir}{os.pathsep}{current_pythonpath}"
+                if current_pythonpath
+                else bootstrap_dir
+            )
+        _NPCAP_DLL_HANDLE = os.add_dll_directory(npcap_dir)
+
 
 
 class SensorAdapter(ABC):
@@ -351,6 +388,7 @@ def _convert_nfstream_flow(flow: Any, capture_mode: CaptureMode, sensor_id: str)
         "application_is_guessed": bool(_nf_value(flow, "application_is_guessed", False)),
         "application_confidence": float(_nf_value(flow, "application_confidence", 0.0)),
         "direction_basis": direction_basis,
+        "capture_mode": capture_mode.value,
     }
     category = str(_nf_value(flow, "application_category_name", "")).strip()
     if category:
@@ -407,7 +445,7 @@ def _convert_nfstream_flow(flow: Any, capture_mode: CaptureMode, sensor_id: str)
 
 
 class NfstreamAdapter(SensorAdapter):
-    """NFStream completed-flow adapter for bounded PCAP or explicit Linux live capture."""
+    """NFStream completed-flow adapter for bounded PCAP or explicit local live capture."""
 
     def __init__(
         self,
@@ -422,8 +460,11 @@ class NfstreamAdapter(SensorAdapter):
         if capture_mode == CaptureMode.DEMO:
             raise ValueError("NFStream is available only for PCAP or live capture")
         if capture_mode == CaptureMode.LIVE:
-            if platform.system() != "Linux":
-                raise RuntimeError("live capture is supported only on Linux; use demo or PCAP mode")
+            if platform.system() not in {"Linux", "Windows"}:
+                raise RuntimeError(
+                    "live capture is supported only on Linux or Windows; "
+                    "Windows requires Npcap"
+                )
             if not isinstance(source, str) or not source.strip():
                 raise ValueError("live capture requires an explicit interface")
             self.source = source.strip()
@@ -443,6 +484,7 @@ class NfstreamAdapter(SensorAdapter):
         self.max_flows = max_flows
 
     def flows(self) -> Iterable[FlowEvent]:
+        _prepare_nfstream_runtime()
         try:
             from nfstream import NFStreamer
         except (ImportError, OSError) as exc:
@@ -469,8 +511,11 @@ class LiveAdapter(SensorAdapter):
     def __init__(self, interface: str | None) -> None:
         if not interface:
             raise ValueError("live capture requires an explicit interface")
-        if platform.system() != "Linux":
-            raise RuntimeError("live capture is supported only on Linux; use demo or PCAP mode")
+        if platform.system() not in {"Linux", "Windows"}:
+            raise RuntimeError(
+                "live capture is supported only on Linux or Windows; "
+                "Windows requires Npcap"
+            )
         self.interface = interface
 
     def flows(self) -> Iterable[FlowEvent]:
@@ -478,4 +523,6 @@ class LiveAdapter(SensorAdapter):
             self.interface,
             capture_mode=CaptureMode.LIVE,
             sensor_id="live-nfstream-sensor",
+            idle_timeout=5,
+            active_timeout=15,
         ).flows()

@@ -629,6 +629,9 @@ export function App() {
   const alerts = data.alerts.data?.items ?? [];
   const incidents = data.incidents.data?.items ?? [];
   const flows = data.flows.data?.items ?? [];
+  const hasLiveTraffic = flows.some(
+    (flow) => flow.protocol_metadata?.capture_mode === "live"
+  );
   const hosts = data.hosts.data?.items ?? [];
   const models = data.models.data?.items ?? [];
   const drift = data.drift.data?.items ?? [];
@@ -655,7 +658,7 @@ export function App() {
         <div className="sidebar__foot"><span className={`connection ${data.connected ? "is-live" : ""}`} />{data.connected ? "Live stream linked" : "Reconnecting stream"}</div>
       </aside>
       <main id="main-content" tabIndex={-1}>
-        {data.status.data?.mode === "demo" && <div className="demo-banner"><strong>Demo traffic</strong><span>Generated records are isolated and carry no real packet payloads.</span></div>}
+        {data.status.data?.mode === "demo" && !hasLiveTraffic && <div className="demo-banner"><strong>Demo traffic</strong><span>Generated records are isolated and carry no real packet payloads.</span></div>}
         <div className="main-inner">
           <header className="page-header"><div><p className="eyebrow">AegisFlow intelligence / {currentView.mark}</p><h1>{currentView.label}</h1><p className="page-deck">{currentView.description}</p></div><div className="edition-meta"><span className={`edition-meta__status ${data.connected ? "is-live" : ""}`}>{data.connected ? "Live evidence" : "Link pending"}</span><span>UTC edition</span><strong>{new Date().toISOString().slice(11, 19)}</strong></div></header>
           <State loading={loading} error={error as Error | null} empty={false}>{content}</State>

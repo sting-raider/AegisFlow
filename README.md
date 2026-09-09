@@ -4,7 +4,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 AegisFlow is an adaptive hybrid network intrusion detection system for deterministic
-PCAP replay, explicit Linux live capture, explainable risk fusion, incident grouping,
+PCAP replay, explicit local live capture, explainable risk fusion, incident grouping,
 and a real-time editorial network-intelligence dashboard.
 
 > AegisFlow detects known threats and flags statistically unusual behaviour that may
@@ -216,9 +216,9 @@ guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Follow the practical
   two-worker smoke exercised both workers. The recorded local numbers remain synthetic
   single-host evidence, not a production capacity claim.
 - The Scapy PCAP adapter is deterministic but deliberately compact. NFStream 6.6.0 is
-  validated for PCAP and explicit Linux live interfaces; its Windows native engine is
-  unavailable, so Windows falls back to Scapy replay.
-- Windows supports demo and PCAP replay, not live capture.
+  validated for PCAP on Linux and Windows and for explicit Linux live interfaces.
+  Windows live capture is enabled with Npcap at its standard install path, but has not
+  completed the isolated live-interface acceptance probe and remains experimental.
 - The deployed smoke bundle remains calibrated against deterministic synthetic data.
   Public evaluation retrains the identical model families and fusion path for the
   reviewed dataset but does not promote the result.
