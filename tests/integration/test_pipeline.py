@@ -41,6 +41,46 @@ def test_demo_detection_persistence_and_idempotency(bundle: ModelBundle, tmp_pat
     assert context["payload"]["aggregated_features"]["flow_count"] >= 1
 
 
+def test_dashboard_summaries_never_hydrate_the_complete_flow_ledger(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
+    repository = Repository(f"sqlite:///{(tmp_path / 'bounded-summaries.db').as_posix()}")
+    repository.create_schema()
+    detector = DetectionEngine(bundle)
+    for flow in DemoAdapter().flows():
+        repository.ingest(flow, detector.detect(flow))
+
+    statements: list[str] = []
+
+    def capture_statement(
+        _connection: Any,
+        _cursor: Any,
+        statement: str,
+        _parameters: Any,
+        _context: Any,
+        _executemany: bool,
+    ) -> None:
+        if statement.lstrip().upper().startswith("SELECT"):
+            statements.append(" ".join(statement.lower().split()))
+
+    event.listen(repository.engine, "before_cursor_execute", capture_statement)
+    try:
+        assert repository.status()["flows"] == 6
+        assert repository.hosts()
+    finally:
+        event.remove(repository.engine, "before_cursor_execute", capture_statement)
+
+    complete_flow_reads = [
+        statement
+        for statement in statements
+        if " from flows" in statement
+        and " limit " not in statement
+        and " group by " not in statement
+        and "count(" not in statement
+    ]
+    assert complete_flow_reads == []
+
+
 def test_repository_ingest_batch_commits_rows_and_reports_novelty(
     bundle: ModelBundle, tmp_path: Path
 ) -> None:

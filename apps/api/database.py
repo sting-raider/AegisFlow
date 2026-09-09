@@ -1182,32 +1182,95 @@ class Repository:
                 }
                 for row in rows
             ]
-    def hosts(self) -> list[dict[str, Any]]:
+    def hosts(self, *, offset: int = 0, limit: int = 200) -> list[dict[str, Any]]:
         with self.session() as session:
-            flows = session.scalars(select(FlowRow)).all()
-            alerts = {item["flow"]["src_ip"] for item in self.alerts(limit=200)}
-            summary: dict[str, dict[str, Any]] = {}
-            for flow in flows:
-                host = summary.setdefault(
-                    flow.src_ip,
-                    {"host": flow.src_ip, "flows": 0, "destinations": set(), "alerting": False},
+            recent_alerts = (
+                select(AlertRow.flow_event_id)
+                .order_by(AlertRow.created_at.desc())
+                .limit(200)
+                .subquery()
+            )
+            alerting_hosts = set(
+                session.scalars(
+                    select(FlowRow.src_ip).join(
+                        recent_alerts,
+                        recent_alerts.c.flow_event_id == FlowRow.event_id,
+                    )
                 )
-                host["flows"] += 1
-                host["destinations"].add(flow.dst_ip)
-                host["alerting"] = flow.src_ip in alerts
+            )
+            flow_count = func.count(FlowRow.event_id)
+            rows = session.execute(
+                select(
+                    FlowRow.src_ip,
+                    flow_count.label("flow_count"),
+                    func.count(func.distinct(FlowRow.dst_ip)).label("destination_count"),
+                )
+                .group_by(FlowRow.src_ip)
+                .order_by(flow_count.desc(), FlowRow.src_ip.asc())
+                .offset(max(0, offset))
+                .limit(min(max(1, limit), 200))
+            ).all()
             return [
-                {**value, "destinations": len(value["destinations"])} for value in summary.values()
+                {
+                    "host": host,
+                    "flows": int(flows),
+                    "destinations": int(destinations),
+                    "alerting": host in alerting_hosts,
+                }
+                for host, flows, destinations in rows
             ]
+
+    def host(self, address: str) -> dict[str, Any] | None:
+        with self.session() as session:
+            row = session.execute(
+                select(
+                    FlowRow.src_ip,
+                    func.count(FlowRow.event_id),
+                    func.count(func.distinct(FlowRow.dst_ip)),
+                )
+                .where(FlowRow.src_ip == address)
+                .group_by(FlowRow.src_ip)
+            ).one_or_none()
+            if row is None:
+                return None
+            recent_alerts = (
+                select(AlertRow.flow_event_id)
+                .order_by(AlertRow.created_at.desc())
+                .limit(200)
+                .subquery()
+            )
+            alerting = session.scalar(
+                select(func.count())
+                .select_from(FlowRow)
+                .join(recent_alerts, recent_alerts.c.flow_event_id == FlowRow.event_id)
+                .where(FlowRow.src_ip == address)
+            )
+            return {
+                "host": row[0],
+                "flows": int(row[1]),
+                "destinations": int(row[2]),
+                "alerting": bool(alerting),
+            }
 
     def status(self) -> dict[str, Any]:
         with self.session() as session:
             return {
                 "database": "ready",
-                "sensors": len(session.scalars(select(SensorRow)).all()),
-                "flows": len(session.scalars(select(FlowRow)).all()),
-                "signature_events": len(session.scalars(select(SignatureRow)).all()),
-                "alerts": len(session.scalars(select(AlertRow)).all()),
-                "incidents": len(session.scalars(select(IncidentRow)).all()),
+                "sensors": int(
+                    session.scalar(select(func.count()).select_from(SensorRow)) or 0
+                ),
+                "flows": int(
+                    session.scalar(select(func.count()).select_from(FlowRow)) or 0
+                ),
+                "signature_events": int(
+                    session.scalar(select(func.count()).select_from(SignatureRow)) or 0
+                ),
+                "alerts": int(
+                    session.scalar(select(func.count()).select_from(AlertRow)) or 0
+                ),
+                "incidents": int(
+                    session.scalar(select(func.count()).select_from(IncidentRow)) or 0
+                ),
                 "mode": "demo" if os.getenv("AEGISFLOW_DEMO", "1") == "1" else "production",
             }
 

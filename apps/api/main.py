@@ -1059,14 +1059,18 @@ def export_retraining_candidates(
 
 
 @app.get("/api/v1/hosts")
-def list_hosts(repo: Annotated[Repository, Depends(repository)]) -> dict[str, Any]:
-    items = repo.hosts()
-    return {"items": items, "count": len(items)}
+def list_hosts(
+    repo: Annotated[Repository, Depends(repository)],
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=200)] = 200,
+) -> dict[str, Any]:
+    items = repo.hosts(offset=offset, limit=limit)
+    return {"items": items, "offset": offset, "limit": limit, "count": len(items)}
 
 
 @app.get("/api/v1/hosts/{host}")
 def get_host(host: str, repo: Annotated[Repository, Depends(repository)]) -> dict[str, Any]:
-    item = next((value for value in repo.hosts() if value["host"] == host), None)
+    item = repo.host(host)
     if item is None:
         raise HTTPException(status_code=404, detail={"code": "host_not_found"})
     return item
