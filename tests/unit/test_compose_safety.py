@@ -21,3 +21,16 @@ def test_base_compose_waits_for_api_readiness_before_dashboard() -> None:
 
     assert "/health/ready" in " ".join(api["healthcheck"]["test"])
     assert dashboard["depends_on"]["api"]["condition"] == "service_healthy"
+
+
+def test_ci_integration_explicitly_enables_safe_attack_simulation() -> None:
+    workflow = yaml.safe_load(
+        Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
+    )
+
+    assert (
+        workflow["jobs"]["integration"]["env"][
+            "AEGISFLOW_SAFE_SIMULATION_ENABLED"
+        ]
+        == "1"
+    )
