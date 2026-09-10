@@ -90,6 +90,13 @@ Axe violations across all seven views and the drawer. The isolated containers we
 removed after acceptance; the old high-I/O containers remain stopped. Actual Windows
 live capture remains unverified because no authorized interface was selected.
 
+The first remote runs of the updated browser scenario failed because the CI integration
+job left the explicitly gated safe-simulation endpoint disabled; every button request
+therefore returned HTTP 403. The integration job now opts into that endpoint without
+changing its disabled-by-default runtime setting, and a workflow regression test guards
+the configuration. Commit `dd04ddf` passed all ten GitHub Actions jobs in run
+`34439563578`, including the real Chromium simulation/evidence scenario.
+
 ## 2026-09-09 runtime refinement
 
 The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently
