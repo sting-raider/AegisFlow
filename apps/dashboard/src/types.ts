@@ -63,6 +63,7 @@ export interface Incident {
   attack_stages: string[];
   escalation_count: number;
   timeline: IncidentTimelineEntry[];
+  timeline_truncated?: boolean;
   alerts?: Alert[];
   analyst_notes?: IncidentNote[];
 }

@@ -530,7 +530,7 @@ function Incidents({ incidents }: { incidents: Incident[] }) {
       <article className="incident-card" key={incident.id}>
         <div><Badge value={incident.severity} /><span className="incident-card__status">{incident.status}</span></div>
         <h2>{incident.title}</h2>
-        <p>{incident.alert_ids.length} related alert{incident.alert_ids.length === 1 ? "" : "s"}</p>
+        <p>{incident.alert_count} related alert{incident.alert_count === 1 ? "" : "s"}</p>
         <ul>{incident.grouping_reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
         <small>Updated {new Date(incident.updated_at).toLocaleString()}</small>
         <button className="primary incident-card__explain" onClick={() => open(incident)}>
@@ -566,6 +566,7 @@ function Incidents({ incidents }: { incidents: Incident[] }) {
         {current.attack_stages.map((stage) => <code key={stage}>{stage.replaceAll("_", " ")}</code>)}
       </div>
       <h3>Timeline</h3>
+      {current.timeline_truncated && <p className="state">Showing the latest {current.timeline.length} alerts from this incident.</p>}
       <ol className="incident-timeline">{current.timeline.map((entry) => <li key={entry.alert_id}>
         <span className={`incident-timeline__mark incident-timeline__mark--${entry.severity}`} />
         <div><strong>{entry.attack_stage.replaceAll("_", " ")}</strong><small>{new Date(entry.timestamp).toLocaleString()}</small></div>

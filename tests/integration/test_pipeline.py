@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
 
+import pytest
 from sqlalchemy import event, func, select
 
 from apps.api.database import IncidentAlertRow, IncidentRow, Repository
@@ -221,7 +222,7 @@ def test_parent_rows_flush_before_foreign_key_dependants(
 
 
 def test_incidents_group_on_explainable_rules_and_return_timeline(
-    bundle: ModelBundle, tmp_path: Path
+    bundle: ModelBundle, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repository = Repository(f"sqlite:///{(tmp_path / 'incidents.db').as_posix()}")
     repository.create_schema()
@@ -273,11 +274,15 @@ def test_incidents_group_on_explainable_rules_and_return_timeline(
     } <= set(summary["grouping_reasons"])
     assert summary["escalation_count"] >= 1
     assert summary["attack_stages"] == ["reconnaissance", "unclassified_anomaly"]
+    assert summary["alert_ids"] == []
+    assert summary["timeline"] == []
+    assert summary["timeline_truncated"] is True
 
     detail = repository.incident(summary["id"])
     assert detail is not None
     assert len(detail["timeline"]) == 5
     assert len(detail["alerts"]) == 5
+    assert detail["timeline_truncated"] is False
     assert detail["timeline"][0]["source_host"] == "10.0.0.1"
     assert detail["timeline"][-1]["severity"] == "critical"
     assert detail["destination_hosts"] == [
@@ -286,6 +291,18 @@ def test_incidents_group_on_explainable_rules_and_return_timeline(
         "10.0.0.102",
         "10.0.0.103",
     ]
+    monkeypatch.setattr("apps.api.database.INCIDENT_EVIDENCE_LIMIT", 3)
+    bounded_detail = repository.incident(summary["id"])
+    assert bounded_detail is not None
+    assert bounded_detail["alert_count"] == 5
+    assert len(bounded_detail["timeline"]) == 3
+    assert len(bounded_detail["alerts"]) == 3
+    assert bounded_detail["timeline_truncated"] is True
+    assert bounded_detail["timeline"][0]["source_host"] == "10.0.0.3"
+    bounded_context = repository.incident_explanation_context(summary["id"])
+    assert bounded_context is not None
+    assert bounded_context["payload"]["aggregated_features"]["flow_count"] == 3
+    assert len(bounded_context["payload"]["timeline"]) == 3
     with repository.session() as session:
         stored = session.get(IncidentRow, summary["id"])
         assert stored is not None

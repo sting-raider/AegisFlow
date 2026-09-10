@@ -39,6 +39,8 @@ from packages.incidents import (
     should_group,
 )
 
+INCIDENT_EVIDENCE_LIMIT = 200
+
 
 def _as_utc(value: datetime) -> datetime:
     """Restore the UTC marker that SQLite drops from timezone-aware columns."""
@@ -771,13 +773,41 @@ class Repository:
 
     def incidents(self, *, offset: int = 0, limit: int = 50) -> list[dict[str, Any]]:
         with self.session() as session:
-            rows = session.scalars(
-                select(IncidentRow)
+            aggregates = (
+                select(
+                    IncidentAlertRow.incident_id.label("incident_id"),
+                    func.count(AlertRow.id).label("alert_count"),
+                    func.coalesce(
+                        func.sum(case((AlertRow.acknowledged.is_(True), 1), else_=0)),
+                        0,
+                    ).label("acknowledged_alerts"),
+                    func.coalesce(func.max(AlertRow.risk), 0.0).label("max_risk"),
+                )
+                .join(AlertRow, AlertRow.id == IncidentAlertRow.alert_id)
+                .group_by(IncidentAlertRow.incident_id)
+                .subquery()
+            )
+            rows = session.execute(
+                select(
+                    IncidentRow,
+                    aggregates.c.alert_count,
+                    aggregates.c.acknowledged_alerts,
+                    aggregates.c.max_risk,
+                )
+                .outerjoin(aggregates, aggregates.c.incident_id == IncidentRow.id)
                 .order_by(IncidentRow.updated_at.desc())
                 .offset(max(0, offset))
                 .limit(min(max(1, limit), 200))
-            )
-            return [self._incident_dict(session, row, include_alerts=False) for row in rows]
+            ).all()
+            return [
+                self._incident_summary_dict(
+                    incident,
+                    alert_count=int(alert_count or 0),
+                    acknowledged_alerts=int(acknowledged_alerts or 0),
+                    max_risk=float(max_risk or 0.0),
+                )
+                for incident, alert_count, acknowledged_alerts, max_risk in rows
+            ]
 
     def incident_count(self, *, open_only: bool = False) -> int:
         with self.session() as session:
@@ -794,14 +824,21 @@ class Repository:
     def _incident_dict(
         self, session: Session, incident: IncidentRow, *, include_alerts: bool
     ) -> dict[str, Any]:
-        rows = session.execute(
-            select(AlertRow, DetectionRow, FlowRow)
-            .join(IncidentAlertRow, IncidentAlertRow.alert_id == AlertRow.id)
-            .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
-            .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
-            .where(IncidentAlertRow.incident_id == incident.id)
-            .order_by(AlertRow.created_at.asc())
-        ).all()
+        rows = list(
+            session.execute(
+                select(AlertRow, DetectionRow, FlowRow)
+                .join(IncidentAlertRow, IncidentAlertRow.alert_id == AlertRow.id)
+                .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
+                .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
+                .where(IncidentAlertRow.incident_id == incident.id)
+                .order_by(AlertRow.created_at.desc())
+                .limit(INCIDENT_EVIDENCE_LIMIT)
+            ).all()
+        )
+        rows.reverse()
+        alert_count, acknowledged_alerts, max_risk = self._incident_totals(
+            session, incident.id
+        )
         signature_rows = self._signature_rows_for_flows(
             session, [flow for _, _, flow in rows]
         )
@@ -854,22 +891,27 @@ class Repository:
             if risks[index - 2] < risks[index - 1] < risks[index]
             or severity_ranks[index - 2] < severity_ranks[index - 1] < severity_ranks[index]
         )
+        context = _deserialize_incident_context(incident.grouping_context)
         result: dict[str, Any] = {
             "id": incident.id,
             "title": incident.title,
             "status": incident.status,
             "severity": incident.severity,
             "source_host": incident.source_host,
-            "source_hosts": sorted({flow.src_ip for _, _, flow in rows}),
-            "destination_hosts": sorted({flow.dst_ip for _, _, flow in rows}),
+            "source_hosts": sorted(
+                context.source_hosts if context else {flow.src_ip for _, _, flow in rows}
+            ),
+            "destination_hosts": sorted(
+                context.destination_hosts if context else {flow.dst_ip for _, _, flow in rows}
+            ),
             "created_at": _as_utc(incident.created_at),
             "updated_at": _as_utc(incident.updated_at),
             "alert_ids": [alert.id for alert, _, _ in rows],
-            "alert_count": len(rows),
-            "acknowledged_alerts": sum(alert.acknowledged for alert, _, _ in rows),
-            "max_risk": max(risks, default=0.0),
+            "alert_count": alert_count,
+            "acknowledged_alerts": acknowledged_alerts,
+            "max_risk": max_risk,
             "grouping_reasons": incident.grouping_reasons,
-            "reason_codes": sorted(reason_codes),
+            "reason_codes": sorted(context.reason_codes if context else reason_codes),
             "signature_names": sorted(
                 {
                     str(signature.payload["signature_name"])
@@ -877,14 +919,65 @@ class Repository:
                     if isinstance(signature.payload.get("signature_name"), str)
                 }
             ),
-            "attack_stages": sorted(stages),
+            "attack_stages": sorted(context.attack_stages if context else stages),
             "escalation_count": escalation_count,
             "timeline": timeline,
+            "timeline_truncated": alert_count > len(rows),
         }
         if include_alerts:
             result["alerts"] = [self._alert_dict(*row) for row in rows]
             result["analyst_notes"] = self._incident_notes(session, incident.id)
         return result
+
+    @staticmethod
+    def _incident_totals(session: Session, incident_id: str) -> tuple[int, int, float]:
+        alert_count, acknowledged_alerts, max_risk = session.execute(
+            select(
+                func.count(AlertRow.id),
+                func.coalesce(
+                    func.sum(case((AlertRow.acknowledged.is_(True), 1), else_=0)), 0
+                ),
+                func.coalesce(func.max(AlertRow.risk), 0.0),
+            )
+            .select_from(IncidentAlertRow)
+            .join(AlertRow, AlertRow.id == IncidentAlertRow.alert_id)
+            .where(IncidentAlertRow.incident_id == incident_id)
+        ).one()
+        return int(alert_count), int(acknowledged_alerts), float(max_risk)
+
+    @staticmethod
+    def _incident_summary_dict(
+        incident: IncidentRow,
+        *,
+        alert_count: int,
+        acknowledged_alerts: int,
+        max_risk: float,
+    ) -> dict[str, Any]:
+        context = _deserialize_incident_context(incident.grouping_context)
+        return {
+            "id": incident.id,
+            "title": incident.title,
+            "status": incident.status,
+            "severity": incident.severity,
+            "source_host": incident.source_host,
+            "source_hosts": (
+                sorted(context.source_hosts) if context else [incident.source_host]
+            ),
+            "destination_hosts": sorted(context.destination_hosts) if context else [],
+            "created_at": _as_utc(incident.created_at),
+            "updated_at": _as_utc(incident.updated_at),
+            "alert_ids": [],
+            "alert_count": alert_count,
+            "acknowledged_alerts": acknowledged_alerts,
+            "max_risk": max_risk,
+            "grouping_reasons": incident.grouping_reasons,
+            "reason_codes": sorted(context.reason_codes) if context else [],
+            "signature_names": [],
+            "attack_stages": sorted(context.attack_stages) if context else [],
+            "escalation_count": int("repeated escalation" in incident.grouping_reasons),
+            "timeline": [],
+            "timeline_truncated": alert_count > 0,
+        }
 
     def incident_explanation_context(self, incident_id: str) -> dict[str, Any] | None:
         """Build an endpoint-free, allow-list-ready incident evidence envelope."""
@@ -893,14 +986,18 @@ class Repository:
             incident = session.get(IncidentRow, incident_id)
             if incident is None:
                 return None
-            rows = session.execute(
-                select(AlertRow, DetectionRow, FlowRow)
-                .join(IncidentAlertRow, IncidentAlertRow.alert_id == AlertRow.id)
-                .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
-                .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
-                .where(IncidentAlertRow.incident_id == incident.id)
-                .order_by(AlertRow.created_at.asc())
-            ).all()
+            rows = list(
+                session.execute(
+                    select(AlertRow, DetectionRow, FlowRow)
+                    .join(IncidentAlertRow, IncidentAlertRow.alert_id == AlertRow.id)
+                    .join(DetectionRow, DetectionRow.event_id == AlertRow.detection_id)
+                    .join(FlowRow, FlowRow.event_id == AlertRow.flow_event_id)
+                    .where(IncidentAlertRow.incident_id == incident.id)
+                    .order_by(AlertRow.created_at.desc())
+                    .limit(INCIDENT_EVIDENCE_LIMIT)
+                ).all()
+            )
+            rows.reverse()
             detections = [detection.payload for _, detection, _ in rows]
             flows = [flow.payload for _, _, flow in rows]
             signatures = self._signature_rows_for_flows(

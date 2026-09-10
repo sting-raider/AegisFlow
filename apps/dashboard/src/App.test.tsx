@@ -63,7 +63,8 @@ const incidentFixture = {
     source_host: "10.0.0.8",
     destination_host: "10.0.0.9",
     acknowledged: false
-  }]
+  }],
+  timeline_truncated: false
 };
 const alertFixture = {
   id: "22222222-2222-4222-8222-222222222222",
