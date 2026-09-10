@@ -38,6 +38,22 @@ def test_windows_npcap_bootstrap_is_inherited_by_nfstream_workers(
     assert adapters._NPCAP_DLL_HANDLE is handle
 
 
+def test_windows_live_friendly_name_resolves_to_npcap_device(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    device = r"\Device\NPF_{4CA251FD-DA57-4E10-9F1A-43187DBD3A4C}"
+    monkeypatch.setattr(adapters.platform, "system", lambda: "Windows")
+    monkeypatch.setattr(
+        adapters,
+        "_windows_npcap_interfaces",
+        lambda: {"wi-fi": device},
+    )
+
+    adapter = adapters.NfstreamAdapter("Wi-Fi", capture_mode=CaptureMode.LIVE)
+
+    assert adapter.source == device
+
+
 def test_nfstream_flow_preserves_semantic_direction_and_is_payload_free() -> None:
     flow = SimpleNamespace(
         src_ip="10.0.0.2",

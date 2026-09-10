@@ -24,6 +24,9 @@ EPHEMERAL_PORT_MIN = 49_152
 
 _NPCAP_DLL_HANDLE: Any | None = None
 _NFSTREAM_WINDOWS_BOOTSTRAP = Path(__file__).with_name("_windows_nfstream_bootstrap")
+_WINDOWS_NETWORK_CONNECTIONS_KEY = (
+    r"SYSTEM\CurrentControlSet\Control\Network\{4D36E972-E325-11CE-BFC1-08002BE10318}"
+)
 
 
 def _prepare_nfstream_runtime() -> None:
@@ -59,6 +62,46 @@ def _prepare_nfstream_runtime() -> None:
                 else bootstrap_dir
             )
         _NPCAP_DLL_HANDLE = add_dll_directory(npcap_dir)
+
+
+def _windows_npcap_interfaces() -> dict[str, str]:
+    if platform.system() != "Windows":
+        return {}
+    try:
+        import winreg
+
+        root = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            _WINDOWS_NETWORK_CONNECTIONS_KEY,
+        )
+    except (ImportError, OSError):
+        return {}
+
+    interfaces: dict[str, str] = {}
+    with root:
+        index = 0
+        while True:
+            try:
+                guid = winreg.EnumKey(root, index)
+            except OSError:
+                break
+            index += 1
+            try:
+                with winreg.OpenKey(root, rf"{guid}\Connection") as connection:
+                    name, _ = winreg.QueryValueEx(connection, "Name")
+            except OSError:
+                continue
+            if isinstance(name, str) and name.strip():
+                interfaces[name.strip().casefold()] = rf"\Device\NPF_{guid}"
+    return interfaces
+
+
+def _resolve_live_capture_source(interface: str) -> str:
+    if platform.system() != "Windows":
+        return interface
+    if interface.casefold().startswith(r"\device\npf_"):
+        return interface
+    return _windows_npcap_interfaces().get(interface.casefold(), interface)
 
 
 
@@ -470,7 +513,7 @@ class NfstreamAdapter(SensorAdapter):
                 )
             if not isinstance(source, str) or not source.strip():
                 raise ValueError("live capture requires an explicit interface")
-            self.source = source.strip()
+            self.source = _resolve_live_capture_source(source.strip())
         else:
             path = Path(source).resolve()
             if not path.is_file():
