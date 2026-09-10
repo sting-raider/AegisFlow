@@ -13,12 +13,14 @@ export interface Detection {
   final_risk_score: number;
   reason_codes: string[];
   explanation: string;
+  known_attack_label: string | null;
   anomaly_score: number;
   reconstruction_error: number;
   reconstruction_score: number;
   known_attack_probability: number;
   signature_score: number;
   classifier_model_version: string;
+  anomaly_model_version: string;
   feature_schema_version: string;
 }
 
@@ -136,6 +138,7 @@ export interface FlowDetail extends Flow {
     category: string;
     severity: Severity;
     source: string;
+    metadata: Record<string, string | number | boolean>;
   }>;
 }
 

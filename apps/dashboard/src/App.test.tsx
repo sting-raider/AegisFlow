@@ -88,12 +88,14 @@ const alertFixture = {
     final_risk_score: 82,
     reason_codes: ["REPEATED_AUTH_FAILURE"],
     explanation: "Known authentication pattern with model evidence.",
+    known_attack_label: "brute_force",
     anomaly_score: 0.42,
     reconstruction_error: 0.1,
     reconstruction_score: 0.2,
     known_attack_probability: 0.93,
     signature_score: 0.9,
     classifier_model_version: "0.2.0",
+    anomaly_model_version: "0.2.0",
     feature_schema_version: "1.0.0"
   }
 };
@@ -133,11 +135,14 @@ const flowFixture = {
     signature_name: "Repeated authentication pattern",
     category: "credential access",
     severity: "high",
-    source: "fixture"
+    source: "fixture",
+    metadata: { offline_suricata_rule_verified: true }
   }]
 };
 let holdModelsRequest = false;
 let simulationShouldFail = false;
+let simulationTriggered = false;
+afterEach(() => { simulationTriggered = false; });
 vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   const url = String(input);
   const isSimulation = url.endsWith("/api/v1/simulations/attack");
@@ -151,6 +156,7 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   if (holdModelsRequest && url.endsWith("/api/v1/models")) {
     await new Promise(() => undefined);
   }
+  if (isSimulation && !simulationShouldFail) simulationTriggered = true;
   return {
     ok: !(isSimulation && simulationShouldFail),
     status: isSimulation && simulationShouldFail ? 503 : 200,
@@ -203,7 +209,12 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
             : isAlerts
               ? { items: [alertFixture], count: 1, total: 1 }
               : isFlowDetail
-                ? flowFixture
+                ? {
+                    ...flowFixture,
+                    protocol_metadata: simulationTriggered
+                      ? { simulated: true, network_transmitted: false, payload_bytes: 0 }
+                      : flowFixture.protocol_metadata
+                  }
                 : isFlows
                   ? { items: [flowFixture], count: 1, total: 1 }
                   : { items: [], count: 0 }
@@ -239,6 +250,7 @@ test("simulates a safe attack and opens its detected alert", async () => {
   expect(await screen.findByText("Attack detected")).toBeTruthy();
   expect(screen.getByRole("heading", { name: "Live alerts" })).toBeTruthy();
   expect(screen.getByRole("dialog", { name: "known attack" })).toBeTruthy();
+  expect(await screen.findByText("Safe simulated replay · no packets transmitted · no payload retained")).toBeTruthy();
   expect(vi.mocked(fetch).mock.calls.some((call) => (
     String(call[0]).endsWith("/api/v1/simulations/attack") &&
     (call[1] as RequestInit | undefined)?.method === "POST"
@@ -282,6 +294,12 @@ test("filters, pauses, and acknowledges a live alert", async () => {
   fireEvent.change(screen.getByRole("combobox", { name: "Severity" }), { target: { value: "high" } });
   fireEvent.click(await screen.findByText("10.0.0.8 → 10.0.0.9:22"));
   expect(await screen.findByText("Known authentication pattern with model evidence.")).toBeTruthy();
+  expect(await screen.findByText("Known-Attack Detection Module")).toBeTruthy();
+  expect(screen.getByText("Calibrated Logistic Regression")).toBeTruthy();
+  expect(screen.getByText("Isolation Forest anomaly score")).toBeTruthy();
+  expect(screen.getByText("Denoising autoencoder reconstruction score")).toBeTruthy();
+  expect(screen.getByText("Signature Detector")).toBeTruthy();
+  expect(screen.getByText("Final Fused Decision")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Acknowledge alert" }));
   expect(await screen.findByRole("button", { name: "Acknowledged" })).toBeTruthy();
 });
@@ -295,5 +313,9 @@ test("selects a flow for sanitized export and opens associated evidence", async 
   expect(exportLink.getAttribute("href")).toContain(flowFixture.event_id);
   fireEvent.click(screen.getByText("10.0.0.9:22"));
   expect(await screen.findByRole("dialog", { name: "Flow evidence" })).toBeTruthy();
-  expect(await screen.findByText("Repeated authentication pattern · credential access")).toBeTruthy();
+  expect(await screen.findByText("Known-Attack Detection Module")).toBeTruthy();
+  expect(screen.getByText("Anomaly Detection Module")).toBeTruthy();
+  expect(screen.getByText("Repeated authentication pattern")).toBeTruthy();
+  expect(screen.getByText(/SID 9000001 · credential access · fixture/)).toBeTruthy();
+  expect(screen.getByText("Fused risk")).toBeTruthy();
 });

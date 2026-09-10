@@ -18,8 +18,10 @@ import {
 } from "./api";
 import type {
   Alert,
+  Detection,
   DriftEvent,
   Flow,
+  FlowDetail,
   Host,
   Incident,
   ModelVersion,
@@ -367,7 +369,7 @@ function AlertTable({
               <td><span className={`risk risk--${alert.severity}`}>{alert.risk.toFixed(0)}</span></td>
               <td className="mono">{alert.flow.src_ip} → {alert.flow.dst_ip}:{alert.flow.dst_port}</td>
               <td>{alert.flow.protocol}</td>
-              <td>{alert.detection.signature_score > 0 ? "signature + model" : "model"}</td>
+              <td>{alert.detection.signature_score > 0 ? "Suricata + ML" : "ML only"}</td>
               <td>{alert.acknowledged ? "acknowledged" : "new"}</td>
             </tr>
           ))}
@@ -376,6 +378,55 @@ function AlertTable({
       </div>
     </>
   );
+}
+
+function DetectionEvidence({
+  detection,
+  signatures,
+  simulated
+}: {
+  detection: Detection;
+  signatures?: FlowDetail["signatures"];
+  simulated: boolean;
+}) {
+  return <div className="evidence-stack">
+    {simulated && <p className="simulation-provenance">Safe simulated replay · no packets transmitted · no payload retained</p>}
+    <section className="evidence-module">
+      <header><strong>Known-Attack Detection Module</strong><span>Supervised ML</span></header>
+      <p>Calibrated Logistic Regression</p>
+      <dl>
+        <div><dt>Known-attack probability</dt><dd>{(detection.known_attack_probability * 100).toFixed(1)}%</dd></div>
+        <div><dt>Predicted attack class</dt><dd>{detection.known_attack_label ?? "none above threshold"}</dd></div>
+        <div><dt>Model version</dt><dd>{detection.classifier_model_version}</dd></div>
+      </dl>
+    </section>
+    <section className="evidence-module">
+      <header><strong>Anomaly Detection Module</strong><span>Unsupervised ML</span></header>
+      <dl>
+        <div><dt>Isolation Forest anomaly score</dt><dd>{(detection.anomaly_score * 100).toFixed(1)}%</dd></div>
+        <div><dt>Denoising autoencoder reconstruction score</dt><dd>{(detection.reconstruction_score * 100).toFixed(1)}%</dd></div>
+        <div><dt>Reconstruction error</dt><dd>{detection.reconstruction_error.toFixed(4)}</dd></div>
+        <div><dt>Model version</dt><dd>{detection.anomaly_model_version}</dd></div>
+      </dl>
+    </section>
+    <section className="evidence-module">
+      <header><strong>Signature Detector</strong><span>Suricata evidence</span></header>
+      <dl><div><dt>Signature contribution</dt><dd>{(detection.signature_score * 100).toFixed(1)}%</dd></div></dl>
+      {signatures === undefined
+        ? <p className="limitation">Loading correlated signature evidence…</p>
+        : signatures.length
+          ? signatures.map((signature) => <p className="signature-evidence" key={`${signature.signature_id}-${signature.signature_name}`}><strong>{signature.signature_name}</strong><span>SID {signature.signature_id} · {signature.category} · {signature.source}</span></p>)
+          : <p className="limitation">No correlated Suricata signature event.</p>}
+    </section>
+    <section className="evidence-module evidence-module--fused">
+      <header><strong>Final Fused Decision</strong><span>Hybrid verdict</span></header>
+      <dl>
+        <div><dt>Fused risk</dt><dd>{detection.final_risk_score.toFixed(1)} / 100</dd></div>
+        <div><dt>Verdict</dt><dd><Badge value={detection.verdict} /></dd></div>
+      </dl>
+      <div className="reason-list">{detection.reason_codes.map((reason) => <code key={reason}>{reason}</code>)}</div>
+    </section>
+  </div>;
 }
 
 function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
@@ -390,6 +441,10 @@ function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
     mutationFn: () => api.acknowledge(alert.id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["alerts"] })
   });
+  const flowDetail = useQuery({
+    queryKey: ["flow", alert.flow.event_id],
+    queryFn: () => api.flow(alert.flow.event_id)
+  });
   return (
     <div className="drawer" role="dialog" aria-modal="true" aria-labelledby="alert-detail-title">
       <button autoFocus className="drawer__close" onClick={close} aria-label="Close alert detail">×</button>
@@ -403,13 +458,11 @@ function AlertDetail({ alert, close }: { alert: Alert; close: () => void }) {
         </button>
         <span className="mono">model {alert.detection.classifier_model_version}</span>
       </div>
-      <div className="signal-grid">
-        <Metric label="Known" value={`${(alert.detection.known_attack_probability * 100).toFixed(0)}%`} note="classifier" />
-        <Metric label="Anomaly" value={`${(alert.detection.anomaly_score * 100).toFixed(0)}%`} note="benign baseline" />
-        <Metric label="Signature" value={`${(alert.detection.signature_score * 100).toFixed(0)}%`} note="rules" />
-      </div>
-      <h3>Reason codes</h3>
-      <div className="reason-list">{alert.detection.reason_codes.map((reason) => <code key={reason}>{reason}</code>)}</div>
+      <DetectionEvidence
+        detection={alert.detection}
+        signatures={flowDetail.isError ? [] : flowDetail.data?.signatures}
+        simulated={flowDetail.data?.protocol_metadata.simulated === true}
+      />
       <form onSubmit={(event) => { event.preventDefault(); mutation.mutate(); }}>
         <label>Analyst disposition
           <select value={disposition} onChange={(event) => setDisposition(event.target.value)}>
@@ -596,7 +649,7 @@ function Flows({ flows }: { flows: Flow[] }) {
         <div className="route-block"><span className="mono">{detail.data.src_ip}:{detail.data.src_port}</span><i>→</i><span className="mono">{detail.data.dst_ip}:{detail.data.dst_port}</span></div>
         <div className="signal-grid"><Metric label="Duration" value={`${detail.data.duration_ms.toFixed(0)} ms`} note={detail.data.protocol} /><Metric label="Packet rate" value={detail.data.packet_rate.toFixed(2)} note="packets / second" /><Metric label="Byte rate" value={detail.data.byte_rate.toFixed(0)} note="bytes / second" /></div>
         <h3>Associated detection</h3>
-        {detail.data.detection ? <><Badge value={detail.data.detection.verdict} /><p>{detail.data.detection.explanation}</p><div className="reason-list">{detail.data.detection.reason_codes.map((reason) => <code key={reason}>{reason}</code>)}</div></> : <p className="limitation">No detection result is associated with this flow.</p>}
+        {detail.data.detection ? <><p>{detail.data.detection.explanation}</p><DetectionEvidence detection={detail.data.detection} signatures={detail.data.signatures} simulated={detail.data.protocol_metadata.simulated === true} /></> : <p className="limitation">No detection result is associated with this flow.</p>}
         <h3>Feature details</h3>
         <dl className="feature-ledger">
           <div><dt>Packets forward / reverse</dt><dd>{detail.data.packets_forward} / {detail.data.packets_reverse}</dd></div>
@@ -606,8 +659,6 @@ function Flows({ flows }: { flows: Flow[] }) {
           <div><dt>TCP SYN / ACK / FIN / RST</dt><dd>{detail.data.tcp_syn_count} / {detail.data.tcp_ack_count} / {detail.data.tcp_fin_count} / {detail.data.tcp_rst_count}</dd></div>
           <div><dt>Extractor</dt><dd>{detail.data.source_adapter} · {detail.data.feature_extractor_version}</dd></div>
         </dl>
-        <h3>Signatures</h3>
-        {detail.data.signatures.length ? detail.data.signatures.map((signature) => <p className="limitation" key={signature.signature_id}>{signature.signature_name} · {signature.category}</p>) : <p>No correlated signature event.</p>}
       </>}
     </div>}
   </>;

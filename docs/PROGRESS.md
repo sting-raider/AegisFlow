@@ -57,6 +57,14 @@ disablement, pipeline failure, and confirmation timeout remain visible rather th
 reported as success. Nine dashboard tests, ESLint, and the production build pass. Docker
 end-to-end verification remains pending.
 
+Alert and flow drawers now separate the calibrated Logistic Regression known-attack
+module from the Isolation Forest and denoising-autoencoder anomaly module. They display
+known-attack probability/class, anomaly score, reconstruction score/error, correlated
+Suricata signature name/SID/source and contribution, then the final fused risk, verdict,
+and reasons. Simulated flow provenance is explicit in the drawer without changing the
+global capture mode. No model artifact, threshold, training path, or registry pointer was
+changed. Nine dashboard tests, ESLint, and the production build pass.
+
 ## 2026-09-09 runtime refinement
 
 The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently

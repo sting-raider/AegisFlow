@@ -225,6 +225,18 @@ textarea { min-height: 86px; resize: vertical; }
 .analyst-notes li > div { width: 100%; }
 .analyst-notes p { margin: 6px 0 0; color: var(--ink); line-height: 1.5; }
 .limitation { padding-left: 11px; color: var(--muted); border-left: 3px solid var(--warning); }
+.evidence-stack { margin: 24px 0; display: grid; gap: 12px; }
+.evidence-module { padding: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.evidence-module > header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.evidence-module > header strong { font: 600 16px Georgia, "Times New Roman", serif; }
+.evidence-module > header span { color: var(--muted); font: 9px "Cascadia Mono", Consolas, monospace; text-transform: uppercase; letter-spacing: .08em; }
+.evidence-module > p { margin: 8px 0 0; color: var(--muted); }
+.evidence-module dl { margin: 10px 0 0; }
+.evidence-module--fused { border-left: 4px solid var(--danger); }
+.simulation-provenance { margin: 0; padding: 9px 11px; color: var(--warning); background: var(--warning-soft); border-radius: 7px; font-size: 12px; }
+.signature-evidence { display: grid; gap: 3px; padding-left: 11px; border-left: 3px solid var(--danger); }
+.signature-evidence strong { color: var(--ink); }
+.signature-evidence span { font: 11px "Cascadia Mono", Consolas, monospace; }
 .state { padding: 50px 24px; color: var(--muted); text-align: center; border: 1px dashed var(--line); border-radius: 12px; }
 .state--error { color: var(--danger); border-color: var(--danger); }
 pre { color: var(--muted); white-space: pre-wrap; }
