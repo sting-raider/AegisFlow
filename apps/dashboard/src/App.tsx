@@ -755,17 +755,16 @@ export function App() {
     const deadline = Date.now() + 15_000;
     const checkForDetection = async () => {
       try {
-        const page = await api.alerts("?limit=200");
+        const flow = await api.flow(result.target_flow_event_id);
         if (cancelled) return;
-        queryClient.setQueryData(["alerts"], page);
-        const detected = page.items.find(
-          (alert) => alert.flow.event_id === result.target_flow_event_id
-        );
-        if (detected) {
+        if (flow.alert_id) {
+          const detected = await api.alert(flow.alert_id);
+          if (cancelled) return;
           setSimulationState({ phase: "detected", message: "Attack detected" });
           setView("alerts");
           setSelected(detected);
           await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["alerts"] }),
             queryClient.invalidateQueries({ queryKey: ["flows"] }),
             queryClient.invalidateQueries({ queryKey: ["incidents"] }),
             queryClient.invalidateQueries({ queryKey: ["status"] })

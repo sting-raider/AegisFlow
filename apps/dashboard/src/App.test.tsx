@@ -151,6 +151,7 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   const isIncidents = url.endsWith("/api/v1/incidents");
   const isIncidentDetail = url.includes(`/api/v1/incidents/${incidentFixture.id}`);
   const isAlerts = url.includes("/api/v1/alerts?");
+  const isAlertDetail = url.endsWith(`/api/v1/alerts/${alertFixture.id}`);
   const isFlowDetail = url.endsWith(`/api/v1/flows/${flowFixture.event_id}`);
   const isFlows = url.includes("/api/v1/flows?");
   if (holdModelsRequest && url.endsWith("/api/v1/models")) {
@@ -208,8 +209,12 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
             }
           : isIncidentDetail
             ? incidentFixture
+            : isAlertDetail
+              ? alertFixture
             : isAlerts
-              ? { items: [alertFixture], count: 1, total: 1 }
+              ? simulationTriggered
+                ? { items: [], count: 0, total: 200 }
+                : { items: [alertFixture], count: 1, total: 1 }
               : isFlowDetail
                 ? {
                     ...flowFixture,
@@ -256,6 +261,12 @@ test("simulates a safe attack and opens its detected alert", async () => {
   expect(vi.mocked(fetch).mock.calls.some((call) => (
     String(call[0]).endsWith("/api/v1/simulations/attack") &&
     (call[1] as RequestInit | undefined)?.method === "POST"
+  ))).toBe(true);
+  expect(vi.mocked(fetch).mock.calls.some((call) => (
+    String(call[0]).endsWith(`/api/v1/flows/${flowFixture.event_id}`)
+  ))).toBe(true);
+  expect(vi.mocked(fetch).mock.calls.some((call) => (
+    String(call[0]).endsWith(`/api/v1/alerts/${alertFixture.id}`)
   ))).toBe(true);
 });
 
