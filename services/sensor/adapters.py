@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import UTC, datetime, timedelta
+from importlib import import_module
 from ipaddress import ip_address
 from itertools import pairwise
 from pathlib import Path
@@ -68,10 +69,9 @@ def _windows_npcap_interfaces() -> dict[str, str]:
     if platform.system() != "Windows":
         return {}
     try:
-        import winreg
-
-        root = winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE,
+        registry: Any = import_module("winreg")
+        root = registry.OpenKey(
+            registry.HKEY_LOCAL_MACHINE,
             _WINDOWS_NETWORK_CONNECTIONS_KEY,
         )
     except (ImportError, OSError):
@@ -82,13 +82,13 @@ def _windows_npcap_interfaces() -> dict[str, str]:
         index = 0
         while True:
             try:
-                guid = winreg.EnumKey(root, index)
+                guid = registry.EnumKey(root, index)
             except OSError:
                 break
             index += 1
             try:
-                with winreg.OpenKey(root, rf"{guid}\Connection") as connection:
-                    name, _ = winreg.QueryValueEx(connection, "Name")
+                with registry.OpenKey(root, rf"{guid}\Connection") as connection:
+                    name, _ = registry.QueryValueEx(connection, "Name")
             except OSError:
                 continue
             if isinstance(name, str) and name.strip():
@@ -102,8 +102,6 @@ def _resolve_live_capture_source(interface: str) -> str:
     if interface.casefold().startswith(r"\device\npf_"):
         return interface
     return _windows_npcap_interfaces().get(interface.casefold(), interface)
-
-
 
 class SensorAdapter(ABC):
     @abstractmethod
