@@ -20,6 +20,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    case,
     create_engine,
     delete,
     func,
@@ -1254,6 +1255,14 @@ class Repository:
 
     def status(self) -> dict[str, Any]:
         with self.session() as session:
+            capture_mode = session.scalar(
+                select(SensorRow.mode)
+                .order_by(
+                    case((SensorRow.mode == "live", 0), else_=1),
+                    SensorRow.last_seen.desc(),
+                )
+                .limit(1)
+            )
             return {
                 "database": "ready",
                 "sensors": int(
@@ -1271,7 +1280,7 @@ class Repository:
                 "incidents": int(
                     session.scalar(select(func.count()).select_from(IncidentRow)) or 0
                 ),
-                "mode": "demo" if os.getenv("AEGISFLOW_DEMO", "1") == "1" else "production",
+                "mode": capture_mode or "waiting",
             }
 
     def drift_events(self) -> list[dict[str, Any]]:

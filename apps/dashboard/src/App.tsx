@@ -149,6 +149,18 @@ function Metric({ label, value, note }: { label: string; value: string | number;
   );
 }
 
+function captureModeLabel(mode?: SystemStatus["mode"]) {
+  if (mode === "live") return "live capture";
+  if (mode === "pcap") return "offline replay";
+  if (mode === "demo") return "offline fixture";
+  return "waiting for capture";
+}
+
+function authModeLabel(mode?: SystemStatus["auth_mode"]) {
+  if (mode === "demo") return "local access";
+  return mode ?? "not reported";
+}
+
 function Flowline({ alerts }: { alerts: Alert[] }) {
   return (
     <section className="flowline" aria-label="Recent detection flowline">
@@ -216,7 +228,7 @@ function Overview({
         <Metric label="Flow throughput" value={`${throughput.toFixed(2)}/s`} note={`${flows.length} validated records`} />
         <Metric label="Open incidents" value={incidents.filter((i) => i.status !== "closed").length} note="deterministic grouping" />
         <Metric label="Unknown-behaviour flags" value={unknown} note="statistical, not confirmed" />
-        <Metric label="Sensors ready" value={status?.sensors ?? "—"} note={`${status?.mode ?? "unknown"} mode`} />
+        <Metric label="Sensors ready" value={status?.sensors ?? "—"} note={captureModeLabel(status?.mode)} />
       </div>
       <div className="overview-grid overview-grid--feature">
         <section className="panel panel--lead">
@@ -639,7 +651,7 @@ function SystemHealth({ status, connected, flows }: { status?: SystemStatus; con
     <Metric label="Throughput" value={`${(status?.throughput_per_second ?? observedFlowRate(flows)).toFixed(2)}/s`} note={status?.throughput_per_second === undefined ? "observed window" : "worker metric"} />
     <Metric label="WebSocket" value={connected ? "linked" : "reconnecting"} note="live alert stream" />
   </div><div className="overview-grid overview-grid--lower">
-    <section className="panel ledger-panel"><header><span>Service readiness</span><small>reported only</small></header><dl><div><dt>Sensors</dt><dd>{status?.sensors ?? "not reported"}</dd></div><div><dt>Suricata</dt><dd>{status?.suricata_status ?? "not reported"}</dd></div><div><dt>Identity</dt><dd>{status?.auth_mode ?? "not reported"}</dd></div><div><dt>Governance</dt><dd>{status?.model_governance_enabled ? "enabled" : "read only"}</dd></div><div><dt>Loaded model</dt><dd>{status?.loaded_runtime_version ?? "not reported"}</dd></div><div><dt>Dropped records</dt><dd>{status?.dropped_records ?? "not reported"}</dd></div><div><dt>Worker latency</dt><dd>{status?.worker_latency_ms == null ? "not reported" : `${status.worker_latency_ms.toFixed(2)} ms`}</dd></div></dl></section>
+    <section className="panel ledger-panel"><header><span>Service readiness</span><small>reported only</small></header><dl><div><dt>Sensors</dt><dd>{status?.sensors ?? "not reported"}</dd></div><div><dt>Suricata</dt><dd>{status?.suricata_status ?? "not reported"}</dd></div><div><dt>Identity</dt><dd>{authModeLabel(status?.auth_mode)}</dd></div><div><dt>Governance</dt><dd>{status?.model_governance_enabled ? "enabled" : "read only"}</dd></div><div><dt>Loaded model</dt><dd>{status?.loaded_runtime_version ?? "not reported"}</dd></div><div><dt>Dropped records</dt><dd>{status?.dropped_records ?? "not reported"}</dd></div><div><dt>Worker latency</dt><dd>{status?.worker_latency_ms == null ? "not reported" : `${status.worker_latency_ms.toFixed(2)} ms`}</dd></div></dl></section>
     <section className="panel ledger-panel"><header><span>Retention</span><small>effective policy</small></header><dl><div><dt>Enabled</dt><dd>{status?.retention.enabled ? "yes" : "no"}</dd></div><div><dt>Operations</dt><dd>{status?.retention.days ? `${status.retention.days} days` : "external"}</dd></div><div><dt>Audit</dt><dd>{status?.retention.audit_days ? `${status.retention.audit_days} days` : "external"}</dd></div><div><dt>Interval</dt><dd>{status?.retention.interval_seconds ? `${status.retention.interval_seconds}s` : "not scheduled"}</dd></div><div><dt>Consumers</dt><dd>{status?.queue.consumers ?? 0}</dd></div></dl></section>
     <section className="panel"><header><span>Recent health events</span><small>bounded ledger</small></header>{health.length ? <ol className="event-ledger">{health.map((event) => <li key={event.id}><div><strong>{event.service}</strong><small>{new Date(event.timestamp).toLocaleString()}</small></div><Badge value={event.status === "error" ? "critical" : "benign"} /></li>)}</ol> : <div className="state">No health event has been recorded.</div>}</section>
   </div></>;

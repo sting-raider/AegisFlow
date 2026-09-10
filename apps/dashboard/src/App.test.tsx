@@ -159,7 +159,8 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
           signature_events: 0,
           alerts: 0,
           incidents: 0,
-          mode: "demo",
+          mode: "live",
+          auth_mode: "demo",
           queue: { pending: 0, lag: 0, consumers: 1 },
           retention: { enabled: true, days: 30, interval_seconds: 86400 },
           recent_health_events: []
@@ -210,6 +211,8 @@ test("renders the operations dashboard without synthetic-traffic labels", async 
   expect(screen.queryByText("Demo traffic")).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: /System health/ }));
   expect(await screen.findByText("Detection queue")).toBeTruthy();
+  expect(screen.getByText("local access")).toBeTruthy();
+  expect(screen.queryByText(/^demo$/i)).toBeNull();
 });
 
 test("loads incident explanations on demand and labels AI-generated text", async () => {

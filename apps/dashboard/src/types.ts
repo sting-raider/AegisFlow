@@ -167,7 +167,7 @@ export interface SystemStatus {
   flows: number;
   alerts: number;
   incidents: number;
-  mode: "demo" | "production";
+  mode: "waiting" | "demo" | "pcap" | "live";
   queue: {
     pending: number;
     lag: number;

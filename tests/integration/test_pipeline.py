@@ -9,7 +9,13 @@ from uuid import UUID, uuid4
 from sqlalchemy import event, func, select
 
 from apps.api.database import IncidentAlertRow, IncidentRow, Repository
-from packages.contracts import AnalystFeedback, FeedbackDisposition, Severity, Verdict
+from packages.contracts import (
+    AnalystFeedback,
+    CaptureMode,
+    FeedbackDisposition,
+    Severity,
+    Verdict,
+)
 from packages.detection import DetectionEngine
 from packages.incidents import DriftEvent, RuntimeDriftMonitor
 from packages.model_bundle import ModelBundle
@@ -79,6 +85,25 @@ def test_dashboard_summaries_never_hydrate_the_complete_flow_ledger(
         and "count(" not in statement
     ]
     assert complete_flow_reads == []
+
+
+def test_status_reports_observed_capture_mode_and_keeps_live_priority(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
+    repository = Repository(f"sqlite:///{(tmp_path / 'capture-status.db').as_posix()}")
+    repository.create_schema()
+    detector = DetectionEngine(bundle)
+    demo_flow, live_source = list(DemoAdapter().flows())[:2]
+
+    assert repository.status()["mode"] == "waiting"
+    repository.ingest(demo_flow, detector.detect(demo_flow))
+    assert repository.status()["mode"] == "demo"
+
+    live_flow = live_source.model_copy(
+        update={"capture_mode": CaptureMode.LIVE, "sensor_id": "live-nfstream-sensor"}
+    )
+    repository.ingest(live_flow, detector.detect(live_flow))
+    assert repository.status()["mode"] == "live"
 
 
 def test_repository_ingest_batch_commits_rows_and_reports_novelty(
