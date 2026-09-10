@@ -129,7 +129,8 @@ For the presentation-ready live dashboard on Windows or Linux, run
 `uv run python -m scripts.presentation_live --interface "Wi-Fi"` with the exact
 authorized interface name. It uses an isolated fresh ledger, starts no demo sensor or
 seed data, and runs the payload-free NFStream capture process on the host. Windows
-requires Npcap and remains an experimental capture path. `make live INTERFACE=eth0`
+requires Npcap; the explicit `Wi-Fi` path completed an isolated live acceptance run on
+2026-09-10. `make live INTERFACE=eth0`
 is the hardened Linux-container path; it builds a dedicated non-root sensor target with
 only `NET_RAW`, while the API and detector continue to drop every capability. The Suricata replay profile
 has no network and accepts only an explicitly mounted PCAP. Never replay malicious
@@ -221,9 +222,9 @@ guidance in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Follow the practical
   two-worker smoke exercised both workers. The recorded local numbers remain synthetic
   single-host evidence, not a production capacity claim.
 - The Scapy PCAP adapter is deterministic but deliberately compact. NFStream 6.6.0 is
-  validated for PCAP on Linux and Windows and for explicit Linux live interfaces.
-  Windows live capture is enabled with Npcap at its standard install path, but has not
-  completed the isolated live-interface acceptance probe and remains experimental.
+  validated for PCAP on Linux and Windows, for explicit Linux live interfaces, and for
+  the explicitly authorized Windows `Wi-Fi` interface with Npcap. The Windows launcher
+  remains a host-assisted presentation path; the Linux container is the hardened path.
 - The deployed smoke bundle remains calibrated against deterministic synthetic data.
   Public evaluation retrains the identical model families and fusion path for the
   reviewed dataset but does not promote the result.

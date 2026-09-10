@@ -19,6 +19,9 @@ committed acceptance evidence; the model's scientific status does not change.
 
 ## 2026-09-10 presentation-readiness refinement
 
+The live-dashboard presentation scope is complete. The deployed research model remains
+scientifically NO-GO and was deliberately not retrained or tuned in this refinement.
+
 The dashboard-ledger I/O regression was reproduced against the accumulated Docker
 database. The five-second status poll hydrated complete flow, signature, detection,
 alert, and incident tables to count them, while the hosts summary also hydrated the
@@ -42,8 +45,11 @@ the demo sensor nor seed data, publishes through loopback Redis into the unchang
 pipeline, and clears only its own ephemeral volumes before startup and on Ctrl+C. Unit
 tests verify the exact service and sensor commands; merged Compose configuration validates,
 and an actual cleanup removed only the two `aegisflow-live` volumes. A real authorized
-Windows live-interface run remains pending, so full presentation readiness is not yet
-claimed.
+Windows `Wi-Fi` run now resolves the friendly adapter name to its Npcap device identifier
+without auto-selecting an interface. The run persisted over 30,000 real NFStream flows
+through Redis, the detector, API/PostgreSQL, and dashboard while retaining live mode; a
+checkpoint reported 30,526 total records, including five separately marked 24-flow safe
+simulations, with zero drops. Ctrl+C removed only the isolated containers and volumes.
 
 The safe attack generator now also builds one uniquely identified, current-time replay
 batch from its 24 header-only SYN flows. Every record is marked simulated, transmitted
@@ -66,11 +72,14 @@ and reasons. Simulated flow provenance is explicit in the drawer without changin
 global capture mode. No model artifact, threshold, training path, or registry pointer was
 changed. Nine dashboard tests, ESLint, and the production build pass.
 
-The incident summary endpoint is now paginated to at most 200 rows and returns exact SQL
-`COUNT` totals, including an exact open-incident total used by the overview. The bounded
-ledger regression now rejects unbounded incident reads in addition to full-flow reads.
-Seventeen backend tests (including the 100,000-flow summary benchmark), Ruff, strict
-MyPy, nine dashboard tests, ESLint, and the production build pass.
+The incident summary endpoint is now paginated to at most 200 rows and uses SQL
+`COUNT`/`SUM`/`MAX` aggregation, including an exact open-incident total used by the
+overview. Summary responses no longer hydrate every member alert, detection, and flow;
+detail and explanation evidence are bounded to the latest 200 members while retaining
+exact totals and a visible truncation notice. Against the authorized live ledger with
+about 26,000 alerts in one incident, the list fell from about 1.95 seconds to a 36.4 ms
+average, detail averaged 86.3 ms, and explanation context averaged 32.4 ms. The focused
+backend tests, Ruff, strict MyPy, nine dashboard tests, ESLint, and production build pass.
 
 Fresh Compose acceptance used the isolated `aegisflow-live` project with zero initial
 flows and no live sensor. The dashboard returned HTTP 200; an API-triggered safe replay
@@ -85,10 +94,16 @@ The first browser run exposed historical signature over-association because repe
 simulations correctly share Community IDs. Persistent lookups now require both Community
 ID and the existing three-second time window, and a two-occurrence regression proves
 each flow returns only its own signature. Both real Chromium scenarios then passed in
-5.2 seconds, including the Simulate Attack interaction, all detector evidence, and zero
-Axe violations across all seven views and the drawer. The isolated containers were
-removed after acceptance; the old high-I/O containers remain stopped. Actual Windows
-live capture remains unverified because no authorized interface was selected.
+5.2 seconds against the offline acceptance stack. During the authorized high-volume live
+run, newest-page polling could lose the simulation target as real alerts arrived;
+confirmation now follows the exact target flow to its alert ID. Both Chromium scenarios
+then passed in 6.0 seconds against the 26,000-row live ledger, including the Simulate
+Attack interaction, all detector evidence, and zero Axe violations across all seven views
+and the drawer. An additional exact replay was detected in under two seconds with
+probability 1.0, anomaly/reconstruction score 0.82894951, signature score 0.85, SID
+`9000100`, fused risk 93.35, simulated provenance, and zero transmitted/payload bytes.
+The isolated containers and volumes were removed after acceptance; the old high-I/O
+containers remain stopped.
 
 The first remote runs of the updated browser scenario failed because the CI integration
 job left the explicitly gated safe-simulation endpoint disabled; every button request

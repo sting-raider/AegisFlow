@@ -1111,3 +1111,28 @@ Do not join all historical signatures on Community ID alone. That over-associate
 repeated connections and made a second safe simulation appear to contain evidence from
 the first. In-memory one-batch correlation remains unchanged because its candidates are
 already limited to the current replay batch.
+
+## D-077 - Resolve only the explicitly authorized Windows adapter name
+
+On Windows, map the exact friendly interface supplied by the operator through the local
+network-adapter registry to its `\\Device\\NPF_{GUID}` identifier before NFStream starts.
+Npcap accepts that identifier while NFStream rejects names such as `Wi-Fi` directly. Keep
+the explicit name requirement and visible invalid-interface failure; do not enumerate a
+default, guess from traffic, or silently select another adapter.
+
+## D-078 - Confirm simulations through their exact persisted flow and alert
+
+After the safe simulation endpoint returns its target flow event ID, poll that exact flow
+and then fetch its exact alert ID. Do not search a newest-alert page: authorized live
+capture can produce more than the page limit during the confirmation window even though
+the simulated detection was persisted correctly. This lookup changes only confirmation;
+the replay still enters the normal Redis and detector path.
+
+## D-079 - Aggregate incident summaries and bound detailed evidence
+
+List incidents using SQL membership counts, acknowledgement sums, and maximum risk rather
+than hydrating every related alert, detection, and flow. Return exact totals but omit
+member arrays from summary pages. Incident detail and optional explanation context retain
+only the latest 200 evidence rows, ordered chronologically, and disclose truncation in the
+dashboard. This keeps a large correlated incident from blocking initial rendering while
+preserving a bounded, inspectable evidence window.

@@ -8,6 +8,8 @@ uv run python -m scripts.presentation_live --interface "Wi-Fi"
 ```
 
 Replace `Wi-Fi` with the exact authorized interface name (`eth0` on many Linux hosts).
+On Windows, the launcher resolves that exact friendly name to its Npcap device identifier;
+it never selects an interface automatically.
 The launcher starts only the core Docker services, exposes Redis on loopback for the host
 sensor, and does not run the demo sensor or seed synthetic records. It uses the separate
 `aegisflow-live` Compose project so prior demo data cannot appear. Its ledger is
@@ -49,9 +51,11 @@ docker run --rm --network none --read-only \
 
 The bundled PCAP produces two canonical flows. The isolated Linux loopback probe
 produces one completed flow as the non-root account. NFStream's PCAP path is verified on
-Windows. Windows live capture requires Npcap at `C:\Windows\System32\Npcap` and remains
-experimental until an authorized isolated interface probe is recorded. Missing interfaces,
-missing native libraries, unsupported platforms, and invalid files fail visibly.
+Windows. Windows live capture requires Npcap at `C:\Windows\System32\Npcap`; an authorized
+isolated `Wi-Fi` run on 2026-09-10 captured and persisted over 30,000 real flows, kept
+simulation evidence separately marked, and reported zero dropped records before clean
+shutdown. Missing interfaces, missing native libraries,
+unsupported platforms, and invalid files fail visibly.
 
 Do not monitor networks without authorization. Payload retention is disabled. Prefer
 a SPAN/TAP interface and document local privacy/retention policy.
