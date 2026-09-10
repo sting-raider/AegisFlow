@@ -13,7 +13,7 @@ KUBERNETES_OUTPUT ?= docs/acceptance/kubernetes-local.json
 SECURITY_OUTPUT ?= docs/acceptance/security-local.json
 
 .PHONY: install lint typecheck test frozen-evidence-check research-evidence-check research-v2-check train-smoke demo demo-stop replay \
-	live live-stop suricata-replay simulate-attack benchmark benchmark-sustained multiworker-acceptance restore-acceptance kubernetes-acceptance security-acceptance production-check oidc-prepare oidc-acceptance oidc-stop \
+	live live-stop presentation-live presentation-stop suricata-replay simulate-attack benchmark benchmark-sustained multiworker-acceptance restore-acceptance kubernetes-acceptance security-acceptance production-check oidc-prepare oidc-acceptance oidc-stop \
 	retention-cleanup reset
 
 install:
@@ -75,6 +75,15 @@ endif
 
 live-stop:
 	$(LIVE_COMPOSE) --profile live down
+
+presentation-live:
+ifndef INTERFACE
+	$(error INTERFACE is required)
+endif
+	$(UV) run python -m scripts.presentation_live --interface "$(INTERFACE)"
+
+presentation-stop:
+	$(UV) run python -m scripts.presentation_live --stop
 
 suricata-replay:
 ifndef PCAP

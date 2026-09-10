@@ -85,6 +85,7 @@ make research-v2-check
 make train-smoke
 make replay PCAP=/absolute/path/capture.pcap
 make live INTERFACE=eth0
+uv run python -m scripts.presentation_live --interface "Wi-Fi"
 make suricata-replay PCAP=/absolute/path/capture.pcap
 make simulate-attack
 make benchmark
@@ -124,9 +125,13 @@ sources. The new `make research-v2-check` command verifies retained artifact int
 it was added after the historical CI run above. Research validity issues and remaining
 work are tracked in the [requirements audit](docs/REQUIREMENTS_AUDIT.md).
 
-`make live` is Linux-only, requires an explicit interface, and prints an authorization
-warning. It builds a dedicated non-root NFStream sensor target with only `NET_RAW`;
-the API and detector continue to drop every capability. The Suricata replay profile
+For the presentation-ready live dashboard on Windows or Linux, run
+`uv run python -m scripts.presentation_live --interface "Wi-Fi"` with the exact
+authorized interface name. It uses an isolated fresh ledger, starts no demo sensor or
+seed data, and runs the payload-free NFStream capture process on the host. Windows
+requires Npcap and remains an experimental capture path. `make live INTERFACE=eth0`
+is the hardened Linux-container path; it builds a dedicated non-root sensor target with
+only `NET_RAW`, while the API and detector continue to drop every capability. The Suricata replay profile
 has no network and accepts only an explicitly mounted PCAP. Never replay malicious
 traffic onto a real network.
 

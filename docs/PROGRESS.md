@@ -17,6 +17,33 @@ The working tree also contains four pre-existing, uncommitted smoke-model regist
 and local demo launch files. They are intentionally preserved and are not part of the
 committed acceptance evidence; the model's scientific status does not change.
 
+## 2026-09-10 presentation-readiness refinement
+
+The dashboard-ledger I/O regression was reproduced against the accumulated Docker
+database. The five-second status poll hydrated complete flow, signature, detection,
+alert, and incident tables to count them, while the hosts summary also hydrated the
+complete flow ledger. PostgreSQL and Redis consequently reported more than 220 GB of
+cumulative block reads even though Docker's persisted volumes occupied only 3.34 GB.
+Status now uses SQL `COUNT`, hosts use bounded `GROUP BY` aggregation and direct lookup,
+and a 100,000-flow regression requires the summary query phase to finish within five
+seconds. Dashboard views now render independently when another endpoint remains pending.
+The original AegisFlow containers were stopped before this repair and were not restarted
+during these source-level checks.
+
+System status now reports observed capture mode rather than the API's authentication
+environment. A live sensor takes precedence over later offline replay records, so a
+marked simulation cannot switch the whole dashboard away from live-capture status. The
+UI calls unauthenticated loopback identity `local access`, not demo mode.
+
+An isolated live-presentation launcher now starts a fresh `aegisflow-live` Compose
+project containing only PostgreSQL, Redis, API, detector, and dashboard, then runs the
+existing NFStream live sensor on the explicitly named host interface. It selects neither
+the demo sensor nor seed data, publishes through loopback Redis into the unchanged normal
+pipeline, and tears the isolated stack down on Ctrl+C. Unit tests verify the exact service
+and sensor commands; merged Compose configuration validates. A real authorized Windows
+live-interface run and full Docker end-to-end acceptance remain pending, so presentation
+readiness is not yet claimed.
+
 ## 2026-09-09 runtime refinement
 
 The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently

@@ -1065,3 +1065,19 @@ page limits unapproved commercial use. Also defer further IoT-23 captures until 
 per-scenario authorization language is reconciled, and defer CIC-IDS2017 while its
 official request form is failing. Do not use unofficial mirrors to bypass these source
 or license constraints. See `docs/research-v2/SOURCE_EXPANSION.md`.
+
+## D-074 - Isolate the presentation ledger and run Windows capture on the host
+
+Use a separate `aegisflow-live` Compose project for presentations so existing demo rows
+and accumulated development data cannot appear in the live dashboard. Start only the
+core PostgreSQL, Redis, API, detector, and dashboard services; expose Redis on loopback
+through the existing live override, then run the existing explicit-interface NFStream
+sensor on the host. This preserves the sensor-to-Redis-to-detector-to-API/PostgreSQL path
+and accommodates Windows Npcap without granting the Docker VM access to unrelated host
+interfaces. The launcher must require a nonblank interface and tear down its isolated
+services when capture stops.
+
+Do not auto-select an interface, start the demo sensor, seed synthetic flows, reuse the
+ordinary demo volume, retain packet payloads, or treat Windows capture as accepted before
+an authorized isolated-interface run is recorded. Keep the hardened Linux container
+profile as the preferred deployment path.

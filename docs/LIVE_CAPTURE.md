@@ -1,12 +1,29 @@
 # Live capture
 
-Live mode is Linux-only and requires an explicit authorized interface:
+Live mode always requires an explicit authorized interface. For a presentation on
+Windows or Linux, start an isolated live ledger and the host NFStream sensor with:
+
+```text
+uv run python -m scripts.presentation_live --interface "Wi-Fi"
+```
+
+Replace `Wi-Fi` with the exact authorized interface name (`eth0` on many Linux hosts).
+The launcher starts only the core Docker services, exposes Redis on loopback for the host
+sensor, and does not run the demo sensor or seed synthetic records. It uses the separate
+`aegisflow-live` Compose project so prior demo data cannot appear. Press Ctrl+C to stop
+the sensor and the isolated stack. A separate terminal can stop it after an interruption:
+
+```text
+uv run python -m scripts.presentation_live --stop
+```
+
+The hardened Linux-container path remains available with:
 
 ```bash
 make live INTERFACE=eth0
 ```
 
-The live profile uses NFStream 6.6.0 in a dedicated `sensor-live` image stage. The
+The Linux live profile uses NFStream 6.6.0 in a dedicated `sensor-live` image stage. The
 container runs as UID/GID 10001, has a read-only filesystem, and receives only
 `NET_RAW`. A file capability is applied only to that stage's Python interpreter;
 ordinary API, detector, and demo images remain executable with `cap_drop: ALL`.
@@ -29,10 +46,10 @@ docker run --rm --network none --read-only \
 ```
 
 The bundled PCAP produces two canonical flows. The isolated Linux loopback probe
-produces one completed flow as the non-root account. NFStream's native engine does not
-load on the supported Windows development host; use Scapy PCAP replay there. Missing
-interfaces, missing native libraries, unsupported platforms, and invalid files fail
-visibly.
+produces one completed flow as the non-root account. NFStream's PCAP path is verified on
+Windows. Windows live capture requires Npcap at `C:\Windows\System32\Npcap` and remains
+experimental until an authorized isolated interface probe is recorded. Missing interfaces,
+missing native libraries, unsupported platforms, and invalid files fail visibly.
 
 Do not monitor networks without authorization. Payload retention is disabled. Prefer
 a SPAN/TAP interface and document local privacy/retention policy.
