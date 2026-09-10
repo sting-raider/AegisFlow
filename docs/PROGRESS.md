@@ -65,6 +65,12 @@ and reasons. Simulated flow provenance is explicit in the drawer without changin
 global capture mode. No model artifact, threshold, training path, or registry pointer was
 changed. Nine dashboard tests, ESLint, and the production build pass.
 
+The incident summary endpoint is now paginated to at most 200 rows and returns exact SQL
+`COUNT` totals, including an exact open-incident total used by the overview. The bounded
+ledger regression now rejects unbounded incident reads in addition to full-flow reads.
+Seventeen backend tests (including the 100,000-flow summary benchmark), Ruff, strict
+MyPy, nine dashboard tests, ESLint, and the production build pass.
+
 ## 2026-09-09 runtime refinement
 
 The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently

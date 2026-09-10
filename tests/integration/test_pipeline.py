@@ -73,6 +73,7 @@ def test_dashboard_summaries_never_hydrate_the_complete_flow_ledger(
     try:
         assert repository.status()["flows"] == 6
         assert repository.hosts()
+        assert repository.incidents(limit=2)
     finally:
         event.remove(repository.engine, "before_cursor_execute", capture_statement)
 
@@ -85,6 +86,14 @@ def test_dashboard_summaries_never_hydrate_the_complete_flow_ledger(
         and "count(" not in statement
     ]
     assert complete_flow_reads == []
+    unbounded_incident_reads = [
+        statement
+        for statement in statements
+        if " from incidents" in statement
+        and " limit " not in statement
+        and "count(" not in statement
+    ]
+    assert unbounded_incident_reads == []
 
 
 def test_status_reports_observed_capture_mode_and_keeps_live_priority(

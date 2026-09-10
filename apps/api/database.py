@@ -749,10 +749,22 @@ class Repository:
                 "signatures": [signature.payload for signature in signatures],
             }
 
-    def incidents(self) -> list[dict[str, Any]]:
+    def incidents(self, *, offset: int = 0, limit: int = 50) -> list[dict[str, Any]]:
         with self.session() as session:
-            rows = session.scalars(select(IncidentRow).order_by(IncidentRow.updated_at.desc()))
+            rows = session.scalars(
+                select(IncidentRow)
+                .order_by(IncidentRow.updated_at.desc())
+                .offset(max(0, offset))
+                .limit(min(max(1, limit), 200))
+            )
             return [self._incident_dict(session, row, include_alerts=False) for row in rows]
+
+    def incident_count(self, *, open_only: bool = False) -> int:
+        with self.session() as session:
+            statement = select(func.count(IncidentRow.id))
+            if open_only:
+                statement = statement.where(IncidentRow.status != "closed")
+            return int(session.scalar(statement) or 0)
 
     def incident(self, incident_id: str) -> dict[str, Any] | None:
         with self.session() as session:

@@ -821,9 +821,20 @@ def submit_feedback(
 
 
 @app.get("/api/v1/incidents")
-def list_incidents(repo: Annotated[Repository, Depends(repository)]) -> dict[str, Any]:
-    items = repo.incidents()
-    return {"items": items, "count": len(items)}
+def list_incidents(
+    repo: Annotated[Repository, Depends(repository)],
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+) -> dict[str, Any]:
+    items = repo.incidents(offset=offset, limit=limit)
+    return {
+        "items": items,
+        "offset": offset,
+        "limit": limit,
+        "count": len(items),
+        "total": repo.incident_count(),
+        "open_total": repo.incident_count(open_only=True),
+    }
 
 
 @app.get("/api/v1/incidents/{incident_id}")

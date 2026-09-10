@@ -220,7 +220,13 @@ def test_api_vertical_slice(
             "message": "Request could not be completed",
             "correlation_id": "missing-test",
         }
-        incidents = client.get("/api/v1/incidents").json()["items"]
+        incident_page = client.get(
+            "/api/v1/incidents", params={"offset": 0, "limit": 1}
+        ).json()
+        assert incident_page["count"] == 1
+        assert incident_page["total"] >= incident_page["count"]
+        assert incident_page["open_total"] >= 1
+        incidents = incident_page["items"]
         assert incidents
         incident_detail = client.get(f"/api/v1/incidents/{incidents[0]['id']}").json()
         assert incident_detail["timeline"]

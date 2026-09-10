@@ -202,7 +202,9 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
         : isIncidents
           ? {
               items: [incidentFixture],
-              count: 1
+              count: 1,
+              total: 1,
+              open_total: 1
             }
           : isIncidentDetail
             ? incidentFixture

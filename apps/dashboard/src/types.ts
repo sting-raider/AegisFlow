@@ -233,4 +233,5 @@ export interface Page<T> {
   total?: number;
   offset?: number;
   limit?: number;
+  open_total?: number;
 }

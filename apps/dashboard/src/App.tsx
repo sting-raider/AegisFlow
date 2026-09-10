@@ -202,7 +202,8 @@ function Overview({
   flows,
   models,
   status,
-  drift
+  drift,
+  openIncidentCount
 }: {
   alerts: Alert[];
   incidents: Incident[];
@@ -210,6 +211,7 @@ function Overview({
   models: ModelVersion[];
   status?: SystemStatus;
   drift: DriftEvent[];
+  openIncidentCount?: number;
 }) {
   const severityData = useMemo(
     () =>
@@ -234,7 +236,7 @@ function Overview({
       <Flowline alerts={alerts} />
       <div className="metric-grid">
         <Metric label="Flow throughput" value={`${throughput.toFixed(2)}/s`} note={`${flows.length} validated records`} />
-        <Metric label="Open incidents" value={incidents.filter((i) => i.status !== "closed").length} note="deterministic grouping" />
+        <Metric label="Open incidents" value={openIncidentCount ?? incidents.filter((i) => i.status !== "closed").length} note="deterministic grouping" />
         <Metric label="Unknown-behaviour flags" value={unknown} note="statistical, not confirmed" />
         <Metric label="Sensors ready" value={status?.sensors ?? "—"} note={captureModeLabel(status?.mode)} />
       </div>
@@ -791,7 +793,7 @@ export function App() {
   }, [queryClient, simulation.data]);
 
   let content: React.ReactNode;
-  if (view === "overview") content = <Overview alerts={alerts} incidents={incidents} flows={flows} models={models} status={data.status.data} drift={drift} />;
+  if (view === "overview") content = <Overview alerts={alerts} incidents={incidents} flows={flows} models={models} status={data.status.data} drift={drift} openIncidentCount={data.incidents.data?.open_total} />;
   else if (view === "alerts") content = <AlertTable alerts={alerts} onSelect={setSelected} paused={paused} setPaused={setPaused} />;
   else if (view === "incidents") content = <Incidents incidents={incidents} />;
   else if (view === "flows") content = <Flows flows={flows} />;
