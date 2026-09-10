@@ -9,7 +9,13 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { alertSocketProtocols, alertSocketUrl, api, flowExportUrl } from "./api";
+import {
+  ApiRequestError,
+  alertSocketProtocols,
+  alertSocketUrl,
+  api,
+  flowExportUrl
+} from "./api";
 import type {
   Alert,
   DriftEvent,
@@ -661,7 +667,25 @@ export function App() {
   const [view, setView] = useState<View>("overview");
   const [selected, setSelected] = useState<Alert | null>(null);
   const [paused, setPaused] = useState(false);
+  const [simulationState, setSimulationState] = useState<{
+    phase: "idle" | "running" | "detected" | "failed";
+    message: string;
+  }>({ phase: "idle", message: "" });
   const data = useOperationsData(paused, view);
+  const queryClient = useQueryClient();
+  const simulation = useMutation({
+    mutationFn: api.simulateAttack,
+    onMutate: () => setSimulationState({
+      phase: "running",
+      message: "Queuing a safe header-only SYN sweep…"
+    }),
+    onError: (error) => setSimulationState({
+      phase: "failed",
+      message: error instanceof ApiRequestError && error.status === 403
+        ? "Simulation is disabled for this deployment."
+        : "Simulation failed because the detection pipeline is unavailable."
+    })
+  });
   const alerts = data.alerts.data?.items ?? [];
   const incidents = data.incidents.data?.items ?? [];
   const flows = data.flows.data?.items ?? [];
@@ -669,6 +693,51 @@ export function App() {
   const models = data.models.data?.items ?? [];
   const drift = data.drift.data?.items ?? [];
   const currentView = views.find((item) => item.id === view) ?? views[0];
+
+  useEffect(() => {
+    const result = simulation.data;
+    if (!result) return;
+    let cancelled = false;
+    let timer: number | undefined;
+    const deadline = Date.now() + 15_000;
+    const checkForDetection = async () => {
+      try {
+        const page = await api.alerts("?limit=200");
+        if (cancelled) return;
+        queryClient.setQueryData(["alerts"], page);
+        const detected = page.items.find(
+          (alert) => alert.flow.event_id === result.target_flow_event_id
+        );
+        if (detected) {
+          setSimulationState({ phase: "detected", message: "Attack detected" });
+          setView("alerts");
+          setSelected(detected);
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["flows"] }),
+            queryClient.invalidateQueries({ queryKey: ["incidents"] }),
+            queryClient.invalidateQueries({ queryKey: ["status"] })
+          ]);
+          return;
+        }
+      } catch {
+        // Keep polling until the bounded confirmation deadline.
+      }
+      if (cancelled) return;
+      if (Date.now() >= deadline) {
+        setSimulationState({
+          phase: "failed",
+          message: "Simulation was queued, but no alert appeared within 15 seconds."
+        });
+        return;
+      }
+      timer = window.setTimeout(() => void checkForDetection(), 500);
+    };
+    void checkForDetection();
+    return () => {
+      cancelled = true;
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  }, [queryClient, simulation.data]);
 
   let content: React.ReactNode;
   if (view === "overview") content = <Overview alerts={alerts} incidents={incidents} flows={flows} models={models} status={data.status.data} drift={drift} />;
@@ -705,7 +774,7 @@ export function App() {
       </aside>
       <main id="main-content" tabIndex={-1}>
         <div className="main-inner">
-          <header className="page-header"><div><p className="eyebrow">AegisFlow intelligence / {currentView.mark}</p><h1>{currentView.label}</h1><p className="page-deck">{currentView.description}</p></div><div className="edition-meta"><span className={`edition-meta__status ${data.connected ? "is-live" : ""}`}>{data.connected ? "Live evidence" : "Link pending"}</span><span>UTC edition</span><strong>{new Date().toISOString().slice(11, 19)}</strong></div></header>
+          <header className="page-header"><div><p className="eyebrow">AegisFlow intelligence / {currentView.mark}</p><h1>{currentView.label}</h1><p className="page-deck">{currentView.description}</p></div><div className="page-actions"><div className="simulation-control"><button type="button" className="simulation-button" disabled={simulationState.phase === "running"} onClick={() => { simulation.reset(); simulation.mutate(); }}>{simulationState.phase === "running" ? "Simulating…" : "Simulate Attack"}</button>{simulationState.phase !== "idle" && <span className={`simulation-status simulation-status--${simulationState.phase}`} role="status">{simulationState.message}</span>}</div><div className="edition-meta"><span className={`edition-meta__status ${data.connected ? "is-live" : ""}`}>{data.connected ? "Live evidence" : "Link pending"}</span><span>UTC edition</span><strong>{new Date().toISOString().slice(11, 19)}</strong></div></div></header>
           {renderedContent}
         </div>
       </main>

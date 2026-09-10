@@ -137,8 +137,10 @@ const flowFixture = {
   }]
 };
 let holdModelsRequest = false;
+let simulationShouldFail = false;
 vi.stubGlobal("fetch", vi.fn(async (input: string) => {
   const url = String(input);
+  const isSimulation = url.endsWith("/api/v1/simulations/attack");
   const isStatus = url.includes("/system/status");
   const isExplanation = url.includes("/explanation");
   const isIncidents = url.endsWith("/api/v1/incidents");
@@ -150,8 +152,22 @@ vi.stubGlobal("fetch", vi.fn(async (input: string) => {
     await new Promise(() => undefined);
   }
   return {
-    ok: true,
-    json: async () => isStatus
+    ok: !(isSimulation && simulationShouldFail),
+    status: isSimulation && simulationShouldFail ? 503 : 200,
+    statusText: isSimulation && simulationShouldFail ? "Unavailable" : "OK",
+    json: async () => isSimulation
+      ? {
+          simulation_id: "33333333-3333-4333-8333-333333333333",
+          status: "queued",
+          simulation: "header-only TCP SYN sweep",
+          simulated: true,
+          network_transmitted: false,
+          payload_bytes: 0,
+          flows_queued: 24,
+          signature_id: "9000100",
+          target_flow_event_id: flowFixture.event_id
+        }
+      : isStatus
       ? {
           database: "ready",
           sensors: 1,
@@ -213,6 +229,34 @@ test("renders the operations dashboard without synthetic-traffic labels", async 
   expect(await screen.findByText("Detection queue")).toBeTruthy();
   expect(screen.getByText("local access")).toBeTruthy();
   expect(screen.queryByText(/^demo$/i)).toBeNull();
+});
+
+test("simulates a safe attack and opens its detected alert", async () => {
+  render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
+
+  fireEvent.click(screen.getByRole("button", { name: "Simulate Attack" }));
+
+  expect(await screen.findByText("Attack detected")).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Live alerts" })).toBeTruthy();
+  expect(screen.getByRole("dialog", { name: "known attack" })).toBeTruthy();
+  expect(vi.mocked(fetch).mock.calls.some((call) => (
+    String(call[0]).endsWith("/api/v1/simulations/attack") &&
+    (call[1] as RequestInit | undefined)?.method === "POST"
+  ))).toBe(true);
+});
+
+test("shows a clear attack-simulation pipeline failure", async () => {
+  simulationShouldFail = true;
+  try {
+    render(<QueryClientProvider client={new QueryClient()}><App /></QueryClientProvider>);
+    fireEvent.click(screen.getByRole("button", { name: "Simulate Attack" }));
+    expect(await screen.findByText(
+      "Simulation failed because the detection pipeline is unavailable."
+    )).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Simulate Attack" })).toBeTruthy();
+  } finally {
+    simulationShouldFail = false;
+  }
 });
 
 test("loads incident explanations on demand and labels AI-generated text", async () => {

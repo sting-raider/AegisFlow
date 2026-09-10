@@ -194,6 +194,18 @@ export interface SystemStatus {
   loaded_runtime_version?: string;
 }
 
+export interface AttackSimulationResult {
+  simulation_id: string;
+  status: "queued";
+  simulation: string;
+  simulated: true;
+  network_transmitted: false;
+  payload_bytes: 0;
+  flows_queued: number;
+  signature_id: string;
+  target_flow_event_id: string;
+}
+
 export interface HealthEvent {
   id: string;
   service: string;

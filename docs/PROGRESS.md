@@ -51,7 +51,11 @@ signature `9000100` from the pinned offline-verified Suricata rule. The opt-in A
 that batch on `aegisflow:flows`; the unchanged detector worker produced all 24 detections,
 assigned the signature-bearing flow a 0.85 signature score, and returned a non-benign
 verdict in focused tests. The live launcher enables this endpoint; other Compose modes
-leave it disabled. Dashboard control and Docker end-to-end verification remain pending.
+leave it disabled. The dashboard control now reports queuing, waits up to 15 seconds for
+the exact target flow alert, refreshes related views, and opens the detected alert; API
+disablement, pipeline failure, and confirmation timeout remain visible rather than being
+reported as success. Nine dashboard tests, ESLint, and the production build pass. Docker
+end-to-end verification remains pending.
 
 ## 2026-09-09 runtime refinement
 

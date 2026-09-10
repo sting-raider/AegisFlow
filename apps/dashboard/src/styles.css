@@ -70,6 +70,14 @@ h1 { margin: 0; font-size: clamp(46px, 6vw, 82px); font-weight: 500; line-height
 h2 { font-size: clamp(32px, 4vw, 48px); font-weight: 500; letter-spacing: -.025em; }
 h3 { font-weight: 600; letter-spacing: -.01em; }
 .page-deck { max-width: 680px; margin: 18px 0 0; color: var(--muted); font-size: clamp(15px, 1.6vw, 18px); line-height: 1.55; }
+.page-actions { display: flex; align-items: end; gap: 18px; }
+.simulation-control { display: grid; justify-items: end; gap: 7px; }
+.simulation-button { padding: 10px 14px; color: white; background: var(--danger); border: 1px solid var(--danger); border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.simulation-button:hover:not(:disabled) { background: #843128; }
+.simulation-button:disabled { cursor: wait; opacity: .7; }
+.simulation-status { max-width: 230px; color: var(--muted); font-size: 11px; text-align: right; }
+.simulation-status--detected { color: var(--signal); }
+.simulation-status--failed { color: var(--danger); }
 .edition-meta { min-width: 134px; display: grid; justify-items: end; gap: 4px; color: var(--muted); text-transform: uppercase; font: 9px "Cascadia Mono", Consolas, monospace; letter-spacing: .13em; }
 .edition-meta strong { color: var(--ink); font-size: 18px; letter-spacing: .04em; }
 .edition-meta__status { margin-bottom: 13px; padding: 6px 9px; color: var(--warning); background: var(--warning-soft); border-radius: 999px; letter-spacing: .08em; }
@@ -255,9 +263,11 @@ pre { color: var(--muted); white-space: pre-wrap; }
   .main-inner { padding: 0 18px 42px; }
   .demo-banner { padding-inline: 18px; flex-wrap: wrap; gap: 5px 12px; }
   .page-header { padding: 34px 0 26px; align-items: start; }
+  .page-actions { align-items: start; }
   h1 { font-size: clamp(43px, 15vw, 64px); }
   .page-deck { font-size: 15px; }
   .edition-meta { display: none; }
+  .simulation-control { justify-items: end; }
   .flowline { padding-inline: 14px; }
   .flowline__legend span:first-child { display: none; }
   .split, .metric-grid, .overview-grid, .overview-grid--feature, .toolbar, .flow-toolbar { grid-template-columns: 1fr; }

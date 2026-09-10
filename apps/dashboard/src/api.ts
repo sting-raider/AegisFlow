@@ -1,5 +1,6 @@
 import type {
   Alert,
+  AttackSimulationResult,
   DriftEvent,
   Flow,
   FlowDetail,
@@ -75,6 +76,14 @@ export const api = {
     });
     if (!response.ok) throw new Error("Alert could not be acknowledged");
     return response.json() as Promise<{ id: string; acknowledged: boolean; actor: string }>;
+  },
+  simulateAttack: async () => {
+    const response = await fetch(`${API}/api/v1/simulations/attack`, {
+      method: "POST",
+      headers: headers()
+    });
+    if (!response.ok) throw new ApiRequestError(response.status, response.statusText);
+    return response.json() as Promise<AttackSimulationResult>;
   },
   flows: (query = "") => get<Page<Flow>>(`/api/v1/flows${query}`),
   flow: (id: string) => get<FlowDetail>(`/api/v1/flows/${id}`),
