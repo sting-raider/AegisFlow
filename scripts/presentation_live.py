@@ -29,6 +29,10 @@ def _compose_command(root: Path, *arguments: str) -> list[str]:
     ]
 
 
+def _teardown_command(root: Path) -> list[str]:
+    return _compose_command(root, "down", "--remove-orphans", "--volumes")
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run the AegisFlow dashboard with explicit host live capture"
@@ -52,8 +56,9 @@ def main(arguments: Sequence[str] | None = None) -> int:
     environment = os.environ.copy()
 
     if args.stop:
+        environment.setdefault("INTERFACE", "stop-only-placeholder")
         _run(
-            _compose_command(root, "down", "--remove-orphans"),
+            _teardown_command(root),
             root=root,
             environment=environment,
         )
@@ -70,6 +75,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
         "PRIVACY WARNING: capturing only the explicitly authorized local interface "
         f"{interface!r}; packet payloads are not retained."
     )
+    _run(_teardown_command(root), root=root, environment=environment)
     try:
         _run(
             _compose_command(
@@ -104,7 +110,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
         print("Stopping live capture and isolated services...")
     finally:
         _run(
-            _compose_command(root, "down", "--remove-orphans"),
+            _teardown_command(root),
             root=root,
             environment=environment,
         )

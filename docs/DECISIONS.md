@@ -1075,7 +1075,8 @@ through the existing live override, then run the existing explicit-interface NFS
 sensor on the host. This preserves the sensor-to-Redis-to-detector-to-API/PostgreSQL path
 and accommodates Windows Npcap without granting the Docker VM access to unrelated host
 interfaces. The launcher must require a nonblank interface and tear down its isolated
-services when capture stops.
+services and volumes when capture stops. Clear only the fixed `aegisflow-live` project
+before startup as crash recovery; its presentation ledger is intentionally ephemeral.
 
 Do not auto-select an interface, start the demo sensor, seed synthetic flows, reuse the
 ordinary demo volume, retain packet payloads, or treat Windows capture as accepted before

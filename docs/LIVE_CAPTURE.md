@@ -10,8 +10,10 @@ uv run python -m scripts.presentation_live --interface "Wi-Fi"
 Replace `Wi-Fi` with the exact authorized interface name (`eth0` on many Linux hosts).
 The launcher starts only the core Docker services, exposes Redis on loopback for the host
 sensor, and does not run the demo sensor or seed synthetic records. It uses the separate
-`aegisflow-live` Compose project so prior demo data cannot appear. Press Ctrl+C to stop
-the sensor and the isolated stack. A separate terminal can stop it after an interruption:
+`aegisflow-live` Compose project so prior demo data cannot appear. Its ledger is
+intentionally ephemeral: the launcher removes only that project's volumes before start
+and after shutdown. Press Ctrl+C to stop the sensor and isolated stack. A separate
+terminal can cleanly stop it after an interruption:
 
 ```text
 uv run python -m scripts.presentation_live --stop

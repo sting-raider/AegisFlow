@@ -39,10 +39,11 @@ An isolated live-presentation launcher now starts a fresh `aegisflow-live` Compo
 project containing only PostgreSQL, Redis, API, detector, and dashboard, then runs the
 existing NFStream live sensor on the explicitly named host interface. It selects neither
 the demo sensor nor seed data, publishes through loopback Redis into the unchanged normal
-pipeline, and tears the isolated stack down on Ctrl+C. Unit tests verify the exact service
-and sensor commands; merged Compose configuration validates. A real authorized Windows
-live-interface run and full Docker end-to-end acceptance remain pending, so presentation
-readiness is not yet claimed.
+pipeline, and clears only its own ephemeral volumes before startup and on Ctrl+C. Unit
+tests verify the exact service and sensor commands; merged Compose configuration validates,
+and an actual cleanup removed only the two `aegisflow-live` volumes. A real authorized
+Windows live-interface run remains pending, so full presentation readiness is not yet
+claimed.
 
 The safe attack generator now also builds one uniquely identified, current-time replay
 batch from its 24 header-only SYN flows. Every record is marked simulated, transmitted
@@ -55,7 +56,7 @@ leave it disabled. The dashboard control now reports queuing, waits up to 15 sec
 the exact target flow alert, refreshes related views, and opens the detected alert; API
 disablement, pipeline failure, and confirmation timeout remain visible rather than being
 reported as success. Nine dashboard tests, ESLint, and the production build pass. Docker
-end-to-end verification remains pending.
+end-to-end verification is recorded below.
 
 Alert and flow drawers now separate the calibrated Logistic Regression known-attack
 module from the Isolation Forest and denoising-autoencoder anomaly module. They display
@@ -97,7 +98,9 @@ fails before Compose starts because its privileged backend cannot rename the zer
 Docker-owned UI/backend processes and WSL were stopped, but the still-running privileged
 service retained the socket and this non-elevated session could not restart that service.
 No factory reset, volume deletion, or repository-data deletion was attempted. A Docker
-service restart or Windows reboot remains required before full Compose timing can run.
+service restart or Windows reboot remained required before full Compose timing could run.
+That host-runtime condition was later cleared; the 2026-09-10 fresh Compose acceptance
+above supersedes it for current Docker readiness.
 
 The repository-side slow failure path is corrected independently. API model-load errors
 now emit timed structured errors and fail fast by default instead of silently training a
