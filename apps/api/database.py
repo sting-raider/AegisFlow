@@ -506,6 +506,35 @@ class Repository:
             incident_context_cache[incident.id] = updated_context
 
     @staticmethod
+    def _signature_rows_for_flows(
+        session: Session, flows: Sequence[FlowRow]
+    ) -> list[SignatureRow]:
+        if not flows:
+            return []
+        tolerance = timedelta(seconds=3)
+        earliest = min(_as_utc(flow.timestamp_start) for flow in flows) - tolerance
+        latest = max(_as_utc(flow.timestamp_end) for flow in flows) + tolerance
+        community_ids = {flow.community_flow_id for flow in flows}
+        candidates = session.scalars(
+            select(SignatureRow).where(
+                SignatureRow.community_flow_id.in_(community_ids),
+                SignatureRow.timestamp >= earliest,
+                SignatureRow.timestamp <= latest,
+            )
+        ).all()
+        return [
+            signature
+            for signature in candidates
+            if any(
+                signature.community_flow_id == flow.community_flow_id
+                and _as_utc(flow.timestamp_start) - tolerance
+                <= _as_utc(signature.timestamp)
+                <= _as_utc(flow.timestamp_end) + tolerance
+                for flow in flows
+            )
+        ]
+
+    @staticmethod
     def _incident_grouping_context(
         session: Session, incident: IncidentRow
     ) -> IncidentGroupingContext:
@@ -520,13 +549,8 @@ class Repository:
             .where(IncidentAlertRow.incident_id == incident.id)
             .order_by(AlertRow.created_at.asc())
         ).all()
-        community_ids = {flow.community_flow_id for _, _, flow in rows}
-        signature_rows = (
-            session.scalars(
-                select(SignatureRow).where(SignatureRow.community_flow_id.in_(community_ids))
-            ).all()
-            if community_ids
-            else []
+        signature_rows = Repository._signature_rows_for_flows(
+            session, [flow for _, _, flow in rows]
         )
         signatures_by_community: dict[str, list[SignatureRow]] = {}
         for signature in signature_rows:
@@ -737,11 +761,7 @@ class Repository:
                 select(DetectionRow).where(DetectionRow.flow_event_id == event_id)
             )
             alert = session.scalar(select(AlertRow).where(AlertRow.flow_event_id == event_id))
-            signatures = session.scalars(
-                select(SignatureRow).where(
-                    SignatureRow.community_flow_id == row.community_flow_id
-                )
-            ).all()
+            signatures = self._signature_rows_for_flows(session, [row])
             return {
                 **row.payload,
                 "detection": detection.payload if detection else None,
@@ -782,13 +802,8 @@ class Repository:
             .where(IncidentAlertRow.incident_id == incident.id)
             .order_by(AlertRow.created_at.asc())
         ).all()
-        community_ids = {flow.community_flow_id for _, _, flow in rows}
-        signature_rows = (
-            session.scalars(
-                select(SignatureRow).where(SignatureRow.community_flow_id.in_(community_ids))
-            ).all()
-            if community_ids
-            else []
+        signature_rows = self._signature_rows_for_flows(
+            session, [flow for _, _, flow in rows]
         )
         signatures_by_community: dict[str, list[SignatureRow]] = {}
         for signature in signature_rows:
@@ -888,13 +903,8 @@ class Repository:
             ).all()
             detections = [detection.payload for _, detection, _ in rows]
             flows = [flow.payload for _, _, flow in rows]
-            community_ids = {flow.community_flow_id for _, _, flow in rows}
-            signatures = (
-                session.scalars(
-                    select(SignatureRow).where(SignatureRow.community_flow_id.in_(community_ids))
-                ).all()
-                if community_ids
-                else []
+            signatures = self._signature_rows_for_flows(
+                session, [flow for _, _, flow in rows]
             )
 
             highest = max(rows, key=lambda row: row[0].risk, default=None)

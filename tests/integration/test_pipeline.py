@@ -14,6 +14,7 @@ from packages.contracts import (
     CaptureMode,
     FeedbackDisposition,
     Severity,
+    SignatureEvent,
     Verdict,
 )
 from packages.detection import DetectionEngine
@@ -113,6 +114,57 @@ def test_status_reports_observed_capture_mode_and_keeps_live_priority(
     )
     repository.ingest(live_flow, detector.detect(live_flow))
     assert repository.status()["mode"] == "live"
+
+
+def test_flow_detail_limits_repeated_community_signatures_to_time_window(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
+    repository = Repository(f"sqlite:///{(tmp_path / 'signature-window.db').as_posix()}")
+    repository.create_schema()
+    detector = DetectionEngine(bundle)
+    source = next(iter(DemoAdapter().flows()))
+    first = source.model_copy(
+        update={
+            "event_id": uuid4(),
+            "community_flow_id": "shared-community-id",
+        }
+    )
+    second = source.model_copy(
+        update={
+            "event_id": uuid4(),
+            "timestamp_start": source.timestamp_start + timedelta(seconds=10),
+            "timestamp_end": source.timestamp_end + timedelta(seconds=10),
+            "community_flow_id": "shared-community-id",
+        }
+    )
+    first_signature = SignatureEvent(
+        timestamp=first.timestamp_start,
+        community_flow_id=first.community_flow_id,
+        signature_id="first",
+        signature_name="First occurrence",
+        category="test",
+        severity=Severity.HIGH,
+        source="fixture",
+        raw_event_hash="a" * 64,
+    )
+    second_signature = first_signature.model_copy(
+        update={
+            "event_id": uuid4(),
+            "timestamp": second.timestamp_start,
+            "signature_id": "second",
+            "signature_name": "Second occurrence",
+            "raw_event_hash": "b" * 64,
+        }
+    )
+    repository.ingest(first, detector.detect(first, first_signature), first_signature)
+    repository.ingest(second, detector.detect(second, second_signature), second_signature)
+
+    first_detail = repository.flow(str(first.event_id))
+    second_detail = repository.flow(str(second.event_id))
+    assert first_detail is not None
+    assert second_detail is not None
+    assert [item["signature_id"] for item in first_detail["signatures"]] == ["first"]
+    assert [item["signature_id"] for item in second_detail["signatures"]] == ["second"]
 
 
 def test_repository_ingest_batch_commits_rows_and_reports_novelty(

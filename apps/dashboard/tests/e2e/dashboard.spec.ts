@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-test("shows seeded operations data and opens detection evidence", async ({ page }) => {
+test("shows live operations and detects the safe attack simulation", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.keyboard.press("Tab");
@@ -10,7 +10,7 @@ test("shows seeded operations data and opens detection evidence", async ({ page 
   await expect(page.locator("#main-content")).toBeFocused();
   await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
   await expect(page.getByRole("button", { name: /Overview/ })).toHaveAttribute("aria-current", "page");
-  await expect(page.getByText("Demo traffic")).toBeVisible();
+  await expect(page.getByText("Demo traffic")).toHaveCount(0);
   await expect(page.getByText("Live stream linked")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("Signal edition")).toBeVisible();
   await expect(page.locator(".flowline__mark").first()).toBeVisible();
@@ -24,15 +24,21 @@ test("shows seeded operations data and opens detection evidence", async ({ page 
     await page.setViewportSize({ width: 1440, height: 900 });
   }
 
-  await page.getByRole("button", { name: "Live alerts" }).click();
-  const rows = page.locator("tbody tr");
-  await expect(rows.first()).toBeVisible();
-  await rows.first().click();
+  await page.getByRole("button", { name: "Simulate Attack" }).click();
+  await expect(page.getByText("Attack detected")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole("dialog", { name: /known attack/i })).toBeVisible();
   await expect(page.getByText("Detection evidence")).toBeVisible();
+  await expect(page.getByText("Known-Attack Detection Module")).toBeVisible();
+  await expect(page.getByText("Calibrated Logistic Regression")).toBeVisible();
+  await expect(page.getByText("Isolation Forest anomaly score")).toBeVisible();
+  await expect(page.getByText("Denoising autoencoder reconstruction score")).toBeVisible();
+  await expect(page.getByText("Signature Detector")).toBeVisible();
+  await expect(page.getByText(/SID 9000100/)).toBeVisible();
+  await expect(page.getByText("Final Fused Decision")).toBeVisible();
+  await expect(page.getByText(/Safe simulated replay/)).toBeVisible();
   const dialogAccessibility = await new AxeBuilder({ page }).include(".drawer").analyze();
   expect(dialogAccessibility.violations).toEqual([]);
-  await page.getByLabel("Note").fill("Automated demo acceptance check");
+  await page.getByLabel("Note").fill("Automated live-presentation acceptance check");
   await page.getByRole("button", { name: "Record feedback" }).click();
   await expect(
     page.getByText("Feedback recorded without changing the detection.")

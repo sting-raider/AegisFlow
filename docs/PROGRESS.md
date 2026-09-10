@@ -71,6 +71,24 @@ ledger regression now rejects unbounded incident reads in addition to full-flow 
 Seventeen backend tests (including the 100,000-flow summary benchmark), Ruff, strict
 MyPy, nine dashboard tests, ESLint, and the production build pass.
 
+Fresh Compose acceptance used the isolated `aegisflow-live` project with zero initial
+flows and no live sensor. The dashboard returned HTTP 200; an API-triggered safe replay
+queued 24 flows and produced its exact `known_attack` alert plus one incident in 579 ms.
+Persisted evidence recorded known probability 1.0, anomaly/reconstruction score
+0.82894951, reconstruction error 2051112.875, signature contribution 0.85, SID `9000100`,
+fused risk 93.35, simulated provenance, zero transmitted network traffic, and zero
+payload bytes. Twenty subsequent status calls averaged 22.03 ms (120.92 ms maximum);
+PostgreSQL cumulative block reads stayed at 27.5 MB and API block reads stayed at zero.
+
+The first browser run exposed historical signature over-association because repeated
+simulations correctly share Community IDs. Persistent lookups now require both Community
+ID and the existing three-second time window, and a two-occurrence regression proves
+each flow returns only its own signature. Both real Chromium scenarios then passed in
+5.2 seconds, including the Simulate Attack interaction, all detector evidence, and zero
+Axe violations across all seven views and the drawer. The isolated containers were
+removed after acceptance; the old high-I/O containers remain stopped. Actual Windows
+live capture remains unverified because no authorized interface was selected.
+
 ## 2026-09-09 runtime refinement
 
 The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently

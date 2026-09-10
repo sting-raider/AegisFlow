@@ -1097,3 +1097,16 @@ Require `AEGISFLOW_SAFE_SIMULATION_ENABLED=1`; only the isolated presentation la
 sets it automatically. Do not mount the Docker control socket into the API, start a
 privileged subprocess from an HTTP request, transmit the PCAP, mislabel fixture evidence
 as a live Suricata event, or permit simulation records into an unmarked baseline.
+
+## D-076 - Time-bound Community-ID joins in the persistent evidence ledger
+
+Community ID identifies a bidirectional flow tuple, not one historical occurrence.
+When loading signatures from the persistent ledger, require a matching Community ID and
+a signature timestamp within three seconds of the flow start/end, matching the existing
+fallback correlation tolerance. Bound the SQL candidate set by the incident or flow time
+range, then recheck each candidate against an individual flow before presenting it.
+
+Do not join all historical signatures on Community ID alone. That over-associates
+repeated connections and made a second safe simulation appear to contain evidence from
+the first. In-memory one-batch correlation remains unchanged because its candidates are
+already limited to the current replay batch.
