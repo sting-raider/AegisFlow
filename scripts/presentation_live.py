@@ -64,6 +64,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
         _parser().error("--interface cannot be blank")
     environment["INTERFACE"] = interface
     environment["AEGISFLOW_REDIS_URL"] = "redis://127.0.0.1:6379/0"
+    environment["AEGISFLOW_SAFE_SIMULATION_ENABLED"] = "1"
 
     print(
         "PRIVACY WARNING: capturing only the explicitly authorized local interface "

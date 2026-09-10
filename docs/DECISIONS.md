@@ -1081,3 +1081,19 @@ Do not auto-select an interface, start the demo sensor, seed synthetic flows, re
 ordinary demo volume, retain packet payloads, or treat Windows capture as accepted before
 an authorized isolated-interface run is recorded. Keep the hardened Linux container
 profile as the preferred deployment path.
+
+## D-075 - Replay offline-verified simulation evidence without a Docker control socket
+
+The dashboard attack control publishes a uniquely timestamped replay of the existing
+header-only SYN-sweep PCAP plus one schema-valid signature envelope for pinned rule
+`9000100` onto the normal `aegisflow:flows` stream. Mark every flow and signature as
+simulated, record zero transmitted/payload bytes, retain `source=fixture`, and identify
+the signature as offline-Suricata-verified. The existing detector then performs hybrid
+inference and the existing API consumer persists the resulting evidence. Keep the
+networkless `make simulate-attack` command as the authoritative proof that real Suricata
+emits and correlates that rule.
+
+Require `AEGISFLOW_SAFE_SIMULATION_ENABLED=1`; only the isolated presentation launcher
+sets it automatically. Do not mount the Docker control socket into the API, start a
+privileged subprocess from an HTTP request, transmit the PCAP, mislabel fixture evidence
+as a live Suricata event, or permit simulation records into an unmarked baseline.

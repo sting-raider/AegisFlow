@@ -36,6 +36,7 @@ def test_live_launcher_starts_only_core_services_then_host_sensor(
         "Wi-Fi",
     ]
     assert sensor[2]["AEGISFLOW_REDIS_URL"] == "redis://127.0.0.1:6379/0"
+    assert sensor[2]["AEGISFLOW_SAFE_SIMULATION_ENABLED"] == "1"
     assert sensor[2]["INTERFACE"] == "Wi-Fi"
     assert stop[0][-2:] == ["down", "--remove-orphans"]
 

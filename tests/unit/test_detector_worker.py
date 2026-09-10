@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import cast
 from unittest.mock import Mock
 
@@ -8,6 +9,7 @@ import pytest
 from packages.common.bus import RedisStreamBus
 from packages.detection import DetectionEngine
 from packages.model_bundle import ModelBundle
+from scripts.simulate_attack import build_pipeline_simulation
 from services.detector.worker import DetectorWorker
 from services.sensor import DemoAdapter
 
@@ -35,6 +37,29 @@ def test_detector_worker_runs_one_hybrid_call_for_a_redis_batch(bundle: ModelBun
         [str(index) for index in range(len(flows))],
     )
     bus.publish.assert_not_called()
+
+
+def test_safe_simulation_uses_normal_hybrid_detection_batch(
+    bundle: ModelBundle, tmp_path: Path
+) -> None:
+    envelopes, summary = build_pipeline_simulation(tmp_path / "safe-simulation")
+    messages = [(str(index), envelope) for index, envelope in enumerate(envelopes)]
+    bus = Mock(spec=RedisStreamBus)
+    worker = DetectorWorker(bus=cast(RedisStreamBus, bus), engine=DetectionEngine(bundle))
+
+    result = worker.process_batch(messages)
+
+    assert result.received == 24
+    assert result.published == 24
+    published = bus.publish_batch.call_args.args[1]
+    target = next(
+        item
+        for item in published
+        if item["flow"]["event_id"] == summary["target_flow_event_id"]
+    )
+    assert target["signature"]["signature_id"] == "9000100"
+    assert target["detection"]["signature_score"] == 0.85
+    assert target["detection"]["verdict"] != "benign"
 
 
 @pytest.mark.parametrize(

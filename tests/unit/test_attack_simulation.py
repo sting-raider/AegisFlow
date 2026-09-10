@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
+from uuid import UUID
 
 from scapy.all import Raw, rdpcap
 
 from scripts.simulate_attack import (
     SIMULATION_PACKETS,
     SIMULATION_SIGNATURE_ID,
+    build_pipeline_simulation,
     generate_header_only_syn_sweep,
     verify_outputs,
 )
@@ -61,3 +64,45 @@ def test_simulation_verifier_requires_and_correlates_suricata_signature(
     assert summary["payload_bytes"] == 0
     assert summary["suricata_signature_events"] == 1
     assert summary["aegisflow_correlated_flows"] == 1
+
+
+def test_pipeline_simulation_is_provenanced_unique_and_signature_bearing(
+    tmp_path: Path,
+) -> None:
+    started_at = datetime(2026, 9, 10, 12, 0, tzinfo=UTC)
+    envelopes, summary = build_pipeline_simulation(
+        tmp_path / "pipeline-run",
+        simulation_id=UUID("11111111-1111-4111-8111-111111111111"),
+        started_at=started_at,
+    )
+
+    assert len(envelopes) == SIMULATION_PACKETS
+    assert summary == {
+        "simulation_id": "11111111-1111-4111-8111-111111111111",
+        "status": "queued",
+        "simulation": "header-only TCP SYN sweep",
+        "simulated": True,
+        "network_transmitted": False,
+        "payload_bytes": 0,
+        "flows_queued": SIMULATION_PACKETS,
+        "signature_id": SIMULATION_SIGNATURE_ID,
+        "target_flow_event_id": summary["target_flow_event_id"],
+    }
+    assert len({envelope["flow"]["event_id"] for envelope in envelopes}) == SIMULATION_PACKETS
+    assert all(envelope["flow"]["capture_mode"] == "pcap" for envelope in envelopes)
+    timestamps = [
+        datetime.fromisoformat(envelope["flow"]["timestamp_start"])
+        for envelope in envelopes
+    ]
+    assert min(timestamps) == started_at
+    assert all(envelope["flow"]["protocol_metadata"]["simulated"] for envelope in envelopes)
+    assert all(
+        envelope["flow"]["protocol_metadata"]["network_transmitted"] is False
+        for envelope in envelopes
+    )
+    signed = [envelope for envelope in envelopes if "signature" in envelope]
+    assert len(signed) == 1
+    assert signed[0]["flow"]["event_id"] == summary["target_flow_event_id"]
+    assert signed[0]["signature"]["signature_id"] == SIMULATION_SIGNATURE_ID
+    assert signed[0]["signature"]["source"] == "fixture"
+    assert signed[0]["signature"]["metadata"]["offline_suricata_rule_verified"] is True

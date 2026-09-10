@@ -44,6 +44,15 @@ and sensor commands; merged Compose configuration validates. A real authorized W
 live-interface run and full Docker end-to-end acceptance remain pending, so presentation
 readiness is not yet claimed.
 
+The safe attack generator now also builds one uniquely identified, current-time replay
+batch from its 24 header-only SYN flows. Every record is marked simulated, transmitted
+network and payload byte counts remain zero, and the twelfth flow carries fixture-source
+signature `9000100` from the pinned offline-verified Suricata rule. The opt-in API queues
+that batch on `aegisflow:flows`; the unchanged detector worker produced all 24 detections,
+assigned the signature-bearing flow a 0.85 signature score, and returned a non-benign
+verdict in focused tests. The live launcher enables this endpoint; other Compose modes
+leave it disabled. Dashboard control and Docker end-to-end verification remain pending.
+
 ## 2026-09-09 runtime refinement
 
 The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently

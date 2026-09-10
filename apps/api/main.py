@@ -12,6 +12,7 @@ from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from time import perf_counter
 from typing import Annotated, Any, Literal, cast
 from urllib.parse import urlsplit
@@ -35,6 +36,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from pydantic import BaseModel, ConfigDict, Field
+from redis.exceptions import RedisError
 
 from apps.api.auth import (
     AuthConfigurationError,
@@ -55,6 +57,7 @@ from packages.common import (
     sanitize_flow_export,
     service_logger,
 )
+from packages.common.bus import RedisStreamBus
 from packages.contracts import (
     AnalystFeedback,
     DetectionResult,
@@ -81,6 +84,8 @@ from packages.model_bundle import (
     rollback_production_bundle,
 )
 from packages.model_bundle.bundle import sha256_file
+from scripts.simulate_attack import build_pipeline_simulation
+from services.detector.worker import FLOW_STREAM
 from services.sensor import DemoAdapter
 
 DETECTIONS = Counter("detections_total", "Detection results", ["verdict"])
@@ -309,6 +314,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         retention_worker.start()
     consumer: DetectionConsumer | None = None
     app.state.consumer = None
+    app.state.flow_publisher = None
     if os.getenv("AEGISFLOW_CONSUME_REDIS", "0") == "1":
         consumer = DetectionConsumer(
             repository,
@@ -328,6 +334,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             on_drift_event=_record_drift_metric,
         )
         app.state.consumer = consumer
+        app.state.flow_publisher = consumer.bus
         consumer.start()
     if os.getenv("AEGISFLOW_DEMO_SEED", "1") == "1":
         _seed_demo(repository, engine, drift_monitor)
@@ -730,6 +737,45 @@ def list_alerts(
             end=end,
         ),
     }
+
+
+@app.post("/api/v1/simulations/attack", status_code=202)
+def simulate_attack(
+    request: Request,
+    principal: Annotated[Principal, Depends(analyst_principal)],
+) -> dict[str, Any]:
+    if os.getenv("AEGISFLOW_SAFE_SIMULATION_ENABLED", "0") != "1":
+        raise HTTPException(status_code=403, detail={"code": "simulation_disabled"})
+    publisher = cast(
+        RedisStreamBus | None,
+        getattr(request.app.state, "flow_publisher", None),
+    )
+    if publisher is None:
+        raise HTTPException(status_code=503, detail={"code": "simulation_unavailable"})
+    with TemporaryDirectory(prefix="aegisflow-safe-simulation-") as temporary:
+        envelopes, summary = build_pipeline_simulation(Path(temporary))
+    try:
+        publisher.publish_batch(FLOW_STREAM, envelopes)
+    except RedisError as exc:
+        log_event(
+            LOGGER,
+            "safe_attack_simulation_failed",
+            level="error",
+            correlation_id=getattr(request.state, "correlation_id", None),
+            error_code=type(exc).__name__,
+        )
+        raise HTTPException(
+            status_code=503,
+            detail={"code": "simulation_pipeline_unavailable"},
+        ) from exc
+    log_event(
+        LOGGER,
+        "safe_attack_simulation_queued",
+        correlation_id=getattr(request.state, "correlation_id", None),
+        flow_id=str(summary["target_flow_event_id"]),
+        batch_size=int(summary["flows_queued"]),
+    )
+    return summary
 
 
 @app.get("/api/v1/alerts/{alert_id}")

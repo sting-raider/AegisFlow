@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,6 +11,7 @@ from starlette.websockets import WebSocketDisconnect
 
 from apps.api.auth import AuthConfigurationError
 from apps.api.main import _cors_origins_from_env, app
+from packages.contracts import FlowEvent, SignatureEvent
 from services.sensor import DemoAdapter
 
 
@@ -39,6 +41,7 @@ def test_api_vertical_slice(
     monkeypatch.setenv("AEGISFLOW_MODEL_REGISTRY", str(registry))
     monkeypatch.setenv("AEGISFLOW_DEMO", "1")
     monkeypatch.setenv("AEGISFLOW_DEMO_SEED", "1")
+    monkeypatch.setenv("AEGISFLOW_SAFE_SIMULATION_ENABLED", "1")
     monkeypatch.setenv("AEGISFLOW_EXPLANATION_PROVIDER", "disabled")
     monkeypatch.setenv("AEGISFLOW_RETENTION_ENABLED", "0")
     monkeypatch.setenv("AEGISFLOW_AUTH_MODE", "demo")
@@ -54,6 +57,39 @@ def test_api_vertical_slice(
         }
         assert initial_queue["capacity"] == 100_000
         assert initial_queue["backpressure"] is False
+        with monkeypatch.context() as disabled:
+            disabled.setenv("AEGISFLOW_SAFE_SIMULATION_ENABLED", "0")
+            disabled_simulation = client.post("/api/v1/simulations/attack")
+        assert disabled_simulation.status_code == 403
+        assert disabled_simulation.json()["error"]["code"] == "simulation_disabled"
+        unavailable_simulation = client.post("/api/v1/simulations/attack")
+        assert unavailable_simulation.status_code == 503
+        assert unavailable_simulation.json()["error"]["code"] == "simulation_unavailable"
+
+        published: list[dict[str, Any]] = []
+
+        class CapturingPublisher:
+            def publish_batch(
+                self, stream: str, envelopes: list[dict[str, Any]]
+            ) -> list[str]:
+                assert stream == "aegisflow:flows"
+                published.extend(envelopes)
+                return [f"{index}-0" for index in range(len(envelopes))]
+
+        app.state.flow_publisher = CapturingPublisher()
+        simulation = client.post("/api/v1/simulations/attack")
+        assert simulation.status_code == 202
+        simulation_body = simulation.json()
+        assert simulation_body["status"] == "queued"
+        assert simulation_body["network_transmitted"] is False
+        assert simulation_body["payload_bytes"] == 0
+        assert simulation_body["flows_queued"] == 24
+        assert len(published) == 24
+        validated_flows = [FlowEvent.model_validate(item["flow"]) for item in published]
+        assert all(flow.protocol_metadata["simulated"] is True for flow in validated_flows)
+        signed = [item for item in published if "signature" in item]
+        assert len(signed) == 1
+        assert SignatureEvent.model_validate(signed[0]["signature"]).signature_id == "9000100"
         metrics = client.get("/metrics").text
         for metric_name in (
             "flows_received_total",
