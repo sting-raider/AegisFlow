@@ -112,6 +112,11 @@ changing its disabled-by-default runtime setting, and a workflow regression test
 the configuration. Commit `dd04ddf` passed all ten GitHub Actions jobs in run
 `34439563578`, including the real Chromium simulation/evidence scenario.
 
+Final presentation head `7d9cc0d` passed all ten GitHub Actions jobs in run
+`34456063369`. That run includes the Linux 132-file MyPy gate, the full Python coverage
+suite, dashboard unit/build/lint checks, the real Chromium simulation scenario, Compose
+and live-profile validation, security, OIDC, restore, Kubernetes, and release evidence.
+
 ## 2026-09-09 runtime refinement
 
 The Docker startup complaint has two distinct causes. Docker Desktop 4.89.0 currently
